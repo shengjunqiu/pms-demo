@@ -676,7 +676,7 @@ export const mockIssues: Issue[] = Array.from({ length: 105 }).map((_, i) => {
     severity: p.id === 'P-003' && i < mockProjects.length ? '重大' : p.id === 'P-002' ? '重要' : '一般',
     status: i % 2 === 0 ? '处理中' : '待解决',
     owner: p.pmName,
-    deadline: '2026-09-20',
+    deadline: i === 0 ? '2026-09-01' : '2026-09-20',
   };
 });
 
@@ -885,7 +885,7 @@ for (const project of mockProjects) {
   const overdue = mockMilestones.filter((m) => m.projectId === project.id && m.status !== '已达成')
     .map((m) => Math.max(0, (Date.parse(AS_OF_DATE) - Date.parse(m.plannedDate)) / 86400000));
   const health = assessHealth(project, { delayDays: Math.max(0, ...overdue), overdueReceipt: sumMoney(mockReceiptPlans.filter((r) => r.projectId === project.id && r.dueDate <= AS_OF_DATE).map((r) => r.amount - r.paidAmount)),
-    majorIssues: mockIssues.filter((i) => i.projectId === project.id && i.severity === '重大' && i.status !== '已关闭').length });
+    majorRisks: mockRisks.filter((r) => r.projectId === project.id && ['特大', '重大'].includes(r.level) && r.status === '监控中').length, majorIssues: mockIssues.filter((i) => i.projectId === project.id && i.severity === '重大' && i.status !== '已关闭').length });
   project.health = health.level;
   project.healthReason = health.reasons.join('；');
 }

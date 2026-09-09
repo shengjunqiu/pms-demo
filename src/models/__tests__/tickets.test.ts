@@ -1,0 +1,53 @@
+import { expect, it } from 'vitest';
+import { createBusinessState, transition } from '@/mock/business';
+import { ticketMeta, ticketTable, type TicketAction } from '@/mock/tickets';
+import { visibleProjects } from '@/mock/selectors';
+const pm = { id: 'U-001', name: '张建国', role: 'project-manager' as const };
+const tech = { id: 'U-005', name: '赵工', role: 'solution-tech' as const };
+const pmo = { id: 'U-002', name: '李主任', role: 'pmo' as const };
+const create: Extract<TicketAction, { type: 'create-ticket' }> = { type: 'create-ticket', kind: 'requirement', projectId: 'P-001', title: '地图告警筛选', rank: '高', ownerId: 'U-005', description: '支持按告警类型筛选', category: '功能优化', deadline: '2026-09-20' };
+it('需求责任人提交后仅发起人确认关闭或退回，处理历史保留', () => {
+  let state = transition(createBusinessState(), create, pm); const id = state.requirements.at(-1)!.id;
+  expect(visibleProjects('solution-tech', state.projects).some((p) => p.id === 'P-001')).toBe(true);
+  state = transition(state, { type: 'update-ticket', kind: 'requirement', id, operation: 'resolve', note: '筛选已实现' }, tech);
+  expect(() => transition(state, { type: 'update-ticket', kind: 'requirement', id, operation: 'confirm', note: '自行关闭' }, tech)).toThrow();
+  state = transition(state, { type: 'update-ticket', kind: 'requirement', id, operation: 'return', note: '补齐空结果提示' }, pm);
+  state = transition(state, { type: 'update-ticket', kind: 'requirement', id, operation: 'resolve', note: '已补齐' }, tech);
+  state = transition(state, { type: 'update-ticket', kind: 'requirement', id, operation: 'confirm', note: '验证通过' }, pm);
+  expect(state.requirements.at(-1)?.status).toBe('已关闭');
+  expect(state.ticketMeta[id].history).toHaveLength(5);
+  expect(state.ticketMeta[id].closedAt).toBe('2026-09-09');
+});
+it('转办更新责任人与参与权限；BUG仍由发起人关闭', () => {
+  let state = transition(createBusinessState(), { ...create, kind: 'bug', rank: '严重', ownerId: 'U-001' }, pm); const id = state.bugs.at(-1)!.id;
+  state = transition(state, { type: 'update-ticket', kind: 'bug', id, operation: 'transfer', ownerId: 'U-005', note: '技术责任人排查' }, pm);
+  expect(state.bugs.at(-1)?.owner).toBe('赵工');
+  state = transition(state, { type: 'update-ticket', kind: 'bug', id, operation: 'resolve', note: '已修复' }, tech);
+  expect(() => transition(state, { type: 'update-ticket', kind: 'bug', id, operation: 'confirm', note: '关闭' }, tech)).toThrow();
+  state = transition(state, { type: 'update-ticket', kind: 'bug', id, operation: 'confirm', note: '复测通过' }, pm);
+  expect(state.bugs.at(-1)?.status).toBe('已关闭');
+});
+it('重大风险升级持续跟踪，转问题保留关联且主PM最终关问题', () => {
+  let state = transition(createBusinessState(), { ...create, kind: 'risk', rank: '', probability: 5, impact: 4, measures: '安排替代供应商' }, pm); const risk = state.risks.at(-1)!;
+  expect(risk.level).toBe('特大'); expect(state.projects[0].healthReason).toContain('监控风险');
+  state = transition(state, { type: 'update-ticket', kind: 'risk', id: risk.id, operation: 'escalate', note: '申请集团协调' }, pmo);
+  expect(state.risks.at(-1)?.status).toBe('监控中');
+  state = transition(state, { type: 'risk-to-issue', id: risk.id, note: '交货延期实际发生' }, pm);
+  const issue = state.issues.at(-1)!;
+  expect(issue.fromRiskId).toBe(risk.id); expect(state.risks.at(-1)?.status).toBe('已转问题');
+  expect(state.projects[0].health).toBe('red');
+  state = transition(state, { type: 'update-ticket', kind: 'issue', id: issue.id, operation: 'resolve', note: '替代设备已交付' }, tech);
+  expect(() => transition(state, { type: 'update-ticket', kind: 'issue', id: issue.id, operation: 'confirm', note: '关闭' }, tech)).toThrow();
+  state = transition(state, { type: 'update-ticket', kind: 'issue', id: issue.id, operation: 'confirm', note: 'PM确认影响解除' }, pm);
+  expect(state.issues.at(-1)?.status).toBe('已关闭'); expect(state.ticketMeta[risk.id].history).toHaveLength(3);
+});
+it('影响基线需求先走真实变更审批，未批准时不能提交解决；超期升级按规则计算', () => {
+  let state = transition(createBusinessState(), { ...create, baselineImpact: true }, pm); const id = state.requirements.at(-1)!.id;
+  expect(() => transition(state, { type: 'update-ticket', kind: 'requirement', id, operation: 'resolve', note: '完成' }, tech)).toThrow();
+  state = transition(state, { type: 'request-plan', kind: 'schedule', projectId: 'P-001', sourceRequirementId: id, shiftDays: 7, reason: '需求影响进度' }, pm);
+  expect(state.ticketMeta[id].changeRequestId).toBe('PLAN-1');
+  state = transition(state, { type: 'review-plan', id: 'PLAN-1', approve: true, opinion: '同意变更' }, pmo);
+  state = transition(state, { type: 'update-ticket', kind: 'requirement', id, operation: 'resolve', note: '按新基线完成' }, tech);
+  expect(ticketTable(state, 'requirement').at(-1)?.status).toBe('待验证');
+  expect(ticketMeta(state, 'issue', 'ISSUE-0001').escalatedTo).toBe('PMC');
+});

@@ -1,6 +1,7 @@
+import { applyTicketAction, ticketMeta, type TicketAction, type TicketMeta } from '@/mock/tickets';
 import { create } from 'zustand';
-import { AS_OF_DATE, mockProjects, mockBudgetVersions, mockBaselineVersions, mockIssues, mockRisks, mockBugs, mockDecisions, mockAcceptances, mockCostItems, mockEstimateVersions, mockMilestones, mockSettlements, mockReceiptPlans, mockChanges, mockWbsTasks } from '@/mock';
-import type { Project, BudgetVersion, BaselineVersion, Issue, Risk, Bug, CostItem, DecisionItem, AcceptanceRecord, EstimateVersion, Milestone, SettlementRecord, ProjectChange, WbsTask } from '@/models/types';
+import { AS_OF_DATE, mockProjects, mockBudgetVersions, mockBaselineVersions, mockIssues, mockRisks, mockBugs, mockDecisions, mockAcceptances, mockCostItems, mockEstimateVersions, mockMilestones, mockSettlements, mockReceiptPlans, mockChanges, mockWbsTasks, mockRequirements } from '@/mock';
+import type { Project, BudgetVersion, BaselineVersion, Issue, Risk, Bug, CostItem, DecisionItem, AcceptanceRecord, EstimateVersion, Milestone, SettlementRecord, ProjectChange, WbsTask, Requirement } from '@/models/types';
 import type { UserRole } from '@/store/useAppStore';
 import { allocateMoney, money, percentage, sumMoney } from '@/utils/money';
 import { assessHealth } from '@/utils/health';
@@ -19,11 +20,11 @@ export interface ManagementApproval {
 }
 export interface PlanRequest {
   id: string; projectId: string; kind: 'schedule' | 'stage'; reason: string; status: '待审批' | '通过' | '驳回';
-  requiredRoles: ('pmo' | 'finance')[]; reviews: { role: UserRole; approve: boolean; opinion: string }[]; submittedBy: string; submittedAt: string; baselineId: string; tasks: WbsTask[]; shiftDays: number; opinion?: string;
+  requiredRoles: ('pmo' | 'finance')[]; reviews: { role: UserRole; approve: boolean; opinion: string }[]; sourceRequirementId?: string; submittedBy: string; submittedAt: string; baselineId: string; tasks: WbsTask[]; shiftDays: number; opinion?: string;
 }
 export interface Material { id: string; projectId: string; name: string; required: boolean; status: '缺失' | '待审核' | '通过' }
 export interface BusinessState {
-  tasks: WbsTask[]; planRequests: PlanRequest[]; projects: Project[]; budgets: BudgetVersion[]; baselines: BaselineVersion[];
+  requirements: Requirement[]; ticketMeta: Record<string, TicketMeta>; tasks: WbsTask[]; planRequests: PlanRequest[]; projects: Project[]; budgets: BudgetVersion[]; baselines: BaselineVersion[];
   estimates: EstimateVersion[]; milestones: Milestone[]; settlements: SettlementRecord[];
   issues: Issue[]; risks: Risk[]; bugs: Bug[]; costs: CostItem[];
   changes: ProjectChange[]; managementApprovals: ManagementApproval[]; approvals: Approval[]; decisions: DecisionItem[]; acceptances: AcceptanceRecord[];
@@ -31,7 +32,7 @@ export interface BusinessState {
   audit: { id: string; actor: string; action: string; target: string; date: string }[];
 }
 export function createBusinessState(): BusinessState {
-  return structuredClone({ tasks: mockWbsTasks, planRequests: [], projects: mockProjects, budgets: mockBudgetVersions, baselines: mockBaselineVersions,
+  return structuredClone({ requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects, budgets: mockBudgetVersions, baselines: mockBaselineVersions,
     estimates: mockEstimateVersions, milestones: mockMilestones, settlements: mockSettlements,
     issues: mockIssues, risks: mockRisks, bugs: mockBugs, costs: mockCostItems, approvals: [], changes: mockChanges, managementApprovals: [],
     decisions: mockDecisions, acceptances: mockAcceptances, lockedProjects: ['P-008'], maintenanceCosts: [], audit: [],
@@ -41,16 +42,16 @@ export function createBusinessState(): BusinessState {
     }))),
   });
 }
-export type BusinessAction =
+export type BusinessAction = TicketAction
   | { type: 'submit-budget'; projectId: string; budget: BudgetVersion; reason: string }
   | { type: 'review'; approvalId: string; approve: boolean; opinion: string }
   | { type: 'review-management'; id: string; approve: boolean; opinion: string }
   | { type: 'update-task'; id: string; progress: number; actualStartDate: string; actualEndDate?: string; note: string }
-  | { type: 'request-plan'; projectId: string; kind: 'schedule' | 'stage'; reason: string; shiftDays: number }
+  | { type: 'request-plan'; projectId: string; kind: 'schedule' | 'stage'; reason: string; shiftDays: number; sourceRequirementId?: string }
   | { type: 'review-plan'; id: string; approve: boolean; opinion: string }
   | { type: 'close-issue'; id: string }
   | { type: 'close-bug'; id: string }
-  | { type: 'risk-to-issue'; id: string }
+  | { type: 'risk-to-issue'; id: string; note?: string }
   | { type: 'stage-gate'; projectId: string }
   | { type: 'settle'; projectId: string }
   | { type: 'confirm-cost'; cost: CostItem; fromCommitment?: boolean; maintenance?: boolean };
@@ -65,7 +66,9 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     return value;
   };
   let target = '';
-  if (action.type === 'submit-budget') {
+  if (action.type === 'create-ticket' || action.type === 'update-ticket') {
+    target = applyTicketAction(state, action, actor);
+  } else if (action.type === 'submit-budget') {
     const p = project(action.projectId); target = p.id;
     requireRole('project-manager', 'finance');
     if (actor.role === 'project-manager' && actor.id !== p.pmId) throw new Error('仅项目主PM可提交');
@@ -154,8 +157,11 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     if (!action.reason.trim()) throw new Error('申请说明必填');
     if (action.kind === 'schedule' && (!Number.isInteger(action.shiftDays) || action.shiftDays < 1 || action.shiftDays > 90)) throw new Error('演示计划顺延须为1至90天');
     if (state.planRequests.some((r) => r.projectId === p.id && r.status === '待审批')) throw new Error('已有待审批计划事项');
+    const origin = action.sourceRequirementId ? state.requirements.find((r) => r.id === action.sourceRequirementId && r.projectId === p.id) : undefined;
+    if (action.sourceRequirementId && !origin) throw new Error('来源需求与项目不符');
     const baseline = state.baselines.find((b) => b.projectId === p.id && b.status === '已生效')!;
-    state.planRequests.push({ id: `PLAN-${state.planRequests.length + 1}`, projectId: p.id, kind: action.kind, reason: action.reason, shiftDays: action.shiftDays, status: '待审批', requiredRoles: action.kind === 'schedule' && action.shiftDays > 30 ? ['pmo', 'finance'] : ['pmo'], reviews: [], submittedBy: actor.id, submittedAt: AS_OF_DATE, baselineId: baseline.id, tasks: structuredClone(state.tasks.filter((t) => t.projectId === p.id)), });
+    if (origin && state.ticketMeta[origin.id]) state.ticketMeta[origin.id].changeRequestId = `PLAN-${state.planRequests.length + 1}`;
+    state.planRequests.push({ id: `PLAN-${state.planRequests.length + 1}`, projectId: p.id, kind: action.kind, sourceRequirementId: origin?.id, reason: action.reason, shiftDays: action.shiftDays, status: '待审批', requiredRoles: action.kind === 'schedule' && action.shiftDays > 30 ? ['pmo', 'finance'] : ['pmo'], reviews: [], submittedBy: actor.id, submittedAt: AS_OF_DATE, baselineId: baseline.id, tasks: structuredClone(state.tasks.filter((t) => t.projectId === p.id)), });
   } else if (action.type === 'review-plan') {
     const request = state.planRequests.find((r) => r.id === action.id);
     if (!request || request.status !== '待审批') throw new Error('事项不存在或已处理');
@@ -199,7 +205,11 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     requireRole('project-manager');
     if (project(risk.projectId).pmId !== actor.id) throw new Error('仅项目主PM可转问题');
     const id = `ISSUE-FROM-${risk.id}`;
-    state.issues.push({ id, code: id, projectId: risk.projectId, title: risk.title, severity: '重要', status: '待解决', owner: risk.owner, deadline: '2026-09-30', fromRiskId: risk.id });
+    state.issues.push({ id, code: id, projectId: risk.projectId, title: risk.title, severity: ['重大', '特大'].includes(risk.level) ? '重大' : '重要', status: '待解决', owner: risk.owner, deadline: ticketMeta(state, 'risk', risk.id).deadline, fromRiskId: risk.id });
+    const meta = structuredClone(ticketMeta(state, 'risk', risk.id));
+    meta.history.push({ date: AS_OF_DATE, actor: actor.name, action: 'convert', detail: action.note ?? `风险已发生，转为问题${id}` });
+    state.ticketMeta[risk.id] = meta;
+    state.ticketMeta[id] = { ...structuredClone(meta), history: [{ date: AS_OF_DATE, actor: actor.name, action: '由风险转入', detail: `原风险${risk.id}；${action.note ?? '风险实际发生'}` }] };
     risk.status = '已转问题'; target = risk.id;
   } else if (action.type === 'stage-gate') {
     requireRole('pmo'); const p = project(action.projectId); target = p.id;
@@ -237,7 +247,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
   }
   for (const p of state.projects) {
     const delayDays = Math.max(0, ...state.milestones.filter((m) => m.projectId === p.id && m.status !== '已达成').map((m) => (Date.parse(AS_OF_DATE) - Date.parse(m.plannedDate)) / 86400000));
-    const health = assessHealth(p, { delayDays, overdueReceipt: sumMoney(mockReceiptPlans.filter((r) => r.projectId === p.id && r.dueDate <= AS_OF_DATE).map((r) => r.amount - r.paidAmount)), majorIssues: state.issues.filter((i) => i.projectId === p.id && i.severity === '重大' && i.status !== '已关闭').length });
+    const health = assessHealth(p, { delayDays, overdueReceipt: sumMoney(mockReceiptPlans.filter((r) => r.projectId === p.id && r.dueDate <= AS_OF_DATE).map((r) => r.amount - r.paidAmount)), majorRisks: state.risks.filter((r) => r.projectId === p.id && ['特大', '重大'].includes(r.level) && r.status === '监控中').length, majorIssues: state.issues.filter((i) => i.projectId === p.id && i.severity === '重大' && i.status !== '已关闭').length });
     p.health = health.level; p.healthReason = health.reasons.join('；');
   }
   state.audit.push({ id: `AUD-${state.audit.length + 1}`, actor: actor.name, action: action.type, target, date: AS_OF_DATE });

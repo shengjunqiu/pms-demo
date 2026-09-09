@@ -18,6 +18,8 @@ import { DynamicAccountingPage } from '@/pages/execution/DynamicAccountingPage';
 import { GL06DecisionsPage } from '@/pages/executive/GL06DecisionsPage';
 import { ManagementApprovalPage } from '@/pages/approvals/ManagementApprovalPage';
 import { BudgetApprovalPage } from '@/pages/approvals/BudgetApprovalPage';
+import { TicketsPage } from '@/pages/tickets/TicketsPage';
+import { TicketDetailPage } from '@/pages/tickets/TicketDetailPage';
 import { TodosPage } from '@/pages/workbench/TodosPage';
 import { ProjectProgressPage } from '@/pages/execution/ProjectProgressPage';
 import { PlanRequestPage } from '@/pages/approvals/PlanRequestPage';
@@ -43,6 +45,10 @@ export const AppRouter: React.FC = () => {
         <Route path="approvals/:id" element={<BudgetApprovalPage />} />
         <Route path="executive/exceptions" element={<GL05ExceptionsPage />} />
         <Route path="projects/:id/dynamic-accounting" element={<DynamicAccountingPage />} />
+        <Route path="requirements-bugs" element={<TicketsPage family="quality" />} />
+        <Route path="requirements-bugs/:id" element={<TicketDetailPage family="quality" />} />
+        <Route path="issues-risks" element={<TicketsPage family="risk" />} />
+        <Route path="issues-risks/:id" element={<TicketDetailPage family="risk" />} />
         <Route path="workbench/todos" element={<TodosPage />} />
         <Route path="projects/:id/progress" element={<ProjectProgressPage />} />
         <Route path="projects/:id/plan-requests/:requestId" element={<PlanRequestPage />} />
@@ -52,7 +58,7 @@ export const AppRouter: React.FC = () => {
         {PAGE_MANIFEST.map((item) => {
           const relativeRoute = item.route.startsWith('/') ? item.route.slice(1) : item.route;
           // 跳过已实现的页面
-          if (['workbench/todos', 'projects/:id/progress', 'projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/four-calculations', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions', 'executive/decisions'].includes(relativeRoute)) {
+          if (['requirements-bugs', 'requirements-bugs/:id', 'issues-risks', 'issues-risks/:id', 'workbench/todos', 'projects/:id/progress', 'projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/four-calculations', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions', 'executive/decisions'].includes(relativeRoute)) {
             return null;
           }
           return (

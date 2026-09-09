@@ -3,16 +3,16 @@
 <!-- pms-loop:begin -->
 ## Loop 当前进度
 
-已验收：**10 / 72 页面**
+已验收：**14 / 72 页面**
 
-状态：`in_progress`；更新时间：2026-09-09T17:14:42+00:00
+状态：`in_progress`；更新时间：2026-09-09T17:45:45+00:00
 
 | 模块 | 已验收 | 待办/活动/阻塞 |
 |---|---:|---|
 | WK | 1/2 | WK-01(pending) |
 | GS | 0/11 | GS-01(pending)、GS-02(pending)、GS-03(pending)、GS-04(pending)、GS-05(pending)、GS-06(pending)、GS-07(pending)、GS-08(pending)、GS-09(pending)、GS-10(pending)、GS-11(pending) |
 | YS | 0/15 | YS-01(pending)、YS-02(pending)、YS-03(pending)、YS-04(pending)、YS-05(pending)、YS-06(pending)、YS-07(pending)、YS-08(pending)、YS-09(pending)、YS-10(pending)、YS-11(pending)、YS-12(pending)、YS-13(pending)、YS-14(pending)、YS-15(pending) |
-| HS | 3/17 | HS-03(pending)、HS-04(pending)、HS-05(pending)、HS-06(pending)、HS-07(pending)、HS-08(pending)、HS-09(pending)、HS-10(pending)、HS-11(pending)、HS-12(pending)、HS-14(pending)、HS-15(pending)、HS-16(pending)、HS-17(pending) |
+| HS | 7/17 | HS-03(pending)、HS-04(pending)、HS-09(pending)、HS-10(pending)、HS-11(pending)、HS-12(pending)、HS-14(pending)、HS-15(pending)、HS-16(pending)、HS-17(pending) |
 | JS | 0/13 | JS-01(pending)、JS-02(pending)、JS-03(pending)、JS-04(pending)、JS-05(pending)、JS-06(pending)、JS-07(pending)、JS-08(pending)、JS-09(pending)、JS-10(pending)、JS-11(pending)、JS-12(pending)、JS-13(pending) |
 | GL | 6/6 | 无 |
 | CF | 0/8 | CF-01(pending)、CF-02(pending)、CF-03(pending)、CF-04(pending)、CF-05(pending)、CF-06(pending)、CF-07(pending)、CF-08(pending) |
@@ -23,13 +23,14 @@
 
 ### 最近轮次与验证
 
-- R0009：GL-01, GL-05；deferred；证据目录 `.pms-loop/runs/R0009/`
 - R0010：GL-01, GL-05, GL-06；accepted；证据目录 `.pms-loop/runs/R0010/`
   验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
 - R0011：GL-02, GL-04；accepted；证据目录 `.pms-loop/runs/R0011/`
   验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
 - R0012：HS-02, WK-01, WK-02；deferred；证据目录 `.pms-loop/runs/R0012/`
 - R0013：HS-02, WK-02；accepted；证据目录 `.pms-loop/runs/R0013/`
+  验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
+- R0014：HS-05, HS-06, HS-07, HS-08；accepted；证据目录 `.pms-loop/runs/R0014/`
   验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
 
 ### 假设、已知问题与恢复说明

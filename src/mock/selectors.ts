@@ -21,7 +21,8 @@ export function inOrganization(departmentId: string, root?: string): boolean {
 }
 export function visibleProjects(role: UserRole, projects = mockProjects): Project[] {
   const all = ['executive', 'pmo', 'finance', 'admin', 'market'];
-  return projects.filter((p) => all.includes(role) || (role === 'project-manager' ? p.pmId === 'U-001' : inOrganization(p.departmentId, 'D-003')));
+  const userId = ({ executive: 'U-003', pmo: 'U-002', 'project-manager': 'U-001', market: 'U-006', finance: 'U-004', 'solution-tech': 'U-005', admin: 'U-ADMIN' })[role];
+  return projects.filter((p) => all.includes(role) || p.memberIds?.includes(userId) || (role === 'project-manager' ? p.pmId === 'U-001' : inOrganization(p.departmentId, 'D-003')));
 }
 export function selectProjects(filter: ProjectFilter = {}, role: UserRole = 'executive', projects = mockProjects): Project[] {
   return Array.from(new Map(visibleProjects(role, projects).filter((p) => {

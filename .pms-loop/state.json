@@ -143,20 +143,20 @@
       "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
     },
     "HS-05": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0014"
     },
     "HS-06": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0014"
     },
     "HS-07": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0014"
     },
     "HS-08": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0014"
     },
     "HS-09": {
       "status": "pending",
@@ -616,6 +616,43 @@
         ".pms-loop/runs/R0013/artifacts/wk-02-1280.png": "55d707931d1a76d8d9ac5f41f75a23a9480a978c8b13064e3f088c3092ddddd1",
         ".pms-loop/runs/R0013/checks.json": "54cb7f54acad288c4146f633000a82addbc9f2a8968730b30f7f99aaba2118a3",
         ".pms-loop/runs/R0013/evidence.json": "2f0974c50a554ceea397aeee67ff67d50b1b48e014f59ddb4b2d200d6f026320"
+      }
+    },
+    {
+      "id": "R0014",
+      "items": [
+        "HS-05",
+        "HS-06",
+        "HS-07",
+        "HS-08"
+      ],
+      "started_at": "2026-09-09T17:15:14+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-09T17:45:45+00:00",
+      "revision": "14fe3763859f16ba91a6d10a780b55ec9b9c733191ba3f897743ed3f6860ec9b",
+      "proof": {
+        ".pms-loop/runs/R0014/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0014/build.log": "f61555e8e8eaed3202b35b70da60aeb28681eaaed302be6dfaf2a832eff0032c",
+        ".pms-loop/runs/R0014/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0014/test-domain.log": "8a2b401a804fe516c8e2e8e2e1f4b1a643221a1be6476023988dce1451277b58",
+        ".pms-loop/runs/R0014/artifacts/console.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        ".pms-loop/runs/R0014/artifacts/readonly.txt": "828161e1018f39375744eed6b17fb8f31f1ed45ed08614d342e4182669631d10",
+        ".pms-loop/runs/R0014/artifacts/hs-05-1440.png": "6aa29ba324736fcdbe79ae5c5a0267360057c36ab4dab50f4cc4ed110778eb63",
+        ".pms-loop/runs/R0014/artifacts/hs-05-1280.png": "a96644c2f4399603bee22189ac9d56d4ff81ff59fbc7af79cbc814d0100f85ec",
+        ".pms-loop/runs/R0014/artifacts/hs-06-1440.png": "8c82146b3dd9c2a8e24101b8f233f280ab332fd6476b8bd73ec6a7f8ee4dcf5a",
+        ".pms-loop/runs/R0014/artifacts/hs-06-1280.png": "48d54c5ae0837d95fc686e5cecca01a47adf77d9e0c0538ecc7c76ff6b1e90b5",
+        ".pms-loop/runs/R0014/artifacts/hs-07-1440.png": "d003fb55dc91586aa42a8285b57bd2f2a368154761c8b5a1b0fcef0784461994",
+        ".pms-loop/runs/R0014/artifacts/hs-07-1280.png": "96079c8e537c1277199c3d467e4dc1147ebdde21aab4c07b788931fd3949d7a0",
+        ".pms-loop/runs/R0014/artifacts/hs-08-1440.png": "c0d42e925b7d9e05afb798ded43923b0c4b80436074645c11069f7de4f44ea09",
+        ".pms-loop/runs/R0014/artifacts/hs-08-1280.png": "74599a22319c1cfced8ebde95bb3f5ba9bbd04361b129567f651c951005e9571",
+        ".pms-loop/runs/R0014/checks.json": "6cfb7d7275e0313a031295263506810eaf4eff12edca35b95ce81c83a210c864",
+        ".pms-loop/runs/R0014/evidence.json": "a0501d5a282980ad7ca243c2c381d1bcd960b6840876c7fa3120304e416e9576"
       }
     }
   ],
