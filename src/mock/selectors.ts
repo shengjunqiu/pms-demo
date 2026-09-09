@@ -49,7 +49,7 @@ export function selectFourCalculations(project: Project, data: Pick<BusinessStat
   const costs = data.costs.filter((c) => c.projectId === project.id);
   const weights = (budget?.items ?? []).map((item) => item.amount);
   const allocationWeights = weights.some((w) => w > 0) ? weights : weights.map(() => 1);
-  const committed = allocationWeights.length ? allocateMoney(project.committedCost, allocationWeights) : [];
+  const committed = project.commitmentBySubject ? (budget?.items ?? []).map((item) => project.commitmentBySubject![item.subjectId] ?? 0) : allocationWeights.length ? allocateMoney(project.committedCost, allocationWeights) : [];
   const remaining = allocationWeights.length ? allocateMoney(project.forecastRemainingCost, allocationWeights) : [];
   const subjects = (budget?.items ?? []).map((item, index) => {
     const actual = sumMoney(costs.filter((c) => c.subjectId === item.subjectId).map((c) => c.amount));

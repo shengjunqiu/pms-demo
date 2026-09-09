@@ -1,3 +1,4 @@
+import { CostSourcesPage } from '@/pages/execution/CostSourcesPage';
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -44,6 +45,9 @@ export const AppRouter: React.FC = () => {
         <Route path="management-approvals/:id" element={<ManagementApprovalPage />} />
         <Route path="approvals/:id" element={<BudgetApprovalPage />} />
         <Route path="executive/exceptions" element={<GL05ExceptionsPage />} />
+        <Route path="projects/:id/procurement" element={<CostSourcesPage key="procurement" kind="procurement" />} />
+        <Route path="projects/:id/outsourcing" element={<CostSourcesPage key="outsource" kind="outsource" />} />
+        <Route path="projects/:id/expenses" element={<CostSourcesPage key="expense" kind="expense" />} />
         <Route path="projects/:id/dynamic-accounting" element={<DynamicAccountingPage />} />
         <Route path="requirements-bugs" element={<TicketsPage family="quality" />} />
         <Route path="requirements-bugs/:id" element={<TicketDetailPage family="quality" />} />
@@ -58,7 +62,7 @@ export const AppRouter: React.FC = () => {
         {PAGE_MANIFEST.map((item) => {
           const relativeRoute = item.route.startsWith('/') ? item.route.slice(1) : item.route;
           // 跳过已实现的页面
-          if (['requirements-bugs', 'requirements-bugs/:id', 'issues-risks', 'issues-risks/:id', 'workbench/todos', 'projects/:id/progress', 'projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/four-calculations', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions', 'executive/decisions'].includes(relativeRoute)) {
+          if (['projects/:id/procurement', 'projects/:id/outsourcing', 'projects/:id/expenses', 'requirements-bugs', 'requirements-bugs/:id', 'issues-risks', 'issues-risks/:id', 'workbench/todos', 'projects/:id/progress', 'projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/four-calculations', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions', 'executive/decisions'].includes(relativeRoute)) {
             return null;
           }
           return (

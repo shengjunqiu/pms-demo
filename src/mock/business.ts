@@ -1,3 +1,4 @@
+import { applyCostOrderAction, type CostOrder, type CostOrderAction } from '@/mock/cost-orders';
 import { applyTicketAction, ticketMeta, type TicketAction, type TicketMeta } from '@/mock/tickets';
 import { create } from 'zustand';
 import { AS_OF_DATE, mockProjects, mockBudgetVersions, mockBaselineVersions, mockIssues, mockRisks, mockBugs, mockDecisions, mockAcceptances, mockCostItems, mockEstimateVersions, mockMilestones, mockSettlements, mockReceiptPlans, mockChanges, mockWbsTasks, mockRequirements } from '@/mock';
@@ -24,7 +25,7 @@ export interface PlanRequest {
 }
 export interface Material { id: string; projectId: string; name: string; required: boolean; status: '缺失' | '待审核' | '通过' }
 export interface BusinessState {
-  requirements: Requirement[]; ticketMeta: Record<string, TicketMeta>; tasks: WbsTask[]; planRequests: PlanRequest[]; projects: Project[]; budgets: BudgetVersion[]; baselines: BaselineVersion[];
+  costOrders: CostOrder[]; requirements: Requirement[]; ticketMeta: Record<string, TicketMeta>; tasks: WbsTask[]; planRequests: PlanRequest[]; projects: Project[]; budgets: BudgetVersion[]; baselines: BaselineVersion[];
   estimates: EstimateVersion[]; milestones: Milestone[]; settlements: SettlementRecord[];
   issues: Issue[]; risks: Risk[]; bugs: Bug[]; costs: CostItem[];
   changes: ProjectChange[]; managementApprovals: ManagementApproval[]; approvals: Approval[]; decisions: DecisionItem[]; acceptances: AcceptanceRecord[];
@@ -32,7 +33,7 @@ export interface BusinessState {
   audit: { id: string; actor: string; action: string; target: string; date: string }[];
 }
 export function createBusinessState(): BusinessState {
-  return structuredClone({ requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects, budgets: mockBudgetVersions, baselines: mockBaselineVersions,
+  return structuredClone({ costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects, budgets: mockBudgetVersions, baselines: mockBaselineVersions,
     estimates: mockEstimateVersions, milestones: mockMilestones, settlements: mockSettlements,
     issues: mockIssues, risks: mockRisks, bugs: mockBugs, costs: mockCostItems, approvals: [], changes: mockChanges, managementApprovals: [],
     decisions: mockDecisions, acceptances: mockAcceptances, lockedProjects: ['P-008'], maintenanceCosts: [], audit: [],
@@ -42,7 +43,7 @@ export function createBusinessState(): BusinessState {
     }))),
   });
 }
-export type BusinessAction = TicketAction
+export type BusinessAction = CostOrderAction | TicketAction
   | { type: 'submit-budget'; projectId: string; budget: BudgetVersion; reason: string }
   | { type: 'review'; approvalId: string; approve: boolean; opinion: string }
   | { type: 'review-management'; id: string; approve: boolean; opinion: string }
@@ -66,7 +67,9 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     return value;
   };
   let target = '';
-  if (action.type === 'create-ticket' || action.type === 'update-ticket') {
+  if (action.type === 'submit-cost-order' || action.type === 'process-cost-order') {
+    target = applyCostOrderAction(state, action, actor);
+  } else if (action.type === 'create-ticket' || action.type === 'update-ticket') {
     target = applyTicketAction(state, action, actor);
   } else if (action.type === 'submit-budget') {
     const p = project(action.projectId); target = p.id;
@@ -239,6 +242,10 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
       if (action.fromCommitment && action.cost.amount > p.committedCost) throw new Error('结转金额超过未发生承诺');
       const nextCommitted = action.fromCommitment ? money(p.committedCost - action.cost.amount) : p.committedCost;
       if (p.isUnsigned && p.actualCost + action.cost.amount + nextCommitted > (p.unsignedLimitQuota ?? 0)) throw new Error('未签额度不足，须追加审批');
+      if (action.fromCommitment && p.commitmentBySubject) {
+        if ((p.commitmentBySubject[action.cost.subjectId] ?? 0) < action.cost.amount) throw new Error('科目承诺余额不足');
+        p.commitmentBySubject[action.cost.subjectId] = money(p.commitmentBySubject[action.cost.subjectId] - action.cost.amount);
+      }
       p.actualCost = money(p.actualCost + action.cost.amount); p.committedCost = nextCommitted;
       p.rollingCost = money(p.actualCost + p.committedCost + p.forecastRemainingCost);
       p.costVariance = money(p.rollingCost - p.budgetAmount); p.costVarianceRate = percentage(p.costVariance, p.budgetAmount) ?? 0;

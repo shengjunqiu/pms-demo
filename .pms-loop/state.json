@@ -163,16 +163,16 @@
       "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
     },
     "HS-10": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0015"
     },
     "HS-11": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0015"
     },
     "HS-12": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0015"
     },
     "HS-13": {
       "status": "done",
@@ -653,6 +653,40 @@
         ".pms-loop/runs/R0014/artifacts/hs-08-1280.png": "74599a22319c1cfced8ebde95bb3f5ba9bbd04361b129567f651c951005e9571",
         ".pms-loop/runs/R0014/checks.json": "6cfb7d7275e0313a031295263506810eaf4eff12edca35b95ce81c83a210c864",
         ".pms-loop/runs/R0014/evidence.json": "a0501d5a282980ad7ca243c2c381d1bcd960b6840876c7fa3120304e416e9576"
+      }
+    },
+    {
+      "id": "R0015",
+      "items": [
+        "HS-10",
+        "HS-11",
+        "HS-12"
+      ],
+      "started_at": "2026-09-09T17:46:15+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-09T18:06:49+00:00",
+      "revision": "9a051c4633e07b8e2fe91b44873cfa2d5b0941f3c1f05080c9d03e3821b35b15",
+      "proof": {
+        ".pms-loop/runs/R0015/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0015/test-domain.log": "3466569b947982f7c0cd7d9fe2f85466b58441bbca995311ccddf6483655253a",
+        ".pms-loop/runs/R0015/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0015/build.log": "466a0d4e286719b6ec00efd2168bf621f7582c221e115994034795435b5d5a1f",
+        ".pms-loop/runs/R0015/artifacts/console.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        ".pms-loop/runs/R0015/artifacts/outsourcing-source.png": "ddf283d37ad104f36d4306b79f3e43ff135bbfc96342383562960201e096983c",
+        ".pms-loop/runs/R0015/artifacts/hs-10-1440.png": "9f7a70765374f1f309002f2204d908111a389618fb31a27443cbbb4b1dc7e78d",
+        ".pms-loop/runs/R0015/artifacts/hs-10-1280.png": "3f5eb6c2f6d28de120c02e4f6aec79d064daf00d8a656f780dafd64b27f421f5",
+        ".pms-loop/runs/R0015/artifacts/hs-11-1440.png": "1d2cf1d96c60e4221da63b0e9232a0a95ccc56f519d3a373b46afe813e40dc85",
+        ".pms-loop/runs/R0015/artifacts/hs-11-1280.png": "2dc43ae83e1fbb45b263a01c91a432590af4db86ea305e98283123aa90993a3b",
+        ".pms-loop/runs/R0015/artifacts/hs-12-1440.png": "773c763fd374aa2ce176c4aa1cc2c6f4258c653634beffb34d9bd89c65d29588",
+        ".pms-loop/runs/R0015/artifacts/hs-12-1280.png": "37657575f11aea41523f756fb68dc692bc92cd4bbaafdbef10098a395f1d89af",
+        ".pms-loop/runs/R0015/checks.json": "3b6ad9459e08e2ef150eafafc0a8afbaa770a26fcc7da7b91f1d3af71b6805b4",
+        ".pms-loop/runs/R0015/evidence.json": "1e3e696bbdd8d61da93dc33833fb8b74c0a1c83bb2679fb8d8da0995b41fd0bc"
       }
     }
   ],

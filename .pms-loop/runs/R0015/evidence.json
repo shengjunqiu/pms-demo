@@ -1,0 +1,248 @@
+{
+  "schema_version": 1,
+  "round": "R0015",
+  "revision": "9a051c4633e07b8e2fe91b44873cfa2d5b0941f3c1f05080c9d03e3821b35b15",
+  "items": {
+    "HS-10": {
+      "entry": "/projects/P-001/procurement",
+      "covered_features": [
+        "HS-046",
+        "HS-047",
+        "HS-048",
+        "HS-049"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行140、任务书行439，PRD11.11–11.13；功能来源详见plan。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "侧栏三页、项目摘要入口、WK02待办→原单、动态核算→新增来源→原申请均接通；抽屉关闭保留筛选。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "项目、成本科目、基线、供应商、合同、到货履约/费用用途及处理历史有真实关联；历史凭证单独展示，不伪造缺失履约历史。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "原单待审批→已批准（0/10）→验收通过→已入账（10/0）；未验收时入账禁用，入账后全部处理禁用，保留5条轨迹。采购实际412.5→422.5，承诺仍209.05。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "36领域测试通过；浏览器跨页实际1667/承诺836.2/滚动3003.2，三笔来源只增17。科目承诺增减保持对应科目，不重新分摊到其他科目。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "浏览器财务新建按钮禁用，PM不能自行审批/入账；无关P002费用403；搜索不存在单据时申请与流水均显示暂无数据。锁定及未签超额由领域测试验证。同步本地状态无网络加载等待。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "实际查看1440×900、1280×900截图，卡片/科目明细清晰，宽表横向滚动；另保存外包详情和处理轨迹截图。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "实际浏览器完整三类闭环后error/warn=[]，见console.json。"
+        },
+        "business-1": {
+          "requirement": "采购申请预算合同到货验收实际与承诺成本",
+          "passed": true,
+          "observation": "原单待审批→已批准（0/10）→验收通过→已入账（10/0）；未验收时入账禁用，入账后全部处理禁用，保留5条轨迹。采购实际412.5→422.5，承诺仍209.05。"
+        },
+        "business-2": {
+          "requirement": "预算/未签约束，来源单据可下钻，承诺转实际不重复",
+          "passed": true,
+          "observation": "浏览器与领域测试区分见scenarios；COST-1科目预算/待批占用/未签额度提交和批准双检；合同须履约100%与主PM验收后财务入账，费用由财务确认；建设期锁定阻止写入。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "浏览器主PM提交10万元采购CO-1，财务从WK02批准，主PM登记100%到货并验收，财务最终入账。",
+          "expected": "待批只占申请额度；批准增承诺；验收后财务等额结转，不能重复。",
+          "observed": "原单待审批→已批准（0/10）→验收通过→已入账（10/0）；未验收时入账禁用，入账后全部处理禁用，保留5条轨迹。采购实际412.5→422.5，承诺仍209.05。"
+        },
+        {
+          "action": "跨页面核对P001动态核算及财务/PM待办，执行36个领域测试。",
+          "expected": "同一成本来源只计入一次，批准/验收/入账权限及预算边界受控。",
+          "observed": "三笔完成后实际1667、承诺836.2、剩余预测500、滚动3003.2；总计增加17万元，成本凭证20→23笔。财务初始3待办，采购外包验收后2待办/1已办；PM履约2待办。领域测试覆盖科目承诺守恒、预算占用/驳回释放、未签额度、锁定、WBS校验、进度回退、验收及重复入账。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0015/artifacts/console.json",
+        ".pms-loop/runs/R0015/artifacts/outsourcing-source.png"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0015/artifacts/hs-10-1440.png",
+        "1280": ".pms-loop/runs/R0015/artifacts/hs-10-1280.png"
+      }
+    },
+    "HS-11": {
+      "entry": "/projects/P-001/outsourcing",
+      "covered_features": [
+        "HS-050",
+        "HS-051",
+        "HS-052"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行141、任务书行440，PRD11.11–11.13；功能来源详见plan。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "侧栏三页、项目摘要入口、WK02待办→原单、动态核算→新增来源→原申请均接通；抽屉关闭保留筛选。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "项目、成本科目、基线、供应商、合同、到货履约/费用用途及处理历史有真实关联；历史凭证单独展示，不伪造缺失履约历史。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "范围为任务内网关接口适配与测试报告；100%履约后验收说明保留；已入账5/0，5条轨迹。外包实际330→335，承诺167.24不变。动态核算搜索CO-2→凭证→原申请和履约记录实际可达。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "36领域测试通过；浏览器跨页实际1667/承诺836.2/滚动3003.2，三笔来源只增17。科目承诺增减保持对应科目，不重新分摊到其他科目。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "浏览器财务新建按钮禁用，PM不能自行审批/入账；无关P002费用403；搜索不存在单据时申请与流水均显示暂无数据。锁定及未签超额由领域测试验证。同步本地状态无网络加载等待。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "实际查看1440×900、1280×900截图，卡片/科目明细清晰，宽表横向滚动；另保存外包详情和处理轨迹截图。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "实际浏览器完整三类闭环后error/warn=[]，见console.json。"
+        },
+        "business-1": {
+          "requirement": "外包范围WBS供应商合同交付履约预算及成本",
+          "passed": true,
+          "observation": "范围为任务内网关接口适配与测试报告；100%履约后验收说明保留；已入账5/0，5条轨迹。外包实际330→335，承诺167.24不变。动态核算搜索CO-2→凭证→原申请和履约记录实际可达。"
+        },
+        "business-2": {
+          "requirement": "超限规则与验收联动，合同承诺未发生余额准确",
+          "passed": true,
+          "observation": "浏览器与领域测试区分见scenarios；COST-1科目预算/待批占用/未签额度提交和批准双检；合同须履约100%与主PM验收后财务入账，费用由财务确认；建设期锁定阻止写入。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "浏览器主PM提交5万元外包CO-2，引用性能与安全验证WBS、BASE-VER-001，财务批准后主PM验收再入账。",
+          "expected": "外包范围、合同、WBS、履约与成本关联；实际和未发生余额互斥。",
+          "observed": "范围为任务内网关接口适配与测试报告；100%履约后验收说明保留；已入账5/0，5条轨迹。外包实际330→335，承诺167.24不变。动态核算搜索CO-2→凭证→原申请和履约记录实际可达。"
+        },
+        {
+          "action": "跨页面核对P001动态核算及财务/PM待办，执行36个领域测试。",
+          "expected": "同一成本来源只计入一次，批准/验收/入账权限及预算边界受控。",
+          "observed": "三笔完成后实际1667、承诺836.2、剩余预测500、滚动3003.2；总计增加17万元，成本凭证20→23笔。财务初始3待办，采购外包验收后2待办/1已办；PM履约2待办。领域测试覆盖科目承诺守恒、预算占用/驳回释放、未签额度、锁定、WBS校验、进度回退、验收及重复入账。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0015/artifacts/console.json",
+        ".pms-loop/runs/R0015/artifacts/outsourcing-source.png"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0015/artifacts/hs-11-1440.png",
+        "1280": ".pms-loop/runs/R0015/artifacts/hs-11-1280.png"
+      }
+    },
+    "HS-12": {
+      "entry": "/projects/P-001/expenses",
+      "covered_features": [
+        "HS-053",
+        "HS-054",
+        "HS-055"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行142、任务书行441，PRD11.11–11.13；功能来源详见plan。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "侧栏三页、项目摘要入口、WK02待办→原单、动态核算→新增来源→原申请均接通；抽屉关闭保留筛选。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "项目、成本科目、基线、供应商、合同、到货履约/费用用途及处理历史有真实关联；历史凭证单独展示，不伪造缺失履约历史。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "差旅实际33→35，费用实际165→167；CO-3已入账2/0，三条轨迹，重复入账禁用。第三方/租房/其他超支如实显示，不使用差旅余额抵消。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "36领域测试通过；浏览器跨页实际1667/承诺836.2/滚动3003.2，三笔来源只增17。科目承诺增减保持对应科目，不重新分摊到其他科目。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "浏览器财务新建按钮禁用，PM不能自行审批/入账；无关P002费用403；搜索不存在单据时申请与流水均显示暂无数据。锁定及未签超额由领域测试验证。同步本地状态无网络加载等待。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "实际查看1440×900、1280×900截图，卡片/科目明细清晰，宽表横向滚动；另保存外包详情和处理轨迹截图。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "实际浏览器完整三类闭环后error/warn=[]，见console.json。"
+        },
+        "business-1": {
+          "requirement": "差旅租房第三方等费用，预算已用本次剩余明细",
+          "passed": true,
+          "observation": "差旅实际33→35，费用实际165→167；CO-3已入账2/0，三条轨迹，重复入账禁用。第三方/租房/其他超支如实显示，不使用差旅余额抵消。"
+        },
+        "business-2": {
+          "requirement": "科目与阶段/锁定规则校验，审批确认后更新统一核算",
+          "passed": true,
+          "observation": "浏览器与领域测试区分见scenarios；COST-1科目预算/待批占用/未签额度提交和批准双检；合同须履约100%与主PM验收后财务入账，费用由财务确认；建设期锁定阻止写入。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "浏览器主PM提交差旅CO-3金额2万元，财务审批再确认交通住宿凭证入账。",
+          "expected": "四个费用叶子科目单独校验，财务确认后才更新实际。",
+          "observed": "差旅实际33→35，费用实际165→167；CO-3已入账2/0，三条轨迹，重复入账禁用。第三方/租房/其他超支如实显示，不使用差旅余额抵消。"
+        },
+        {
+          "action": "跨页面核对P001动态核算及财务/PM待办，执行36个领域测试。",
+          "expected": "同一成本来源只计入一次，批准/验收/入账权限及预算边界受控。",
+          "observed": "三笔完成后实际1667、承诺836.2、剩余预测500、滚动3003.2；总计增加17万元，成本凭证20→23笔。财务初始3待办，采购外包验收后2待办/1已办；PM履约2待办。领域测试覆盖科目承诺守恒、预算占用/驳回释放、未签额度、锁定、WBS校验、进度回退、验收及重复入账。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0015/artifacts/console.json",
+        ".pms-loop/runs/R0015/artifacts/outsourcing-source.png"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0015/artifacts/hs-12-1440.png",
+        "1280": ".pms-loop/runs/R0015/artifacts/hs-12-1280.png"
+      }
+    }
+  }
+}

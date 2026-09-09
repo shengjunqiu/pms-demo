@@ -68,7 +68,7 @@ export function DynamicAccountingPage() {
           { title: '统一成本科目', dataIndex: 'subjectName', fixed: 'left', width: 150, render: (name: string, row) => <Button type="link" size="small" onClick={() => { update('subject', row.subjectId); setQuery(''); }}>{name}</Button> },
           ...(['budget', 'actual', 'committed', 'remaining', 'rolling', 'variance'] as const).map((key, i) => ({ title: ['有效预算', '已发生', '未发生承诺', '剩余预测', '滚动预测', '偏差'][i], dataIndex: key, align: 'right' as const, render: (v: number) => <MoneyText value={v} signed={key === 'variance'} /> })),
         ]} />
-        <Text type="secondary">承诺与剩余预测按有效预算科目比例分摊（演示口径）；期间费用只统计子科目，避免父子重复计费。</Text>
+        <Text type="secondary">期初承诺与剩余预测按预算科目比例分摊；新批准合同按原科目增减承诺（演示口径）；期间费用只统计子科目，避免父子重复计费。</Text>
       </> },
       { key: 'trend', label: '历史成本趋势', children: <><CostTrendChart points={points} /><Table rowKey="date" size="small" pagination={false} dataSource={points} columns={[{ title: '快照日期', dataIndex: 'date' }, ...(['budget', 'actual', 'rolling'] as const).map((key, i) => ({ title: ['预算', '已发生', '滚动预测'][i], dataIndex: key, render: (v: number) => <MoneyText value={v} /> }))]} /><Text type="secondary">历史演示快照只读；最新一行使用当前共享数据。</Text></> },
       { key: 'organizations', label: '业务群成本对比', children: <><Alert type="info" message="同角色可见项目的业务群汇总；每个项目按主责部门全额归属，不重复分摊。" /><Table dataSource={orgRows} rowKey="id" size="small" pagination={false} columns={[{ title: '业务群', dataIndex: 'name' }, { title: '项目数', dataIndex: 'count' }, ...(['budget', 'actual', 'rolling'] as const).map((key, i) => ({ title: ['预算（万元）', '已发生（万元）', '滚动（万元）'][i], dataIndex: key, render: (v: number) => <MoneyText value={v} /> }))]} /></> },
@@ -85,6 +85,7 @@ export function DynamicAccountingPage() {
         { key: 'owner', label: '项目责任人', children: p.pmName }, { key: 'upstream', label: '上游单据', children: sourceVoucher?.upstreamId ?? '本轮录入凭证' },
         { key: 'description', label: '摘要', children: source.description },
       ]} />
+      {data.costOrders.find((o) => o.id === source.sourceId) && <Button onClick={() => { const o = data.costOrders.find((o) => o.id === source.sourceId)!; navigate(`/projects/${p.id}/${o.kind === 'procurement' ? 'procurement' : o.kind === 'outsource' ? 'outsourcing' : 'expenses'}?source=${o.id}`); }}>进入原申请及履约记录</Button>}
       {upstream && <Card title="上游记录摘要" size="small" style={{ marginTop: 16 }}>{'supplierName' in upstream ? `供应商：${upstream.supplierName}` : 'vendorName' in upstream ? `外包单位：${upstream.vendorName}` : 'applicant' in upstream ? `报销人：${upstream.applicant}` : `填报人：${upstream.userName} · ${upstream.hours} 小时`}<p>单据状态：{upstream.status}</p><Text type="secondary">上游单据可能分期确认；此处展示关联关系，核算只累计本凭证金额。</Text></Card>}
       <Alert style={{ marginTop: 16 }} type="info" message="经营穿透为只读查看；关闭后保留科目、查询与上一级筛选。" />
     </>}</Drawer>

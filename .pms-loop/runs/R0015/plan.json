@@ -1,0 +1,132 @@
+{
+  "round": "R0015",
+  "items": [
+    {
+      "id": "HS-10",
+      "title": "采购成本",
+      "route": "/projects/:id/procurement",
+      "kind": "专题/列表",
+      "roles": "项目经理、采购、财务",
+      "phase": 6,
+      "feature_ids": [
+        "HS-046",
+        "HS-047",
+        "HS-048",
+        "HS-049"
+      ],
+      "upstream_feature_scope": "采购申请、合同、到货、成本归集",
+      "source_lines": {
+        "pages": 140,
+        "brief": 439
+      },
+      "criteria": [
+        "采购申请预算合同到货验收实际与承诺成本",
+        "预算/未签约束，来源单据可下钻，承诺转实际不重复"
+      ]
+    },
+    {
+      "id": "HS-11",
+      "title": "外包成本",
+      "route": "/projects/:id/outsourcing",
+      "kind": "专题/列表",
+      "roles": "项目经理、采购、技术",
+      "phase": 6,
+      "feature_ids": [
+        "HS-050",
+        "HS-051",
+        "HS-052"
+      ],
+      "upstream_feature_scope": "外包申请、合同、履约、成本归集",
+      "source_lines": {
+        "pages": 141,
+        "brief": 440
+      },
+      "criteria": [
+        "外包范围WBS供应商合同交付履约预算及成本",
+        "超限规则与验收联动，合同承诺未发生余额准确"
+      ]
+    },
+    {
+      "id": "HS-12",
+      "title": "项目费用",
+      "route": "/projects/:id/expenses",
+      "kind": "专题/列表",
+      "roles": "项目经理、财务",
+      "phase": 6,
+      "feature_ids": [
+        "HS-053",
+        "HS-054",
+        "HS-055"
+      ],
+      "upstream_feature_scope": "差旅、第三方、租房、业务等费用",
+      "source_lines": {
+        "pages": 142,
+        "brief": 441
+      },
+      "criteria": [
+        "差旅租房第三方等费用，预算已用本次剩余明细",
+        "科目与阶段/锁定规则校验，审批确认后更新统一核算"
+      ]
+    }
+  ],
+  "sources": {
+    "prd": {
+      "path": "docs/项目管理平台PRD_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "6dac675ca22237b7fa59129eccc466a9e242d20f948c0b68e958a7227bb2bd1b"
+    },
+    "features": {
+      "path": "docs/项目管理平台详细功能清单_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "fabfac73b480ccaf01aa831ae3c5d0a6485e33fff80f517468b2b6c52829ddfb"
+    },
+    "pages": {
+      "path": "docs/项目管理平台页面清单与原型设计说明_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "db1c548b5f5ef025eb90fef06422e132f003665fc7e6156dd706b7f095c994dc"
+    },
+    "brief": {
+      "path": "docs/项目管理平台高保真原型_AgentLoop开发任务书_V1.0.md",
+      "sha256": "286f917d5edc99a4a0c7da97515a3d6308cae7395fb287bbcd1846de60045b43"
+    }
+  },
+  "feature_references": {
+    "HS-046": {
+      "title": "采购申请关联项目",
+      "line": 302
+    },
+    "HS-047": {
+      "title": "采购预算校验",
+      "line": 303
+    },
+    "HS-048": {
+      "title": "采购合同归集",
+      "line": 304
+    },
+    "HS-049": {
+      "title": "到货确认",
+      "line": 305
+    },
+    "HS-050": {
+      "title": "外包申请",
+      "line": 306
+    },
+    "HS-051": {
+      "title": "外包预算校验",
+      "line": 307
+    },
+    "HS-052": {
+      "title": "外包合同成本归集",
+      "line": 308
+    },
+    "HS-053": {
+      "title": "项目费用申请",
+      "line": 309
+    },
+    "HS-054": {
+      "title": "费用预算控制",
+      "line": 310
+    },
+    "HS-055": {
+      "title": "财务实际归集",
+      "line": 311
+    }
+  }
+}
