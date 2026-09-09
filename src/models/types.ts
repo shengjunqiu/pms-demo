@@ -376,7 +376,7 @@ export interface DecisionItem {
   id: string;
   projectId: string;
   projectName: string;
-  type: '超概算审批' | '重大变更审批' | '重大风险处置' | '未签额外投入' | '结算争议审定';
+  type: '超概算审批' | '重大变更审批' | '重大风险处置' | '未签额外投入' | '结算争议审定' | '重大验收异常';
   title: string;
   impactAmount: number; // 万元
   level: 'PMC决策会' | 'PMO立项会' | '高管审批';

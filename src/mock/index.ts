@@ -1,5 +1,5 @@
 import { assessHealth } from '@/utils/health';
-import { allocateMoney, money } from '@/utils/money';
+import { sumMoney, allocateMoney, money } from '@/utils/money';
 import {
   Department,
   User,
@@ -199,7 +199,7 @@ const projectSeeds: Project[] = [
     costVarianceRate: 8.33,
     progressRate: 85.0,
     plannedStartDate: '2026-02-01',
-    plannedEndDate: '2026-08-30',
+    plannedEndDate: '2026-08-12',
     actualStartDate: '2026-02-05',
     currentBaselineVersion: 'V1.0',
   },
@@ -875,11 +875,16 @@ export const mockAuditLogs: AuditLog[] = Array.from({ length: 315 }).map((_, i) 
   };
 });
 
+export const mockReceiptPlans = mockContracts.flatMap((contract) => [
+  { id: `RCPT-${contract.id}-1`, projectId: contract.projectId, contractId: contract.id, title: '合同首付款', dueDate: '2026-05-15', amount: contract.paidAmount, paidAmount: contract.paidAmount },
+  { id: `RCPT-${contract.id}-2`, projectId: contract.projectId, contractId: contract.id, title: '验收结算款', dueDate: contract.projectId === 'P-002' ? '2026-09-01' : contract.projectId === 'P-003' ? '2026-08-30' : '2026-12-31', amount: contract.unpaidAmount, paidAmount: 0 },
+]);
+
 // 统一健康度从成本和关联事项复算，页面使用同一结果。
 for (const project of mockProjects) {
   const overdue = mockMilestones.filter((m) => m.projectId === project.id && m.status !== '已达成')
     .map((m) => Math.max(0, (Date.parse(AS_OF_DATE) - Date.parse(m.plannedDate)) / 86400000));
-  const health = assessHealth(project, { delayDays: Math.max(0, ...overdue),
+  const health = assessHealth(project, { delayDays: Math.max(0, ...overdue), overdueReceipt: sumMoney(mockReceiptPlans.filter((r) => r.projectId === project.id && r.dueDate <= AS_OF_DATE).map((r) => r.amount - r.paidAmount)),
     majorIssues: mockIssues.filter((i) => i.projectId === project.id && i.severity === '重大' && i.status !== '已关闭').length });
   project.health = health.level;
   project.healthReason = health.reasons.join('；');

@@ -1,4 +1,4 @@
-import { mockProjects, mockDepartments, mockCustomers, mockContracts, mockCostItems, mockBudgetVersions, mockEstimateVersions, mockSettlements } from '@/mock';
+import { mockProjects, mockDepartments, mockCustomers, mockContracts, mockCostItems, mockBudgetVersions, mockEstimateVersions, mockSettlements, mockReceiptPlans, AS_OF_DATE } from '@/mock';
 import type { BusinessState } from '@/mock/business';
 import type { Project } from '@/models/types';
 import type { UserRole } from '@/store/useAppStore';
@@ -67,5 +67,9 @@ export function selectReceipts(projects: Project[]) {
   const contracts = Array.from(new Map(mockContracts.filter((c) => ids.has(c.projectId) && c.status !== '已终止').map((c) => [c.id, c])).values());
   const signed = sumMoney(contracts.map((c) => c.amount));
   const paid = sumMoney(contracts.map((c) => c.paidAmount));
-  return { contracts, signed, paid, outstanding: sumMoney([signed, -paid]), completion: percentage(paid, signed) };
+  const plans = mockReceiptPlans.filter((p) => ids.has(p.projectId));
+  const duePlans = plans.filter((p) => p.dueDate <= AS_OF_DATE);
+  const due = sumMoney(duePlans.map((p) => p.amount));
+  const overdue = sumMoney(duePlans.map((p) => Math.max(0, p.amount - p.paidAmount)));
+  return { contracts, plans, due, overdue, dueCompletion: percentage(sumMoney(duePlans.map((p) => p.paidAmount)), due), signed, paid, outstanding: sumMoney([signed, -paid]), completion: percentage(paid, signed) };
 }

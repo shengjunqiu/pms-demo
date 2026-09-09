@@ -1,8 +1,8 @@
 import { create } from 'zustand';
-import { AS_OF_DATE, mockProjects, mockBudgetVersions, mockBaselineVersions, mockIssues, mockRisks, mockBugs, mockDecisions, mockAcceptances, mockCostItems, mockEstimateVersions, mockMilestones, mockSettlements } from '@/mock';
-import type { Project, BudgetVersion, BaselineVersion, Issue, Risk, Bug, CostItem, DecisionItem, AcceptanceRecord, EstimateVersion, Milestone, SettlementRecord } from '@/models/types';
+import { AS_OF_DATE, mockProjects, mockBudgetVersions, mockBaselineVersions, mockIssues, mockRisks, mockBugs, mockDecisions, mockAcceptances, mockCostItems, mockEstimateVersions, mockMilestones, mockSettlements, mockReceiptPlans, mockChanges } from '@/mock';
+import type { Project, BudgetVersion, BaselineVersion, Issue, Risk, Bug, CostItem, DecisionItem, AcceptanceRecord, EstimateVersion, Milestone, SettlementRecord, ProjectChange } from '@/models/types';
 import type { UserRole } from '@/store/useAppStore';
-import { money, percentage } from '@/utils/money';
+import { allocateMoney, money, percentage, sumMoney } from '@/utils/money';
 import { assessHealth } from '@/utils/health';
 
 export interface Actor { id: string; name: string; role: UserRole }
@@ -10,21 +10,26 @@ export interface Approval {
   id: string; projectId: string; kind: 'budget' | 'change'; status: '待审批' | '通过' | '驳回';
   budget: BudgetVersion; baseline: BaselineVersion; submittedBy: string; reason: string;
   requiredRole: 'pmo' | 'executive'; opinion?: string;
-  estimate: EstimateVersion;
+  estimate: EstimateVersion; sourceChangeId?: string;
+}
+export interface ManagementApproval {
+  id: string; projectId: string; sourceId: string; type: DecisionItem['type'];
+  reason: string; submittedBy: string; status: '待审批' | '通过' | '驳回'; opinion?: string;
+  originalQuota?: number; proposedQuota?: number; impactAmount: number;
 }
 export interface Material { id: string; projectId: string; name: string; required: boolean; status: '缺失' | '待审核' | '通过' }
 export interface BusinessState {
   projects: Project[]; budgets: BudgetVersion[]; baselines: BaselineVersion[];
   estimates: EstimateVersion[]; milestones: Milestone[]; settlements: SettlementRecord[];
   issues: Issue[]; risks: Risk[]; bugs: Bug[]; costs: CostItem[];
-  approvals: Approval[]; decisions: DecisionItem[]; acceptances: AcceptanceRecord[];
+  changes: ProjectChange[]; managementApprovals: ManagementApproval[]; approvals: Approval[]; decisions: DecisionItem[]; acceptances: AcceptanceRecord[];
   materials: Material[]; lockedProjects: string[]; maintenanceCosts: CostItem[];
   audit: { id: string; actor: string; action: string; target: string; date: string }[];
 }
 export function createBusinessState(): BusinessState {
   return structuredClone({ projects: mockProjects, budgets: mockBudgetVersions, baselines: mockBaselineVersions,
     estimates: mockEstimateVersions, milestones: mockMilestones, settlements: mockSettlements,
-    issues: mockIssues, risks: mockRisks, bugs: mockBugs, costs: mockCostItems, approvals: [],
+    issues: mockIssues, risks: mockRisks, bugs: mockBugs, costs: mockCostItems, approvals: [], changes: mockChanges, managementApprovals: [],
     decisions: mockDecisions, acceptances: mockAcceptances, lockedProjects: ['P-008'], maintenanceCosts: [], audit: [],
     materials: mockProjects.flatMap((p) => ['测试报告', '验收确认函'].map((name, i) => ({
       id: `MAT-${p.id}-${i}`, projectId: p.id, name, required: true,
@@ -35,6 +40,7 @@ export function createBusinessState(): BusinessState {
 export type BusinessAction =
   | { type: 'submit-budget'; projectId: string; budget: BudgetVersion; reason: string }
   | { type: 'review'; approvalId: string; approve: boolean; opinion: string }
+  | { type: 'review-management'; id: string; approve: boolean; opinion: string }
   | { type: 'close-issue'; id: string }
   | { type: 'close-bug'; id: string }
   | { type: 'risk-to-issue'; id: string }
@@ -84,19 +90,39 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     if (action.approve) {
       const baseline = state.baselines.find((b) => b.projectId === p.id && b.status === '已生效');
       if (baseline?.id !== approval.baseline.id) throw new Error('基线已变化，请重新提交审批');
-      const version = `V${state.baselines.filter((b) => b.projectId === p.id).length + 1}.0`;
+      const latestMajor = Math.max(0, ...state.baselines.filter((b) => b.projectId === p.id).map((b) => Number(/^V(\d+)/.exec(b.version)?.[1] ?? 0)));
+      const version = `V${latestMajor + 1}.0`;
       // Preserve all prior values; only validity metadata changes, then append a new snapshot.
       state.budgets.filter((b) => b.projectId === p.id && b.status === '已生效').forEach((b) => { b.status = '已废弃'; });
       baseline.status = '历史';
-      state.budgets.push({ ...approval.budget, id: `BUD-${approval.id}`, version, status: '已生效' });
-      state.baselines.push({ ...approval.baseline, id: `BASE-${approval.id}`, version, status: '已生效', budgetAmount: approval.budget.totalAmount });
+      state.budgets.push({ ...approval.budget, id: `BUD-${approval.id}`, version, status: '已生效', createdAt: AS_OF_DATE, createdBy: actor.id });
+      state.baselines.push({ ...approval.baseline, id: `BASE-${approval.id}`, version, status: '已生效', budgetAmount: approval.budget.totalAmount, createdAt: AS_OF_DATE });
       p.budgetAmount = approval.budget.totalAmount; p.currentBaselineVersion = version;
       p.costVariance = money(p.rollingCost - p.budgetAmount);
       p.costVarianceRate = percentage(p.costVariance, p.budgetAmount) ?? 0;
     }
+    if (approval.sourceChangeId) {
+      const change = state.changes.find((c) => c.id === approval.sourceChangeId)!;
+      change.status = action.approve ? '已批准' : '已否决';
+      if (action.approve) change.newBaselineId = `BASE-${approval.id}`;
+    }
     approval.status = action.approve ? '通过' : '驳回'; approval.opinion = action.opinion;
     const decision = state.decisions.find((d) => d.id === approval.id);
     if (decision) decision.status = action.approve ? '已通过' : '已否决';
+  } else if (action.type === 'review-management') {
+    requireRole('executive');
+    const approval = state.managementApprovals.find((a) => a.id === action.id);
+    if (!approval || approval.status !== '待审批') throw new Error('审批不存在或已处理');
+    if (!action.opinion.trim()) throw new Error('审批意见必填');
+    const p = project(approval.projectId); target = approval.id;
+    if (action.approve && approval.type === '未签额外投入') {
+      if (!p.isUnsigned || p.unsignedLimitQuota !== approval.originalQuota || !approval.proposedQuota || approval.proposedQuota <= (p.unsignedLimitQuota ?? 0)) throw new Error('额度或未签状态已变化，请重新申报');
+      p.unsignedLimitQuota = approval.proposedQuota;
+    }
+    // Coordination decisions retain the source risk, acceptance and locked settlement state.
+    approval.status = action.approve ? '通过' : '驳回'; approval.opinion = action.opinion.trim();
+    const decision = state.decisions.find((d) => d.id === approval.id)!;
+    decision.status = action.approve ? '已通过' : '已否决';
   } else if (action.type === 'close-issue') {
     const issue = state.issues.find((i) => i.id === action.id);
     if (!issue) throw new Error('问题不存在');
@@ -151,14 +177,55 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
   }
   for (const p of state.projects) {
     const delayDays = Math.max(0, ...state.milestones.filter((m) => m.projectId === p.id && m.status !== '已达成').map((m) => (Date.parse(AS_OF_DATE) - Date.parse(m.plannedDate)) / 86400000));
-    const health = assessHealth(p, { delayDays, majorIssues: state.issues.filter((i) => i.projectId === p.id && i.severity === '重大' && i.status !== '已关闭').length });
+    const health = assessHealth(p, { delayDays, overdueReceipt: sumMoney(mockReceiptPlans.filter((r) => r.projectId === p.id && r.dueDate <= AS_OF_DATE).map((r) => r.amount - r.paidAmount)), majorIssues: state.issues.filter((i) => i.projectId === p.id && i.severity === '重大' && i.status !== '已关闭').length });
     p.health = health.level; p.healthReason = health.reasons.join('；');
   }
   state.audit.push({ id: `AUD-${state.audit.length + 1}`, actor: actor.name, action: action.type, target, date: AS_OF_DATE });
   return state;
 }
 
+/** Pending approvals quote real budget, estimate and baseline objects; no dashboard-only fake decisions. */
+export function createDemoBusinessState(): BusinessState {
+  let state = createBusinessState();
+  state.decisions = [];
+  const candidates = state.projects.filter((p) => !p.isMaintenance && !state.lockedProjects.includes(p.id)).slice(0, 45);
+  for (const p of candidates) {
+    const budget = state.budgets.find((b) => b.projectId === p.id && b.status === '已生效')!;
+    const estimate = state.estimates.find((e) => e.opportunityId === p.opportunityId && e.isFrozen)!;
+    const totalAmount = money(Math.max(budget.totalAmount, estimate.totalCost) * 1.04);
+    const amounts = allocateMoney(totalAmount, budget.items.map((i) => i.amount));
+    const items = budget.items.map((item, i) => ({ ...item, amount: amounts[i] }));
+    const amount = (id: string) => sumMoney(items.filter((i) => i.subjectId === id || i.subjectId.startsWith(`${id}-`)).map((i) => i.amount));
+    state = transition(state, { type: 'submit-budget', projectId: p.id, reason: '新增数据接入范围与交付保障工作，申请按冻结概算评估追加预算。', budget: {
+      ...budget, id: `SUBMIT-${p.id}`, version: 'V-待审', status: '审批中', totalAmount, items,
+      laborCost: amount('SUB-01'), outsourceCost: amount('SUB-02'), procurementCost: amount('SUB-03'), expenseCost: amount('SUB-04'), reserveCost: amount('SUB-05'),
+    } }, { id: 'U-004', name: '刘敏', role: 'finance' });
+    const decision = state.decisions[state.decisions.length - 1];
+    decision.createdAt = '2026-09-05';
+    if (state.approvals.length > 15) state = transition(state, { type: 'review', approvalId: decision.id, approve: false, opinion: '分项测算与交付范围尚不一致，请补充材料后重新申报。' }, { id: 'U-003', name: '王总', role: 'executive' });
+  }
+  const changeApproval = state.approvals.find((a) => a.projectId === 'P-005')!;
+  const change = state.changes.find((c) => c.projectId === 'P-005')!;
+  change.type = '成本变更'; change.scheduleImpactDays = 0; change.status = 'PMC审议中';
+  change.costImpact = money(changeApproval.budget.totalAmount - changeApproval.baseline.budgetAmount);
+  changeApproval.kind = 'change'; changeApproval.sourceChangeId = change.id;
+  const changeDecision = state.decisions.find((d) => d.id === changeApproval.id)!;
+  changeDecision.type = '重大变更审批'; changeDecision.title = change.title;
+  const cases: ManagementApproval[] = [
+    { id: 'MGT-001', projectId: 'P-003', sourceId: state.risks.find((r) => r.projectId === 'P-003')!.id, type: '重大风险处置', reason: '申请集团协调专项资源并按周跟踪所引风险；风险仍由项目团队持续监控。', impactAmount: 0, submittedBy: 'U-001', status: '待审批' },
+    { id: 'MGT-002', projectId: 'P-004', sourceId: 'P-004', type: '未签额外投入', reason: '未签阶段申请追加80万元投入额度，用于客户验证；本审批只调整额度，不确认成本。', impactAmount: 80, originalQuota: state.projects.find((p) => p.id === 'P-004')!.unsignedLimitQuota, proposedQuota: money((state.projects.find((p) => p.id === 'P-004')!.unsignedLimitQuota ?? 0) + 80), submittedBy: 'U-001', status: '待审批' },
+    { id: 'MGT-003', projectId: 'P-006', sourceId: state.acceptances.find((a) => a.projectId === 'P-006' && a.type === '客户终验')!.id, type: '重大验收异常', reason: '申请协调客户复验与整改资源；整改完成后仍须客户终验确认。', impactAmount: 0, submittedBy: 'U-001', status: '待审批' },
+    { id: 'MGT-004', projectId: 'P-008', sourceId: state.settlements.find((s) => s.projectId === 'P-008')!.id, type: '结算争议审定', reason: '演示争议：对已锁定结算的成本归属提出复核申请，请决策是否组织专项核查；本审批不重开或修改结算。', impactAmount: 0, submittedBy: 'U-004', status: '待审批' },
+  ];
+  state.managementApprovals = cases;
+  for (const item of cases) {
+    const p = state.projects.find((p) => p.id === item.projectId)!;
+    state.decisions.push({ id: item.id, projectId: p.id, projectName: p.name, type: item.type, title: item.reason, impactAmount: item.impactAmount, level: '高管审批', status: '待决策', targetRoute: `/management-approvals/${item.id}`, createdAt: '2026-09-05' });
+  }
+  return state;
+}
+
 export const useBusinessStore = create<{ data: BusinessState; dispatch: (action: BusinessAction, actor: Actor) => void }>((set) => ({
-  data: createBusinessState(),
+  data: createDemoBusinessState(),
   dispatch: (action, actor) => set((state) => ({ data: transition(state.data, action, actor) })),
 }));

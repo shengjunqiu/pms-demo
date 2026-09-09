@@ -22,7 +22,11 @@ export function GL03ProjectDrilldownPage() {
   const scope = selectProjects(readProjectFilter(params), role, data.projects).filter((p) =>
     (!params.get('stage') || fourStage(p) === params.get('stage')) &&
     (params.get('metric') !== 'overbudget' || p.rollingCost > p.budgetAmount) &&
-    (params.get('metric') !== 'unsigned' || p.isUnsigned));
+    (params.get('metric') !== 'unsigned' || p.isUnsigned) &&
+    (params.get('metric') !== 'signed' || !p.isUnsigned) &&
+    (params.get('metric') !== 'construction' || p.phase === '执行') &&
+    (params.get('metric') !== 'closing' || p.phase === '收尾') &&
+    (params.get('metric') !== 'maintenance' || p.isMaintenance));
   if (!['executive', 'pmo', 'admin'].includes(role)) return <StateView type="403" />;
   const id = params.get('projectId'); const project = data.projects.find((p) => p.id === id);
   if (id && !project) return <StateView type="404" title="项目不存在" />;
@@ -36,7 +40,7 @@ export function GL03ProjectDrilldownPage() {
   const receipts = selectReceipts(scope);
   const totalBudget = sumMoney(scope.map((p) => p.budgetAmount)); const totalRolling = sumMoney(scope.map((p) => p.rollingCost));
   const list = <>{header}<ProjectFilters params={params} onChange={setParams} />
-    {(params.get('metric') || params.get('stage')) && <Alert style={{ marginBottom: 16 }} message={`继承指标：${params.get('metric') === 'overbudget' ? '预测超预算' : params.get('metric') === 'unsigned' ? '未签项目' : '全部'}；阶段：${params.get('stage') ?? '全部'}`} type="info" />}
+    {(params.get('metric') || params.get('stage')) && <Alert style={{ marginBottom: 16 }} message={`继承指标：${(({ overbudget: '预测超预算', unsigned: '未签项目', signed: '已签约项目', construction: '在建项目', closing: '验收收尾', maintenance: '运维项目' } as Record<string, string>)[params.get('metric') ?? ''] ?? '全部')}；阶段：${params.get('stage') ?? '全部'}`} type="info" />}
     <Row gutter={16} style={{ marginBottom: 16 }}>{[['项目数量', scope.length], ['已签合同金额', receipts.signed], ['有效预算合计', totalBudget], ['滚动预测合计', totalRolling]].map(([label, value], i) => <Col span={6} key={String(label)}><Card size="small"><Statistic title={label} value={Number(value)} formatter={() => i === 0 ? String(value) : <MoneyText value={Number(value)} />} /></Card></Col>)}</Row>
     <Table rowKey="id" size="small" dataSource={scope} scroll={{ x: 1250 }} pagination={{ current: Number(params.get('page')) || 1, pageSize: 10, showSizeChanger: false, showTotal: (n) => `共 ${n} 个项目`, }} onChange={(pagination, _, sorter, extra) => { const sort = Array.isArray(sorter) ? sorter[0] : sorter; view({ page: String(extra.action === 'sort' ? 1 : pagination.current ?? 1), sort: sort.order ? String(sort.columnKey) : undefined, order: sort.order ?? undefined }); }} columns={[
       { title: '项目', width: 260, fixed: 'left', render: (_, p) => <><Button type="link" style={{ padding: 0, whiteSpace: 'normal', textAlign: 'left' }} onClick={() => view({ projectId: p.id })}>{p.name}</Button><div><Typography.Text type="secondary">{p.id} · {p.customerName}</Typography.Text></div></> },

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createBusinessState, transition, type Actor } from '@/mock/business';
+import { createBusinessState, createDemoBusinessState, transition, type Actor } from '@/mock/business';
 import { mockProjects } from '@/mock';
 import { selectProjects, selectFourCalculations, selectReceipts } from '@/mock/selectors';
 import { calculateCockpitKPIs } from '@/utils/calculator';
@@ -131,3 +131,58 @@ describe('审批、权限及成本锁定', () => {
     expect(maintenance.projects[6].actualCost).toBe(settled.projects[6].actualCost);
   });
 });
+
+
+describe('领导待决策与到期回款', () => {
+  it('每条决策关联真实审批快照；审批后原事项及当前预算联动，历史记录仍可读取', () => {
+    const initial = createDemoBusinessState();
+    expect(initial.decisions).toHaveLength(49);
+    expect(initial.decisions.filter((d) => d.status === '待决策')).toHaveLength(19);
+    for (const decision of initial.decisions.filter((d) => d.targetRoute.startsWith('/approvals/'))) {
+      const approval = initial.approvals.find((a) => a.id === decision.id)!;
+      expect(approval.projectId).toBe(decision.projectId);
+      expect(decision.targetRoute).toBe(`/approvals/${approval.id}`);
+      expect(sumMoney(approval.budget.items.map((i) => i.amount))).toBe(approval.budget.totalAmount);
+    }
+    const pending = initial.approvals.find((a) => a.status === '待审批')!;
+    const next = transition(initial, { type: 'review', approvalId: pending.id, approve: true, opinion: '同意所引版本和交付范围' }, leader);
+    expect(next.decisions.filter((d) => d.status === '待决策')).toHaveLength(18);
+    expect(next.projects.find((p) => p.id === pending.projectId)?.budgetAmount).toBe(pending.budget.totalAmount);
+    expect(pending.status).toBe('待审批');
+    const second = initial.approvals.find((a) => a.projectId === 'P-003')!;
+    const imported = { ...initial, baselines: initial.baselines.filter((b) => b.projectId !== 'P-003' || b.status === '已生效') };
+    const upgraded = transition(imported, { type: 'review', approvalId: second.id, approve: true, opinion: '按引用版本批准' }, leader);
+    expect(upgraded.projects.find((p) => p.id === 'P-003')?.currentBaselineVersion).toBe('V3.0');
+    expect(new Set(upgraded.baselines.filter((b) => b.projectId === 'P-003').map((b) => b.version)).size).toBe(2);
+  });
+  it('到期回款只使用计划，不把未到期合同余额算成逾期，未签不产生合同计划', () => {
+    const p1 = selectReceipts([mockProjects[0]]);
+    expect(p1.overdue).toBe(0);
+    expect(p1.outstanding).toBeGreaterThan(0);
+    expect(sumMoney(p1.plans.map((p) => p.amount))).toBe(p1.signed);
+    expect(p1.dueCompletion).toBe(100);
+    expect(selectReceipts([mockProjects[1]]).overdue).toBeGreaterThan(0);
+    expect(selectReceipts([mockProjects[3]]).plans).toHaveLength(0);
+    expect(selectReceipts([]).dueCompletion).toBeNull();
+  });
+});
+
+ it('管理审批联动原事项但不跳过风险、终验和结算流程；未签审批只变更额度', () => {
+    const initial = createDemoBusinessState();
+    expect(new Set(initial.decisions.map((d) => d.type)).size).toBe(6);
+    let next = initial;
+    for (const item of initial.managementApprovals) {
+      expect(() => transition(next, { type: 'review-management', id: item.id, approve: true, opinion: '' }, leader)).toThrow();
+      next = transition(next, { type: 'review-management', id: item.id, approve: true, opinion: '同意专项方案，按原流程跟踪' }, leader);
+      expect(next.decisions.find((d) => d.id === item.id)?.status).toBe('已通过');
+      expect(() => transition(next, { type: 'review-management', id: item.id, approve: true, opinion: '重复' }, leader)).toThrow();
+    }
+    expect(next.risks).toEqual(initial.risks);
+    expect(next.acceptances).toEqual(initial.acceptances);
+    expect(next.settlements).toEqual(initial.settlements);
+    expect(next.projects.find((p) => p.id === 'P-004')?.unsignedLimitQuota).toBe((initial.projects.find((p) => p.id === 'P-004')?.unsignedLimitQuota ?? 0) + 80);
+    expect(next.projects.map((p) => p.actualCost)).toEqual(initial.projects.map((p) => p.actualCost));
+    const change = initial.approvals.find((a) => a.kind === 'change')!;
+    const changed = transition(initial, { type: 'review', approvalId: change.id, approve: true, opinion: '同意成本变更' }, leader);
+    expect(changed.changes.find((c) => c.id === change.sourceChangeId)?.newBaselineId).toBe(`BASE-${change.id}`);
+  });

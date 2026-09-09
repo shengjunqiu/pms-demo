@@ -4,6 +4,8 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { RoutesManifestPage } from '@/pages/manifest/RoutesManifestPage';
 import { PagePlaceholder } from '@/pages/common/PagePlaceholder';
 import { StateView } from '@/components/common/StateView';
+import { useAppStore } from '@/store/useAppStore';
+import { ROLE_HOME } from '@/routes/navigation';
 import { PAGE_MANIFEST } from '@/routes/manifest';
 
 // Phase 2: GL 领导经营驾驶舱系列
@@ -13,14 +15,19 @@ import { GL03ProjectDrilldownPage } from '@/pages/executive/GL03ProjectDrilldown
 import { GL04PortfolioPage } from '@/pages/executive/GL04PortfolioPage';
 import { GL05ExceptionsPage } from '@/pages/executive/GL05ExceptionsPage';
 import { DynamicAccountingPage } from '@/pages/execution/DynamicAccountingPage';
+import { GL06DecisionsPage } from '@/pages/executive/GL06DecisionsPage';
+import { ManagementApprovalPage } from '@/pages/approvals/ManagementApprovalPage';
+import { BudgetApprovalPage } from '@/pages/approvals/BudgetApprovalPage';
 import { ProjectOverviewPage } from '@/pages/execution/ProjectOverviewPage';
+
+function RoleHome() { const role = useAppStore((s) => s.currentRole); return <Navigate to={ROLE_HOME[role]} replace />; }
 
 export const AppRouter: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<MainLayout />}>
         {/* 默认重定向到驾驶舱 */}
-        <Route index element={<Navigate to="/executive/dashboard" replace />} />
+        <Route index element={<RoleHome />} />
         <Route path="/routes-manifest" element={<RoutesManifestPage />} />
 
         {/* Phase 2: GL 驾驶舱与专题分析 */}
@@ -28,6 +35,9 @@ export const AppRouter: React.FC = () => {
         <Route path="executive/four-calculations" element={<GL02FourCalculationsPage />} />
         <Route path="executive/project-drilldown" element={<GL03ProjectDrilldownPage />} />
         <Route path="executive/portfolio" element={<GL04PortfolioPage />} />
+        <Route path="executive/decisions" element={<GL06DecisionsPage />} />
+        <Route path="management-approvals/:id" element={<ManagementApprovalPage />} />
+        <Route path="approvals/:id" element={<BudgetApprovalPage />} />
         <Route path="executive/exceptions" element={<GL05ExceptionsPage />} />
         <Route path="projects/:id/dynamic-accounting" element={<DynamicAccountingPage />} />
         <Route path="projects/:id" element={<ProjectOverviewPage />} />
@@ -36,7 +46,7 @@ export const AppRouter: React.FC = () => {
         {PAGE_MANIFEST.map((item) => {
           const relativeRoute = item.route.startsWith('/') ? item.route.slice(1) : item.route;
           // 跳过已实现的页面
-          if (['projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/four-calculations', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions'].includes(relativeRoute)) {
+          if (['projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/four-calculations', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions', 'executive/decisions'].includes(relativeRoute)) {
             return null;
           }
           return (

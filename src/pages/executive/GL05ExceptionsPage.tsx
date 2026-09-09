@@ -1,142 +1,59 @@
-import React, { useState } from 'react';
-import { Card, Table, Tag, Typography, Space, Tabs, Badge, Button, Alert } from 'antd';
-import { WarningOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import { mockProjects } from '@/mock';
+import { useState } from 'react';
+import { Alert, Button, Descriptions, Drawer, Space, Table, Tabs, Tag, type TableColumnsType } from 'antd';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useBusinessStore } from '@/mock/business';
+import { EXCEPTION_TABS, projectExceptions } from '@/mock/exceptions';
+import { fourStage, selectProjects } from '@/mock/selectors';
+import { mockDepartments, AS_OF_DATE } from '@/mock';
+import { useAppStore } from '@/store/useAppStore';
 import { PageHeader } from '@/components/common/PageHeader';
-import { Project } from '@/models/types';
+import { StateView } from '@/components/common/StateView';
+import { ProjectFilters } from '@/components/common/ProjectFilters';
+import { AnalysisTools } from '@/components/common/AnalysisTools';
+import { readProjectFilter } from '@/utils/project-query';
+import { MoneyText } from '@/components/common/MoneyText';
 
-const { Text } = Typography;
-
-export const GL05ExceptionsPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<string>('all');
-
-  const redProjects = mockProjects.filter((p) => p.health === 'red');
-  const orangeProjects = mockProjects.filter((p) => p.health === 'orange');
-  const costExceptions = mockProjects.filter((p) => p.costVarianceRate > 5);
-  const unsignedExceptions = mockProjects.filter((p) => p.isUnsigned);
-
-  const getDataSource = () => {
-    switch (activeTab) {
-      case 'red': return redProjects;
-      case 'orange': return orangeProjects;
-      case 'cost': return costExceptions;
-      case 'unsigned': return unsignedExceptions;
-      default: return mockProjects.filter((p) => p.health !== 'green');
-    }
-  };
-
-  const columns = [
-    {
-      title: '项目编号/名称',
-      dataIndex: 'name',
-      key: 'name',
-      render: (_value: unknown, record: Project) => (
-        <div>
-          <Space size={4}>
-            <Tag color="blue">{record.id}</Tag>
-            <Text strong>{record.name}</Text>
-          </Space>
-          <div style={{ fontSize: 12, color: '#8c8c8c' }}>{record.customerName} | PM: {record.pmName}</div>
-        </div>
-      ),
-    },
-    {
-      title: '所属部门',
-      dataIndex: 'departmentName',
-      key: 'departmentName',
-      width: 140,
-    },
-    {
-      title: '健康等级',
-      dataIndex: 'health',
-      key: 'health',
-      width: 100,
-      render: (health: string) => {
-        const color = health === 'red' ? 'error' : health === 'orange' ? 'warning' : 'gold';
-        const text = health === 'red' ? '高风险' : health === 'orange' ? '预警' : '关注';
-        return <Badge status={color as 'error' | 'warning' | 'default' | 'success' | 'processing'} text={text} />;
-      },
-    },
-    {
-      title: '最严重异常原因与诊断',
-      dataIndex: 'healthReason',
-      key: 'healthReason',
-      render: (reason: string) => <Text style={{ color: '#cf1322', fontSize: 13 }}>{reason}</Text>,
-    },
-    {
-      title: '合同金额 / 滚动成本 (万元)',
-      key: 'cost',
-      width: 200,
-      render: (_value: unknown, record: Project) => (
-        <div>
-          <div>合同: ¥{record.contractAmount.toLocaleString()}</div>
-          <div style={{ fontSize: 12, color: record.costVariance > 0 ? '#cf1322' : '#3f8600' }}>
-            滚动: ¥{record.rollingCost.toLocaleString()} (偏差: {record.costVarianceRate}%)
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: '操作',
-      key: 'action',
-      width: 100,
-      render: (_value: unknown, record: Project) => (
-        <Button
-          type="link"
-          size="small"
-          onClick={() => navigate(`/executive/project-drilldown?projectId=${record.id}`)}
-        >
-          全景穿透
-        </Button>
-      ),
-    },
+const names = { green: '健康', yellow: '关注', orange: '预警', red: '高风险' };
+const colors = { green: 'success', yellow: 'gold', orange: 'orange', red: 'error' };
+type ExceptionRow = ReturnType<typeof projectExceptions>[number];
+export function GL05ExceptionsPage() {
+  const data = useBusinessStore((s) => s.data); const role = useAppStore((s) => s.currentRole);
+  const navigate = useNavigate(); const [params, setParams] = useSearchParams(); const [selected, setSelected] = useState<string>();
+  const [visible, setVisible] = useState(['amount', 'org', 'phase', 'reason', 'duration', 'variance', 'owner']);
+  if (!['executive', 'pmo', 'admin'].includes(role)) return <StateView type="403" />;
+  const scope = selectProjects(readProjectFilter(params), role, data.projects); const exceptions = projectExceptions(scope, data, params.get('health') === 'green');
+  const category = params.get('exception') ?? 'all';
+  const rows = exceptions.filter((p) => category === 'all' || p.types.includes(category));
+  const detail = exceptions.find((p) => p.id === selected);
+  const query = (values: Record<string, string>) => { const next = new URLSearchParams(params); Object.entries(values).forEach(([k, v]) => next.set(k, v)); return next; };
+  const project = (p: ExceptionRow) => navigate(`/executive/project-drilldown?${query({ projectId: p.id })}`);
+  const source = (p: ExceptionRow, kind: string) => { const next = query({ projectId: p.id }); next.delete('tab'); if (kind === 'receipt') next.set('tab', 'receipts'); else if (kind === 'schedule') next.set('tab', 'progress'); else if (kind === 'risk') next.set('tab', 'risks'); navigate(`/projects/${p.id}${['cost', 'unsigned', 'margin'].includes(kind) ? '/dynamic-accounting' : ''}?${next}`); };
+  const columns: TableColumnsType<ExceptionRow> = [
+    { key: 'project', title: '项目', width: 250, fixed: 'left', render: (_, p) => <><Button type="link" style={{ padding: 0, whiteSpace: 'normal', textAlign: 'left' }} onClick={() => project(p)}>{p.name}</Button><div>{p.id} <Tag color={colors[p.health]}>{names[p.health]}</Tag></div></> },
+    { key: 'amount', title: '项目金额（万元）', width: 130, render: (_, p) => <MoneyText value={p.revenueAmount} /> },
+    { key: 'org', title: '责任组织', width: 140, dataIndex: 'departmentName' },
+    { key: 'phase', title: '阶段', width: 105, render: (_, p) => fourStage(p) },
+    { key: 'reason', title: '主要异常 / 偏差', width: 240, render: (_, p) => <><div>{p.healthReason}</div>{p.overdueReceipt > 0 && <div>到期未收 <MoneyText value={p.overdueReceipt} /></div>}</> },
+    { key: 'duration', title: '首次观测 / 持续', width: 135, render: (_, p) => <>{p.firstObserved}<div>{p.duration} 天（演示快照）</div></> },
+    { key: 'variance', title: '成本 / 毛利偏差', width: 145, render: (_, p) => <><MoneyText value={p.calc.variance} signed /><div><MoneyText value={p.marginVariance} signed /></div></>, sortOrder: params.get('exceptionSort') === 'variance' ? (params.get('exceptionOrder') === 'ascend' ? 'ascend' : 'descend') : null, sorter: (a, b) => a.calc.variance - b.calc.variance },
+    { key: 'owner', title: 'PM / 总监', width: 150, render: (_, p) => <>{p.pmName}<div>{mockDepartments.find((d) => d.id === mockDepartments.find((d) => d.id === p.departmentId)?.parentId)?.leader ?? '王总'}（演示任命）</div></> },
+    { key: 'action', title: '只读操作', width: 120, fixed: 'right', render: (_, p) => <Space direction="vertical"><Button size="small" onClick={() => setSelected(p.id)}>原因与责任链</Button><Button type="link" size="small" onClick={() => project(p)}>查看项目</Button></Space> },
   ];
-
-  return (
-    <div>
-      <PageHeader
-        title="GL-05 项目健康度与异常监控中心"
-        description="集中监控高风险、进度严重逾期、成本超支、未签投入超限等红黄绿异常项目台账"
-        extra={
-          <Space size={12}>
-            <Tag color="error">高风险: {redProjects.length}</Tag>
-            <Tag color="warning">预警: {orangeProjects.length}</Tag>
-          </Space>
-        }
-      />
-
-      <Alert
-        message="异常监控规则提示"
-        description="系统实时依据【成本偏差率 ≥ 15%】、【终验延期超 14 天】、【未签投入超限】等规则自动触发红线预警并归集至本中心。"
-        type="warning"
-        showIcon
-        icon={<WarningOutlined />}
-        style={{ marginBottom: 16 }}
-      />
-
-      <Card size="small">
-        <Tabs
-          activeKey={activeTab}
-          onChange={setActiveTab}
-          items={[
-            { key: 'all', label: `全部异常项目 (${mockProjects.filter(p => p.health !== 'green').length})` },
-            { key: 'red', label: `高风险红线项目 (${redProjects.length})` },
-            { key: 'orange', label: `预警项目 (${orangeProjects.length})` },
-            { key: 'cost', label: `成本超支专项 (${costExceptions.length})` },
-            { key: 'unsigned', label: `未签立项监控 (${unsignedExceptions.length})` },
-          ]}
-        />
-
-        <Table
-          dataSource={getDataSource()}
-          columns={columns}
-          rowKey="id"
-          size="small"
-          pagination={{ pageSize: 8 }}
-        />
-      </Card>
-    </div>
-  );
-};
+  return <><PageHeader title="GL-05 项目异常中心" description={`成本、进度、毛利、到期回款与未签额度 · 数据基准 ${AS_OF_DATE} · 金额单位：万元`} breadcrumbs={[{ title: '首页', href: '/' }, { title: '项目异常中心' }]} extra={<Button onClick={() => navigate(-1)}>返回上一级</Button>} />
+    <ProjectFilters params={params} onChange={setParams} />
+    <AnalysisTools storageKey="pms-exception-views" params={params} onChange={setParams} columns={columns.filter((c) => !['project', 'action'].includes(String(c.key))).map((c) => ({ value: String(c.key), label: String(c.title) }))} visible={visible} onColumns={setVisible} exportRows={[
+      ['项目编号', '项目名称', '组织', '健康度', '成本偏差（万元）', '毛利偏差（万元）', '原因'], ...rows.map((p) => [p.id, p.name, p.departmentName, names[p.health], p.calc.variance.toFixed(2), p.marginVariance.toFixed(2), p.healthReason]),
+    ]} />
+    <Alert type="info" showIcon style={{ marginBottom: 12 }} message="演示规则 DEMO-1：超预算>0为关注，≥5%为预警，≥15%为高风险；最严重因素决定健康度。" description="异常按当前来源数据复算；首次观测使用2026-09-01监控快照，不等同于业务发生时间。回款异常仅统计已到期且未收计划，不将合同余额全部视为逾期。" />
+    {params.get('health') === 'green' && <Alert style={{ marginBottom: 12 }} type="success" message={`当前查看${scope.length}个健康项目，未命中异常；其他异常分类为空。`} />}
+    <Tabs activeKey={category} onChange={(key) => { const next = query({ exception: key }); next.delete('page'); setParams(next); }} items={EXCEPTION_TABS.map((tab) => ({ ...tab, label: `${tab.label}（${exceptions.filter((p) => tab.key === 'all' || p.types.includes(tab.key)).length}）` }))} />
+    <Table rowKey="id" size="small" dataSource={rows} columns={columns.filter((c) => ['project', 'action'].includes(String(c.key)) || visible.includes(String(c.key)))} scroll={{ x: 1500 }} pagination={{ current: Number(params.get('page')) || 1, pageSize: 8, showSizeChanger: false, showTotal: (n) => `共 ${n} 个${params.get('health') === 'green' ? '健康' : '异常'}项目`}} onChange={(pagination, _, sorter, extra) => { const sort = Array.isArray(sorter) ? sorter[0] : sorter; const next = query({ page: String(extra.action === 'sort' ? 1 : pagination.current ?? 1) }); if (sort.order) { next.set('exceptionSort', String(sort.columnKey)); next.set('exceptionOrder', sort.order); } else { next.delete('exceptionSort'); next.delete('exceptionOrder'); } setParams(next); }} />
+    <Drawer title="异常原因与责任链" width={600} open={!!detail} onClose={() => setSelected(undefined)}>{detail && <><Descriptions bordered column={1} items={[
+      { key: 'project', label: '项目', children: `${detail.id} · ${detail.name}` }, { key: 'owner', label: '责任链', children: `${detail.departmentName} → ${detail.pmName}` },
+      { key: 'reason', label: '健康原因', children: detail.healthReason }, { key: 'cost', label: '成本偏差', children: <MoneyText value={detail.calc.variance} signed /> },
+      { key: 'schedule', label: '最长里程碑逾期', children: `${detail.delayDays} 天` }, { key: 'unsigned', label: '未签额度超出', children: <MoneyText value={detail.unsignedExcess} /> },
+    ]} /><Space wrap style={{ margin: '16px 0' }}><Button onClick={() => source(detail, 'cost')}>成本来源明细</Button><Button onClick={() => source(detail, 'schedule')}>里程碑原记录</Button><Button onClick={() => source(detail, 'risk')}>风险问题记录</Button><Button onClick={() => source(detail, 'receipt')}>合同回款明细</Button></Space>
+      <Table rowKey="id" size="small" pagination={false} dataSource={detail.receiptPlans} columns={[{ title: '回款计划', dataIndex: 'title' }, { title: '到期日', dataIndex: 'dueDate' }, { title: '计划金额', dataIndex: 'amount', render: (v: number) => <MoneyText value={v} /> }, { title: '实收金额', dataIndex: 'paidAmount', render: (v: number) => <MoneyText value={v} /> }]} />
+    </>}</Drawer>
+  </>;
+}

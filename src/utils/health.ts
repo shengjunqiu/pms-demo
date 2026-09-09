@@ -15,7 +15,7 @@ export function assessHealth(project: Project, facts: HealthFacts = {}, rules = 
   const margin = percentage((project.revenueAmount ?? project.contractAmount) - project.rollingCost, project.revenueAmount ?? project.contractAmount);
   if (margin !== null && margin < rules.lowMargin) hits.push({ id: 'margin', severity: margin < 0 ? 3 : 2, reason: `预测毛利率 ${margin.toFixed(1)}%` });
   if (project.isUnsigned && project.actualCost + project.committedCost > (project.unsignedLimitQuota ?? 0)) hits.push({ id: 'unsigned', severity: 3, reason: '未签已发生及未发生承诺超过授权额度' });
-  if ((facts.overdueReceipt ?? 0) > 0) hits.push({ id: 'receipt', severity: 2, reason: `逾期应收 ${facts.overdueReceipt} 万元` });
+  if ((facts.overdueReceipt ?? 0) > 0) hits.push({ id: 'receipt', severity: 2, reason: `逾期应收 ${facts.overdueReceipt!.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} 万元` });
   if ((facts.missingMaterials ?? 0) > 0) hits.push({ id: 'compliance', severity: 2, reason: `缺少 ${facts.missingMaterials} 项必交材料` });
   hits.sort((a, b) => b.severity - a.severity);
   return { level: (['green', 'yellow', 'orange', 'red'] as const)[hits[0]?.severity ?? 0],

@@ -247,8 +247,8 @@
       "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
     },
     "GL-01": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0010"
     },
     "GL-02": {
       "status": "pending",
@@ -263,12 +263,12 @@
       "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
     },
     "GL-05": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0010"
     },
     "GL-06": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0010"
     },
     "CF-01": {
       "status": "pending",
@@ -304,7 +304,7 @@
     },
     "FINAL": {
       "status": "pending",
-      "reason": "保留R0006实现及截图，与HS-01组成闭环后重新验收。"
+      "reason": "与GL-06合并验收实际可操作的待决策链路"
     }
   },
   "runs": [
@@ -501,6 +501,50 @@
         ".pms-loop/runs/R0008/checks.json": "0b5650f81f2fdd4be3fa391f433451992a0d20f9cb5a26f93af661e2517fbcb9",
         ".pms-loop/runs/R0008/evidence.json": "b4287167eafa574fe306828b23a385547d0af02f89a65c29c1cc5f11754b428c"
       }
+    },
+    {
+      "id": "R0009",
+      "items": [
+        "GL-01",
+        "GL-05"
+      ],
+      "started_at": "2026-09-09T15:59:41+00:00",
+      "status": "deferred",
+      "reason": "驾驶舱待决策下钻依赖GL-06与原预算审批详情，扩大同轮闭环范围",
+      "ended_at": "2026-09-09T16:01:15+00:00"
+    },
+    {
+      "id": "R0010",
+      "items": [
+        "GL-01",
+        "GL-05",
+        "GL-06"
+      ],
+      "started_at": "2026-09-09T16:01:15+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-09T16:47:35+00:00",
+      "revision": "82db7acc5e53eab5413c580ec6371a2e60cfbc7dce716ce0c5e350adb9e92b54",
+      "proof": {
+        ".pms-loop/runs/R0010/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0010/test-domain.log": "78deec795626c9a55981de3bfdb5ddc65cc34a2ffc5fae9b6ab2895d1295abde",
+        ".pms-loop/runs/R0010/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0010/build.log": "10675837053125eb09955f6033c6b683d1eb111f782ac06f5b0a2b39b79147d5",
+        ".pms-loop/runs/R0010/artifacts/final-console.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        ".pms-loop/runs/R0010/artifacts/gl-01-1440.png": "b5dac430d2a71774b5258f546b27b9f7cf1ebf9a60d552634e5db3d8809c1399",
+        ".pms-loop/runs/R0010/artifacts/gl-01-1280.png": "b76bf7a50b287ed21e16a60ae1e379cabfe4339270a5924462ccd4a81e772a32",
+        ".pms-loop/runs/R0010/artifacts/gl-05-1440.png": "bf8f2802439a80c49749c187ea5c59bb5fb3eaf4150ad9e6bf0eed12106df141",
+        ".pms-loop/runs/R0010/artifacts/gl-05-1280.png": "5e8a9809b93b7816429671bda20515bfb24e2d680431c6b8d9941a0f8d34e0d7",
+        ".pms-loop/runs/R0010/artifacts/gl-06-1440.png": "d21a9577b99eeef6a3cb90c0442392ea7e1bec778b668328be121add70fb16a9",
+        ".pms-loop/runs/R0010/artifacts/gl-06-1280.png": "2b40c6fe08fdc1a9ea49544db1e1bb469d1dffe195aa2f885663765d0d3dac82",
+        ".pms-loop/runs/R0010/checks.json": "a3b9818c924fe64ff1f407314d8904f09db295863daf36df49f2a53a34888d91",
+        ".pms-loop/runs/R0010/evidence.json": "b1e0ad0f2360e4030de225820aa9e2f8a62c4e37912f1cc4535a53ed5fbe6a03"
+      }
     }
   ],
   "notes": [
@@ -519,6 +563,18 @@
     {
       "at": "2026-09-09T15:27:28+00:00",
       "text": "reopen FINAL, HS-13: 保留R0006实现及截图，与HS-01组成闭环后重新验收。"
+    },
+    {
+      "at": "2026-09-09T16:01:15+00:00",
+      "text": "R0009阻塞: 驾驶舱待决策下钻依赖GL-06与原预算审批详情，扩大同轮闭环范围"
+    },
+    {
+      "at": "2026-09-09T16:01:15+00:00",
+      "text": "reopen FINAL, GL-01, GL-05: 与GL-06合并验收实际可操作的待决策链路"
+    },
+    {
+      "at": "2026-09-09T16:27:05+00:00",
+      "text": "R0010(GL01/05/06)已实现：15真实预算待审+30历史驳回，原审批/approvals/:id；22领域测试曾通过，最新AnalysisTools保存视图选中标签修复后需重跑check。浏览器已验证APR-2批准预算720→748.8/V2、实际650及滚动780不变，待审15→14；APR-3驳回后P003预算1980/滚动2360不变，待审13。验证六种GL01场景、P001保存视图/下钻同范围、合同54项169276.6、逾期P2/P3合计2347.565、健康32范围、GL05列设置及CSV32条。剩余GL06分页/排序/角色、GL01分析Tabs、三页1440/1280截图与控制台；最终填写证据accept并提交。当前浏览器1 tab3 localhost需192.168.31.210:5174；CUA变量tab/browser/cdp/evidenceFs可用。"
     }
   ]
 }
