@@ -255,8 +255,8 @@
       "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
     },
     "GL-03": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0008"
     },
     "GL-04": {
       "status": "pending",
@@ -472,6 +472,34 @@
         ".pms-loop/runs/R0007/artifacts/hs-13-1280.png": "734979de9a929ebfc027c77eb6817ebd9a14830a6ec0a7d4ae8d5ee5593583f7",
         ".pms-loop/runs/R0007/checks.json": "072496ccefa80568ebebcd49c8ac4d16084094b117a1bc5d34b28436889e1625",
         ".pms-loop/runs/R0007/evidence.json": "20aa562f878f6abfbee1472b744ee6c1e484081ef6cf84fe02375ff64dd5d70f"
+      }
+    },
+    {
+      "id": "R0008",
+      "items": [
+        "GL-03"
+      ],
+      "started_at": "2026-09-09T15:46:28+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-09T15:59:18+00:00",
+      "revision": "5d360362f7b0aa662b6c9a48fc5feca4def3620927d24d2da53312161539e2c0",
+      "proof": {
+        ".pms-loop/runs/R0008/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0008/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0008/build.log": "cc2046f458adf1ac4e3eccb8c3bb8bb4c0463762f5ed5720c7de2a8c5d4fb845",
+        ".pms-loop/runs/R0008/test-domain.log": "6b5022f744d36814712f20ee698e7dc73aa765ff5ca32a76c648d1a8d9b87a6c",
+        ".pms-loop/runs/R0008/artifacts/gl-03-1440.png": "b68bcd431ead9fa05077a2a2d9cc354f53bf10b4324c54603d95f546ee7455d4",
+        ".pms-loop/runs/R0008/artifacts/gl-03-1280.png": "a3075122248276a35d0b4ac33eccb7102ac82a6b5a48ee3dfd168245ec4c24db",
+        ".pms-loop/runs/R0008/artifacts/gl-03-drawer.png": "74017318a36bdf8f148bf80d6b439853adc7b9b6570d1f5952e11a2a8f18c233",
+        ".pms-loop/runs/R0008/artifacts/browser-report.json": "a4bb16fdefd8b325611e15f02779c74cee6406c09fcd6a5a52362474dfbf5c14",
+        ".pms-loop/runs/R0008/checks.json": "0b5650f81f2fdd4be3fa391f433451992a0d20f9cb5a26f93af661e2517fbcb9",
+        ".pms-loop/runs/R0008/evidence.json": "b4287167eafa574fe306828b23a385547d0af02f89a65c29c1cc5f11754b428c"
       }
     }
   ],

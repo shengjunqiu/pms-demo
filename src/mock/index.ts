@@ -60,7 +60,7 @@ export const mockUsers: User[] = Array.from({ length: 50 }).map((_, i) => {
   const roles = ['项目经理', '方案架构师', '高级开发工程师', '测试经理', '财务专员', '市场商务经理', 'PMO专员', '质控专员'];
   const depts = mockDepartments.map((d) => d.id);
   const names = ['张建国', '李主任', '王总', '刘敏', '赵工', '陈亮', '黄总监', '郑经理', '钱工程师', '孙总', '吴首席', '周总', '冯架构', '沈开发'];
-  const name = i < names.length ? names[i] : `工程师_${i + 1}`;
+  const name = i < names.length ? names[i] : `${['林', '何', '许', '郑', '吴', '杜'][Math.floor((i - names.length) / 6)]}${['志远', '思齐', '文静', '嘉宁', '明哲', '晓晨'][(i - names.length) % 6]}`;
   return {
     id,
     name,
@@ -89,11 +89,11 @@ export const mockCustomers: Customer[] = Array.from({ length: 32 }).map((_, i) =
   ];
   return {
     id,
-    name: i < fixedNames.length ? fixedNames[i] : `华东${regions[i % regions.length]}某集团客户_${i + 1}`,
+    name: i < fixedNames.length ? fixedNames[i] : `${['海州', '临江', '云山', '新港', '江宁', '滨海'][Math.floor((i - 8) / 4)]}市${['交通运输局', '工业和信息化局', '城市投资集团', '公共数据运营中心'][(i - 8) % 4]}`,
     industry: industries[i % industries.length],
     level: i < 5 ? '战略客户' : i < 15 ? '重点客户' : '普通客户',
-    region: regions[i % regions.length],
-    contactPerson: `客户代表_${i + 1}`,
+    region: i < 2 ? '福建省' : regions[i % regions.length],
+    contactPerson: `${['林', '陈', '周', '许'][i % 4]}${['志明', '雅文', '晓峰', '嘉宁', '建华', '思远', '文静', '明哲'][Math.floor(i / 4)]}`,
     contactPhone: `1890000${String(i).padStart(4, '0')}`,
   };
 });
@@ -436,7 +436,7 @@ const projectSeeds: Project[] = [
     return {
       id,
       code: `PRJ-2026-${String(num).padStart(3, '0')}`,
-      name: `${isMaintenance ? '运维服务' : isUnsigned ? '未签拟建' : '交付项目'}_${num}`,
+      name: `${mockCustomers[num % mockCustomers.length].name.replace(/(局|厅|中心|管委会|集团)$/, '')}${idx < 32 ? '业务协同平台' : '数据共享平台'}${isMaintenance ? '运维服务' : ''}`,
       customerId: mockCustomers[num % mockCustomers.length].id,
       customerName: mockCustomers[num % mockCustomers.length].name,
       opportunityId: `OPP-${String(num).padStart(3, '0')}`,
