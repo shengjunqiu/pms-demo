@@ -1,0 +1,4 @@
+interface:
+  display_name: "项目四算原型 Loop"
+  short_description: "面向项目四算与领导驾驶舱的持续开发、断点恢复和逐页验收技能"
+  default_prompt: "使用 $pms-prototype-loop 读取项目文档和开发进度，持续开发并验证项目四算高保真原型，直到满足完整验收标准。"
