@@ -1,0 +1,417 @@
+{
+  "schema_version": 1,
+  "catalog_sha256": "afabe9c27b289a2aa00a72d116be344fdbb01683443388e367536a99feb1f05e",
+  "status": "in_progress",
+  "active": null,
+  "completion_revision": null,
+  "created_at": "2026-09-09T14:33:07+00:00",
+  "items": {
+    "FND-01": {
+      "status": "done",
+      "round": "R0004"
+    },
+    "FND-02": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "WK-01": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "WK-02": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "GS-01": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "GS-02": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "GS-03": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "GS-04": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "GS-05": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "GS-06": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "GS-07": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "GS-08": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "GS-09": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "GS-10": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "GS-11": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "YS-01": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "YS-02": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "YS-03": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "YS-04": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "YS-05": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "YS-06": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "YS-07": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "YS-08": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "YS-09": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "YS-10": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "YS-11": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "YS-12": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "YS-13": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "YS-14": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "YS-15": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "HS-01": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "HS-02": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "HS-03": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "HS-04": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "HS-05": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "HS-06": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "HS-07": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "HS-08": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "HS-09": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "HS-10": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "HS-11": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "HS-12": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "HS-13": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "HS-14": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "HS-15": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "HS-16": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "HS-17": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "JS-01": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "JS-02": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "JS-03": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "JS-04": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "JS-05": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "JS-06": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "JS-07": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "JS-08": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "JS-09": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "JS-10": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "JS-11": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "JS-12": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "JS-13": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "GL-01": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "GL-02": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "GL-03": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "GL-04": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "GL-05": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "GL-06": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "CF-01": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "CF-02": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "CF-03": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "CF-04": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "CF-05": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "CF-06": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "CF-07": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "CF-08": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    "FINAL": {
+      "status": "pending",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    }
+  },
+  "runs": [
+    {
+      "id": "R0001",
+      "items": [
+        "FND-01"
+      ],
+      "started_at": "2026-09-09T14:33:26+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass"
+      },
+      "accepted_at": "2026-09-09T14:42:33+00:00",
+      "revision": "6d342ad3744dae39f66dbf5c2d52785faac70302a3c49efffa9ed15528ee9d3a",
+      "proof": {
+        ".pms-loop/runs/R0001/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0001/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0001/build.log": "ab8c07affee4f4b821205025d83460696667951786329896eacca9d8a0ee885a",
+        ".pms-loop/runs/R0001/artifacts/fnd-01-console.txt": "4c024815aa5cdcca67f8a07537feaf4c3b21f80d7f6c8023903cb28e317155d2",
+        ".pms-loop/runs/R0001/artifacts/fnd-01-1440.png": "e9cbcd5ff6116fd77e6bf8798d31510f41e97b0cc3dddeffe1fc463980eb6e57",
+        ".pms-loop/runs/R0001/artifacts/fnd-01-1280.png": "38d7c89af2e4d7b28e9264bd397dc9fbf3fe35ca7003dc2dc7124bed5f755e84",
+        ".pms-loop/runs/R0001/checks.json": "8efb8b2aaac487301c2f80b6bfd54bb4feeff202e335ecf957c52ac83b60de15",
+        ".pms-loop/runs/R0001/evidence.json": "ae59364ec9fe81889a84eba25fa4ee50e1e2b1d12c6752ff92aef08efe462410"
+      }
+    },
+    {
+      "id": "R0002",
+      "items": [
+        "FND-02"
+      ],
+      "started_at": "2026-09-09T14:42:42+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-09T14:48:14+00:00",
+      "revision": "738e9b06a7add1bfa4ede44da6fb02e758142c8496fd87aa3753e84f1af53fc6",
+      "proof": {
+        ".pms-loop/runs/R0002/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0002/build.log": "941a5f5877a794aab065aaa45f3ff1bc4ae7fd812088aba8f541d0ca0c05bb77",
+        ".pms-loop/runs/R0002/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0002/test-domain.log": "b7a33f323ef3c666ba5cfa2ac40d4a4b4446a3d2f2255b983b19b3f07165b0cd",
+        ".pms-loop/runs/R0002/artifacts/test-domain.log": "4476447b5472d2edbeb8040ab0ec50849e13ee486b2bd3c6d9e14304ae58993b",
+        ".pms-loop/runs/R0002/checks.json": "987cc1f4de509e9e64e3e596c026a3f10c0daadcdb673d7dfc43db0f97af6971",
+        ".pms-loop/runs/R0002/evidence.json": "c9f51065ff9e641298cb62aba8e97cea8f02ac77d2f3f2a700a4e8c294d07d20"
+      }
+    },
+    {
+      "id": "R0003",
+      "items": [
+        "GL-01",
+        "GL-02",
+        "GL-03",
+        "GL-04",
+        "GL-05"
+      ],
+      "started_at": "2026-09-09T14:49:21+00:00",
+      "status": "deferred",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "reason": "恢复验证发现 FND-02 数据不变量失败：未签金额计入合同、流水与摘要不符、版本科目合计不符、来源商机复用；先修复基础层再恢复 GL 验收。",
+      "ended_at": "2026-09-09T15:01:06+00:00"
+    },
+    {
+      "id": "R0004",
+      "items": [
+        "FND-01"
+      ],
+      "started_at": "2026-09-09T15:01:16+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass"
+      },
+      "accepted_at": "2026-09-09T15:06:13+00:00",
+      "revision": "8a0e22ac5923eaceab0f9edb0a2244ee2af0b5149799859ddae1ea7f3303a89a",
+      "proof": {
+        ".pms-loop/runs/R0004/build.log": "d04b7e0e7588021330c81b7647f6a6457324929bb779b0707d1bdd9cf85313ae",
+        ".pms-loop/runs/R0004/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0004/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0004/artifacts/browser-check.json": "56a9df2bf1108815323367ce91e1ea4597ccd27b5ab72b0791a9ce24a674acf1",
+        ".pms-loop/runs/R0004/artifacts/fnd-01-1440.png": "b60b8bfb441fbf6845574b287762e916928e236af089491c68484ad933b96f9b",
+        ".pms-loop/runs/R0004/artifacts/fnd-01-1280.png": "42fa27e795f8dbbd3705a31f3df00e362db53f8aa5f7f4e0571e5a85021186f9",
+        ".pms-loop/runs/R0004/checks.json": "e993bd3add327d642876eec5c85f085890793b8b0e7cb25ff84f1bcdf7fb72cc",
+        ".pms-loop/runs/R0004/evidence.json": "a7720e59b861003f450d8e49ea791f4f2470390fd483266c3d0067aec9d034de"
+      }
+    }
+  ],
+  "notes": [
+    {
+      "at": "2026-09-09T15:01:06+00:00",
+      "text": "R0003阻塞: 恢复验证发现 FND-02 数据不变量失败：未签金额计入合同、流水与摘要不符、版本科目合计不符、来源商机复用；先修复基础层再恢复 GL 验收。"
+    },
+    {
+      "at": "2026-09-09T15:01:06+00:00",
+      "text": "reopen CF-01, CF-02, CF-03, CF-04, CF-05, CF-06, CF-07, CF-08, FINAL, FND-01, FND-02, GL-01, GL-02, GL-03, GL-04, GL-05, GL-06, GS-01, GS-02, GS-03, GS-04, GS-05, GS-06, GS-07, GS-08, GS-09, GS-10, GS-11, HS-01, HS-02, HS-03, HS-04, HS-05, HS-06, HS-07, HS-08, HS-09, HS-10, HS-11, HS-12, HS-13, HS-14, HS-15, HS-16, HS-17, JS-01, JS-02, JS-03, JS-04, JS-05, JS-06, JS-07, JS-08, JS-09, JS-10, JS-11, JS-12, JS-13, WK-01, WK-02, YS-01, YS-02, YS-03, YS-04, YS-05, YS-06, YS-07, YS-08, YS-09, YS-10, YS-11, YS-12, YS-13, YS-14, YS-15: 新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    }
+  ]
+}
