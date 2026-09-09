@@ -119,6 +119,7 @@ export interface Contract {
   customerId: string;
   amount: number; // 万元
   signDate: string;
+  acceptanceDueDate?: string;
   status: '已签订' | '履约中' | '已完成' | '已终止';
   paidAmount: number; // 实收金额 万元
   unpaidAmount: number; // 待收金额 万元
@@ -171,6 +172,9 @@ export interface WbsTask {
   plannedDays: number;
   startDate: string;
   endDate: string;
+  actualStartDate?: string;
+  actualEndDate?: string;
+  executionNote?: string;
   progress: number; // 0-100
   isMilestone: boolean;
   status: '未开始' | '进行中' | '已完成' | '已延期';

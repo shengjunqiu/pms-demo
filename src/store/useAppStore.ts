@@ -53,8 +53,8 @@ export const useAppStore = create<AppState>((set) => ({
     set({
       currentRole: role,
       currentUser: {
-        id: `U-${role}`,
-        name: roleInfo.name.split(' ')[0],
+        id: ({ executive: 'U-003', pmo: 'U-002', 'project-manager': 'U-001', market: 'U-006', finance: 'U-004', 'solution-tech': 'U-005', admin: 'U-ADMIN' })[role],
+        name: /\((.+)\)/.exec(roleInfo.name)?.[1] ?? roleInfo.name,
         role: role,
         roleName: roleInfo.name,
         department: roleInfo.dept,

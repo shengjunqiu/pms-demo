@@ -18,6 +18,9 @@ import { DynamicAccountingPage } from '@/pages/execution/DynamicAccountingPage';
 import { GL06DecisionsPage } from '@/pages/executive/GL06DecisionsPage';
 import { ManagementApprovalPage } from '@/pages/approvals/ManagementApprovalPage';
 import { BudgetApprovalPage } from '@/pages/approvals/BudgetApprovalPage';
+import { TodosPage } from '@/pages/workbench/TodosPage';
+import { ProjectProgressPage } from '@/pages/execution/ProjectProgressPage';
+import { PlanRequestPage } from '@/pages/approvals/PlanRequestPage';
 import { ProjectOverviewPage } from '@/pages/execution/ProjectOverviewPage';
 
 function RoleHome() { const role = useAppStore((s) => s.currentRole); return <Navigate to={ROLE_HOME[role]} replace />; }
@@ -40,13 +43,16 @@ export const AppRouter: React.FC = () => {
         <Route path="approvals/:id" element={<BudgetApprovalPage />} />
         <Route path="executive/exceptions" element={<GL05ExceptionsPage />} />
         <Route path="projects/:id/dynamic-accounting" element={<DynamicAccountingPage />} />
+        <Route path="workbench/todos" element={<TodosPage />} />
+        <Route path="projects/:id/progress" element={<ProjectProgressPage />} />
+        <Route path="projects/:id/plan-requests/:requestId" element={<PlanRequestPage />} />
         <Route path="projects/:id" element={<ProjectOverviewPage />} />
 
         {/* 其余 72 个页面的标准路由占位与挂载 */}
         {PAGE_MANIFEST.map((item) => {
           const relativeRoute = item.route.startsWith('/') ? item.route.slice(1) : item.route;
           // 跳过已实现的页面
-          if (['projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/four-calculations', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions', 'executive/decisions'].includes(relativeRoute)) {
+          if (['workbench/todos', 'projects/:id/progress', 'projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/four-calculations', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions', 'executive/decisions'].includes(relativeRoute)) {
             return null;
           }
           return (

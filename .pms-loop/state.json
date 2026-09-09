@@ -16,11 +16,11 @@
     },
     "WK-01": {
       "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "reason": "按真实依赖拆分验收轮次，先验收进度与待办；工作台待原业务入口完成后继续。"
     },
     "WK-02": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0013"
     },
     "GS-01": {
       "status": "pending",
@@ -131,8 +131,8 @@
       "round": "R0007"
     },
     "HS-02": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0013"
     },
     "HS-03": {
       "status": "pending",
@@ -304,7 +304,7 @@
     },
     "FINAL": {
       "status": "pending",
-      "reason": "与GL-06合并验收实际可操作的待决策链路"
+      "reason": "按真实依赖拆分验收轮次，先验收进度与待办；工作台待原业务入口完成后继续。"
     }
   },
   "runs": [
@@ -575,6 +575,48 @@
         ".pms-loop/runs/R0011/checks.json": "8e85da37e16b50f9f2c7b3a2f6e1c0bca424acfc63391c29b577c66dea238731",
         ".pms-loop/runs/R0011/evidence.json": "08b7d8e6427e65dc555bc5c8f60915858e5f07e86932e94e8a9838e0112dd909"
       }
+    },
+    {
+      "id": "R0012",
+      "items": [
+        "HS-02",
+        "WK-01",
+        "WK-02"
+      ],
+      "started_at": "2026-09-09T16:58:06+00:00",
+      "status": "deferred",
+      "reason": "WK01完整快捷发起依赖采购、外包、费用、质量等原业务表单；先独立完成HS02和WK02的进度及审批闭环，避免链接占位。",
+      "ended_at": "2026-09-09T17:02:41+00:00"
+    },
+    {
+      "id": "R0013",
+      "items": [
+        "HS-02",
+        "WK-02"
+      ],
+      "started_at": "2026-09-09T17:02:41+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-09T17:14:42+00:00",
+      "revision": "0a6a4c3b1e10c172c8c5a65e802f0805748ebe0413822dd243acb06615378c94",
+      "proof": {
+        ".pms-loop/runs/R0013/test-domain.log": "6fd6edff68d0ae900c9179815758c9f3532d511416e743f1a5a60a64b964edb9",
+        ".pms-loop/runs/R0013/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0013/build.log": "0e13e55d3fca96649a311a08eda9353eecacf722c7d89813c9ea9e78c94102e3",
+        ".pms-loop/runs/R0013/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0013/artifacts/console.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        ".pms-loop/runs/R0013/artifacts/hs-02-1440.png": "cecc5a474b017b6fc59a83d317adf1d81fd4212b264a1389dd7c5465e4541ee5",
+        ".pms-loop/runs/R0013/artifacts/hs-02-1280.png": "152901fc05463b296ec11fe5f5dd73a404dd74844f6b69c0345fdf1e078b5886",
+        ".pms-loop/runs/R0013/artifacts/wk-02-1440.png": "cb1371118d0bad50f9e5eba76b73f0c20dda8a044c0d5fdadb4464ba9b355ebe",
+        ".pms-loop/runs/R0013/artifacts/wk-02-1280.png": "55d707931d1a76d8d9ac5f41f75a23a9480a978c8b13064e3f088c3092ddddd1",
+        ".pms-loop/runs/R0013/checks.json": "54cb7f54acad288c4146f633000a82addbc9f2a8968730b30f7f99aaba2118a3",
+        ".pms-loop/runs/R0013/evidence.json": "2f0974c50a554ceea397aeee67ff67d50b1b48e014f59ddb4b2d200d6f026320"
+      }
     }
   ],
   "notes": [
@@ -605,6 +647,22 @@
     {
       "at": "2026-09-09T16:27:05+00:00",
       "text": "R0010(GL01/05/06)已实现：15真实预算待审+30历史驳回，原审批/approvals/:id；22领域测试曾通过，最新AnalysisTools保存视图选中标签修复后需重跑check。浏览器已验证APR-2批准预算720→748.8/V2、实际650及滚动780不变，待审15→14；APR-3驳回后P003预算1980/滚动2360不变，待审13。验证六种GL01场景、P001保存视图/下钻同范围、合同54项169276.6、逾期P2/P3合计2347.565、健康32范围、GL05列设置及CSV32条。剩余GL06分页/排序/角色、GL01分析Tabs、三页1440/1280截图与控制台；最终填写证据accept并提交。当前浏览器1 tab3 localhost需192.168.31.210:5174；CUA变量tab/browser/cdp/evidenceFs可用。"
+    },
+    {
+      "at": "2026-09-09T16:57:57+00:00",
+      "text": "R0011已验收GL02/GL04，累计8/72页。25领域测试及双宽度浏览器验收通过。下一步WK01/WK02，工作台聚合须使用真实待办源和原审批/项目/风险问题入口，不可跳占位。GL02明示最新滚动比较非历史预测准确率；后续结算链补历史预测快照。"
+    },
+    {
+      "at": "2026-09-09T17:02:41+00:00",
+      "text": "R0012阻塞: WK01完整快捷发起依赖采购、外包、费用、质量等原业务表单；先独立完成HS02和WK02的进度及审批闭环，避免链接占位。"
+    },
+    {
+      "at": "2026-09-09T17:02:41+00:00",
+      "text": "reopen FINAL, HS-02, WK-01, WK-02: 按真实依赖拆分验收轮次，先验收进度与待办；工作台待原业务入口完成后继续。"
+    },
+    {
+      "at": "2026-09-09T17:11:16+00:00",
+      "text": "R0013正在实现HS02/WK02：真实任务执行更新、计划变更/阶段原单、超过30天PMO+财务全通过会签。浏览器已验证P001任务完成62.5→75，待办转已办；35天会签PMO后待审、财务后V2与终验2027-02-04；阶段缺材料通过被拒、驳回原单。需最终check（最近修改待办只保留指定责任角色、合同验收日期字段、完成任务日期缺失文案）、双宽度截图、控制台及验收提交。WK01仍待采购外包等原表单依赖。"
     }
   ]
 }

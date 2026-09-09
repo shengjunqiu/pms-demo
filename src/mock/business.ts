@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { AS_OF_DATE, mockProjects, mockBudgetVersions, mockBaselineVersions, mockIssues, mockRisks, mockBugs, mockDecisions, mockAcceptances, mockCostItems, mockEstimateVersions, mockMilestones, mockSettlements, mockReceiptPlans, mockChanges } from '@/mock';
-import type { Project, BudgetVersion, BaselineVersion, Issue, Risk, Bug, CostItem, DecisionItem, AcceptanceRecord, EstimateVersion, Milestone, SettlementRecord, ProjectChange } from '@/models/types';
+import { AS_OF_DATE, mockProjects, mockBudgetVersions, mockBaselineVersions, mockIssues, mockRisks, mockBugs, mockDecisions, mockAcceptances, mockCostItems, mockEstimateVersions, mockMilestones, mockSettlements, mockReceiptPlans, mockChanges, mockWbsTasks } from '@/mock';
+import type { Project, BudgetVersion, BaselineVersion, Issue, Risk, Bug, CostItem, DecisionItem, AcceptanceRecord, EstimateVersion, Milestone, SettlementRecord, ProjectChange, WbsTask } from '@/models/types';
 import type { UserRole } from '@/store/useAppStore';
 import { allocateMoney, money, percentage, sumMoney } from '@/utils/money';
 import { assessHealth } from '@/utils/health';
@@ -17,9 +17,13 @@ export interface ManagementApproval {
   reason: string; submittedBy: string; status: '待审批' | '通过' | '驳回'; opinion?: string;
   originalQuota?: number; proposedQuota?: number; impactAmount: number;
 }
+export interface PlanRequest {
+  id: string; projectId: string; kind: 'schedule' | 'stage'; reason: string; status: '待审批' | '通过' | '驳回';
+  requiredRoles: ('pmo' | 'finance')[]; reviews: { role: UserRole; approve: boolean; opinion: string }[]; submittedBy: string; submittedAt: string; baselineId: string; tasks: WbsTask[]; shiftDays: number; opinion?: string;
+}
 export interface Material { id: string; projectId: string; name: string; required: boolean; status: '缺失' | '待审核' | '通过' }
 export interface BusinessState {
-  projects: Project[]; budgets: BudgetVersion[]; baselines: BaselineVersion[];
+  tasks: WbsTask[]; planRequests: PlanRequest[]; projects: Project[]; budgets: BudgetVersion[]; baselines: BaselineVersion[];
   estimates: EstimateVersion[]; milestones: Milestone[]; settlements: SettlementRecord[];
   issues: Issue[]; risks: Risk[]; bugs: Bug[]; costs: CostItem[];
   changes: ProjectChange[]; managementApprovals: ManagementApproval[]; approvals: Approval[]; decisions: DecisionItem[]; acceptances: AcceptanceRecord[];
@@ -27,7 +31,7 @@ export interface BusinessState {
   audit: { id: string; actor: string; action: string; target: string; date: string }[];
 }
 export function createBusinessState(): BusinessState {
-  return structuredClone({ projects: mockProjects, budgets: mockBudgetVersions, baselines: mockBaselineVersions,
+  return structuredClone({ tasks: mockWbsTasks, planRequests: [], projects: mockProjects, budgets: mockBudgetVersions, baselines: mockBaselineVersions,
     estimates: mockEstimateVersions, milestones: mockMilestones, settlements: mockSettlements,
     issues: mockIssues, risks: mockRisks, bugs: mockBugs, costs: mockCostItems, approvals: [], changes: mockChanges, managementApprovals: [],
     decisions: mockDecisions, acceptances: mockAcceptances, lockedProjects: ['P-008'], maintenanceCosts: [], audit: [],
@@ -41,6 +45,9 @@ export type BusinessAction =
   | { type: 'submit-budget'; projectId: string; budget: BudgetVersion; reason: string }
   | { type: 'review'; approvalId: string; approve: boolean; opinion: string }
   | { type: 'review-management'; id: string; approve: boolean; opinion: string }
+  | { type: 'update-task'; id: string; progress: number; actualStartDate: string; actualEndDate?: string; note: string }
+  | { type: 'request-plan'; projectId: string; kind: 'schedule' | 'stage'; reason: string; shiftDays: number }
+  | { type: 'review-plan'; id: string; approve: boolean; opinion: string }
   | { type: 'close-issue'; id: string }
   | { type: 'close-bug'; id: string }
   | { type: 'risk-to-issue'; id: string }
@@ -123,6 +130,59 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     approval.status = action.approve ? '通过' : '驳回'; approval.opinion = action.opinion.trim();
     const decision = state.decisions.find((d) => d.id === approval.id)!;
     decision.status = action.approve ? '已通过' : '已否决';
+  } else if (action.type === 'update-task') {
+    const task = state.tasks.find((t) => t.id === action.id);
+    if (!task) throw new Error('任务不存在');
+    const p = project(task.projectId); target = task.id;
+    requireRole('project-manager', 'solution-tech');
+    if (!(actor.role === 'project-manager' && actor.id === p.pmId) && actor.id !== task.ownerId) throw new Error('仅项目主PM或任务责任人可更新');
+    if (state.lockedProjects.includes(p.id) || p.phase === '已关闭') throw new Error('已关闭项目不可更新建设任务');
+    if (!Number.isFinite(action.progress) || action.progress < task.progress || action.progress > 100) throw new Error('完成率不可回退且须在0到100之间');
+    if (!action.note.trim()) throw new Error('执行说明必填');
+    const dateValid = (value?: string) => !!value && /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value)) && value <= AS_OF_DATE;
+    if (action.progress > 0 && !dateValid(action.actualStartDate)) throw new Error('实际开始时间必填且不可晚于基准日');
+    if (action.progress === 100 && (!dateValid(action.actualEndDate) || action.actualEndDate! < action.actualStartDate)) throw new Error('完成任务须填写有效实际完成时间');
+    if (action.progress < 100 && action.actualEndDate) throw new Error('未完成任务不能填写实际完成时间');
+    task.progress = action.progress; task.actualStartDate = action.actualStartDate || undefined; task.actualEndDate = action.actualEndDate; task.executionNote = action.note;
+    task.status = action.progress === 100 ? '已完成' : action.progress === 0 ? '未开始' : task.endDate < AS_OF_DATE ? '已延期' : '进行中';
+    const tasks = state.tasks.filter((t) => t.projectId === p.id);
+    p.progressRate = money(tasks.reduce((sum, t) => sum + t.progress * t.plannedDays, 0) / tasks.reduce((sum, t) => sum + t.plannedDays, 0));
+  } else if (action.type === 'request-plan') {
+    const p = project(action.projectId); target = p.id;
+    requireRole('project-manager');
+    if (actor.id !== p.pmId || state.lockedProjects.includes(p.id)) throw new Error('仅未锁定项目主PM可提交');
+    if (!action.reason.trim()) throw new Error('申请说明必填');
+    if (action.kind === 'schedule' && (!Number.isInteger(action.shiftDays) || action.shiftDays < 1 || action.shiftDays > 90)) throw new Error('演示计划顺延须为1至90天');
+    if (state.planRequests.some((r) => r.projectId === p.id && r.status === '待审批')) throw new Error('已有待审批计划事项');
+    const baseline = state.baselines.find((b) => b.projectId === p.id && b.status === '已生效')!;
+    state.planRequests.push({ id: `PLAN-${state.planRequests.length + 1}`, projectId: p.id, kind: action.kind, reason: action.reason, shiftDays: action.shiftDays, status: '待审批', requiredRoles: action.kind === 'schedule' && action.shiftDays > 30 ? ['pmo', 'finance'] : ['pmo'], reviews: [], submittedBy: actor.id, submittedAt: AS_OF_DATE, baselineId: baseline.id, tasks: structuredClone(state.tasks.filter((t) => t.projectId === p.id)), });
+  } else if (action.type === 'review-plan') {
+    const request = state.planRequests.find((r) => r.id === action.id);
+    if (!request || request.status !== '待审批') throw new Error('事项不存在或已处理');
+    requireRole(...request.requiredRoles);
+    if (request.reviews.some((r) => r.role === actor.role)) throw new Error('当前节点已处理');
+    if (!action.opinion.trim()) throw new Error('审批意见必填');
+    const p = project(request.projectId); target = request.id;
+    request.reviews.push({ role: actor.role, approve: action.approve, opinion: action.opinion });
+    const allPassed = request.requiredRoles.every((role) => request.reviews.some((r) => r.role === role && r.approve));
+    if (action.approve && allPassed) {
+      if (request.kind === 'stage') {
+        const next = transition(state, { type: 'stage-gate', projectId: p.id }, actor);
+        state.projects = next.projects;
+      } else {
+        const baseline = state.baselines.find((b) => b.projectId === p.id && b.status === '已生效');
+        if (baseline?.id !== request.baselineId || state.lockedProjects.includes(p.id)) throw new Error('基线或锁定状态已变化，请重新申报');
+        const shift = (date: string) => new Date(Date.parse(date) + request.shiftDays * 86400000).toISOString().slice(0, 10);
+        const version = `V${Math.max(...state.baselines.filter((b) => b.projectId === p.id).map((b) => Number(/^V(\d+)/.exec(b.version)?.[1] ?? 0))) + 1}.0`;
+        baseline.status = '历史';
+        state.baselines.push({ ...structuredClone(baseline), id: `BASE-${request.id}`, version, status: '已生效', plannedEndDate: shift(baseline.plannedEndDate), createdAt: AS_OF_DATE });
+        p.currentBaselineVersion = version;
+        state.tasks.filter((t) => t.projectId === p.id && t.progress < 100).forEach((t) => { t.startDate = shift(t.startDate); t.endDate = shift(t.endDate); });
+        state.milestones.filter((m) => m.projectId === p.id && m.status !== '已达成').forEach((m) => { m.plannedDate = shift(m.plannedDate); m.status = m.plannedDate < AS_OF_DATE ? '逾期未达成' : '未达成'; });
+        p.plannedEndDate = shift(p.plannedEndDate);
+      }
+    }
+    request.status = !action.approve ? '驳回' : allPassed ? '通过' : '待审批'; request.opinion = action.opinion;
   } else if (action.type === 'close-issue') {
     const issue = state.issues.find((i) => i.id === action.id);
     if (!issue) throw new Error('问题不存在');

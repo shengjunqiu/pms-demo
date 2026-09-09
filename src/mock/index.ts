@@ -488,7 +488,7 @@ export const mockContracts: Contract[] = mockProjects.filter((p) => !p.isUnsigne
     projectId: p.id,
     customerId: p.customerId,
     amount: p.contractAmount,
-    signDate: '2026-01-20',
+    signDate: '2026-01-20', acceptanceDueDate: p.plannedEndDate,
     status: p.isUnsigned ? '已终止' : '履约中',
     paidAmount: money(p.contractAmount * 0.45),
     unpaidAmount: money(p.contractAmount - money(p.contractAmount * 0.45)),
@@ -577,7 +577,7 @@ export const mockWbsTasks: WbsTask[] = Array.from({ length: 520 }).map((_, i) =>
   return {
     id: `TSK-${String(i + 1).padStart(4, '0')}`,
     projectId: p.id,
-    taskCode: `1.${(i % 10) + 1}`,
+    taskCode: `1.${taskIndex + 1}`,
     name: ['需求调研与确认', '总体架构设计', '业务接口开发', '前端功能交付', '系统集成联调', '性能与安全验证', '初验问题整改', '项目交付验收'][taskIndex],
     ownerId: p.pmId,
     ownerName: p.pmName,

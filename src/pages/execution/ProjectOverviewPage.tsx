@@ -5,7 +5,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useBusinessStore } from '@/mock/business';
 import { useAppStore } from '@/store/useAppStore';
 import { fourStage, selectFourCalculations, selectReceipts, visibleProjects } from '@/mock/selectors';
-import { mockUsers, mockRequirements, mockWbsTasks, mockDailyReports, mockWeeklyReports, mockProcurements, mockOutsources, mockDepartments, mockOpportunities, AS_OF_DATE } from '@/mock';
+import { mockUsers, mockRequirements, mockDailyReports, mockWeeklyReports, mockProcurements, mockOutsources, mockDepartments, mockOpportunities, AS_OF_DATE } from '@/mock';
 import { formatPercent } from '@/utils/money';
 import { PageHeader } from '@/components/common/PageHeader';
 import { StateView } from '@/components/common/StateView';
@@ -60,7 +60,7 @@ export function ProjectOverviewPage() {
   const tabs = [
     { key: 'overview', label: '项目概览', children: overview },
     { key: 'team', label: '团队', children: <Table rowKey="id" size="small" pagination={false} dataSource={mockUsers.filter((u) => u.id === p.pmId || u.departmentId === p.departmentId)} columns={[{ title: '人员', dataIndex: 'name' }, { title: '角色', render: (_, u) => u.id === p.pmId ? <Tag color="blue">主项目经理</Tag> : u.role }, { title: '所属部门', render: (_, u) => mockDepartments.find((d) => d.id === u.departmentId)?.name ?? '—' }, { title: '联系邮箱', dataIndex: 'email' }]} /> },
-    { key: 'progress', label: '计划进度', children: <>{milestoneView}<Table rowKey="id" size="small" dataSource={mockWbsTasks.filter((t) => t.projectId === p.id)} columns={[{ title: '工作包', dataIndex: 'name' }, { title: '责任人', dataIndex: 'ownerName' }, { title: '计划开始', dataIndex: 'startDate' }, { title: '计划完成', dataIndex: 'endDate' }, { title: '进度', dataIndex: 'progress', render: (v: number) => <Progress percent={v} size="small" /> }]} /></> },
+    { key: 'progress', label: '计划进度', children: <>{milestoneView}<Table rowKey="id" size="small" dataSource={data.tasks.filter((t) => t.projectId === p.id)} columns={[{ title: '工作包', dataIndex: 'name' }, { title: '责任人', dataIndex: 'ownerName' }, { title: '计划开始', dataIndex: 'startDate' }, { title: '计划完成', dataIndex: 'endDate' }, { title: '进度', dataIndex: 'progress', render: (v: number) => <Progress percent={v} size="small" /> }]} /></> },
     { key: 'four', label: '四算', children: <><Descriptions bordered column={2} items={[
       { key: 'estimate', label: `概算 ${calc.estimate?.version ?? '无有效版本'}`, children: <MoneyText value={calc.estimate?.totalCost} /> },
       { key: 'budget', label: `预算 ${calc.budget?.version ?? '无有效版本'}`, children: <MoneyText value={calc.budget?.totalAmount} /> },
