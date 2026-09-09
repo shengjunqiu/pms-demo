@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "round": "R0007",
+  "revision": "9a8f7cf9ea11932ecf18e5bd4296ca3baa8f45720e4291aa9c7ddcf776663259",
+  "items": {
+    "HS-01": {
+      "entry": "/projects/P-001",
+      "covered_features": [
+        "HS-020",
+        "HS-021",
+        "HS-022",
+        "HS-023",
+        "PT-001",
+        "PT-002",
+        "PT-003",
+        "PT-004",
+        "PT-005",
+        "PT-006",
+        "PT-007"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单第131行/任务书第430行：统一全景15个Tabs；HS-020~023嵌入质量页签，引用BUG整改与内部初验轮次；PT-001~007覆盖页头、四阶段、来源商机Drawer、合同回款及基线时间线。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "核算导航HS-01进入P-001；成本摘要点击到同项目HS-13；返回上一级回总览。商机OPP-2026-001抽屉明确关联P-001，里程碑Drawer关闭后保留Tabs。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "P-001晋江市岸海防平台，客户海洋与渔业局，负责人张建国；四算使用V1.0概算及V1.1预算；日报9月8日至4日日期唯一，质量检查7项缺陷、0/2材料通过。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "未关闭BUG7点击后仅展示7条BUG并可打开原始记录；内部初验打开MLS-P-001-3，计划2026-09-20；质量Tab显示整改人和最终确认人；商机来源打开冻结概算版本。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "P-001两页预算2847.70、已发生1650.00、滚动2986.20、偏差+138.50一致；回款摘要与合同明细使用统一格式。20项领域测试通过，包含流水/预算/三桶、WBS加权进度及日报唯一性。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "实际以项目经理访问UNKNOWN显示项目不存在，P-003显示403；未结算显示尚未结算。共用路由Skeleton提供加载态；集团领导从导航进入页面显示只读且无修改操作。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "实际查看1440×900、1280×900 PNG截图，标题/金额/表格无全页横向溢出；总览Tabs在1280通过更多菜单展开。另查看质量页签及来源Drawer。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "CUA dev.logs error/warn 实际返回空数组 []。"
+        },
+        "business-1": {
+          "requirement": "统一项目页头、生命周期、里程碑四算成本风险需求变更交付物验收回款时间线",
+          "passed": true,
+          "observation": "逐页签核对计划、四算、成本、质量、日报周报、风险需求、采购、变更、材料、验收和回款，金额数量来自同一项目；生命周期和里程碑在总览可见。"
+        },
+        "business-2": {
+          "requirement": "所有摘要可到相关业务且项目一致；管理角色只读",
+          "passed": true,
+          "observation": "摘要进入对应Tabs/动态核算/来源Drawer，项目ID保持P-001；集团领导实际从核算导航进入总览并下钻成本，无重复审批和编辑入口。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "点击未关闭BUG7",
+          "expected": "只显示该项目BUG并可读原记录",
+          "observed": "7条BUG，BUG-0001地图切换后点位重复显示，保留P-001"
+        },
+        {
+          "action": "点击质量Tab与来源商机",
+          "expected": "质量引用业务证据；商机可追溯",
+          "observed": "7项未关闭、0/2材料、ACC-P-001-1待验收；OPP-2026-001关联P-001"
+        },
+        {
+          "action": "集团领导从导航进入并下钻成本",
+          "expected": "只读且同项目金额一致",
+          "observed": "显示集团领导（只读），滚动2986.20进入HS-13"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0007/artifacts/browser-report.json",
+        ".pms-loop/runs/R0007/artifacts/hs-01-1440.png",
+        ".pms-loop/runs/R0007/artifacts/hs-01-1280.png"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0007/artifacts/hs-01-1440.png",
+        "1280": ".pms-loop/runs/R0007/artifacts/hs-01-1280.png"
+      }
+    },
+    "HS-13": {
+      "entry": "/projects/P-001/dynamic-accounting",
+      "covered_features": [
+        "HS-056",
+        "HS-057",
+        "HS-058",
+        "HS-059",
+        "HS-060",
+        "HS-061",
+        "HS-062",
+        "HS-063",
+        "HS-064",
+        "HS-065"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单第143行/任务书第442行：HS-056~065通过科目映射、预算/实际/承诺/剩余/滚动、执行率/偏差率、五期历史曲线、健康规则和业务群对比实现。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "P-001总览滚动成本摘要进入动态核算，返回上一级恢复总览；科目筛选、Tabs保留URL参数，凭证Drawer关闭仍在原科目。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "P-001预算V1.1、演示科目映射DEMO-1、更新时间2026-09-09；8个叶子科目、20条确认凭证；人工/采购/外包/费用分别有来源关联。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "采购与设备下钻显示5条凭证合计412.50；VOUCHER-P-001-3显示82.50及PROC-0001；搜索不存在的凭证出现空态，重置恢复；趋势Tab显示5期真实保存快照。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "P-001两页预算2847.70、已发生1650.00、滚动2986.20、偏差+138.50一致；回款摘要与合同明细使用统一格式。20项领域测试通过，包含流水/预算/三桶、WBS加权进度及日报唯一性。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "搜索无匹配显示当前科目没有已确认成本；P-003项目经理403、UNKNOWN项目不存在；缺有效预算有空态实现，未执行数据注入；零分母由领域测试验证返回null。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "实际查看1440×900、1280×900 PNG截图，标题/金额/表格无全页横向溢出；总览Tabs在1280通过更多菜单展开。另查看质量页签及来源Drawer。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "CUA dev.logs error/warn 实际返回空数组 []。"
+        },
+        "business-1": {
+          "requirement": "预算/实际/承诺/剩余预测/滚动/偏差/毛利及趋势和科目表",
+          "passed": true,
+          "observation": "8项指标与执行率/偏差率/毛利率可见；五期趋势实际330/660/990/1650/1650，滚动2847.7/2875/2910/2940/2986.2；业务群聚合在角色可见项目范围内。"
+        },
+        "business-2": {
+          "requirement": "异常下钻来源Drawer，三桶互斥，各页金额一致，零分母安全",
+          "passed": true,
+          "observation": "采购来源Drawer关联项目、上游原单和已确认金额；流水唯一凭证及三桶互斥由20项领域测试检查，两页金额一致，无零分母Infinity。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "点击采购与设备及来源凭证",
+          "expected": "科目汇总与明细一致且可追溯",
+          "observed": "5条合计412.50，VOUCHER-P-001-3金额82.50，关联PROC-0001"
+        },
+        {
+          "action": "搜索不存在的凭证后重置",
+          "expected": "显示空态并能恢复",
+          "observed": "当前科目没有已确认成本；重置恢复凭证列表"
+        },
+        {
+          "action": "切换历史成本趋势",
+          "expected": "历史快照与当前值分开",
+          "observed": "5期曲线及表格显示，当前2986.20"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0007/artifacts/browser-report.json",
+        ".pms-loop/runs/R0007/artifacts/hs-13-1440.png",
+        ".pms-loop/runs/R0007/artifacts/hs-13-1280.png"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0007/artifacts/hs-13-1440.png",
+        "1280": ".pms-loop/runs/R0007/artifacts/hs-13-1280.png"
+      }
+    }
+  }
+}

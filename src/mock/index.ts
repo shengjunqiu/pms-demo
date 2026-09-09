@@ -423,16 +423,16 @@ const projectSeeds: Project[] = [
     const forecastRemainingCost = rollingCost - actualCost - committedCost;
     const costVariance = rollingCost - budgetAmount;
     const costVarianceRate = Number(((costVariance / budgetAmount) * 100).toFixed(2));
-    
+
     const healthArr: ('green' | 'yellow' | 'orange' | 'red')[] = ['green', 'green', 'yellow', 'green', 'orange', 'red', 'green'];
     const health = healthArr[idx % healthArr.length];
-    
+
     const prjType: '软件开发' | '系统集成' | '运维服务' = isMaintenance ? '运维服务' : num % 2 === 0 ? '软件开发' : '系统集成';
     const prjLevel: '特大型' | '重大' | '重点' | '一般' = num % 4 === 0 ? '特大型' : num % 3 === 0 ? '重大' : '重点';
     const prjPhase: '立项' | '执行' | '收尾' | '运维' = isMaintenance ? '运维' : isUnsigned ? '立项' : num % 5 === 0 ? '收尾' : '执行';
     const prjSubPhase: 'WBS编制' | '开发实施' | '客户终验' | '质保运维' = isMaintenance ? '质保运维' : isUnsigned ? 'WBS编制' : num % 5 === 0 ? '客户终验' : '开发实施';
     const prjStatus: '正常进行' | '关注' | '预警' | '高风险' = health === 'red' ? '高风险' : health === 'orange' ? '预警' : health === 'yellow' ? '关注' : '正常进行';
-    
+
     return {
       id,
       code: `PRJ-2026-${String(num).padStart(3, '0')}`,
@@ -571,20 +571,22 @@ export const mockBaselineVersions: BaselineVersion[] = Array.from({ length: 95 }
 // 10. WBS任务 (≥500)
 export const mockWbsTasks: WbsTask[] = Array.from({ length: 520 }).map((_, i) => {
   const p = mockProjects[i % mockProjects.length];
-  const isMilestone = i % 8 === 0;
+  const taskIndex = Math.floor(i / mockProjects.length);
+  const isMilestone = taskIndex === 7;
+  const progress = Math.max(0, Math.min(100, p.progressRate * 8 - taskIndex * 100));
   return {
     id: `TSK-${String(i + 1).padStart(4, '0')}`,
     projectId: p.id,
     taskCode: `1.${(i % 10) + 1}`,
-    name: isMilestone ? `关键里程碑节点_${i + 1}` : `WBS执行任务项_${i + 1}`,
+    name: ['需求调研与确认', '总体架构设计', '业务接口开发', '前端功能交付', '系统集成联调', '性能与安全验证', '初验问题整改', '项目交付验收'][taskIndex],
     ownerId: p.pmId,
     ownerName: p.pmName,
-    plannedDays: 10 + (i % 20),
-    startDate: '2026-04-15',
-    endDate: '2026-05-30',
-    progress: (i * 7) % 100,
+    plannedDays: 10,
+    startDate: `2026-${String(p.status === '已结算' ? 1 + Math.floor(taskIndex / 3) : 3 + taskIndex + (taskIndex >= 5 ? 1 : 0)).padStart(2, '0')}-01`,
+    endDate: `2026-${String(p.status === '已结算' ? 1 + Math.floor(taskIndex / 3) : 3 + taskIndex + (taskIndex >= 5 ? 1 : 0)).padStart(2, '0')}-28`,
+    progress,
     isMilestone,
-    status: (i * 7) % 100 === 100 ? '已完成' : '进行中',
+    status: progress === 100 ? '已完成' : progress === 0 ? '未开始' : '进行中',
   };
 });
 
@@ -608,7 +610,7 @@ export const mockDailyReports: DailyReport[] = Array.from({ length: 310 }).map((
   return {
     id: `DR-${String(i + 1).padStart(4, '0')}`,
     projectId: p.id,
-    date: '2026-09-08',
+    date: `2026-09-${String(8 - Math.floor(i / mockProjects.length)).padStart(2, '0')}`,
     reporter: p.pmName,
     completedTasks: '完成系统核心模块接口对接联调与单元测试',
     plannedTasks: '推进前台交互界面与数据统计联调',
@@ -622,10 +624,10 @@ export const mockWeeklyReports: WeeklyReport[] = Array.from({ length: 110 }).map
   return {
     id: `WR-${String(i + 1).padStart(4, '0')}`,
     projectId: p.id,
-    weekSpan: '2026-W36 (09.01 - 09.07)',
+    weekSpan: Math.floor(i / mockProjects.length) === 0 ? '2026-W36 (09.01 - 09.07)' : '2026-W35 (08.25 - 08.31)',
     reporter: p.pmName,
-    progressSummary: '整体进度符合预期，累计完工比例62.5%',
-    costStatus: '滚动成本在预算帽管控范围内',
+    progressSummary: `当前累计完工比例${p.progressRate}%，详见项目有效计划`,
+    costStatus: p.costVariance > 0 ? `滚动成本高于预算${p.costVariance}万元` : '滚动成本未超过预算',
     riskSummary: '关注第三方接口响应延迟风险',
     nextWeekPlan: '启动系统集成压力测试并组织专家初验评审',
   };
@@ -638,7 +640,7 @@ export const mockRequirements: Requirement[] = Array.from({ length: 90 }).map((_
     id: `REQ-${String(i + 1).padStart(4, '0')}`,
     projectId: p.id,
     code: `REQ-2026-${String(i + 1).padStart(3, '0')}`,
-    title: `业务功能需求项_${i + 1} (${p.name})`,
+    title: `${['海域网格化监管', '视频点位统一接入', '船舶轨迹回放', '告警联动处置', '巡检工单闭环', '地图图层管理', '监控录像检索', '应急指挥调度', '设备在线监测', '事件统计分析', '数据质量检查', '报表导出', '组织权限配置', '移动端消息提醒', '多源数据同步', '访问审计查询', '统一登录接入', '运维告警订阅'][i % 18]}（${p.name}）`,
     priority: i % 3 === 0 ? '高' : '中',
     status: i % 2 === 0 ? '待验证' : '开发中',
     creator: '客户业务处',
@@ -654,7 +656,7 @@ export const mockBugs: Bug[] = Array.from({ length: 110 }).map((_, i) => {
     id: `BUG-${String(i + 1).padStart(4, '0')}`,
     projectId: p.id,
     code: `BUG-2026-${String(i + 1).padStart(3, '0')}`,
-    title: `系统缺陷与异常记录_${i + 1}`,
+    title: `${['地图切换后点位重复显示', '告警详情附件无法预览', '录像检索跨日条件失效', '报表导出金额精度丢失', '移动端工单状态未同步', '并发保存导致重复工单', '长时间会话后刷新异常'][i % 7]}`,
     severity: i % 4 === 0 ? '严重' : '一般',
     status: i % 3 === 0 ? '待复测' : '修复中',
     creator: '测试工程师_钱工',
@@ -670,7 +672,7 @@ export const mockIssues: Issue[] = Array.from({ length: 105 }).map((_, i) => {
     id: `ISSUE-${String(i + 1).padStart(4, '0')}`,
     projectId: p.id,
     code: `ISS-2026-${String(i + 1).padStart(3, '0')}`,
-    title: `项目实施阻碍与协调问题_${i + 1}`,
+    title: `${['第三方接口联调窗口尚未确认', '验收材料与客户口径需统一', '核心设备交货延期影响系统联调', '跨部门数据授权待协调'][i % 4]}`,
     severity: p.id === 'P-003' && i < mockProjects.length ? '重大' : p.id === 'P-002' ? '重要' : '一般',
     status: i % 2 === 0 ? '处理中' : '待解决',
     owner: p.pmName,
@@ -685,7 +687,7 @@ export const mockRisks: Risk[] = Array.from({ length: 85 }).map((_, i) => {
     id: `RSK-${String(i + 1).padStart(4, '0')}`,
     projectId: p.id,
     code: `RSK-2026-${String(i + 1).padStart(3, '0')}`,
-    title: `项目潜在交付与供应链风险_${i + 1}`,
+    title: `${['视频接入协议兼容性影响联调', '海域现场施工受天气窗口影响', '关键供应商交货周期延长', '客户新增范围尚未冻结'][i % 4]}`,
     level: p.id === 'P-003' ? '特大' : '中等',
     status: '监控中',
     strategy: '减轻',
@@ -718,7 +720,7 @@ export const mockCostItems: CostItem[] = mockProjects.flatMap((p) => {
   return amounts.map((amount, i) => ({
     id: `COST-${p.id}-${i + 1}`, sourceId: `VOUCHER-${p.id}-${i + 1}`, projectId: p.id, type: types[i % 4],
     subjectId: `SUB-0${i % 4 + 1}`, subjectName: names[i % 4], amount,
-    occurredDate: '2026-08-25', description: `${names[i % 4]}第${Math.floor(i / 4) + 1}期已确认结转`,
+    occurredDate: ['2026-05-20', '2026-06-20', '2026-07-20', '2026-08-20', '2026-08-25'][Math.floor(i / 4)], description: `${names[i % 4]}第${Math.floor(i / 4) + 1}期已确认结转`,
   }));
 });
 
@@ -898,6 +900,29 @@ function freezeSnapshot<T extends object>(value: T): T {
   for (const child of Object.values(value)) if (child && typeof child === 'object') freezeSnapshot(child);
   return Object.freeze(value);
 }
+// Period expenses are a parent category. Only these leaves participate in totals.
+const expenseLeaves = ['第三方费用', '差旅费用', '租房费用', '其他期间费用'];
+for (const version of [...mockBudgetVersions, ...mockEstimateVersions]) {
+  version.items = version.items.flatMap((item) => item.subjectId !== 'SUB-04' ? [item] :
+    allocateMoney(item.amount, [30, 40, 10, 20]).map((amount, i) => ({
+      ...item, subjectId: `SUB-04-${i + 1}`, subjectName: expenseLeaves[i], amount,
+    })));
+}
+for (const project of mockProjects) {
+  const rows = mockCostItems.filter((c) => c.projectId === project.id && c.subjectId === 'SUB-04');
+  // Preserve total actual costs and source identity while giving each voucher a single leaf mapping.
+  rows.forEach((row, i) => { row.subjectId = `SUB-04-${i % 4 + 1}`; row.subjectName = expenseLeaves[i % 4]; });
+}
 mockEstimateVersions.filter((v) => v.isFrozen).forEach(freezeSnapshot);
 mockBudgetVersions.filter((v) => v.status === '已生效').forEach(freezeSnapshot);
 mockBaselineVersions.forEach(freezeSnapshot);
+
+for (const p of mockProjects) {
+  const actual = (type: CostItem['type']) => money(mockCostItems.filter((c) => c.projectId === p.id && c.type === type).reduce((sum, c) => sum + c.amount, 0));
+  const procurement = mockProcurements.filter((r) => r.projectId === p.id);
+  procurement.forEach((row, i) => { row.status = i === 0 ? '部分到货' : '询价中'; if (i === 0) row.amount = money(actual('procurement') + p.committedCost * 0.25); });
+  const outsource = mockOutsources.find((r) => r.projectId === p.id);
+  if (outsource) outsource.amount = money(actual('outsource') + p.committedCost * 0.2);
+  const expenses = mockExpenses.filter((r) => r.projectId === p.id);
+  expenses.forEach((row, i) => { row.status = i === 0 ? '财务已审核' : '待审批'; if (i === 0) row.amount = actual('expense'); });
+}

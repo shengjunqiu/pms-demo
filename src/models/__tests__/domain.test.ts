@@ -57,6 +57,16 @@ describe('Domain & Data Contract Invariants', () => {
     expect(() => { mockEstimateVersions[0].totalCost = 1; }).toThrow();
     expect(() => { mockBudgetVersions[0].items[0].amount = 1; }).toThrow();
   });
+
+  it('日报按项目日期唯一，项目进度与叶子任务加权进度相同，来源单据覆盖已确认金额', () => {
+    expect(new Set(mockDailyReports.map((r) => `${r.projectId}/${r.date}`)).size).toBe(mockDailyReports.length);
+    for (const p of mockProjects) {
+      const tasks = mockWbsTasks.filter((t) => t.projectId === p.id);
+      expect(tasks.reduce((sum, t) => sum + t.progress * t.plannedDays, 0) / tasks.reduce((sum, t) => sum + t.plannedDays, 0)).toBeCloseTo(p.progressRate, 6);
+      const actualProcurement = mockCostItems.filter((c) => c.projectId === p.id && c.type === 'procurement').reduce((sum, c) => sum + c.amount, 0);
+      expect(mockProcurements.find((r) => r.projectId === p.id)!.amount + 0.000001).toBeGreaterThanOrEqual(actualProcurement);
+    }
+  });
   it('未签项目不计入已签合同额，零分母返回空值', () => {
     const unsigned = mockProjects.filter((p) => p.isUnsigned);
     expect(calculateCockpitKPIs(unsigned).totalContractAmount).toBe(0);

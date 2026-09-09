@@ -12,6 +12,8 @@ import { GL02FourCalculationsPage } from '@/pages/executive/GL02FourCalculations
 import { GL03ProjectDrilldownPage } from '@/pages/executive/GL03ProjectDrilldownPage';
 import { GL04PortfolioPage } from '@/pages/executive/GL04PortfolioPage';
 import { GL05ExceptionsPage } from '@/pages/executive/GL05ExceptionsPage';
+import { DynamicAccountingPage } from '@/pages/execution/DynamicAccountingPage';
+import { ProjectOverviewPage } from '@/pages/execution/ProjectOverviewPage';
 
 export const AppRouter: React.FC = () => {
   return (
@@ -27,12 +29,14 @@ export const AppRouter: React.FC = () => {
         <Route path="executive/project-drilldown" element={<GL03ProjectDrilldownPage />} />
         <Route path="executive/portfolio" element={<GL04PortfolioPage />} />
         <Route path="executive/exceptions" element={<GL05ExceptionsPage />} />
+        <Route path="projects/:id/dynamic-accounting" element={<DynamicAccountingPage />} />
+        <Route path="projects/:id" element={<ProjectOverviewPage />} />
 
         {/* 其余 72 个页面的标准路由占位与挂载 */}
         {PAGE_MANIFEST.map((item) => {
           const relativeRoute = item.route.startsWith('/') ? item.route.slice(1) : item.route;
           // 跳过已实现的页面
-          if (['executive/dashboard', 'executive/four-calculations', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions'].includes(relativeRoute)) {
+          if (['projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/four-calculations', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions'].includes(relativeRoute)) {
             return null;
           }
           return (

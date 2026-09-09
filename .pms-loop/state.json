@@ -127,8 +127,8 @@
       "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
     },
     "HS-01": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0007"
     },
     "HS-02": {
       "status": "pending",
@@ -175,8 +175,8 @@
       "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
     },
     "HS-13": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0007"
     },
     "HS-14": {
       "status": "pending",
@@ -304,7 +304,7 @@
     },
     "FINAL": {
       "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "reason": "保留R0006实现及截图，与HS-01组成闭环后重新验收。"
     }
   },
   "runs": [
@@ -427,6 +427,52 @@
         ".pms-loop/runs/R0005/checks.json": "b5c6f9696e41b43c506fb159dfa1779d3d419c607fba35074ea875b112988477",
         ".pms-loop/runs/R0005/evidence.json": "309cb1139a5949acdb4f5e427a62e269cc031778f290cd8b294898a3171756e3"
       }
+    },
+    {
+      "id": "R0006",
+      "items": [
+        "HS-13"
+      ],
+      "started_at": "2026-09-09T15:20:24+00:00",
+      "status": "deferred",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "reason": "HS-13自身检查通过，但项目总览返回入口HS-01仍为占位；合并依赖页面验收完整链路。",
+      "ended_at": "2026-09-09T15:27:28+00:00"
+    },
+    {
+      "id": "R0007",
+      "items": [
+        "HS-01",
+        "HS-13"
+      ],
+      "started_at": "2026-09-09T15:27:28+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-09T15:45:50+00:00",
+      "revision": "9a8f7cf9ea11932ecf18e5bd4296ca3baa8f45720e4291aa9c7ddcf776663259",
+      "proof": {
+        ".pms-loop/runs/R0007/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0007/test-domain.log": "d924c7a06110595cff80832f80f3aec2d64cf70aa840f3a53d5242a10fdf9e4b",
+        ".pms-loop/runs/R0007/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0007/build.log": "3adbefe6111c60e852559f5a212db6cb05f31c8dc4d7ec884d3cfee25404a388",
+        ".pms-loop/runs/R0007/artifacts/browser-report.json": "9bfbff8e33a97c69f4f8e9593ad6763689aeb9ee6120f97a5e7fa57378b81998",
+        ".pms-loop/runs/R0007/artifacts/hs-01-1440.png": "7450dd773005cafd065892bd49029490da8a468fe2932fab9f5ad4ac1c42bf65",
+        ".pms-loop/runs/R0007/artifacts/hs-01-1280.png": "40046cfd4229845884fb35d669c5ec805b900b813ad8dbde122b3d569f61e923",
+        ".pms-loop/runs/R0007/artifacts/hs-13-1440.png": "3b752259fed7ac1262009c793917609b394b738d014f8a8d38d22be2561c80ce",
+        ".pms-loop/runs/R0007/artifacts/hs-13-1280.png": "734979de9a929ebfc027c77eb6817ebd9a14830a6ec0a7d4ae8d5ee5593583f7",
+        ".pms-loop/runs/R0007/checks.json": "072496ccefa80568ebebcd49c8ac4d16084094b117a1bc5d34b28436889e1625",
+        ".pms-loop/runs/R0007/evidence.json": "20aa562f878f6abfbee1472b744ee6c1e484081ef6cf84fe02375ff64dd5d70f"
+      }
     }
   ],
   "notes": [
@@ -437,6 +483,14 @@
     {
       "at": "2026-09-09T15:01:06+00:00",
       "text": "reopen CF-01, CF-02, CF-03, CF-04, CF-05, CF-06, CF-07, CF-08, FINAL, FND-01, FND-02, GL-01, GL-02, GL-03, GL-04, GL-05, GL-06, GS-01, GS-02, GS-03, GS-04, GS-05, GS-06, GS-07, GS-08, GS-09, GS-10, GS-11, HS-01, HS-02, HS-03, HS-04, HS-05, HS-06, HS-07, HS-08, HS-09, HS-10, HS-11, HS-12, HS-13, HS-14, HS-15, HS-16, HS-17, JS-01, JS-02, JS-03, JS-04, JS-05, JS-06, JS-07, JS-08, JS-09, JS-10, JS-11, JS-12, JS-13, WK-01, WK-02, YS-01, YS-02, YS-03, YS-04, YS-05, YS-06, YS-07, YS-08, YS-09, YS-10, YS-11, YS-12, YS-13, YS-14, YS-15: 新增回归测试复现四类数据契约失败，旧验收证据不足。"
+    },
+    {
+      "at": "2026-09-09T15:27:28+00:00",
+      "text": "R0006阻塞: HS-13自身检查通过，但项目总览返回入口HS-01仍为占位；合并依赖页面验收完整链路。"
+    },
+    {
+      "at": "2026-09-09T15:27:28+00:00",
+      "text": "reopen FINAL, HS-13: 保留R0006实现及截图，与HS-01组成闭环后重新验收。"
     }
   ]
 }

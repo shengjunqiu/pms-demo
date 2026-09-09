@@ -44,8 +44,10 @@ export function selectFourCalculations(project: Project, data: Pick<BusinessStat
   const budget = data.budgets.find((v) => v.projectId === project.id && v.status === '已生效');
   const settlement = data.settlements.find((v) => v.projectId === project.id && v.status === '已锁定已生效');
   const costs = data.costs.filter((c) => c.projectId === project.id);
-  const committed = allocateMoney(project.committedCost, [45, 20, 25, 8, 2]);
-  const remaining = allocateMoney(project.forecastRemainingCost, [45, 20, 25, 8, 2]);
+  const weights = (budget?.items ?? []).map((item) => item.amount);
+  const allocationWeights = weights.some((w) => w > 0) ? weights : weights.map(() => 1);
+  const committed = allocationWeights.length ? allocateMoney(project.committedCost, allocationWeights) : [];
+  const remaining = allocationWeights.length ? allocateMoney(project.forecastRemainingCost, allocationWeights) : [];
   const subjects = (budget?.items ?? []).map((item, index) => {
     const actual = sumMoney(costs.filter((c) => c.subjectId === item.subjectId).map((c) => c.amount));
     const rolling = sumMoney([actual, committed[index], remaining[index]]);
