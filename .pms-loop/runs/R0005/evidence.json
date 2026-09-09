@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "round": "R0005",
+  "revision": "722c82bb8fd8ccd003565c3c822789f2518a311bc25d09b29eed3968e867e867",
+  "items": {
+    "FND-02": {
+      "entry": "src/mock/business.ts",
+      "covered_features": [],
+      "checks": {
+        "business-1": {
+          "requirement": "31类数据达到最低量、ID唯一、关联完整、固定seed/asOf可重现",
+          "passed": true,
+          "observation": "19项领域测试覆盖31类最低数量、ID唯一及关联引用；固定基准2026-09-09，重建状态完全一致。"
+        },
+        "business-2": {
+          "requirement": "8个固定故事及健康度/数量可从关联明细复算",
+          "passed": true,
+          "observation": "8故事断言覆盖P-001金额/风险2/BUG7/需求18，P-002试运行/重要问题，P-003单个重大问题，P-004拟签8800与投入98.5，P-005多采购，P-006客户整改，P-007运维，P-008冻结结算1390。"
+        },
+        "business-3": {
+          "requirement": "四算科目、互斥成本桶、零分母及组合聚合通过不变量测试",
+          "passed": true,
+          "observation": "真实回归复现并修复未签计合同、流水合计、叶子科目差额、来源复用；三桶互斥、零分母返回null、组织子树与去重、加权毛利及四算明细复算通过。"
+        },
+        "business-4": {
+          "requirement": "版本、审批、阶段门、权限和成本锁定模拟具有实际状态变化",
+          "passed": true,
+          "observation": "纯transition及共享Zustand状态实现审批快照、超概算真实判定、批准追加基线/驳回不变、原决策同步、角色关闭约束、风险转问题、阶段门、成本去重/结转/未签额度/结算锁定与运维分离；失败无部分写入。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "运行pnpm test:domain",
+          "expected": "所有数据与状态不变量通过",
+          "observed": "19 tests passed；包含正向与阻断分支"
+        },
+        {
+          "action": "在独立状态对P-001结转50万元承诺",
+          "expected": "实际增加50，承诺减少50，滚动不变",
+          "observed": "actual=1700, committed=786.2, rolling=2986.2；重复来源被拒绝"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0005/artifacts/test-domain.log"
+      ]
+    }
+  }
+}

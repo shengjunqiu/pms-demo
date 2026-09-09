@@ -11,8 +11,8 @@
       "round": "R0004"
     },
     "FND-02": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0005"
     },
     "WK-01": {
       "status": "pending",
@@ -401,6 +401,31 @@
         ".pms-loop/runs/R0004/artifacts/fnd-01-1280.png": "42fa27e795f8dbbd3705a31f3df00e362db53f8aa5f7f4e0571e5a85021186f9",
         ".pms-loop/runs/R0004/checks.json": "e993bd3add327d642876eec5c85f085890793b8b0e7cb25ff84f1bcdf7fb72cc",
         ".pms-loop/runs/R0004/evidence.json": "a7720e59b861003f450d8e49ea791f4f2470390fd483266c3d0067aec9d034de"
+      }
+    },
+    {
+      "id": "R0005",
+      "items": [
+        "FND-02"
+      ],
+      "started_at": "2026-09-09T15:06:57+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-09T15:20:02+00:00",
+      "revision": "722c82bb8fd8ccd003565c3c822789f2518a311bc25d09b29eed3968e867e867",
+      "proof": {
+        ".pms-loop/runs/R0005/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0005/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0005/build.log": "200a1c2152727af22bbdd3f1d71ca2824597d42a861874ce4c3061ba3a8ee88e",
+        ".pms-loop/runs/R0005/test-domain.log": "d2a24ee06428703eb6fc65a23f23633621007c721256de0784c0dd4c1bceb8b8",
+        ".pms-loop/runs/R0005/artifacts/test-domain.log": "d2a24ee06428703eb6fc65a23f23633621007c721256de0784c0dd4c1bceb8b8",
+        ".pms-loop/runs/R0005/checks.json": "b5c6f9696e41b43c506fb159dfa1779d3d419c607fba35074ea875b112988477",
+        ".pms-loop/runs/R0005/evidence.json": "309cb1139a5949acdb4f5e427a62e269cc031778f290cd8b294898a3171756e3"
       }
     }
   ],

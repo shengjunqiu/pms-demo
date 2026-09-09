@@ -5,7 +5,7 @@
 
 已验收：**0 / 72 页面**
 
-状态：`in_progress`；更新时间：2026-09-09T15:06:13+00:00
+状态：`in_progress`；更新时间：2026-09-09T15:20:02+00:00
 
 | 模块 | 已验收 | 待办/活动/阻塞 |
 |---|---:|---|
@@ -17,7 +17,7 @@
 | GL | 0/6 | GL-01(pending)、GL-02(pending)、GL-03(pending)、GL-04(pending)、GL-05(pending)、GL-06(pending) |
 | CF | 0/8 | CF-01(pending)、CF-02(pending)、CF-03(pending)、CF-04(pending)、CF-05(pending)、CF-06(pending)、CF-07(pending)、CF-08(pending) |
 
-公共能力：FND-01=done；FND-02=pending
+公共能力：FND-01=done；FND-02=done
 
 活动轮次：无
 
@@ -31,6 +31,8 @@
   验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
 - R0004：FND-01；accepted；证据目录 `.pms-loop/runs/R0004/`
   验证：typecheck=pass，lint=pass，build=pass
+- R0005：FND-02；accepted；证据目录 `.pms-loop/runs/R0005/`
+  验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
 
 ### 假设、已知问题与恢复说明
 

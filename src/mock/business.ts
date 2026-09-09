@@ -1,0 +1,164 @@
+import { create } from 'zustand';
+import { AS_OF_DATE, mockProjects, mockBudgetVersions, mockBaselineVersions, mockIssues, mockRisks, mockBugs, mockDecisions, mockAcceptances, mockCostItems, mockEstimateVersions, mockMilestones, mockSettlements } from '@/mock';
+import type { Project, BudgetVersion, BaselineVersion, Issue, Risk, Bug, CostItem, DecisionItem, AcceptanceRecord, EstimateVersion, Milestone, SettlementRecord } from '@/models/types';
+import type { UserRole } from '@/store/useAppStore';
+import { money, percentage } from '@/utils/money';
+import { assessHealth } from '@/utils/health';
+
+export interface Actor { id: string; name: string; role: UserRole }
+export interface Approval {
+  id: string; projectId: string; kind: 'budget' | 'change'; status: '待审批' | '通过' | '驳回';
+  budget: BudgetVersion; baseline: BaselineVersion; submittedBy: string; reason: string;
+  requiredRole: 'pmo' | 'executive'; opinion?: string;
+  estimate: EstimateVersion;
+}
+export interface Material { id: string; projectId: string; name: string; required: boolean; status: '缺失' | '待审核' | '通过' }
+export interface BusinessState {
+  projects: Project[]; budgets: BudgetVersion[]; baselines: BaselineVersion[];
+  estimates: EstimateVersion[]; milestones: Milestone[]; settlements: SettlementRecord[];
+  issues: Issue[]; risks: Risk[]; bugs: Bug[]; costs: CostItem[];
+  approvals: Approval[]; decisions: DecisionItem[]; acceptances: AcceptanceRecord[];
+  materials: Material[]; lockedProjects: string[]; maintenanceCosts: CostItem[];
+  audit: { id: string; actor: string; action: string; target: string; date: string }[];
+}
+export function createBusinessState(): BusinessState {
+  return structuredClone({ projects: mockProjects, budgets: mockBudgetVersions, baselines: mockBaselineVersions,
+    estimates: mockEstimateVersions, milestones: mockMilestones, settlements: mockSettlements,
+    issues: mockIssues, risks: mockRisks, bugs: mockBugs, costs: mockCostItems, approvals: [],
+    decisions: mockDecisions, acceptances: mockAcceptances, lockedProjects: ['P-008'], maintenanceCosts: [], audit: [],
+    materials: mockProjects.flatMap((p) => ['测试报告', '验收确认函'].map((name, i) => ({
+      id: `MAT-${p.id}-${i}`, projectId: p.id, name, required: true,
+      status: p.status === '已结算' ? '通过' as const : '缺失' as const,
+    }))),
+  });
+}
+export type BusinessAction =
+  | { type: 'submit-budget'; projectId: string; budget: BudgetVersion; reason: string }
+  | { type: 'review'; approvalId: string; approve: boolean; opinion: string }
+  | { type: 'close-issue'; id: string }
+  | { type: 'close-bug'; id: string }
+  | { type: 'risk-to-issue'; id: string }
+  | { type: 'stage-gate'; projectId: string }
+  | { type: 'settle'; projectId: string }
+  | { type: 'confirm-cost'; cost: CostItem; fromCommitment?: boolean; maintenance?: boolean };
+
+/** Pure transition: validate first and clone, so failed actions never partially update the shared store. */
+export function transition(previous: BusinessState, action: BusinessAction, actor: Actor): BusinessState {
+  const state = structuredClone(previous);
+  const requireRole = (...roles: UserRole[]) => { if (!roles.includes(actor.role)) throw new Error('当前角色无权执行此操作'); };
+  const project = (id: string) => {
+    const value = state.projects.find((p) => p.id === id);
+    if (!value) throw new Error('项目不存在');
+    return value;
+  };
+  let target = '';
+  if (action.type === 'submit-budget') {
+    const p = project(action.projectId); target = p.id;
+    requireRole('project-manager', 'finance');
+    if (actor.role === 'project-manager' && actor.id !== p.pmId) throw new Error('仅项目主PM可提交');
+    if (state.lockedProjects.includes(p.id)) throw new Error('建设期已结算锁定');
+    if (action.budget.projectId !== p.id || action.budget.totalAmount < 0 || !Number.isFinite(action.budget.totalAmount)) throw new Error('预算数据无效');
+    const sum = action.budget.items.reduce((total, item) => total + item.amount, 0);
+    if (Math.abs(sum - action.budget.totalAmount) > 0.000001 || action.budget.items.some((i) => i.amount < 0 || !Number.isFinite(i.amount))) throw new Error('预算科目合计不符');
+    if (state.approvals.some((a) => a.projectId === p.id && a.status === '待审批')) throw new Error('已有待审批预算');
+    const estimate = state.estimates.find((e) => e.opportunityId === p.opportunityId && e.isFrozen);
+    if (!estimate) throw new Error('缺少冻结概算');
+    const isOverEstimate = action.budget.totalAmount > estimate.totalCost;
+    if (isOverEstimate && !action.reason.trim()) throw new Error('超概算提交必须说明原因');
+    const baseline = state.baselines.find((b) => b.projectId === p.id && b.status === '已生效');
+    if (!baseline) throw new Error('缺少当前基线');
+    const id = `APR-${state.approvals.length + 1}`;
+    state.approvals.push({ id, projectId: p.id, kind: 'budget', status: '待审批', budget: { ...structuredClone(action.budget), isOverEstimate }, estimate: structuredClone(estimate),
+      baseline: structuredClone(baseline), submittedBy: actor.id, reason: action.reason,
+      requiredRole: isOverEstimate ? 'executive' : 'pmo' });
+    state.decisions.push({ id, projectId: p.id, projectName: p.name, type: '超概算审批', title: `${p.name}预算审批`,
+      impactAmount: money(action.budget.totalAmount - p.budgetAmount), level: isOverEstimate ? 'PMC决策会' : 'PMO立项会',
+      status: '待决策', targetRoute: `/approvals/${id}`, createdAt: AS_OF_DATE });
+  } else if (action.type === 'review') {
+    const approval = state.approvals.find((a) => a.id === action.approvalId);
+    if (!approval || approval.status !== '待审批') throw new Error('审批不存在或已处理');
+    requireRole(approval.requiredRole);
+    if (!action.opinion.trim()) throw new Error('审批意见必填');
+    const p = project(approval.projectId); target = approval.id;
+    if (state.lockedProjects.includes(p.id)) throw new Error('建设期已结算锁定');
+    if (action.approve) {
+      const baseline = state.baselines.find((b) => b.projectId === p.id && b.status === '已生效');
+      if (baseline?.id !== approval.baseline.id) throw new Error('基线已变化，请重新提交审批');
+      const version = `V${state.baselines.filter((b) => b.projectId === p.id).length + 1}.0`;
+      // Preserve all prior values; only validity metadata changes, then append a new snapshot.
+      state.budgets.filter((b) => b.projectId === p.id && b.status === '已生效').forEach((b) => { b.status = '已废弃'; });
+      baseline.status = '历史';
+      state.budgets.push({ ...approval.budget, id: `BUD-${approval.id}`, version, status: '已生效' });
+      state.baselines.push({ ...approval.baseline, id: `BASE-${approval.id}`, version, status: '已生效', budgetAmount: approval.budget.totalAmount });
+      p.budgetAmount = approval.budget.totalAmount; p.currentBaselineVersion = version;
+      p.costVariance = money(p.rollingCost - p.budgetAmount);
+      p.costVarianceRate = percentage(p.costVariance, p.budgetAmount) ?? 0;
+    }
+    approval.status = action.approve ? '通过' : '驳回'; approval.opinion = action.opinion;
+    const decision = state.decisions.find((d) => d.id === approval.id);
+    if (decision) decision.status = action.approve ? '已通过' : '已否决';
+  } else if (action.type === 'close-issue') {
+    const issue = state.issues.find((i) => i.id === action.id);
+    if (!issue) throw new Error('问题不存在');
+    requireRole('project-manager');
+    if (actor.id !== project(issue.projectId).pmId || issue.status !== '已解决') throw new Error('问题解决后仅主PM可最终关闭');
+    issue.status = '已关闭'; target = issue.id;
+  } else if (action.type === 'close-bug') {
+    const bug = state.bugs.find((b) => b.id === action.id);
+    if (!bug || bug.status !== '待复测' || bug.creator !== actor.name) throw new Error('仅发起人复测确认后可关闭BUG');
+    bug.status = '已关闭'; target = bug.id;
+  } else if (action.type === 'risk-to-issue') {
+    const risk = state.risks.find((r) => r.id === action.id);
+    if (!risk || risk.status !== '监控中') throw new Error('风险不存在或已处理');
+    requireRole('project-manager');
+    if (project(risk.projectId).pmId !== actor.id) throw new Error('仅项目主PM可转问题');
+    const id = `ISSUE-FROM-${risk.id}`;
+    state.issues.push({ id, code: id, projectId: risk.projectId, title: risk.title, severity: '重要', status: '待解决', owner: risk.owner, deadline: '2026-09-30', fromRiskId: risk.id });
+    risk.status = '已转问题'; target = risk.id;
+  } else if (action.type === 'stage-gate') {
+    requireRole('pmo'); const p = project(action.projectId); target = p.id;
+    if (p.phase !== '执行') throw new Error('当前阶段不能切换');
+    const materials = state.materials.filter((m) => m.projectId === p.id && m.required);
+    if (!materials.length || materials.some((m) => m.status !== '通过')) throw new Error('必交材料缺失或审核未通过');
+    const milestone = state.milestones.find((m) => m.projectId === p.id && m.type === '开发完成');
+    if (milestone?.status !== '已达成' || p.progressRate < 100 || state.issues.some((i) => i.projectId === p.id && i.severity === '重大' && i.status !== '已关闭')) throw new Error('里程碑未完成或重大问题未关闭');
+    p.phase = '收尾'; p.subPhase = '客户终验';
+  } else if (action.type === 'settle') {
+    requireRole('finance'); const p = project(action.projectId); target = p.id;
+    if (state.lockedProjects.includes(p.id)) throw new Error('禁止重复结算');
+    const rounds = state.acceptances.filter((a) => a.projectId === p.id && a.type === '客户终验').sort((a, b) => b.round - a.round);
+    if (rounds[0]?.status !== '已通过') throw new Error('客户最终验收未通过');
+    if (p.committedCost > 0 || p.forecastRemainingCost > 0) throw new Error('存在未决成本');
+    state.settlements.push({ id: `SET-${state.settlements.length + 1}`, projectId: p.id, finalIncome: p.revenueAmount ?? p.contractAmount, finalCost: p.actualCost, finalGrossMargin: money((p.revenueAmount ?? p.contractAmount) - p.actualCost), finalGrossMarginRate: percentage((p.revenueAmount ?? p.contractAmount) - p.actualCost, p.revenueAmount ?? p.contractAmount) ?? 0, status: '已锁定已生效', isCostLocked: true, settledDate: AS_OF_DATE });
+    state.lockedProjects.push(p.id); p.status = '已结算'; p.phase = '已关闭';
+  } else if (action.type === 'confirm-cost') {
+    requireRole('finance'); const p = project(action.cost.projectId); target = p.id;
+    if (!Number.isFinite(action.cost.amount) || action.cost.amount <= 0 || !action.cost.sourceId) throw new Error('成本金额及来源无效');
+    const bucket = action.maintenance ? state.maintenanceCosts : state.costs;
+    if ([...state.costs, ...state.maintenanceCosts].some((c) => c.id === action.cost.id || c.sourceId === action.cost.sourceId)) throw new Error('同一来源不能重复计入成本');
+    if (action.maintenance) {
+      if (!p.isMaintenance) throw new Error('项目不属于运维周期');
+    } else {
+      if (state.lockedProjects.includes(p.id)) throw new Error('建设期成本已锁定');
+      if (action.fromCommitment && action.cost.amount > p.committedCost) throw new Error('结转金额超过未发生承诺');
+      const nextCommitted = action.fromCommitment ? money(p.committedCost - action.cost.amount) : p.committedCost;
+      if (p.isUnsigned && p.actualCost + action.cost.amount + nextCommitted > (p.unsignedLimitQuota ?? 0)) throw new Error('未签额度不足，须追加审批');
+      p.actualCost = money(p.actualCost + action.cost.amount); p.committedCost = nextCommitted;
+      p.rollingCost = money(p.actualCost + p.committedCost + p.forecastRemainingCost);
+      p.costVariance = money(p.rollingCost - p.budgetAmount); p.costVarianceRate = percentage(p.costVariance, p.budgetAmount) ?? 0;
+    }
+    bucket.push(action.cost);
+  }
+  for (const p of state.projects) {
+    const delayDays = Math.max(0, ...state.milestones.filter((m) => m.projectId === p.id && m.status !== '已达成').map((m) => (Date.parse(AS_OF_DATE) - Date.parse(m.plannedDate)) / 86400000));
+    const health = assessHealth(p, { delayDays, majorIssues: state.issues.filter((i) => i.projectId === p.id && i.severity === '重大' && i.status !== '已关闭').length });
+    p.health = health.level; p.healthReason = health.reasons.join('；');
+  }
+  state.audit.push({ id: `AUD-${state.audit.length + 1}`, actor: actor.name, action: action.type, target, date: AS_OF_DATE });
+  return state;
+}
+
+export const useBusinessStore = create<{ data: BusinessState; dispatch: (action: BusinessAction, actor: Actor) => void }>((set) => ({
+  data: createBusinessState(),
+  dispatch: (action, actor) => set((state) => ({ data: transition(state.data, action, actor) })),
+}));
