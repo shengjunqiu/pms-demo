@@ -1,152 +1,71 @@
-import React, { useState, useMemo } from 'react';
-import { Card, Row, Col, Table, Tag, Typography, Space, Select, Progress, Statistic } from 'antd';
-import { AppstoreOutlined, PieChartOutlined, DollarOutlined } from '@ant-design/icons';
-import { mockProjects } from '@/mock';
+import { Button, Card, Col, Row, Select, Space, Table, Tag } from 'antd';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { AS_OF_DATE, mockCustomers, mockDepartments } from '@/mock';
+import { useBusinessStore } from '@/mock/business';
+import { fourStage, inOrganization, selectFourCalculations, selectProjects, selectReceipts } from '@/mock/selectors';
+import { useAppStore } from '@/store/useAppStore';
 import { PageHeader } from '@/components/common/PageHeader';
+import { StateView } from '@/components/common/StateView';
+import { MoneyText } from '@/components/common/MoneyText';
+import { ProjectFilters } from '@/components/common/ProjectFilters';
+import { AnalysisTools } from '@/components/common/AnalysisTools';
+import { readProjectFilter } from '@/utils/project-query';
+import { sumMoney, formatPercent, percentage } from '@/utils/money';
+import type { Project } from '@/models/types';
 
-const { Text } = Typography;
-
-export const GL04PortfolioPage: React.FC = () => {
-  const [dimension, setDimension] = useState<'dept' | 'type' | 'level' | 'health'>('dept');
-
-  // 按维度分组统计
-  const portfolioData = useMemo(() => {
-    const groups: { [key: string]: { count: number; contractAmount: number; rollingCost: number; actualCost: number } } = {};
-
-    mockProjects.forEach((p) => {
-      let key = p.departmentName;
-      if (dimension === 'type') key = p.type;
-      if (dimension === 'level') key = p.level;
-      if (dimension === 'health') key = p.health === 'red' ? '高风险' : p.health === 'orange' ? '预警' : p.health === 'yellow' ? '关注' : '正常';
-
-      if (!groups[key]) {
-        groups[key] = { count: 0, contractAmount: 0, rollingCost: 0, actualCost: 0 };
-      }
-      groups[key].count += 1;
-      groups[key].contractAmount += p.contractAmount;
-      groups[key].rollingCost += p.rollingCost;
-      groups[key].actualCost += p.actualCost;
-    });
-
-    return Object.keys(groups).map((key) => {
-      const g = groups[key];
-      const grossMargin = g.contractAmount - g.rollingCost;
-      const grossMarginRate = g.contractAmount > 0 ? Number(((grossMargin / g.contractAmount) * 100).toFixed(2)) : 0;
-      return {
-        dimensionKey: key,
-        count: g.count,
-        contractAmount: g.contractAmount,
-        rollingCost: g.rollingCost,
-        grossMargin,
-        grossMarginRate,
-      };
-    });
-  }, [dimension]);
-
-  const totalContract = portfolioData.reduce((s, d) => s + d.contractAmount, 0);
-
-  const columns = [
-    {
-      title: dimension === 'dept' ? '业务群 / 交付部门' : dimension === 'type' ? '项目类型' : dimension === 'level' ? '项目等级' : '健康分级',
-      dataIndex: 'dimensionKey',
-      key: 'dimensionKey',
-      render: (text: string) => <Text strong>{text}</Text>,
-    },
-    {
-      title: '项目数量',
-      dataIndex: 'count',
-      key: 'count',
-      render: (c: number) => <Tag color="blue">{c} 个</Tag>,
-    },
-    {
-      title: '合同金额 (万元)',
-      dataIndex: 'contractAmount',
-      key: 'contractAmount',
-      render: (v: number) => <span>¥{Math.round(v).toLocaleString()}</span>,
-    },
-    {
-      title: '规模金额占比',
-      key: 'share',
-      render: (_value: unknown, record: { contractAmount: number }) => {
-        const percent = Number(((record.contractAmount / totalContract) * 100).toFixed(1));
-        return <Progress percent={percent} size="small" style={{ width: 140 }} />;
-      },
-    },
-    {
-      title: '滚动预测成本 (万元)',
-      dataIndex: 'rollingCost',
-      key: 'rollingCost',
-      render: (v: number) => <span>¥{Math.round(v).toLocaleString()}</span>,
-    },
-    {
-      title: '加权毛利率',
-      dataIndex: 'grossMarginRate',
-      key: 'grossMarginRate',
-      render: (rate: number) => (
-        <Text strong style={{ color: rate >= 35 ? '#3f8600' : '#cf1322' }}>
-          {rate}%
-        </Text>
-      ),
-    },
-  ];
-
-  return (
-    <div>
-      <PageHeader
-        title="GL-04 项目组合与多维经营分析"
-        description="按组织架构、业务类型、等级分级、健康度等维度矩阵化分析项目组合与资金结构"
-        extra={
-          <Space size={12}>
-            <Text strong>分析聚合维度：</Text>
-            <Select
-              value={dimension}
-              onChange={setDimension}
-              style={{ width: 160 }}
-              options={[
-                { value: 'dept', label: '按组织 / 业务群' },
-                { value: 'type', label: '按项目类型' },
-                { value: 'level', label: '按项目等级' },
-                { value: 'health', label: '按健康状态' },
-              ]}
-            />
-          </Space>
-        }
-      />
-
-      <Row gutter={16} style={{ marginBottom: 16 }}>
-        <Col span={8}>
-          <Card size="small">
-            <Statistic title="组合样本项目总数" value={mockProjects.length} suffix="个" prefix={<AppstoreOutlined />} />
-          </Card>
-        </Col>
-        <Col span={8}>
-          <Card size="small">
-            <Statistic title="组合签约总金额" value={totalContract} precision={2} suffix="万元" prefix={<DollarOutlined />} />
-          </Card>
-        </Col>
-        <Col span={8}>
-          <Card size="small">
-            <Statistic
-              title="整体加权平均毛利率"
-              value={38.4}
-              precision={1}
-              suffix="%"
-              valueStyle={{ color: '#3f8600' }}
-              prefix={<PieChartOutlined />}
-            />
-          </Card>
-        </Col>
-      </Row>
-
-      <Card title={`项目组合多维矩阵分解 (${dimension === 'dept' ? '按组织' : dimension === 'type' ? '按类型' : dimension === 'level' ? '按等级' : '按健康'})`} size="small">
-        <Table
-          dataSource={portfolioData}
-          columns={columns}
-          rowKey="dimensionKey"
-          size="small"
-          pagination={false}
-        />
-      </Card>
-    </div>
-  );
-};
+const dimensions = [{ value: 'org', label: '组织层级' }, { value: 'region', label: '区域' }, { value: 'type', label: '项目类型' }, { value: 'level', label: '项目等级' }, { value: 'industry', label: '行业' }, { value: 'customer', label: '客户' }, { value: 'stage', label: '四算阶段' }, { value: 'health', label: '健康度' }];
+const healthNames: Record<string, string> = { green: '健康', yellow: '关注', orange: '预警', red: '高风险' };
+export function GL04PortfolioPage() {
+  const data = useBusinessStore((s) => s.data); const role = useAppStore((s) => s.currentRole);
+  const [params, setParams] = useSearchParams(); const navigate = useNavigate();
+  if (!['executive', 'pmo', 'admin'].includes(role)) return <StateView type="403" />;
+  const scope = selectProjects(readProjectFilter(params), role, data.projects);
+  const dimension = dimensions.some((d) => d.value === params.get('dimension')) ? params.get('dimension')! : 'org';
+  const root = params.get('org') || 'D-001';
+  const groups = new Map<string, { key: string; label: string; projects: Project[]; exact?: boolean }>();
+  if (dimension === 'stage') for (const key of ['概算', '预算', '核算', '结算及运维']) groups.set(key, { key, label: key, projects: [] });
+  for (const p of scope) {
+    const customer = mockCustomers.find((c) => c.id === p.customerId);
+    let key = ''; let label = ''; let exact = false;
+    if (dimension === 'org') {
+      const child = mockDepartments.find((d) => d.parentId === root && inOrganization(p.departmentId, d.id));
+      key = child?.id ?? p.departmentId; exact = !child;
+      label = `${mockDepartments.find((d) => d.id === key)?.name ?? key}${exact ? '（直属项目）' : ''}`;
+    } else {
+      key = dimension === 'region' ? customer?.region ?? '未填写' : dimension === 'industry' ? customer?.industry ?? '未填写' : dimension === 'customer' ? p.customerId : dimension === 'stage' ? fourStage(p) : dimension === 'health' ? p.health : dimension === 'level' ? p.level : p.type;
+      label = dimension === 'customer' ? p.customerName : dimension === 'health' ? healthNames[key] : key;
+    }
+    if (!groups.has(key)) groups.set(key, { key, label, projects: [], exact });
+    groups.get(key)!.projects.push(p);
+  }
+  const aggregate = (projects: Project[]) => {
+    const calculations = projects.map((p) => selectFourCalculations(p, data)); const income = sumMoney(calculations.map((c) => c.income));
+    const rolling = sumMoney(calculations.map((c) => c.rolling)); const gross = sumMoney([income, -rolling]);
+    return { count: projects.length, income, rolling, gross, rate: percentage(gross, income), receipts: selectReceipts(projects), red: projects.filter((p) => p.health === 'red').length, orange: projects.filter((p) => p.health === 'orange').length, yellow: projects.filter((p) => p.health === 'yellow').length, green: projects.filter((p) => p.health === 'green').length };
+  };
+  const total = aggregate(scope); const rows = [...groups.values()].map((group) => ({ ...group, ...aggregate(group.projects) }));
+  const drill = (row: typeof rows[number], nextLevel = false) => {
+    const next = new URLSearchParams(params); next.delete('page'); next.delete('projectId'); next.delete('orgExact');
+    next.set(dimension, row.key);
+    if (dimension === 'org' && row.exact) next.set('orgExact', 'true');
+    if (nextLevel) setParams(next); else navigate(`/executive/project-drilldown?${next}`);
+  };
+  return <><PageHeader title="GL-04 项目组合分析" description={`集团 → 业务群 → 部门 → 项目 · ${AS_OF_DATE} · 万元`} breadcrumbs={[{ title: '首页', href: '/' }, { title: '组合分析' }]} extra={<Button onClick={() => navigate(-1)}>返回上一级</Button>} />
+    <ProjectFilters params={params} onChange={setParams} /><AnalysisTools storageKey="pms-portfolio-views" params={params} onChange={setParams} exportRows={[
+      ['分组', '项目数', '预计收入', '签约金额', '滚动成本', '预测毛利', '加权毛利率'], ...rows.map((r) => [r.label, String(r.count), r.income.toFixed(2), r.receipts.signed.toFixed(2), r.rolling.toFixed(2), r.gross.toFixed(2), formatPercent(r.rate)]),
+    ]} />
+    <Space wrap style={{ margin: '16px 0' }}><Select aria-label="组合维度" style={{ width: 180 }} options={dimensions} value={dimension} onChange={(value) => { const next = new URLSearchParams(params); next.set('dimension', value); next.delete('page'); setParams(next); }} />{dimension === 'org' && <><Tag>当前层级：{mockDepartments.find((d) => d.id === root)?.name}</Tag><Button disabled={root === 'D-001'} onClick={() => { const next = new URLSearchParams(params); next.set('org', mockDepartments.find((d) => d.id === root)?.parentId ?? 'D-001'); next.delete('orgExact'); next.delete('page'); setParams(next); }}>上一级组织</Button></>}</Space>
+    <Row gutter={12} style={{ marginBottom: 16 }}>{[['去重项目数', String(total.count)], ['预计项目收入', <MoneyText value={total.income} />], ['已签合同总额', <MoneyText value={total.receipts.signed} />], ['加权预测毛利率', formatPercent(total.rate)]].map(([label, value]) => <Col span={6} key={String(label)}><Card size="small" title={label}><div style={{ fontSize: 22 }}>{value}</div></Card></Col>)}</Row>
+    <p>各分组互斥，数量与金额可加总。毛利率 = 汇总预测毛利 ÷ 汇总预计收入；未签收入包含拟签收入，合同金额排除未签。回款按到期计划计算。</p>
+    <Table rowKey="key" size="small" dataSource={rows} scroll={{ x: 1700 }} pagination={{ pageSize: 8, current: Number(params.get('page')) || 1, showSizeChanger: false, showTotal: (n) => `共 ${n} 组`, onChange: (page) => { const next = new URLSearchParams(params); next.set('page', String(page)); setParams(next); } }} columns={[
+      { title: '组合分组', width: 220, fixed: 'left', render: (_, r) => <Button type="link" style={{ whiteSpace: 'normal', textAlign: 'left' }} onClick={() => drill(r)}>{r.label}</Button> },
+      { title: '项目数', width: 85, dataIndex: 'count' }, { title: '预计收入 / 占比', width: 150, render: (_, r) => <><MoneyText value={r.income} /><div>{formatPercent(percentage(r.income, total.income))}</div></> },
+      { title: '已签合同', width: 125, render: (_, r) => <MoneyText value={r.receipts.signed} /> }, { title: '滚动成本', width: 125, render: (_, r) => <MoneyText value={r.rolling} /> },
+      { title: '预测毛利 / 比率', width: 150, render: (_, r) => <><MoneyText value={r.gross} /><div>{formatPercent(r.rate)}</div></> },
+      { title: '健康 / 关注 / 预警 / 高风险', width: 210, render: (_, r) => `${r.green} / ${r.yellow} / ${r.orange} / ${r.red}` },
+      { title: '到期应收 / 实收率', width: 150, render: (_, r) => <><MoneyText value={r.receipts.due} /><div>{formatPercent(r.receipts.dueCompletion)}</div></> },
+      { title: '已收 / 逾期', width: 150, render: (_, r) => <><MoneyText value={r.receipts.paid} /><div><MoneyText value={r.receipts.overdue} /></div></> },
+      { title: '下钻', width: 150, fixed: 'right', render: (_, r) => <Space direction="vertical"><Button size="small" onClick={() => drill(r)}>查看{r.count}个项目</Button>{dimension === 'org' && !r.exact && <Button size="small" onClick={() => drill(r, true)}>进入下级组织</Button>}</Space> },
+    ]} />
+  </>;
+}

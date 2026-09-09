@@ -5,7 +5,7 @@ import type { UserRole } from '@/store/useAppStore';
 import { allocateMoney, percentage, sumMoney } from '@/utils/money';
 
 export interface ProjectFilter {
-  org?: string; region?: string; type?: string; level?: string; industry?: string;
+  org?: string; orgExact?: string; stage?: string; region?: string; type?: string; level?: string; industry?: string;
   customer?: string; pm?: string; health?: string; from?: string; to?: string; search?: string;
 }
 export function inOrganization(departmentId: string, root?: string): boolean {
@@ -27,6 +27,8 @@ export function selectProjects(filter: ProjectFilter = {}, role: UserRole = 'exe
   return Array.from(new Map(visibleProjects(role, projects).filter((p) => {
     const customer = mockCustomers.find((c) => c.id === p.customerId);
     return inOrganization(p.departmentId, filter.org)
+      && (filter.orgExact !== 'true' || p.departmentId === filter.org)
+      && (!filter.stage || fourStage(p) === filter.stage)
       && (!filter.region || customer?.region === filter.region)
       && (!filter.industry || customer?.industry === filter.industry)
       && (!filter.customer || p.customerId === filter.customer)

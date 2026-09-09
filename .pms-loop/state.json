@@ -251,16 +251,16 @@
       "round": "R0010"
     },
     "GL-02": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0011"
     },
     "GL-03": {
       "status": "done",
       "round": "R0008"
     },
     "GL-04": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0011"
     },
     "GL-05": {
       "status": "done",
@@ -544,6 +544,36 @@
         ".pms-loop/runs/R0010/artifacts/gl-06-1280.png": "2b40c6fe08fdc1a9ea49544db1e1bb469d1dffe195aa2f885663765d0d3dac82",
         ".pms-loop/runs/R0010/checks.json": "a3b9818c924fe64ff1f407314d8904f09db295863daf36df49f2a53a34888d91",
         ".pms-loop/runs/R0010/evidence.json": "b1e0ad0f2360e4030de225820aa9e2f8a62c4e37912f1cc4535a53ed5fbe6a03"
+      }
+    },
+    {
+      "id": "R0011",
+      "items": [
+        "GL-02",
+        "GL-04"
+      ],
+      "started_at": "2026-09-09T16:48:02+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-09T16:57:38+00:00",
+      "revision": "9682a50d73025882b7d1ad0d60727244cf834636856544f2aaeda1f63a1890a9",
+      "proof": {
+        ".pms-loop/runs/R0011/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0011/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0011/build.log": "38c060224a4c663c2ec6865a677a727ab88c27ac00a966f1a000bd53fc9dde43",
+        ".pms-loop/runs/R0011/test-domain.log": "efc6e9edea4afda40b6ab004c78f94683a2121fa9729676d700a5caf22901b1c",
+        ".pms-loop/runs/R0011/artifacts/console.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        ".pms-loop/runs/R0011/artifacts/gl-02-1440.png": "dc0957d4a92afbbea73ff36286feb41b9569da9817f10fd2bee4d9d8facf11d0",
+        ".pms-loop/runs/R0011/artifacts/gl-02-1280.png": "34c98adb484252d88d752933e85b207c7c5f37a6b728bf5ee8c6e753c33681eb",
+        ".pms-loop/runs/R0011/artifacts/gl-04-1440.png": "be71c7161a53e58a2d2d98b1d813260a93af82b8763ada9691e96a1c525611b1",
+        ".pms-loop/runs/R0011/artifacts/gl-04-1280.png": "d14c70600eca05c79d9692a4323713467d6ed57ccdbee3d1b4ba0971c9e997f1",
+        ".pms-loop/runs/R0011/checks.json": "8e85da37e16b50f9f2c7b3a2f6e1c0bca424acfc63391c29b577c66dea238731",
+        ".pms-loop/runs/R0011/evidence.json": "08b7d8e6427e65dc555bc5c8f60915858e5f07e86932e94e8a9838e0112dd909"
       }
     }
   ],

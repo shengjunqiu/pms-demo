@@ -7,6 +7,7 @@ export function ProjectFilters({ params, onChange }: { params: URLSearchParams; 
   const set = (values: Record<string, string | undefined>) => {
     const next = new URLSearchParams(params);
     Object.entries(values).forEach(([key, value]) => value ? next.set(key, value) : next.delete(key));
+    if ('org' in values) next.delete('orgExact');
     next.delete('projectId'); next.delete('page'); onChange(next);
   };
   const options = (values: string[]) => [...new Set(values)].map((value) => ({ value, label: value }));

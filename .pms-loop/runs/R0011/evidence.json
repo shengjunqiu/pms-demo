@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "round": "R0011",
+  "revision": "9682a50d73025882b7d1ad0d60727244cf834636856544f2aaeda1f63a1890a9",
+  "items": {
+    "GL-02": {
+      "entry": "/executive/four-calculations",
+      "covered_features": [
+        "BI-023",
+        "BI-024",
+        "BI-025",
+        "BI-026",
+        "BI-027",
+        "BI-028"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行162、任务书行471及详细功能映射见plan。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "scenarios记录实际组织/项目/科目下钻及返回；URL筛选贯穿。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "65项目中文数据，使用冻结概算、生效预算和锁定结算；明确基准日、万元及演示分摊规则。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "实际动作与结果见scenarios；分析页面只读，保存视图及导出预览复用已验收公共组件。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "25领域测试通过，新增验证组织直属与后代互斥、阶段筛选、跨项目科目合计及仅锁定结算样本。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "实际搜索无数据与项目经理403，GL02财务可读可下钻；本地同步计算无独立请求加载阶段。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已查看1440×900、1280×900截图，卡片和筛选正常换行，宽表水平滚动固定两端。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "本轮浏览器回归error/warn=[]，见artifacts/console.json。"
+        },
+        "business-1": {
+          "requirement": "组合四算/毛利轨迹、预算核算结算差异、科目偏差",
+          "passed": true,
+          "observation": "全范围65：概算129465、预算133002.70、滚动133494.20、结算—；已结算1：P008概算1438、预算1450、滚动1390、结算1390；毛利1042/1030/1090/1090。最新滚动与结算偏差0，明确不是历史预测准确率。；直接人力组合滚动60072.39、偏差221.17；下钻P001原科目出现5笔成本凭证合计742.50；返回四算专题。"
+        },
+        "business-2": {
+          "requirement": "比较相同样本及有效版本，未结算不当零，偏差可到项目来源",
+          "passed": true,
+          "observation": "全范围65：概算129465、预算133002.70、滚动133494.20、结算—；已结算1：P008概算1438、预算1450、滚动1390、结算1390；毛利1042/1030/1090/1090。最新滚动与结算偏差0，明确不是历史预测准确率。；直接人力组合滚动60072.39、偏差221.17；下钻P001原科目出现5笔成本凭证合计742.50；返回四算专题。；0项目、金额0、结算—、无数据；项目经理403；财务正常读65项目且四算穿透进入HS13。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "全范围四算及同样本结算切换",
+          "expected": "有效版本，同样本比较，未结算不作为零",
+          "observed": "全范围65：概算129465、预算133002.70、滚动133494.20、结算—；已结算1：P008概算1438、预算1450、滚动1390、结算1390；毛利1042/1030/1090/1090。最新滚动与结算偏差0，明确不是历史预测准确率。"
+        },
+        {
+          "action": "科目归因→贡献项目→原科目→返回",
+          "expected": "同源明细可追溯",
+          "observed": "直接人力组合滚动60072.39、偏差221.17；下钻P001原科目出现5笔成本凭证合计742.50；返回四算专题。"
+        },
+        {
+          "action": "输入不存在项目并切换角色",
+          "expected": "空样本与权限正确",
+          "observed": "0项目、金额0、结算—、无数据；项目经理403；财务正常读65项目且四算穿透进入HS13。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0011/artifacts/console.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0011/artifacts/gl-02-1440.png",
+        "1280": ".pms-loop/runs/R0011/artifacts/gl-02-1280.png"
+      }
+    },
+    "GL-04": {
+      "entry": "/executive/portfolio",
+      "covered_features": [
+        "BI-009",
+        "BI-010",
+        "BI-011",
+        "BI-012",
+        "BI-013"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行164、任务书行473及详细功能映射见plan。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "scenarios记录实际组织/项目/科目下钻及返回；URL筛选贯穿。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "65项目中文数据，使用冻结概算、生效预算和锁定结算；明确基准日、万元及演示分摊规则。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "实际动作与结果见scenarios；分析页面只读，保存视图及导出预览复用已验收公共组件。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "25领域测试通过，新增验证组织直属与后代互斥、阶段筛选、跨项目科目合计及仅锁定结算样本。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "实际搜索无数据与项目经理403，GL02财务可读可下钻；本地同步计算无独立请求加载阶段。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已查看1440×900、1280×900截图，卡片和筛选正常换行，宽表水平滚动固定两端。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "本轮浏览器回归error/warn=[]，见artifacts/console.json。"
+        },
+        "business-1": {
+          "requirement": "组织区域类型等级行业客户等组合数量金额成本毛利健康回款",
+          "passed": true,
+          "observation": "65→34→14；部门已签47736.60、滚动31330.20；GL03同14项目、已签47736.60、滚动31330.20；返回保留组织。；核算31下钻GL03同31/合同98081.60；区域7组，福建14/预计收入48651.60；客户32组分页。全范围加权毛利率40.2%，不再使用固定38.4。"
+        },
+        "business-2": {
+          "requirement": "集团→业务群→部门→项目，项目去重且比率按金额汇总",
+          "passed": true,
+          "observation": "65→34→14；部门已签47736.60、滚动31330.20；GL03同14项目、已签47736.60、滚动31330.20；返回保留组织。；核算31下钻GL03同31/合同98081.60；区域7组，福建14/预计收入48651.60；客户32组分页。全范围加权毛利率40.2%，不再使用固定38.4。；零项目与金额0，毛利率—、无数据；重置65；项目经理403。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "集团→智慧城市业务群→交付中心一部→项目清单",
+          "expected": "分组加总与下钻数量金额相同",
+          "observed": "65→34→14；部门已签47736.60、滚动31330.20；GL03同14项目、已签47736.60、滚动31330.20；返回保留组织。"
+        },
+        {
+          "action": "切换阶段、区域和客户维度",
+          "expected": "分组使用统一字典及筛选",
+          "observed": "核算31下钻GL03同31/合同98081.60；区域7组，福建14/预计收入48651.60；客户32组分页。全范围加权毛利率40.2%，不再使用固定38.4。"
+        },
+        {
+          "action": "搜索不存在项目、重置及项目经理访问",
+          "expected": "空态零分母与权限正确",
+          "observed": "零项目与金额0，毛利率—、无数据；重置65；项目经理403。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0011/artifacts/console.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0011/artifacts/gl-04-1440.png",
+        "1280": ".pms-loop/runs/R0011/artifacts/gl-04-1280.png"
+      }
+    }
+  }
+}

@@ -1,197 +1,59 @@
-import React, { useState, useMemo } from 'react';
-import { Card, Row, Col, Statistic, Table, Tag, Typography, Space, Select, Alert, Button } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import { mockProjects } from '@/mock';
+import { useState } from 'react';
+import { Alert, Button, Card, Col, Drawer, Row, Table, Tabs, Tag } from 'antd';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { AS_OF_DATE } from '@/mock';
+import { useBusinessStore } from '@/mock/business';
+import { selectFourCalculations, selectProjects } from '@/mock/selectors';
+import { useAppStore } from '@/store/useAppStore';
 import { PageHeader } from '@/components/common/PageHeader';
-import { Project } from '@/models/types';
+import { ProjectFilters } from '@/components/common/ProjectFilters';
+import { AnalysisTools } from '@/components/common/AnalysisTools';
+import { StateView } from '@/components/common/StateView';
+import { MoneyText } from '@/components/common/MoneyText';
+import { readProjectFilter } from '@/utils/project-query';
+import { sumMoney, percentage, formatPercent } from '@/utils/money';
 
-const { Text } = Typography;
-
-export const GL02FourCalculationsPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [selectedDept, setSelectedDept] = useState<string>('all');
-
-  const filteredProjects = useMemo(() => {
-    return mockProjects.filter((p) => selectedDept === 'all' || p.departmentId === selectedDept);
-  }, [selectedDept]);
-
-  // 四算阶段汇总
-  const totalContract = filteredProjects.reduce((s, p) => s + p.contractAmount, 0);
-  const totalEstimate = Math.round(totalContract * 0.58);
-  const totalBudget = filteredProjects.reduce((s, p) => s + p.budgetAmount, 0);
-  const totalActual = filteredProjects.reduce((s, p) => s + p.actualCost, 0);
-  const totalRolling = filteredProjects.reduce((s, p) => s + p.rollingCost, 0);
-  const settledProjects = filteredProjects.filter((p) => p.status === '已结算');
-  const totalSettlement = settledProjects.reduce((s, p) => s + p.rollingCost, 0);
-
-  // 科目偏差归因
-  const subjectBreakdown = [
-    { subject: '直接人力成本', budget: Math.round(totalBudget * 0.45), actual: Math.round(totalActual * 0.48), diff: Math.round(totalActual * 0.48 - totalBudget * 0.45) },
-    { subject: '硬件与采购支出', budget: Math.round(totalBudget * 0.25), actual: Math.round(totalActual * 0.28), diff: Math.round(totalActual * 0.28 - totalBudget * 0.25) },
-    { subject: '外包开发费用', budget: Math.round(totalBudget * 0.20), actual: Math.round(totalActual * 0.17), diff: Math.round(totalActual * 0.17 - totalBudget * 0.20) },
-    { subject: '项目现场期间费用', budget: Math.round(totalBudget * 0.10), actual: Math.round(totalActual * 0.07), diff: Math.round(totalActual * 0.07 - totalBudget * 0.10) },
-  ];
-
-  const columns = [
-    {
-      title: '项目编号与名称',
-      dataIndex: 'name',
-      key: 'name',
-      render: (_value: unknown, record: Project) => (
-        <div>
-          <Space size={4}>
-            <Tag color="blue">{record.id}</Tag>
-            <Text strong>{record.name}</Text>
-          </Space>
-          <div style={{ fontSize: 12, color: '#8c8c8c' }}>{record.customerName} | PM: {record.pmName}</div>
-        </div>
-      ),
-    },
-    {
-      title: '概算 (万元)',
-      key: 'estimate',
-      render: (_value: unknown, record: Project) => <span>¥{Math.round(record.budgetAmount * 0.95).toLocaleString()}</span>,
-    },
-    {
-      title: '预算 (万元)',
-      dataIndex: 'budgetAmount',
-      key: 'budgetAmount',
-      render: (val: number) => <span>¥{val.toLocaleString()}</span>,
-    },
-    {
-      title: '动态核算/滚动 (万元)',
-      dataIndex: 'rollingCost',
-      key: 'rollingCost',
-      render: (val: number) => <Text strong>¥{val.toLocaleString()}</Text>,
-    },
-    {
-      title: '最终结算 (万元)',
-      key: 'settlement',
-      render: (_value: unknown, record: Project) => (
-        record.status === '已结算' ? (
-          <Tag color="green">¥{record.rollingCost.toLocaleString()}</Tag>
-        ) : (
-          <Text type="secondary">— (未结算)</Text>
-        )
-      ),
-    },
-    {
-      title: '预算→滚动偏差',
-      key: 'variance',
-      sorter: (a: Project, b: Project) => a.costVarianceRate - b.costVarianceRate,
-      render: (_value: unknown, record: Project) => {
-        const isOver = record.costVariance > 0;
-        return (
-          <Text style={{ color: isOver ? '#cf1322' : '#3f8600', fontWeight: 'bold' }}>
-            {isOver ? `+${record.costVariance} (+${record.costVarianceRate}%)` : `${record.costVariance} (${record.costVarianceRate}%)`}
-          </Text>
-        );
-      },
-    },
-    {
-      title: '操作',
-      key: 'action',
-      render: (_value: unknown, record: Project) => (
-        <Button
-          type="link"
-          size="small"
-          onClick={() => navigate(`/executive/project-drilldown?projectId=${record.id}`)}
-        >
-          四算穿透
-        </Button>
-      ),
-    },
-  ];
-
-  return (
-    <div>
-      <PageHeader
-        title="GL-02 四算经营专题分析 (概算 → 预算 → 核算 → 结算)"
-        description="纵向比对四算全流程演变轨迹、科目偏差归因瀑布与毛利率波动分析"
-        extra={
-          <Space size={12}>
-            <Text strong>业务群筛选：</Text>
-            <Select
-              value={selectedDept}
-              onChange={setSelectedDept}
-              style={{ width: 160 }}
-              options={[
-                { value: 'all', label: '全部业务群' },
-                { value: 'D-002', label: '智慧城市业务群' },
-                { value: 'D-003', label: '数字政务业务群' },
-                { value: 'D-004', label: '工业互联网业务群' },
-              ]}
-            />
-          </Space>
-        }
-      />
-
-      <Alert
-        message="四算计算口径与不变量约束提示"
-        description="概算取冻结版本；预算取当前生效基线版本；动态核算按【已发生 + 未发生承诺 + 剩余预测】严格互斥计算；结算仅统计已结项项目，未结项不伪装为0。"
-        type="info"
-        showIcon
-        style={{ marginBottom: 16 }}
-      />
-
-      {/* 四算金额总览 */}
-      <Row gutter={16} style={{ marginBottom: 16 }}>
-        <Col span={6}>
-          <Card size="small" style={{ borderTop: '3px solid #1677ff' }}>
-            <Statistic title="1. 概算总额 (冻结版本)" value={totalEstimate} precision={1} suffix="万元" />
-            <div style={{ marginTop: 6, fontSize: 12, color: '#8c8c8c' }}>售前测算毛利: 42.0%</div>
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card size="small" style={{ borderTop: '3px solid #722ed1' }}>
-            <Statistic title="2. 预算总额 (基线版本)" value={totalBudget} precision={1} suffix="万元" />
-            <div style={{ marginTop: 6, fontSize: 12, color: '#8c8c8c' }}>较概算控制: +{((totalBudget - totalEstimate) / totalEstimate * 100).toFixed(1)}%</div>
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card size="small" style={{ borderTop: '3px solid #fa8c16' }}>
-            <Statistic title="3. 动态核算 (实时滚动)" value={totalRolling} precision={1} suffix="万元" valueStyle={{ color: '#fa8c16' }} />
-            <div style={{ marginTop: 6, fontSize: 12, color: '#cf1322' }}>预算偏差: +{((totalRolling - totalBudget) / totalBudget * 100).toFixed(2)}%</div>
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card size="small" style={{ borderTop: '3px solid #52c41a' }}>
-            <Statistic title="4. 已结算成本 (样本)" value={totalSettlement} precision={1} suffix="万元" valueStyle={{ color: '#52c41a' }} />
-            <div style={{ marginTop: 6, fontSize: 12, color: '#8c8c8c' }}>已结项项目: {settledProjects.length} 个</div>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* 科目偏差归因 */}
-      <Card title="四算成本科目偏差归因分析 (预算 vs 动态核算)" size="small" style={{ marginBottom: 16 }}>
-        <Row gutter={16}>
-          {subjectBreakdown.map((sub, idx) => (
-            <Col span={6} key={idx}>
-              <div style={{ padding: 12, background: '#fafafa', borderRadius: 4 }}>
-                <Text strong>{sub.subject}</Text>
-                <div style={{ margin: '8px 0', fontSize: 13 }}>
-                  <div>预算: ¥{sub.budget.toLocaleString()}万</div>
-                  <div>实际+预测: ¥{sub.actual.toLocaleString()}万</div>
-                </div>
-                <div style={{ fontSize: 12, color: sub.diff > 0 ? '#cf1322' : '#3f8600' }}>
-                  偏差: {sub.diff > 0 ? `+${sub.diff}万 (超支)` : `${sub.diff}万 (结余)`}
-                </div>
-              </div>
-            </Col>
-          ))}
-        </Row>
-      </Card>
-
-      {/* 单项目四算对比表 */}
-      <Card title="项目四算全景对比明细表" size="small">
-        <Table
-          dataSource={filteredProjects}
-          columns={columns}
-          rowKey="id"
-          size="small"
-          pagination={{ pageSize: 8 }}
-        />
-      </Card>
-    </div>
-  );
-};
+export function GL02FourCalculationsPage() {
+  const data = useBusinessStore((s) => s.data); const role = useAppStore((s) => s.currentRole);
+  const [params, setParams] = useSearchParams(); const navigate = useNavigate(); const [subject, setSubject] = useState<string>();
+  if (!['executive', 'pmo', 'finance', 'admin'].includes(role)) return <StateView type="403" />;
+  const scope = selectProjects(readProjectFilter(params), role, data.projects).map((p) => ({ p, ...selectFourCalculations(p, data) }));
+  const settledOnly = params.get('sample') === 'settled';
+  const rows = scope.filter((r) => r.estimate && r.budget && (!settledOnly || r.settlement));
+  const sum = (get: (r: typeof rows[number]) => number) => sumMoney(rows.map(get));
+  const estimate = sum((r) => r.estimate!.totalCost); const budget = sum((r) => r.budget!.totalAmount);
+  const rolling = sum((r) => r.rolling); const income = sum((r) => r.income);
+  const closed = rows.filter((r) => r.settlement); const settlement = closed.length ? sumMoney(closed.map((r) => r.settlement!.finalCost)) : undefined;
+  const complete = rows.length > 0 && closed.length === rows.length;
+  const subjectIds = [...new Set(rows.flatMap((r) => r.subjects.map((s) => s.subjectId)))];
+  const subjects = subjectIds.map((id) => {
+    const items = rows.flatMap((r) => r.subjects.filter((s) => s.subjectId === id));
+    return { id, name: items[0].subjectName, estimate: sumMoney(items.map((s) => s.estimate)), budget: sumMoney(items.map((s) => s.budget)), actual: sumMoney(items.map((s) => s.actual)), rolling: sumMoney(items.map((s) => s.rolling)), variance: sumMoney(items.map((s) => s.variance)) };
+  });
+  const go = (id: string, subjectId?: string) => { const next = new URLSearchParams(params); next.delete('tab'); if (subjectId) next.set('subject', subjectId); navigate(`/projects/${id}/dynamic-accounting?${next}`); };
+  const tab = params.get('tab') ?? 'projects';
+  return <><PageHeader title="GL-02 四算经营专题" description={`冻结概算 → 生效预算 → 动态核算 → 锁定结算 · ${AS_OF_DATE} · 万元`} breadcrumbs={[{ title: '首页', href: '/' }, { title: '四算专题' }]} extra={<Button onClick={() => navigate(-1)}>返回上一级</Button>} />
+    <ProjectFilters params={params} onChange={setParams} /><AnalysisTools storageKey="pms-four-views" params={params} onChange={setParams} />
+    <Tabs activeKey={settledOnly ? 'settled' : 'all'} onChange={(key) => { const next = new URLSearchParams(params); next.set('sample', key); next.delete('page'); setParams(next); }} items={[{ key: 'all', label: `概算 / 预算同样本（${scope.filter((r) => r.estimate && r.budget).length}）` }, { key: 'settled', label: `已结算同样本（${scope.filter((r) => r.estimate && r.budget && r.settlement).length}）` }]} />
+    <Alert showIcon type="info" style={{ marginBottom: 16 }} message={`当前比较 ${rows.length} 个具备冻结概算及生效预算的项目；排除缺失版本 ${scope.filter((r) => !r.estimate || !r.budget).length} 个`} description="结算比较仅使用已锁定结算的同一组项目，未结算显示—。核算为基准日最新滚动值，非历史预测快照；科目承诺及剩余预测按生效预算权重分摊（演示规则）。" />
+    <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>{[['冻结概算成本', estimate], ['生效预算成本', budget], ['最新滚动成本', rolling], ['同样本结算成本', complete ? settlement : undefined]].map(([name, value]) => <Col span={6} key={String(name)}><Card size="small" title={String(name)}><div style={{ fontSize: 24 }}><MoneyText value={value as number | undefined} /></div></Card></Col>)}</Row>
+    <Card size="small" title="毛利变化轨迹 · 同样本预计收入减各阶段成本" style={{ marginBottom: 16 }}><Row gutter={12}>{[['概算毛利', sumMoney([income, -estimate])], ['预算毛利', sumMoney([income, -budget])], ['预测毛利', sum((r) => r.grossMargin)], ['实际结算毛利', complete ? sum((r) => r.settlement!.finalGrossMargin) : undefined]].map(([label, value]) => <Col span={6} key={String(label)}>{label}<div><MoneyText value={value as number | undefined} /></div></Col>)}</Row><p>当前预计收入 <MoneyText value={income} />；概算/预算毛利按当前收入统一重算，不冒充历史收入快照。结算毛利使用原结算收入。</p></Card>
+    <Card size="small" title="偏差分析" style={{ marginBottom: 16 }}><Row gutter={12}><Col span={8}>预算 − 概算<div><MoneyText value={sumMoney([budget, -estimate])} signed /></div></Col><Col span={8}>滚动 − 预算<div><MoneyText value={sumMoney([rolling, -budget])} signed /></div></Col><Col span={8}>结算 − 最新滚动（已结算{closed.length}项）<div><MoneyText value={settlement === undefined ? undefined : sumMoney([settlement, -sumMoney(closed.map((r) => r.rolling))])} signed /></div></Col></Row></Card>
+    <Tabs activeKey={tab} onChange={(key) => { const next = new URLSearchParams(params); next.set('tab', key); setParams(next); }} items={[
+      { key: 'projects', label: '项目与有效版本', children: <Table rowKey={(r) => r.p.id} size="small" dataSource={rows} scroll={{ x: 1350 }} pagination={{ pageSize: 8, current: Number(params.get('page')) || 1, showSizeChanger: false, onChange: (page) => { const next = new URLSearchParams(params); next.set('page', String(page)); setParams(next); } }} columns={[
+        { title: '项目 / 有效版本', width: 270, fixed: 'left', render: (_, r) => <>{r.p.name}<div><Tag>{r.p.id}</Tag>概算{r.estimate!.version} / 预算{r.budget!.version}</div></> },
+        { title: '概算', render: (_, r) => <MoneyText value={r.estimate!.totalCost} /> }, { title: '预算', render: (_, r) => <MoneyText value={r.budget!.totalAmount} /> },
+        { title: '已发生', render: (_, r) => <MoneyText value={r.actual} /> }, { title: '滚动', render: (_, r) => <MoneyText value={r.rolling} /> },
+        { title: '锁定结算', render: (_, r) => <MoneyText value={r.settlement?.finalCost} /> }, { title: '滚动偏差 / 比率', render: (_, r) => <><MoneyText value={r.variance} signed /><div>{formatPercent(percentage(r.variance, r.budget!.totalAmount))}</div></> },
+        { title: '原始来源', fixed: 'right', width: 130, render: (_, r) => <Button onClick={() => go(r.p.id)}>四算穿透</Button> },
+      ]} /> },
+      { key: 'subjects', label: '成本科目偏差来源', children: <Table rowKey="id" size="small" dataSource={subjects} pagination={false} columns={[
+        { title: '成本科目', dataIndex: 'name' }, ...(['estimate', 'budget', 'actual', 'rolling', 'variance'] as const).map((key, i) => ({ title: ['概算', '预算', '已发生', '滚动', '滚动偏差'][i], dataIndex: key, render: (v: number) => <MoneyText value={v} signed={key === 'variance'} /> })),
+        { title: '归因来源', render: (_, r) => <Button onClick={() => setSubject(r.id)}>查看贡献项目</Button> },
+      ]} /> },
+    ]} />
+    <Drawer title={`科目贡献项目 · ${subjects.find((s) => s.id === subject)?.name ?? ''}`} width={700} open={!!subject} onClose={() => setSubject(undefined)}><Table rowKey={(r) => r.p.id} size="small" dataSource={rows.filter((r) => r.subjects.some((s) => s.subjectId === subject))} pagination={{ pageSize: 8 }} columns={[
+      { title: '项目', render: (_, r) => r.p.name }, { title: '滚动偏差', render: (_, r) => <MoneyText signed value={r.subjects.find((s) => s.subjectId === subject)?.variance} /> }, { title: '凭证与构成', render: (_, r) => <Button onClick={() => go(r.p.id, subject)}>查看原科目</Button> },
+    ]} /></Drawer>
+  </>;
+}
