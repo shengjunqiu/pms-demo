@@ -39,16 +39,16 @@
       "round": "R0039"
     },
     "GS-05": {
-      "status": "pending",
-      "reason": "继续用户授权的全页面UI改造：方案、技术成本与专家评审分区和版本上下文优化。"
+      "status": "done",
+      "round": "R0041"
     },
     "GS-06": {
-      "status": "pending",
-      "reason": "继续用户授权的全页面UI改造：方案、技术成本与专家评审分区和版本上下文优化。"
+      "status": "done",
+      "round": "R0041"
     },
     "GS-07": {
-      "status": "pending",
-      "reason": "继续用户授权的全页面UI改造：方案、技术成本与专家评审分区和版本上下文优化。"
+      "status": "done",
+      "round": "R0041"
     },
     "GS-08": {
       "status": "pending",
@@ -67,24 +67,20 @@
       "reason": "持续全页面UI改造：概算版本、提前投入申请及台账，保留业务规则并重新验收。"
     },
     "YS-01": {
-      "status": "done",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
-      "round": "R0030"
+      "status": "pending",
+      "reason": "持续全页面UI改造：立项来源/风险/分级和决策分区，当前申请及返回上下文清晰。"
     },
     "YS-02": {
-      "status": "done",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
-      "round": "R0030"
+      "status": "pending",
+      "reason": "持续全页面UI改造：立项来源/风险/分级和决策分区，当前申请及返回上下文清晰。"
     },
     "YS-03": {
-      "status": "done",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
-      "round": "R0030"
+      "status": "pending",
+      "reason": "持续全页面UI改造：立项来源/风险/分级和决策分区，当前申请及返回上下文清晰。"
     },
     "YS-04": {
-      "status": "done",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
-      "round": "R0030"
+      "status": "pending",
+      "reason": "持续全页面UI改造：立项来源/风险/分级和决策分区，当前申请及返回上下文清晰。"
     },
     "YS-05": {
       "status": "pending",
@@ -326,7 +322,7 @@
     },
     "FINAL": {
       "status": "pending",
-      "reason": "持续全页面UI改造：概算版本、提前投入申请及台账，保留业务规则并重新验收。"
+      "reason": "持续全页面UI改造：立项来源/风险/分级和决策分区，当前申请及返回上下文清晰。"
     }
   },
   "runs": [
@@ -1324,6 +1320,44 @@
         ".pms-loop/runs/R0040/checks.json": "906e65cd1b7f3c84152b8efe978cdb77af68e4f15a809738593015d01419168b",
         ".pms-loop/runs/R0040/evidence.json": "b010285ba7aeb6f26d2e2bc20615bb2781df1859324d91c3b680bc9bc8aed10d"
       }
+    },
+    {
+      "id": "R0041",
+      "items": [
+        "GS-05",
+        "GS-06",
+        "GS-07"
+      ],
+      "started_at": "2026-09-10T19:16:56+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-10T19:26:07+00:00",
+      "revision": "4d1eae948a74ea97b5d56231e8e912374191d3c8728552d81a673dcac385766b",
+      "proof": {
+        ".pms-loop/runs/R0041/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0041/build.log": "0098c96c7b61696ec5717b5885b98ac236128c252da08cc21cbf22fffffa375b",
+        ".pms-loop/runs/R0041/test-domain.log": "14729cb8ff29eb95dba81616eb9dd149c8c019d0b56d0afab8cb7ec00b710fc9",
+        ".pms-loop/runs/R0041/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0041/browser-final.log": "3aa23168241eda4fd31a621d5775fb20f2cff944f77a24ac2da35ecf9937cd1e",
+        ".pms-loop/runs/R0041/browser-clean-exit.log": "17dfdf46bda4dca1b42e26ff5ebad73c65a2b036418ab468c764b2220ddf0f20",
+        ".pms-loop/runs/R0041/artifacts/r0024-fd61c1fe178e69c8118154cd020dc505184b0748.json": "cfcfaf5c47e1ef9283aa508baa11402c081a518b09a19e8cb3517be60799a6fc",
+        ".pms-loop/runs/R0041/artifacts/r0024-523121fa9012486e691987c454174369f78a6461.json": "6a08a6178436876407add178d8e09ccfd1eb16f4c38e4d0a4e3eaebaadcc5be9",
+        ".pms-loop/runs/R0041/artifacts/r0024-fd61c1fe178e69c8118100464a56eaea996346f6.json": "729f2937d4b23490df687df3a8f44f39f7ca40df05a91f286a86df06d2c259d7",
+        ".pms-loop/runs/R0041/artifacts/r0024-fd61c1fe178e69c811813b725fd448b133fd33b1.json": "933b4cafee48bdd930d860fa9a5092ad93baf18fb788bfb2ec5adcce20270fb4",
+        ".pms-loop/runs/R0041/artifacts/GS-05-1440.png": "e80211fafafd5d1f89fce9cfee4f230d806cf8536071ca6026ce8eb86f0bc14d",
+        ".pms-loop/runs/R0041/artifacts/GS-05-1280.png": "0e5209a1a607355f1884b08de875010032aeaf8635926780d66796560745c2f0",
+        ".pms-loop/runs/R0041/artifacts/GS-06-1440.png": "f765b59974d1d348fa79308167926daa7eead18154147910d62e655803eb55c1",
+        ".pms-loop/runs/R0041/artifacts/GS-06-1280.png": "369aa8c0e391a5aed30c662f8c4ad32b17ce9ae9c64e0e3955768232ff17ba92",
+        ".pms-loop/runs/R0041/artifacts/GS-07-1440.png": "c039a139cf0b68a5b9cb17dcdd25ac0323e699227495a6e433f0f93ded199948",
+        ".pms-loop/runs/R0041/artifacts/GS-07-1280.png": "d691fc67485cd47086fcedf1915ce1466f6fbaffc576c30e72aed4dd31f31a89",
+        ".pms-loop/runs/R0041/checks.json": "c1f81585129b360b64b9f7e7d965adb7a69a3682ae82968880832b96b55696a8",
+        ".pms-loop/runs/R0041/evidence.json": "83c5d6cf87ee82b32b774816cbe28523a892c724262ef3573e8e60f7622aa6ce"
+      }
     }
   ],
   "notes": [
@@ -1494,6 +1528,14 @@
     {
       "at": "2026-09-10T19:16:39+00:00",
       "text": "R0040经营分析GL02–06正式验收完成，新UI累计15/72。revision d929cc5ee4af9164596b0dd6c8c87b2c46440d506988dfa13396fcab2ea44493工程4项及235领域通过；正式8浏览器场景通过（GL6+共享计划2），10张最终截图查看。原审批通过后APR1移出待办进入历史且仍待PMO基线确认。继续合入GS2 a50b361和YS2 75625c7（均范围检查通过），再GS3 095fcb7；待提交库存3包暂停派发。后续立项/未签/待办进度只读准备在/tmp/pms-ui-*-preparation.md。浏览器结束后再改任何记录，避免热更新干扰。"
+    },
+    {
+      "at": "2026-09-10T19:26:28+00:00",
+      "text": "R0041 GS05–07正式验收，新UI累计18/72。revision4d1eae948a74ea97b5d56231e8e912374191d3c8728552d81a673dcac385766b工程4项235领域通过；4正式浏览器场景JSON均passed/errors空，原runner在全部场景通过后exit143且遗留测试服务，仅清理pgid2855299；同源码UI再跑通过exit0。6张最终截图查看，双轮成本37→38.44旧快照不变。继续已集成YS2五页，GS3已提交范围检查通过。后续直接check后浏览器，避免不必要预检重复；有实际失败才回修同轮。"
+    },
+    {
+      "at": "2026-09-10T19:26:28+00:00",
+      "text": "reopen FINAL, YS-01, YS-02, YS-03, YS-04: 持续全页面UI改造：立项来源/风险/分级和决策分区，当前申请及返回上下文清晰。"
     }
   ],
   "history": [

@@ -62,9 +62,9 @@ export const MainLayout: React.FC = () => {
   const activeGroup = currentPage?.id.split('-')[0];
   const isWorkspace = [
     'WK-01', 'GL-01', 'HS-01',
-    'GS-01', 'GS-02', 'GS-03', 'GS-04',
+    'GS-01', 'GS-02', 'GS-03', 'GS-04', 'GS-05', 'GS-06', 'GS-07',
     'GL-02', 'GL-03', 'GL-04', 'GL-05', 'GL-06',
-    'YS-06', 'YS-07', 'YS-08',
+    'YS-05', 'YS-06', 'YS-07', 'YS-08', 'YS-09', 'YS-10', 'YS-11', 'YS-12',
   ].includes(currentPage?.id ?? '');
   useEffect(() => {
     if (activeGroup) setOpenGroups((keys) => keys.includes(activeGroup) ? keys : [...keys, activeGroup]);
