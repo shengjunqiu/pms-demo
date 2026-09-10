@@ -1,0 +1,19 @@
+{
+  "round": "R0031",
+  "items": [
+    "YS-05",
+    "YS-09",
+    "YS-10",
+    "YS-11",
+    "YS-12"
+  ],
+  "checks": {
+    "typecheck": "pass",
+    "lint": "pass",
+    "build": "pass",
+    "domain_tests": "pass",
+    "e2e_tests": "pass"
+  },
+  "verified_at": "2026-09-10T15:51:12.074020+00:00",
+  "note": "YS-05/09/10/11/12 预算编制与审批闭环通过E2E与领域测试"
+}

@@ -1,0 +1,17 @@
+{
+  "round": "R0033",
+  "items": [
+    "JS-05",
+    "JS-06",
+    "JS-07"
+  ],
+  "checks": {
+    "typecheck": "pass",
+    "lint": "pass",
+    "build": "pass",
+    "domain_tests": "pass",
+    "e2e_tests": "pass"
+  },
+  "verified_at": "2026-09-10T15:56:11.869356+00:00",
+  "note": "JS-05/06/07 客户终验与报验通过settlement.spec.ts与领域测试"
+}

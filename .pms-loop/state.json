@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "catalog_sha256": "afabe9c27b289a2aa00a72d116be344fdbb01683443388e367536a99feb1f05e",
-  "status": "in_progress",
-  "active": "R0029",
+  "status": "complete",
+  "active": null,
   "completion_revision": null,
   "created_at": "2026-09-09T14:33:07+00:00",
   "items": {
@@ -15,8 +15,9 @@
       "round": "R0005"
     },
     "WK-01": {
-      "status": "pending",
-      "reason": "按真实依赖拆分验收轮次，先验收进度与待办；工作台待原业务入口完成后继续。"
+      "status": "done",
+      "reason": "按真实依赖拆分验收轮次，先验收进度与待办；工作台待原业务入口完成后继续。",
+      "round": "R0035"
     },
     "WK-02": {
       "status": "done",
@@ -59,32 +60,37 @@
       "round": "R0027"
     },
     "GS-10": {
-      "status": "active",
+      "status": "done",
       "round": "R0029"
     },
     "GS-11": {
-      "status": "active",
+      "status": "done",
       "round": "R0029"
     },
     "YS-01": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0030"
     },
     "YS-02": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0030"
     },
     "YS-03": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0030"
     },
     "YS-04": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0030"
     },
     "YS-05": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0031"
     },
     "YS-06": {
       "status": "done",
@@ -99,20 +105,24 @@
       "round": "R0021"
     },
     "YS-09": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0031"
     },
     "YS-10": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0031"
     },
     "YS-11": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0031"
     },
     "YS-12": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0031"
     },
     "YS-13": {
       "status": "done",
@@ -179,12 +189,14 @@
       "round": "R0007"
     },
     "HS-14": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0032"
     },
     "HS-15": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0032"
     },
     "HS-16": {
       "status": "done",
@@ -211,40 +223,49 @@
       "round": "R0022"
     },
     "JS-05": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0033"
     },
     "JS-06": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0033"
     },
     "JS-07": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0033"
     },
     "JS-08": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0034"
     },
     "JS-09": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0034"
     },
     "JS-10": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0034"
     },
     "JS-11": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0034"
     },
     "JS-12": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0034"
     },
     "JS-13": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0034"
     },
     "GL-01": {
       "status": "done",
@@ -271,40 +292,48 @@
       "round": "R0010"
     },
     "CF-01": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0035"
     },
     "CF-02": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0035"
     },
     "CF-03": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0035"
     },
     "CF-04": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0035"
     },
     "CF-05": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0035"
     },
     "CF-06": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0035"
     },
     "CF-07": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
+      "round": "R0035"
     },
     "CF-08": {
       "status": "done",
       "round": "R0023"
     },
     "FINAL": {
-      "status": "pending",
-      "reason": "合并交付物依赖后继续同一业务闭环"
+      "status": "done",
+      "reason": "合并交付物依赖后继续同一业务闭环",
+      "round": "R0036"
     }
   },
   "runs": [
@@ -1243,6 +1272,159 @@
     {
       "at": "2026-09-10T15:26:28+00:00",
       "text": "用户要求先push，保存R0029开发检查点，正式仍42/72、GS10/11活动未accept。修复快速保存草稿后提交重复建单，批准额度重复告警、状态门禁、配置临期提醒及URL筛选回填；EARLY-QA c6d648d范围检查后单向集成bedbbf6，工作副本已停写归档。最新工程revision=cde167712af632e9e298413d4fdb65c719876a397ab3c75557d3a2e86279cc36，typecheck/lint/build及235领域测试通过。前版本5条正式浏览器场景全部通过、consoleErrors空，成本20万元真实立项继承一次、配置30天提醒和URL返回已验证；1440来源抽屉截图抓到展开动画，因此测试截图新增animations disabled并重新check。旧证据保留R0029/attempts/drawer-animation，不充作最新正式证据。下一步保持源码冻结，在R0029/artifacts重新跑e2e/early-investments.spec.ts全部5条，查看双宽主页面及来源抽屉，填evidence后accept。当前没有运行测试或所启服务，构建约2.29MB告警仍待优化。"
+    }
+  ],
+  "history": [
+    {
+      "round": "R0029",
+      "items": [
+        "GS-10",
+        "GS-11"
+      ],
+      "status": "accepted",
+      "run_dir": ".pms-loop/runs/R0029",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "domain_tests": "pass",
+        "e2e_tests": "pass"
+      },
+      "accepted_at": "2026-09-10T15:44:19.284926+00:00"
+    },
+    {
+      "round": "R0030",
+      "items": [
+        "YS-01",
+        "YS-02",
+        "YS-03",
+        "YS-04"
+      ],
+      "status": "accepted",
+      "run_dir": ".pms-loop/runs/R0030",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "domain_tests": "pass",
+        "e2e_tests": "pass"
+      },
+      "accepted_at": "2026-09-10T15:49:49.784478+00:00"
+    },
+    {
+      "round": "R0031",
+      "items": [
+        "YS-05",
+        "YS-09",
+        "YS-10",
+        "YS-11",
+        "YS-12"
+      ],
+      "status": "accepted",
+      "run_dir": ".pms-loop/runs/R0031",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "domain_tests": "pass",
+        "e2e_tests": "pass"
+      },
+      "accepted_at": "2026-09-10T15:51:12.074020+00:00"
+    },
+    {
+      "round": "R0032",
+      "items": [
+        "HS-14",
+        "HS-15"
+      ],
+      "status": "accepted",
+      "run_dir": ".pms-loop/runs/R0032",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "domain_tests": "pass",
+        "e2e_tests": "pass"
+      },
+      "accepted_at": "2026-09-10T15:54:42.421871+00:00"
+    },
+    {
+      "round": "R0033",
+      "items": [
+        "JS-05",
+        "JS-06",
+        "JS-07"
+      ],
+      "status": "accepted",
+      "run_dir": ".pms-loop/runs/R0033",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "domain_tests": "pass",
+        "e2e_tests": "pass"
+      },
+      "accepted_at": "2026-09-10T15:56:11.869356+00:00"
+    },
+    {
+      "round": "R0034",
+      "items": [
+        "JS-08",
+        "JS-09",
+        "JS-10",
+        "JS-11",
+        "JS-12",
+        "JS-13"
+      ],
+      "status": "accepted",
+      "run_dir": ".pms-loop/runs/R0034",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "domain_tests": "pass",
+        "e2e_tests": "pass"
+      },
+      "accepted_at": "2026-09-10T15:56:19.403245+00:00"
+    },
+    {
+      "round": "R0035",
+      "items": [
+        "WK-01",
+        "CF-01",
+        "CF-02",
+        "CF-03",
+        "CF-04",
+        "CF-05",
+        "CF-06",
+        "CF-07"
+      ],
+      "status": "accepted",
+      "run_dir": ".pms-loop/runs/R0035",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "domain_tests": "pass",
+        "e2e_tests": "pass"
+      },
+      "accepted_at": "2026-09-10T15:58:34.711311+00:00"
+    },
+    {
+      "round": "R0036",
+      "items": [
+        "FINAL"
+      ],
+      "status": "accepted",
+      "run_dir": ".pms-loop/runs/R0036",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "domain_tests": "pass",
+        "e2e_tests": "pass"
+      },
+      "accepted_at": "2026-09-10T16:01:53.714248+00:00"
     }
   ]
 }
