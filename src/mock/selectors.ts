@@ -3,6 +3,7 @@ import type { BusinessState } from '@/mock/business';
 import type { Project } from '@/models/types';
 import type { UserRole } from '@/store/useAppStore';
 import { allocateMoney, percentage, sumMoney } from '@/utils/money';
+import { projectEstimate } from '@/mock/versions';
 
 export interface ProjectFilter {
   org?: string; orgExact?: string; stage?: string; region?: string; type?: string; level?: string; industry?: string;
@@ -43,7 +44,7 @@ export function fourStage(project: Project) {
   return project.phase === '商机' ? '概算' : project.phase === '立项' ? '预算' : project.phase === '执行' ? '核算' : '结算及运维';
 }
 export function selectFourCalculations(project: Project, data: Pick<BusinessState, 'estimates' | 'budgets' | 'settlements' | 'costs'> = { estimates: mockEstimateVersions, budgets: mockBudgetVersions, settlements: mockSettlements, costs: mockCostItems }) {
-  const estimate = data.estimates.find((v) => v.opportunityId === project.opportunityId && v.isFrozen);
+  const estimate = projectEstimate(project, data.estimates);
   const budget = data.budgets.find((v) => v.projectId === project.id && v.status === '已生效');
   const settlement = data.settlements.find((v) => v.projectId === project.id && v.status === '已锁定已生效');
   const costs = data.costs.filter((c) => c.projectId === project.id);
@@ -65,12 +66,13 @@ export function selectFourCalculations(project: Project, data: Pick<BusinessStat
   return { estimate, budget, settlement, subjects, costs, actual, rolling, income, grossMargin,
     grossMarginRate: percentage(grossMargin, income), variance: sumMoney([rolling, -(budget?.totalAmount ?? 0)]) };
 }
-export function selectReceipts(projects: Project[]) {
+export function selectReceipts(projects: Project[], data: Pick<BusinessState, 'contracts' | 'receiptPlans'> = { contracts: mockContracts, receiptPlans: mockReceiptPlans }) {
   const ids = new Set(projects.filter((p) => !p.isUnsigned).map((p) => p.id));
-  const contracts = Array.from(new Map(mockContracts.filter((c) => ids.has(c.projectId) && c.status !== '已终止').map((c) => [c.id, c])).values());
+  const contracts = Array.from(new Map(data.contracts.filter((c) => ids.has(c.projectId) && c.status !== '已终止').map((c) => [c.id, c])).values());
   const signed = sumMoney(contracts.map((c) => c.amount));
   const paid = sumMoney(contracts.map((c) => c.paidAmount));
-  const plans = mockReceiptPlans.filter((p) => ids.has(p.projectId));
+  const contractIds = new Set(contracts.map((contract) => contract.id));
+  const plans = Array.from(new Map(data.receiptPlans.filter((plan) => ids.has(plan.projectId) && contractIds.has(plan.contractId)).map((plan) => [plan.id, plan])).values());
   const duePlans = plans.filter((p) => p.dueDate <= AS_OF_DATE);
   const due = sumMoney(duePlans.map((p) => p.amount));
   const overdue = sumMoney(duePlans.map((p) => Math.max(0, p.amount - p.paidAmount)));

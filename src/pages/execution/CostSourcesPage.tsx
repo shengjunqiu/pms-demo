@@ -1,3 +1,4 @@
+import { constructionLockReason } from '@/mock/construction-lock';
 import { useState } from 'react';
 import { Alert, App, Button, Card, Col, Descriptions, Drawer, Input, InputNumber, Modal, Row, Select, Space, Statistic, Table, Tag, Timeline } from 'antd';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -23,7 +24,7 @@ export function CostSourcesPage({ kind }: { kind: CostOrderKind }) {
   if (!visibleProjects(currentRole, data.projects).some((p) => p.id === id)) return <StateView type="403" />;
   const calc = selectFourCalculations(p, data); const subjects = calc.subjects.filter((s) => isCostSubject(kind, s.subjectId));
   const availability = costAvailability(data, p.id, subjectId); const pm = currentRole === 'project-manager' && currentUser.id === p.pmId; const finance = currentRole === 'finance';
-  const locked = data.lockedProjects.includes(p.id) || ['已关闭', '运维'].includes(p.phase) || ['已终止', '已关闭'].includes(p.status); const canSubmit = !locked && (pm || kind === 'expense' && currentRole === 'solution-tech' && p.memberIds?.includes(currentUser.id));
+  const locked = !!constructionLockReason(data, p.id) || ['已关闭', '运维'].includes(p.phase) || ['已终止', '已关闭'].includes(p.status); const canSubmit = !locked && (pm || kind === 'expense' && currentRole === 'solution-tech' && p.memberIds?.includes(currentUser.id));
   const orders = data.costOrders.filter((o) => o.projectId === id && o.kind === kind); const costs = data.costs.filter((c) => c.projectId === id && c.type === kind);
   const selected = orders.find((o) => o.id === params.get('source')); const voucher = costs.find((c) => c.sourceId === params.get('source'));
   const source = mockCostSources.find((s) => s.id === voucher?.sourceId); const upstream = [...mockProcurements, ...mockOutsources, ...mockExpenses].find((s) => s.id === source?.upstreamId);

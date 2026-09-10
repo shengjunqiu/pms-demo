@@ -37,7 +37,7 @@ export function GL03ProjectDrilldownPage() {
   };
   const header = <PageHeader title="GL-03 项目穿透分析" description={`组织与指标 → 项目 → 原始记录 · 数据更新至 ${AS_OF_DATE} · 金额单位：万元 · 管理视角只读`} breadcrumbs={[{ title: '首页', href: '/' }, { title: '项目穿透分析' }]} extra={<Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>返回上一级</Button>} />;
   if (project && !scope.some((p) => p.id === project.id)) return <>{header}<Alert type="warning" showIcon message="项目不在当前筛选范围内" description="保留上一级组织、健康度和时间条件，返回清单重新选择。" action={<Button onClick={() => view({ projectId: undefined })}>返回筛选清单</Button>} /></>;
-  const receipts = selectReceipts(scope);
+  const receipts = selectReceipts(scope, data);
   const totalBudget = sumMoney(scope.map((p) => p.budgetAmount)); const totalRolling = sumMoney(scope.map((p) => p.rollingCost));
   const list = <>{header}<ProjectFilters params={params} onChange={setParams} />
     {(params.get('metric') || params.get('stage')) && <Alert style={{ marginBottom: 16 }} message={`继承指标：${(({ overbudget: '预测超预算', unsigned: '未签项目', signed: '已签约项目', construction: '在建项目', closing: '验收收尾', maintenance: '运维项目' } as Record<string, string>)[params.get('metric') ?? ''] ?? '全部')}；阶段：${params.get('stage') ?? '全部'}`} type="info" />}

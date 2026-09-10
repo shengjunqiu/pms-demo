@@ -5,7 +5,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useBusinessStore } from '@/mock/business';
 import { useAppStore } from '@/store/useAppStore';
 import { fourStage, selectFourCalculations, selectReceipts, visibleProjects } from '@/mock/selectors';
-import { mockUsers, mockProcurements, mockOutsources, mockDepartments, mockOpportunities, AS_OF_DATE } from '@/mock';
+import { mockUsers, mockProcurements, mockOutsources, mockDepartments, AS_OF_DATE } from '@/mock';
 import { formatPercent } from '@/utils/money';
 import { PageHeader } from '@/components/common/PageHeader';
 import { StateView } from '@/components/common/StateView';
@@ -25,7 +25,7 @@ export function ProjectOverviewPage() {
   if (!project) return <StateView type="404" title="项目不存在" />;
   const allowed = visibleProjects(role, data.projects);
   if (!allowed.some((p) => p.id === id)) return <StateView type="403" />;
-  const p = project; const source = mockOpportunities.find((o) => o.id === p.opportunityId); const calc = selectFourCalculations(p, data); const receipt = selectReceipts([p]);
+  const p = project; const source = data.opportunities.find((o) => o.id === p.opportunityId); const calc = selectFourCalculations(p, data); const receipt = selectReceipts([p], data);
   const milestones = data.milestones.filter((m) => m.projectId === p.id);
   const issues = data.issues.filter((i) => i.projectId === p.id);
   const risks = data.risks.filter((r) => r.projectId === p.id);

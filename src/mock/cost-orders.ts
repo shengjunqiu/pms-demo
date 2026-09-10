@@ -1,3 +1,4 @@
+import { assertConstructionWritable } from '@/mock/construction-lock';
 import { AS_OF_DATE } from '@/mock';
 import type { Actor, BusinessState } from '@/mock/business';
 import { selectFourCalculations } from '@/mock/selectors';
@@ -24,6 +25,7 @@ export function applyCostOrderAction(state: BusinessState, action: CostOrderActi
   const existing = action.type === 'process-cost-order' ? state.costOrders.find((o) => o.id === action.id) : undefined;
   const p = state.projects.find((p) => p.id === (action.type === 'submit-cost-order' ? action.projectId : existing?.projectId));
   if (!p) throw new Error('项目或原申请不存在');
+  assertConstructionWritable(state, p.id);
   if (state.lockedProjects.includes(p.id) || ['已关闭', '运维'].includes(p.phase) || ['已终止', '已关闭'].includes(p.status)) throw new Error('建设期已结束或锁定，请使用运维周期费用');
   const pm = actor.role === 'project-manager' && actor.id === p.pmId;
   const checkLimit = (amount: number, subjectId: string, excludeId?: string) => {

@@ -22,7 +22,7 @@ export function GL01DashboardPage() {
   const mode = params.get('demo') ?? 'normal';
   const allowed = ['executive', 'pmo', 'admin'].includes(role);
   const scope = mode === 'empty' ? [] : selectProjects(readProjectFilter(params), role, data.projects);
-  const kpi = calculateCockpitKPIs(scope); const receipt = selectReceipts(scope); const exceptions = projectExceptions(scope, data);
+  const kpi = calculateCockpitKPIs(scope); const receipt = selectReceipts(scope, data); const exceptions = projectExceptions(scope, data);
   const calculations = scope.map((p) => selectFourCalculations(p, data)); const estimate = sumMoney(calculations.map((c) => c.estimate?.totalCost ?? 0));
   const ids = new Set(scope.map((p) => p.id)); const pending = data.decisions.filter((d) => ids.has(d.projectId) && d.status === '待决策');
   const query = (values: Record<string, string> = {}) => { const next = new URLSearchParams(params); next.delete('demo'); next.delete('analysis'); Object.entries(values).forEach(([k, v]) => next.set(k, v)); return next; };
@@ -32,7 +32,7 @@ export function GL01DashboardPage() {
   const stages = ['概算', '预算', '核算', '结算及运维'].map((stage) => { const rows = scope.filter((p) => fourStage(p) === stage); return { stage, count: rows.length, amount: sumMoney(rows.map((p) => p.revenueAmount ?? p.contractAmount)) }; });
   const health = healths.map((h) => ({ ...h, count: scope.filter((p) => p.health === h.key).length }));
   const analysis = params.get('analysis') ?? 'cost';
-  const rows = scope.map((p) => { const c = selectFourCalculations(p, data); const r = selectReceipts([p]); const warning = exceptions.find((e) => e.id === p.id); return { ...p, estimateCost: c.estimate?.totalCost, gross: c.grossMargin, grossRate: c.grossMarginRate, due: r.due, overdue: r.overdue, paid: r.paid, delay: warning?.delayDays ?? 0, settled: c.settlement?.finalCost }; });
+  const rows = scope.map((p) => { const c = selectFourCalculations(p, data); const r = selectReceipts([p], data); const warning = exceptions.find((e) => e.id === p.id); return { ...p, estimateCost: c.estimate?.totalCost, gross: c.grossMargin, grossRate: c.grossMarginRate, due: r.due, overdue: r.overdue, paid: r.paid, delay: warning?.delayDays ?? 0, settled: c.settlement?.finalCost }; });
   const columnsByTab = {
     progress: [{ title: '完成进度', dataIndex: 'progressRate', render: (v: number) => <Progress percent={v} size="small" /> }, { title: '最长里程碑逾期', dataIndex: 'delay', render: (v: number) => `${v} 天` }, { title: '计划验收日', dataIndex: 'plannedEndDate' }],
     cost: [{ title: '有效预算', dataIndex: 'budgetAmount', render: (v: number) => <MoneyText value={v} /> }, { title: '已发生', dataIndex: 'actualCost', render: (v: number) => <MoneyText value={v} /> }, { title: '滚动预测', dataIndex: 'rollingCost', render: (v: number) => <MoneyText value={v} /> }, { title: '偏差', dataIndex: 'costVariance', render: (v: number) => <MoneyText value={v} signed /> }],

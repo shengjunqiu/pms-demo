@@ -1,3 +1,4 @@
+import { constructionLockReason } from '@/mock/construction-lock';
 import { useState } from 'react';
 import { Alert, App, Button, Card, Descriptions, Drawer, Input, InputNumber, Modal, Select, Space, Table, Tabs, Tag } from 'antd';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -18,7 +19,7 @@ export function LaborCostPage() {
   const p=data.projects.find((p)=>p.id===id); if(!p) return <StateView type="404" />;
   if(!visibleProjects(currentRole,data.projects).some((p)=>p.id===id)) return <StateView type="403" />;
   const pm=currentRole==='project-manager' && p.pmId===currentUser.id; const showCost=['project-manager','pmo','finance','executive','admin'].includes(currentRole);
-  const member=pm || currentRole==='solution-tech' && !!p.memberIds?.includes(currentUser.id); const locked=p.phase!=='执行' || data.lockedProjects.includes(p.id) || p.status==='已终止';
+  const member=pm || currentRole==='solution-tech' && !!p.memberIds?.includes(currentUser.id); const locked=p.phase!=='执行' || !!constructionLockReason(data, p.id) || p.status==='已终止';
   const actor={id:currentUser.id,name:currentUser.name,role:currentRole}; const a=laborAvailability(data,p.id); const tasks=data.tasks.filter((t)=>t.projectId===p.id);
   const update=(key:string,value?:string)=>{const next=new URLSearchParams(params); if(value)next.set(key,value);else next.delete(key);setParams(next);};
   const entries=data.laborEntries.filter((e)=>e.projectId===p.id && (showCost || e.userId===currentUser.id));

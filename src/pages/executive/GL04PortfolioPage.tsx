@@ -41,7 +41,7 @@ export function GL04PortfolioPage() {
   const aggregate = (projects: Project[]) => {
     const calculations = projects.map((p) => selectFourCalculations(p, data)); const income = sumMoney(calculations.map((c) => c.income));
     const rolling = sumMoney(calculations.map((c) => c.rolling)); const gross = sumMoney([income, -rolling]);
-    return { count: projects.length, income, rolling, gross, rate: percentage(gross, income), receipts: selectReceipts(projects), red: projects.filter((p) => p.health === 'red').length, orange: projects.filter((p) => p.health === 'orange').length, yellow: projects.filter((p) => p.health === 'yellow').length, green: projects.filter((p) => p.health === 'green').length };
+    return { count: projects.length, income, rolling, gross, rate: percentage(gross, income), receipts: selectReceipts(projects, data), red: projects.filter((p) => p.health === 'red').length, orange: projects.filter((p) => p.health === 'orange').length, yellow: projects.filter((p) => p.health === 'yellow').length, green: projects.filter((p) => p.health === 'green').length };
   };
   const total = aggregate(scope); const rows = [...groups.values()].map((group) => ({ ...group, ...aggregate(group.projects) }));
   const drill = (row: typeof rows[number], nextLevel = false) => {

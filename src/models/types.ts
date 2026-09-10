@@ -74,6 +74,7 @@ export interface EstimateVersion {
 
 // 项目实体
 export interface Project {
+  frozenEstimateVersionId?: string;
   memberIds?: string[];
   releasedBudgetPercent?: number;
   id: string;
@@ -127,6 +128,16 @@ export interface Contract {
   status: '已签订' | '履约中' | '已完成' | '已终止';
   paidAmount: number; // 实收金额 万元
   unpaidAmount: number; // 待收金额 万元
+}
+
+export interface ReceiptPlan {
+  id: string;
+  projectId: string;
+  contractId: string;
+  title: string;
+  dueDate: string;
+  amount: number;
+  paidAmount: number;
 }
 
 // 预算版本

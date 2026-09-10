@@ -5,11 +5,13 @@ import { applyReportAction, type ReportAction } from '@/mock/reports';
 import { applyCostOrderAction, type CostOrder, type CostOrderAction } from '@/mock/cost-orders';
 import { applyTicketAction, ticketMeta, type TicketAction, type TicketMeta } from '@/mock/tickets';
 import { create } from 'zustand';
-import { AS_OF_DATE, mockProjects, mockBudgetVersions, mockBaselineVersions, mockIssues, mockRisks, mockBugs, mockDecisions, mockAcceptances, mockCostItems, mockEstimateVersions, mockMilestones, mockSettlements, mockReceiptPlans, mockChanges, mockWbsTasks, mockRequirements, mockDailyReports, mockWeeklyReports } from '@/mock';
-import type { Project, BudgetVersion, BaselineVersion, Issue, Risk, Bug, CostItem, DecisionItem, AcceptanceRecord, EstimateVersion, Milestone, SettlementRecord, ProjectChange, WbsTask, Requirement, DailyReport, WeeklyReport } from '@/models/types';
+import { AS_OF_DATE, mockOpportunities, mockContracts, mockProjects, mockBudgetVersions, mockBaselineVersions, mockIssues, mockRisks, mockBugs, mockDecisions, mockAcceptances, mockCostItems, mockEstimateVersions, mockMilestones, mockSettlements, mockReceiptPlans, mockChanges, mockWbsTasks, mockRequirements, mockDailyReports, mockWeeklyReports } from '@/mock';
+import type { Opportunity, Contract, ReceiptPlan, Project, BudgetVersion, BaselineVersion, Issue, Risk, Bug, CostItem, DecisionItem, AcceptanceRecord, EstimateVersion, Milestone, SettlementRecord, ProjectChange, WbsTask, Requirement, DailyReport, WeeklyReport } from '@/models/types';
 import type { UserRole } from '@/store/useAppStore';
 import { allocateMoney, money, percentage, sumMoney } from '@/utils/money';
 import { assessHealth } from '@/utils/health';
+import { projectEstimate } from '@/mock/versions';
+import { assertConstructionWritable } from '@/mock/construction-lock';
 
 export interface Actor { id: string; name: string; role: UserRole }
 export interface Approval {
@@ -30,6 +32,10 @@ export interface PlanRequest {
 }
 export interface Material extends DocumentDetails { id: string; projectId: string; name: string; required: boolean; status: '缺失' | '待提交' | '待审核' | '通过' | '驳回' }
 export interface BusinessState {
+  opportunities: Opportunity[];
+  contracts: Contract[];
+  receiptPlans: ReceiptPlan[];
+  constructionFreezes: Record<string, { requestId: string; reason: string }>;
   laborEntries: LaborEntry[]; qualityPlans: Record<string, QualityPlan>; dailyReports: DailyReport[]; weeklyReports: WeeklyReport[]; costOrders: CostOrder[]; requirements: Requirement[]; ticketMeta: Record<string, TicketMeta>; tasks: WbsTask[]; planRequests: PlanRequest[]; projects: Project[]; budgets: BudgetVersion[]; baselines: BaselineVersion[];
   estimates: EstimateVersion[]; milestones: Milestone[]; settlements: SettlementRecord[];
   issues: Issue[]; risks: Risk[]; bugs: Bug[]; costs: CostItem[];
@@ -38,7 +44,7 @@ export interface BusinessState {
   audit: { id: string; actor: string; action: string; target: string; date: string }[];
 }
 export function createBusinessState(): BusinessState {
-  return structuredClone({ laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects, budgets: mockBudgetVersions, baselines: mockBaselineVersions,
+  return structuredClone({ opportunities: mockOpportunities, contracts: mockContracts, receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
     estimates: mockEstimateVersions, milestones: mockMilestones, settlements: mockSettlements,
     issues: mockIssues, risks: mockRisks, bugs: mockBugs, costs: mockCostItems, approvals: [], changes: mockChanges, managementApprovals: [],
     decisions: mockDecisions, acceptances: mockAcceptances, lockedProjects: ['P-008'], maintenanceCosts: [], audit: [],
@@ -86,12 +92,12 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     const p = project(action.projectId); target = p.id;
     requireRole('project-manager', 'finance');
     if (actor.role === 'project-manager' && actor.id !== p.pmId) throw new Error('仅项目主PM可提交');
-    if (state.lockedProjects.includes(p.id)) throw new Error('建设期已结算锁定');
+    assertConstructionWritable(state, p.id);
     if (action.budget.projectId !== p.id || action.budget.totalAmount < 0 || !Number.isFinite(action.budget.totalAmount)) throw new Error('预算数据无效');
     const sum = action.budget.items.reduce((total, item) => total + item.amount, 0);
     if (Math.abs(sum - action.budget.totalAmount) > 0.000001 || action.budget.items.some((i) => i.amount < 0 || !Number.isFinite(i.amount))) throw new Error('预算科目合计不符');
     if (state.approvals.some((a) => a.projectId === p.id && a.status === '待审批')) throw new Error('已有待审批预算');
-    const estimate = state.estimates.find((e) => e.opportunityId === p.opportunityId && e.isFrozen);
+    const estimate = projectEstimate(p, state.estimates);
     if (!estimate) throw new Error('缺少冻结概算');
     const isOverEstimate = action.budget.totalAmount > estimate.totalCost;
     if (isOverEstimate && !action.reason.trim()) throw new Error('超概算提交必须说明原因');
@@ -110,7 +116,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     requireRole(approval.requiredRole);
     if (!action.opinion.trim()) throw new Error('审批意见必填');
     const p = project(approval.projectId); target = approval.id;
-    if (state.lockedProjects.includes(p.id)) throw new Error('建设期已结算锁定');
+    assertConstructionWritable(state, p.id);
     if (action.approve) {
       const baseline = state.baselines.find((b) => b.projectId === p.id && b.status === '已生效');
       if (baseline?.id !== approval.baseline.id) throw new Error('基线已变化，请重新提交审批');
@@ -168,6 +174,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     const p = project(action.projectId); target = p.id;
     requireRole('project-manager');
     if (actor.id !== p.pmId || state.lockedProjects.includes(p.id)) throw new Error('仅未锁定项目主PM可提交');
+    assertConstructionWritable(state, p.id);
     if (p.phase !== '执行' || p.status === '已终止') throw new Error('仅执行中项目可申请计划或阶段变更');
     if (!action.reason.trim()) throw new Error('申请说明必填');
     if (action.kind === 'schedule' && (!Number.isInteger(action.shiftDays) || action.shiftDays < 1 || action.shiftDays > 90)) throw new Error('演示计划顺延须为1至90天');
@@ -193,6 +200,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
         const next = transition(state, { type: 'stage-gate', projectId: p.id }, actor);
         state.projects = next.projects;
       } else {
+        assertConstructionWritable(state, p.id);
         const baseline = state.baselines.find((b) => b.projectId === p.id && b.status === '已生效');
         if (baseline?.id !== request.baselineId || state.lockedProjects.includes(p.id)) throw new Error('基线或锁定状态已变化，请重新申报');
         const shift = (date: string) => new Date(Date.parse(date) + request.shiftDays * 86400000).toISOString().slice(0, 10);
@@ -249,7 +257,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     if (action.maintenance) {
       if (!p.isMaintenance) throw new Error('项目不属于运维周期');
     } else {
-      if (state.lockedProjects.includes(p.id)) throw new Error('建设期成本已锁定');
+      assertConstructionWritable(state, p.id);
       if (action.fromCommitment && action.cost.amount > p.committedCost) throw new Error('结转金额超过未发生承诺');
       const nextCommitted = action.fromCommitment ? money(p.committedCost - action.cost.amount) : p.committedCost;
       if (p.isUnsigned && p.actualCost + action.cost.amount + nextCommitted > (p.unsignedLimitQuota ?? 0)) throw new Error('未签额度不足，须追加审批');
@@ -265,7 +273,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
   }
   for (const p of state.projects) {
     const delayDays = Math.max(0, ...state.milestones.filter((m) => m.projectId === p.id && m.status !== '已达成').map((m) => (Date.parse(AS_OF_DATE) - Date.parse(m.plannedDate)) / 86400000));
-    const health = assessHealth(p, { delayDays, overdueReceipt: sumMoney(mockReceiptPlans.filter((r) => r.projectId === p.id && r.dueDate <= AS_OF_DATE).map((r) => r.amount - r.paidAmount)), majorRisks: state.risks.filter((r) => r.projectId === p.id && ['特大', '重大'].includes(r.level) && r.status === '监控中').length, majorIssues: state.issues.filter((i) => i.projectId === p.id && i.severity === '重大' && i.status !== '已关闭').length });
+    const health = assessHealth(p, { delayDays, overdueReceipt: sumMoney(state.receiptPlans.filter((r) => r.projectId === p.id && r.dueDate <= AS_OF_DATE).map((r) => Math.max(0, r.amount - r.paidAmount))), majorRisks: state.risks.filter((r) => r.projectId === p.id && ['特大', '重大'].includes(r.level) && r.status === '监控中').length, majorIssues: state.issues.filter((i) => i.projectId === p.id && i.severity === '重大' && i.status !== '已关闭').length });
     p.health = health.level; p.healthReason = health.reasons.join('；');
   }
   state.audit.push({ id: `AUD-${state.audit.length + 1}`, actor: actor.name, action: action.type, target, date: AS_OF_DATE });
@@ -279,7 +287,7 @@ export function createDemoBusinessState(): BusinessState {
   const candidates = state.projects.filter((p) => !p.isMaintenance && !state.lockedProjects.includes(p.id)).slice(0, 45);
   for (const p of candidates) {
     const budget = state.budgets.find((b) => b.projectId === p.id && b.status === '已生效')!;
-    const estimate = state.estimates.find((e) => e.opportunityId === p.opportunityId && e.isFrozen)!;
+    const estimate = projectEstimate(p, state.estimates)!;
     const totalAmount = money(Math.max(budget.totalAmount, estimate.totalCost) * 1.04);
     const amounts = allocateMoney(totalAmount, budget.items.map((i) => i.amount));
     const items = budget.items.map((item, i) => ({ ...item, amount: amounts[i] }));

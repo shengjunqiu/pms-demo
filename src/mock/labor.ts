@@ -2,6 +2,7 @@ import { AS_OF_DATE, mockTimesheets } from '@/mock';
 import type { Actor, BusinessState } from '@/mock/business';
 import { selectFourCalculations } from '@/mock/selectors';
 import { money, percentage, sumMoney } from '@/utils/money';
+import { assertConstructionWritable } from '@/mock/construction-lock';
 
 export const LABOR_RULE = { version: 'LAB-2026-01', effectiveDate: '2026-01-01', dailyLimit: 8, defaultHourlyYuan: 120 };
 export interface LaborEntry {
@@ -27,6 +28,7 @@ export function applyLaborAction(state: BusinessState, action: LaborAction, acto
   const p = state.projects.find((p) => p.id === (action.type === 'submit-labor' ? action.projectId : entry?.projectId));
   if (!p) throw new Error('项目或工时记录不存在');
   if (p.phase !== '执行' || ['已终止', '已关闭'].includes(p.status) || state.lockedProjects.includes(p.id)) throw new Error('仅执行中且未锁定项目可办理建设工时');
+  assertConstructionWritable(state, p.id);
   const limit = (amount: number, excludeId?: string) => {
     const a = laborAvailability(state, p.id, excludeId);
     if (amount > a.available) throw new Error('当前阶段释放人力预算不足，请先完成阶段或预算审批');
