@@ -62,8 +62,8 @@ export function StartConfirmationPage() {
           <Button onClick={() => navigate(`/projects/${project.id}`)}>项目详情</Button>
         }
       />
-      <Descriptions
-        bordered
+      <div className="pms-record-summary"><Descriptions
+        size="small"
         column={3}
         items={[
           {
@@ -79,9 +79,13 @@ export function StartConfirmationPage() {
           },
         ]}
       />
+      </div>
+      <Alert showIcon style={{marginTop:16}} type={confirmed?'success':result.checks.every(check=>check.passed)?'success':'warning'} message={confirmed?'项目已正式启动':`已满足 ${result.checks.filter(check=>check.passed).length} / ${result.checks.length} 项启动条件`} description={confirmed?`${confirmed.date} · ${confirmed.by} · ${confirmed.opinion}`:result.checks.filter(check=>!check.passed).map(check=>check.name).join('、')||'请核对实际启动日期与会议意见，确认后生成执行事项。'}/>
       <Card title="启动条件检查" style={{ marginTop: 16 }}>
         <Table
           rowKey="key"
+          size="small"
+          scroll={{x:760}}
           pagination={false}
           dataSource={confirmed?.checks ?? result.checks}
           columns={[
@@ -132,6 +136,8 @@ export function StartConfirmationPage() {
             </p>
             <Table
               rowKey="userId"
+              size="small"
+              scroll={{x:760}}
               pagination={false}
               dataSource={confirmed.notifications}
               columns={[
@@ -151,6 +157,8 @@ export function StartConfirmationPage() {
             />
             <Table
               rowKey="id"
+              size="small"
+              scroll={{x:900}}
               pagination={false}
               dataSource={confirmed.executionWork}
               columns={[
@@ -182,15 +190,17 @@ export function StartConfirmationPage() {
             showIcon
             message="必须先满足立项、唯一任命、完整基线、启动里程碑及真实签约条件。确认后进入执行，并激活WBS、日报和工时入口。"
           />
-          <Space style={{ margin: '16px 0' }}>
+          <Space wrap style={{ margin: '16px 0' }}>
             <span>实际启动日期</span>
             <DatePicker
+              aria-label="实际启动日期"
               disabled={!canConfirm}
               value={dayjs(date)}
               onChange={(value) => setDate(value?.format('YYYY-MM-DD') ?? '')}
             />
           </Space>
-          <Input.TextArea
+          <p>启动会议与确认意见</p><Input.TextArea
+            aria-label="启动会议与确认意见"
             rows={3}
             disabled={!canConfirm}
             value={opinion}
