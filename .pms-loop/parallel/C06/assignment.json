@@ -1,5 +1,6 @@
 {
   "package_id": "C06",
+  "package_type": "acceptance_hardening",
   "items": [
     "JS-08",
     "JS-13"
@@ -7,26 +8,31 @@
   "owner": "develop_js",
   "integration_root": "/Users/shengjunqiu/Documents/Code/pms-demo",
   "workdir": "/private/tmp/pms-parallel-js",
-  "branch": "pms/receipt-ui",
-  "base_commit": "59c1063",
-  "contract_commit": "59c1063",
+  "branch": "pms/c06-receipts-r2",
+  "base_commit": "ea6903f",
+  "contract_commit": "ea6903f",
+  "status": "assigned",
+  "writer": "subagent:c06-worker",
+  "last_confirmed_at": "2026-09-10",
   "owned_paths": [
     "src/pages/settlement/SettlementAnalysisPage.tsx",
     "src/models/__tests__/receipts.test.ts"
   ],
-  "shared_changes": "root only",
-  "status": "assigned",
-  "writer": "/root/develop_js",
-  "last_confirmed_at": "2026-09-10",
+  "shared_changes": "root only; report interface needs without editing receipts state, business.ts, selectors, shared types, route aggregation, navigation, project configuration, Loop state, or managed progress",
   "development_dependencies": [
-    "published contract commit"
+    "current integrated receipts, settlement, operation, action-policy and configuration contracts at ea6903f"
   ],
   "acceptance_dependencies": [
-    "root integration and current revision browser evidence"
+    "root integration and current-revision browser evidence for JS-08/13"
   ],
-  "scenarios": "Assigned in collaboration task; normal, role, immutable history and cross-domain consistency checks",
-  "fixtures": "P006 receipts / actual initiation rounds",
-  "next_action": "deliver one-way independent commit",
+  "scenarios": [
+    "结算分析收支与四算来源一致，实收明细可追溯且重复流水不重复计算",
+    "P006收款门禁与关闭条件同步，建设期和运维期金额隔离",
+    "角色和动作策略限制不影响只读下钻",
+    "1440x900与1280x900正式截图由协调者在集成版本生成"
+  ],
+  "fixtures": "P006 receipts / actual settlement and operation records",
+  "next_action": "在新同步点复核并修复JS-08/13收支分析与下钻阻塞；仅提交独占路径；check_delivery.py通过后交付",
   "delivery_commits": [],
   "integration_commits": []
 }

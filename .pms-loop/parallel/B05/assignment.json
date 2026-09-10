@@ -1,5 +1,6 @@
 {
   "package_id": "B05",
+  "package_type": "development",
   "items": [
     "YS-13",
     "YS-14",
@@ -8,11 +9,11 @@
   "owner": "develop_ys",
   "integration_root": "/Users/shengjunqiu/Documents/Code/pms-demo",
   "workdir": "/private/tmp/pms-parallel-ys",
-  "branch": "pms/budget",
-  "base_commit": "b4e320c",
-  "contract_commit": "b4e320c",
-  "status": "awaiting_contract",
-  "writer": "/root/develop_ys",
+  "branch": "pms/b05-unsigned-r2",
+  "base_commit": "ea6903f",
+  "contract_commit": "ea6903f",
+  "status": "assigned",
+  "writer": "subagent:b05-worker",
   "last_confirmed_at": "2026-09-10",
   "owned_paths": [
     "src/models/unsigned.ts",
@@ -21,16 +22,22 @@
     "src/models/__tests__/unsigned.test.ts",
     "src/routes/modules/unsigned.tsx"
   ],
-  "shared_changes": "root only; interface proposal required; existing WIP retained for one-time review",
+  "shared_changes": "root only; report interface needs without editing business.ts, selectors, shared types, route aggregation, navigation, project configuration, Loop state, or managed progress",
   "development_dependencies": [
-    "P0领域接入契约；领域可在分支先兼容实现"
+    "current integrated initiation, budget, contract, action-policy and execution-start contracts at ea6903f"
   ],
   "acceptance_dependencies": [
-    "按catalog和并发方案，所有真实下钻已集成可操作"
+    "B02/B04真实立项、任命和基线链路已集成",
+    "root integration and current-revision browser evidence"
   ],
-  "scenarios": "catalog对应页面的全部条件及正常/阻断/角色/版本同步场景",
-  "fixtures": "现有固定故事；B01另建合法规划期对象",
-  "next_action": "保存旧分支/WIP；从统一同步点创建新任务分支，仅迁移未交付独占模块；check_delivery.py通过后交付",
+  "scenarios": [
+    "追加投入审批与额度余额、超额和过期阻断",
+    "未签转签约及合同来源可追溯",
+    "启动前检查任命、预算基线、合同与阶段条件，并生成真实执行待办",
+    "角色和动作策略限制与不可变历史"
+  ],
+  "fixtures": "现有固定故事与合法规划期对象，沿用统一BusinessState",
+  "next_action": "在新同步点完成YS-13/14/15独占实现与领域测试；check_delivery.py通过后交付",
   "delivery_commits": [
     "f54928e"
   ],
