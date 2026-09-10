@@ -11,14 +11,14 @@
   "branch": "pms/c06-receipts-r2",
   "base_commit": "ea6903f",
   "contract_commit": "ea6903f",
-  "status": "assigned",
+  "status": "integrated_pending_acceptance",
   "writer": "subagent:c06-worker",
   "last_confirmed_at": "2026-09-10",
   "owned_paths": [
     "src/pages/settlement/SettlementAnalysisPage.tsx",
     "src/models/__tests__/receipts.test.ts"
   ],
-  "shared_changes": "root only; report interface needs without editing receipts state, business.ts, selectors, shared types, route aggregation, navigation, project configuration, Loop state, or managed progress",
+  "shared_changes": "integrated by coordinator in c0992a1: settlementSnapshot, closeChecks and JS-13 tables now consume canonical selectReceipts data",
   "development_dependencies": [
     "current integrated receipts, settlement, operation, action-policy and configuration contracts at ea6903f"
   ],
@@ -32,7 +32,12 @@
     "1440x900与1280x900正式截图由协调者在集成版本生成"
   ],
   "fixtures": "P006 receipts / actual settlement and operation records",
-  "next_action": "在新同步点复核并修复JS-08/13收支分析与下钻阻塞；仅提交独占路径；check_delivery.py通过后交付",
-  "delivery_commits": [],
-  "integration_commits": []
+  "next_action": "在当前集成版本运行工程检查、回款浏览器场景和JS-08/13正式双宽度验收",
+  "delivery_commits": [
+    "97aeb01"
+  ],
+  "integration_commits": [
+    "a2fdef0",
+    "c0992a1"
+  ]
 }

@@ -1,0 +1,49 @@
+{
+  "package_id": "C06",
+  "base_commit": "ea6903fdb378c5c6dceb1dbb62bccb2d786461d0",
+  "delivery_commit": "97aeb0177ee053876bc76f1df1154d86f2bf5d87",
+  "depends_on_deliveries": [],
+  "shared_changes": [
+    {
+      "status": "integrated",
+      "integration_commit": "c0992a1",
+      "summary": "Coordinator unified settlementSnapshot, closeChecks and JS-13 source tables on canonical selectReceipts data and added duplicate/terminated-source regressions."
+    }
+  ],
+  "checks": [
+    {
+      "command": "pnpm exec vitest run src/models/__tests__/receipts.test.ts src/models/__tests__/settlement.test.ts src/models/__tests__/operations.test.ts --maxWorkers=1",
+      "exit_code": 0,
+      "summary": "3 files and 38 tests passed on integration HEAD"
+    },
+    {
+      "command": "pnpm typecheck",
+      "exit_code": 0
+    },
+    {
+      "command": "pnpm lint",
+      "exit_code": 0
+    },
+    {
+      "command": "check_delivery.py ea6903f..97aeb01",
+      "exit_code": 0,
+      "summary": "two C06-owned paths only; no shared paths, merge commits, or conflicts"
+    }
+  ],
+  "artifacts": [
+    "subagent workflow a8c75c15-bf7f-4cd6-be39-eef2f3480c7c deliveries/c06-worker.md",
+    "subagent follow-up review for C06: Merge verdict OK with notes"
+  ],
+  "remaining_dependencies": [
+    "current integration build and full domain checks",
+    "receipt browser scenario including read-only plan-to-receipt drilldown",
+    "formal 1440x900/1280x900 screenshots and Loop acceptance"
+  ],
+  "integration_commit": "a2fdef0",
+  "integration_commits": [
+    "a2fdef0",
+    "c0992a1"
+  ],
+  "formal_rounds": [],
+  "status": "integrated_pending_acceptance"
+}
