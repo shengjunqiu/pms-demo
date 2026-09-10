@@ -229,6 +229,17 @@ describe("真实收款与合同计划单一实收", () => {
     ).toHaveLength(1);
     expect(deDuplicated.paid).toBe(receiptSummary.paid);
     expect(deDuplicated.outstanding).toBe(receiptSummary.outstanding);
+    const deDuplicatedSnapshot = settlementSnapshot(duplicated, p.id);
+    expect(deDuplicatedSnapshot.income).toBe(calc.income);
+    expect(deDuplicatedSnapshot.receipts).toBe(receiptSummary.paid);
+    expect(deDuplicatedSnapshot.receivable).toBe(receiptSummary.outstanding);
+    expect(deDuplicatedSnapshot.overdue).toBe(receiptSummary.overdue);
+    expect(deDuplicatedSnapshot.contracts).toHaveLength(
+      receiptSummary.contracts.length,
+    );
+    expect(deDuplicatedSnapshot.receiptPlans).toHaveLength(
+      receiptSummary.plans.length,
+    );
 
     const constructionBefore = structuredClone(selectFourCalculations(p, s));
     s.maintenanceCosts.push({
@@ -246,6 +257,65 @@ describe("真实收款与合同计划单一实收", () => {
     expect(settlementSnapshot(s, p.id).receipts).toBe(
       receiptSummary.paid + 100,
     );
+  });
+  it("关闭门禁忽略终止合同，并以最新有效合同与计划去重", () => {
+    let s = createBusinessState();
+    const p = s.projects.find((project) => project.id === "P-006")!;
+    s = transition(s, receipt(s, 1023), finance);
+    const currentContract = structuredClone(
+      s.contracts.find((contract) => contract.projectId === p.id)!,
+    );
+    const currentPlan = structuredClone(
+      s.receiptPlans.find((plan) => plan.contractId === currentContract.id)!,
+    );
+    const staleContract = {
+      ...structuredClone(currentContract),
+      paidAmount: 0,
+      unpaidAmount: currentContract.amount,
+    };
+    const stalePlan = { ...structuredClone(currentPlan), paidAmount: 0 };
+    const terminatedContract = {
+      ...structuredClone(currentContract),
+      id: "CONTRACT-P006-TERMINATED",
+      code: "HT-P006-TERMINATED",
+      status: "已终止" as const,
+      paidAmount: 0,
+      unpaidAmount: currentContract.amount,
+    };
+    const terminatedPlan = {
+      ...structuredClone(currentPlan),
+      id: "PLAN-P006-TERMINATED",
+      contractId: terminatedContract.id,
+      paidAmount: 0,
+    };
+    s.contracts = [
+      ...s.contracts.filter((contract) => contract.id !== currentContract.id),
+      staleContract,
+      currentContract,
+      terminatedContract,
+    ];
+    s.receiptPlans = [
+      ...s.receiptPlans.filter((plan) => plan.id !== currentPlan.id),
+      stalePlan,
+      currentPlan,
+      terminatedPlan,
+    ];
+
+    const summary = selectReceipts([p], s);
+    expect(summary.contracts.filter((item) => item.id === currentContract.id)).toHaveLength(1);
+    expect(summary.contracts).not.toContainEqual(
+      expect.objectContaining({ id: terminatedContract.id }),
+    );
+    expect(summary.plans.filter((item) => item.id === currentPlan.id)).toHaveLength(1);
+    expect(summary.plans).not.toContainEqual(
+      expect.objectContaining({ id: terminatedPlan.id }),
+    );
+    expect(summary.outstanding).toBe(0);
+    expect(
+      closeChecks(s, p.id).find(
+        (check) => check.label === "合同及回款计划应收结清",
+      )?.ok,
+    ).toBe(true);
   });
   it("收款动作策略可收紧但JS08只读下钻保持可访问", () => {
     const s = createBusinessState();

@@ -2,6 +2,7 @@ import { pendingSettlementSources } from "@/mock/settlement";
 import { AS_OF_DATE, mockUsers } from "@/mock";
 import type { Actor, BusinessState } from "@/mock/business";
 import type { OperationHandover, OperationEvent } from "@/models/operations";
+import { selectReceipts } from "@/mock/selectors";
 export type OperationsAction =
   | {
       type: "submit-operation-cost";
@@ -130,6 +131,7 @@ export function closeChecks(state: BusinessState, id: string) {
   const p = state.projects.find((p) => p.id === id)!;
   const cycles = state.operationCycles.filter((c) => c.projectId === id);
   const handover = state.operationHandovers[id];
+  const receiptSummary = selectReceipts([p], state);
   return [
     {
       label: "管理决策事项已办理",
@@ -149,12 +151,8 @@ export function closeChecks(state: BusinessState, id: string) {
     {
       label: "合同及回款计划应收结清",
       ok:
-        state.contracts
-          .filter((c) => c.projectId === id)
-          .every((c) => c.unpaidAmount <= 0) &&
-        state.receiptPlans
-          .filter((r) => r.projectId === id)
-          .every((r) => r.paidAmount >= r.amount),
+        receiptSummary.outstanding <= 0 &&
+        receiptSummary.plans.every((r) => r.paidAmount >= r.amount),
     },
     {
       label: "建设期未决成本及承诺预测清零",

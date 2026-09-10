@@ -16,7 +16,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StateView } from "@/components/common/StateView";
 import { useBusinessStore } from "@/mock/business";
-import { visibleProjects } from "@/mock/selectors";
+import { selectReceipts, visibleProjects } from "@/mock/selectors";
 import { useAppStore } from "@/store/useAppStore";
 import { closeChecks } from "@/mock/operations";
 export function ProjectClosePage() {
@@ -35,6 +35,7 @@ export function ProjectClosePage() {
   )
     return <StateView type="403" />;
   const checks = closeChecks(data, p.id);
+  const receiptSummary = selectReceipts([p], data);
   const closure = data.projectClosures[p.id];
   const history = p.phase === "已关闭" && !closure;
   const failed = checks.filter((c) => !c.ok);
@@ -131,7 +132,7 @@ export function ProjectClosePage() {
         />
         <Table
           rowKey="id"
-          dataSource={data.contracts.filter((c) => c.projectId === p.id)}
+          dataSource={receiptSummary.contracts}
           columns={[
             { title: "合同", dataIndex: "name" },
             { title: "合同金额（万元）", dataIndex: "amount" },
@@ -141,7 +142,7 @@ export function ProjectClosePage() {
         />
         <Table
           rowKey="id"
-          dataSource={data.receiptPlans.filter((r) => r.projectId === p.id)}
+          dataSource={receiptSummary.plans}
           columns={[
             { title: "回款节点", dataIndex: "title" },
             { title: "到期日期", dataIndex: "dueDate" },
