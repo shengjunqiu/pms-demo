@@ -48,7 +48,8 @@ async function snapshot(page: Page, id: string) {
 }
 const pane = (page: Page) => page.locator('.ant-tabs-tabpane-active');
 async function choose(page: Page, container: Locator, label: string, option: string) {
-  await container.getByLabel(label, { exact: true }).click();
+  const input = container.getByLabel(label, { exact: true });
+  await input.focus(); await input.press('ArrowDown');
   await page.locator('.ant-select-dropdown:visible').getByText(option, { exact: true }).click();
 }
 async function confirm(page: Page) {
@@ -127,7 +128,7 @@ test('GS-05/06/07 调研、数量单价、财务核对、冻结评审、整改�
   await line.getByLabel('角色 / 职级').fill('高级研发'); await line.getByLabel('测算依据 / 工期假设').fill('2人50天，统一成本基准');
   await line.getByRole('button', { name: /确\s*定/ }).click();
   await page.getByRole('button', { name: '新增成本项', exact: true }).click(); line = page.getByRole('dialog', { name: '新增成本项', exact: true });
-  await line.getByLabel('统一成本科目').click();
+  await line.getByLabel('统一成本科目').focus(); await line.getByLabel('统一成本科目').press('ArrowDown');
   await page.locator('.ant-select-dropdown:visible .ant-select-item-option').filter({ hasText: '采购' }).click();
   await line.getByLabel('测算项名称').fill('集成网关'); await line.getByLabel('数量', { exact: true }).fill('2');
   await line.getByLabel('单位', { exact: true }).fill('套'); await line.getByLabel('单价（万元）').fill('10');
@@ -190,7 +191,7 @@ test('GS-05/06/07 调研、数量单价、财务核对、冻结评审、整改�
   observations.set(page, { id, screenshots: shots, firstCost: 37, secondCost: 38.44, reviewRounds: after.workspace.reviews });
 });
 
-test('GS-05/06/07 客户经理只读方案成本，错误商机展示404', async ({ page }) => {
+test('GS-05/06/07 客户经理只读、非协同技术人员403、错误商机404', async ({ page }) => {
   const [id] = await seed(page); await role(page, '客户经理');
   await navigate(page, `/opportunities/${id}/solution`); await expect(page.getByRole('button', { name: '保存方案草稿' })).toBeDisabled();
   await navigate(page, `/opportunities/${id}/tech-cost`); await expect(page.getByRole('button', { name: '保存技术与成本草稿' })).toBeDisabled();
@@ -198,5 +199,77 @@ test('GS-05/06/07 客户经理只读方案成本，错误商机展示404', async
   for (const route of ['solution', 'tech-cost', 'review']) {
     await navigate(page, `/opportunities/OPP-NOT-FOUND/${route}`); await expect(page.getByText('404 页面未找到', { exact: true })).toBeVisible();
   }
-  observations.set(page, { readOnly: ['solution', 'tech-cost', 'review'], invalidIds: 'all three return 404' });
+  const deniedId = await page.evaluate(async () => {
+    const path = '/src/mock/business.ts'; const b = await import(/* @vite-ignore */ path) as BusinessModule;
+    const state = b.transition(b.useBusinessStore.getState().data, { type: 'save-opportunity', submit: true, duplicateConfirmed: true, input: {
+      name: '验收市场独立商机', customerId: 'CUST-001', departmentId: 'D-002', ownerId: 'U-006', estimatedAmount: 1000,
+      expectedSignDate: '2026-11-30', winRate: 80, source: '客户需求', projectType: '软件开发',
+      description: '市场独立跟进，尚未邀请方案人员', competition: '客户比选', businessLine: '数字政务', region: '福建省', collaborators: [], attachments: [],
+    } }, { id: 'U-006', name: '陈亮', role: 'market' });
+    b.useBusinessStore.setState({ data: state }); return state.opportunities.at(-1)!.id;
+  });
+  await role(page, '方案架构师');
+  for (const route of ['solution', 'tech-cost', 'review']) {
+    await navigate(page, `/opportunities/${deniedId}/${route}`);
+    await expect(page.getByText('403 无访问权限', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /需求调研与解决方案|技术与成本评估|方案与成本专家评审/ })).toHaveCount(0);
+  }
+  observations.set(page, { readOnly: ['solution', 'tech-cost', 'review'], invalidIds: 'all three return 404', deniedId, forbidden: 'unrelated solution-tech receives 403 on all three pages' });
+});
+
+test('GS-07 PMO不通过结论保留双版本且不能承接概算', async ({ page }) => {
+  const [id] = await seed(page);
+  // This isolated branch seeds the previously covered UI chain; rejection itself is UI.
+  await page.evaluate(async target => {
+    const path = '/src/mock/business.ts'; const b = await import(/* @vite-ignore */ path) as BusinessModule;
+    const tech: Actor = { id: 'U-005', name: '赵工', role: 'solution-tech' };
+    const finance: Actor = { id: 'U-004', name: '刘敏', role: 'finance' };
+    const pmo: Actor = { id: 'U-002', name: '李主任', role: 'pmo' };
+    let state = b.useBusinessStore.getState().data;
+    state = b.transition(state, { type: 'presales-save-solution', id: target, draft: {
+      customerSituation: '分散系统', goals: '统一门户', scope: '门户与接口', boundaries: '不含历史数据清理',
+      architecture: '微服务', implementation: '迭代交付', deliverables: '部署包与文档', dependencies: '第三方接口', assumptions: '接口按时开放',
+      ownerId: 'U-005', participants: ['U-006'], startDate: '2026-09-09', endDate: '2026-09-20', attachments: ['方案.pdf'], changeReason: '',
+    } }, tech);
+    state = b.transition(state, { type: 'presales-save-cost', id: target, draft: {
+      solutionFingerprint: '', feasibility: '有条件可行', architecture: '门户V3', reuse: '复用基础平台', customization: '接口开发',
+      environment: '客户容器平台', security: '接口访问审计', dependencies: '第三方厂商开放接口', risk: '接口可能延期', attachments: ['技术评估.pdf'],
+      lines: [{ id: 'REJECTION-L1', subjectId: 'SUB-01', name: '接口开发', scope: '门户与接口', quantity: 100, unit: '人天', unitPrice: 0,
+        taxRate: 0, taxBasis: '含税', basis: '两人50天', risk: '接口延期', laborUserId: 'U-005', laborGrade: '高级研发' }],
+    } }, tech);
+    state = b.transition(state, { type: 'presales-finance-check', id: target, opinion: '人力基准已核对，关注接口延期' }, finance);
+    state = b.transition(state, { type: 'presales-submit-review', id: target, method: '线上专家评审会', plannedDate: '2026-09-10', expertIds: ['U-005', 'U-004'] }, pmo);
+    const reviewId = state.presales[target].reviews.at(-1)!.id;
+    state = b.transition(state, { type: 'presales-expert-opinion', id: target, reviewId, conclusion: '不通过', opinion: '第三方明确不开放接口，关键前提不成立', attachment: '接口函.pdf' }, tech);
+    state = b.transition(state, { type: 'presales-expert-opinion', id: target, reviewId, conclusion: '通过', opinion: '成本口径可核对，最终结论应结合技术阻断', attachment: '' }, finance);
+    b.useBusinessStore.setState({ data: state });
+  }, id);
+  const before = (await snapshot(page, id)).workspace;
+  await role(page, 'PMO负责人'); await navigate(page, `/opportunities/${id}/review`);
+  await page.getByRole('button', { name: '形成综合评审结论' }).click();
+  const dialog = page.getByRole('dialog', { name: '综合评审结论', exact: true });
+  await choose(page, dialog, '评审结论', '不通过');
+  await dialog.getByLabel('综合结论说明').fill('接口前提无法落实，当前方案不通过，不得进入概算');
+  await dialog.getByRole('button', { name: '确认提交' }).click(); await confirm(page);
+  await expect(page.locator('.ant-modal:visible')).toHaveCount(0);
+  await expect(page.getByText('当前查看：第1轮 · 不通过', { exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: '承接通过版本编制概算' })).toHaveCount(0);
+  const after = await snapshot(page, id);
+  expect(after.workspace.reviews).toHaveLength(1);
+  expect(after.workspace.reviews[0]).toMatchObject({ status: '不通过', conclusionReason: '接口前提无法落实，当前方案不通过，不得进入概算' });
+  expect(after.workspace.reviews[0].opinions).toEqual(before.reviews[0].opinions);
+  expect(after.workspace.solutionVersions).toEqual(before.solutionVersions); expect(after.workspace.costVersions).toEqual(before.costVersions);
+  expect(after.task?.status).toBe('进行中');
+  const screenshots = await capturePageEvidence(page, 'GS-07-rejected');
+  await role(page, '方案架构师'); await navigate(page, `/opportunities/${id}/estimate`);
+  await page.getByRole('button', { name: '从通过评审生成草稿' }).click();
+  await expect(page.getByText('只能从已通过专家评审生成概算', { exact: true })).toBeVisible();
+  await expect(page.getByText('尚无概算草稿，请先从通过的专家评审生成', { exact: true })).toBeVisible();
+  const downstream = await page.evaluate(async target => {
+    const path = '/src/mock/business.ts'; const { useBusinessStore } = await import(/* @vite-ignore */ path) as BusinessModule;
+    const state = useBusinessStore.getState().data;
+    return { draft: state.estimateDrafts[target], versions: state.estimates.filter(e => e.opportunityId === target) };
+  }, id);
+  expect(downstream.draft).toBeUndefined(); expect(downstream.versions).toEqual([]);
+  observations.set(page, { id, screenshots, rejectedReview: after.workspace.reviews[0], downstream });
 });
