@@ -99,6 +99,7 @@ for (const [kind, path, label, pageId] of [
     expect(posted.costs.filter(c => c.sourceId === order.id)).toHaveLength(1);
     expect(posted.project.actualCost - before.project.actualCost).toBeCloseTo(0.01, 6);
     expect(posted.project.committedCost).toBeCloseTo(before.project.committedCost, 6);
+    expect(posted.project.forecastRemainingCost).toBe(before.project.forecastRemainingCost);
     expect(posted.project.rollingCost).toBeCloseTo(posted.project.actualCost + posted.project.committedCost + posted.project.forecastRemainingCost, 6);
     await expect(page.getByRole('dialog', { name: '原业务单据', exact: true }).getByRole('button', { name: '确认实际入账', exact: true })).toBeDisabled();
     await overlay(page, `UI-${pageId}-posted`); await closeDrawer(page);
@@ -132,6 +133,13 @@ test('成本 UI：工时待审不计费、PM审核及核算旧深链', async ({ 
   await review.getByLabel('工时审核意见', { exact: true }).fill('核对任务与实际投入，确认工时');
   await review.getByRole('button', { name: /^确\s*定$/ }).click(); await expect(review).toBeHidden();
   const posted = await snapshot(page, 'P-001'); expect(posted.costs.filter(c => c.sourceId === entry.id)).toHaveLength(1);
+  const approvedEntry = posted.labor.find(e => e.id === entry.id)!;
+  expect(approvedEntry.status).toBe('已通过');
+  expect(approvedEntry.consumedCommitment).toBeDefined();
+  expect(posted.project.actualCost - before.project.actualCost).toBeCloseTo(approvedEntry.amount, 6);
+  expect(before.project.committedCost - posted.project.committedCost).toBeCloseTo(approvedEntry.consumedCommitment!, 6);
+  expect(posted.project.forecastRemainingCost).toBe(before.project.forecastRemainingCost);
+  expect(posted.project.rollingCost - before.project.rollingCost).toBeCloseTo(approvedEntry.amount - approvedEntry.consumedCommitment!, 6);
   await expect(drawer.getByRole('button', { name: '审核工时通过', exact: true })).toBeDisabled();
   await overlay(page, 'UI-HS09-reviewed'); await closeDrawer(page);
   await navigate(page, '/projects/P-001/dynamic-accounting?subject=SUB-01&tab=trend');
