@@ -6,10 +6,10 @@ import { useAppStore } from '@/store/useAppStore';
 
 /** UI policy restrictions supplement, rather than replace, each page's domain-state checks. */
 export function useActionAccess() {
-  const data = useBusinessStore((store) => store.data);
-  const actor = useAppStore((store) => store.currentUser);
+  useBusinessStore((store) => store.data);
+  useAppStore((store) => store.currentUser);
   return {
-    canDo: (type: BusinessAction['type'], targetId?: string) => canAccessAction(data, actor, type, targetId),
-    canEditField: (field: SensitiveField) => canEditSensitiveField(data, actor, field),
+    canDo: (type: BusinessAction['type'], targetId?: string) => canAccessAction(useBusinessStore.getState().data, useAppStore.getState().currentUser, type, targetId),
+    canEditField: (field: SensitiveField) => canEditSensitiveField(useBusinessStore.getState().data, useAppStore.getState().currentUser, field),
   };
 }

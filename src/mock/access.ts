@@ -27,6 +27,7 @@ export function assertActionAccess(state: BusinessState, action: BusinessAction,
   const target = actionTarget(action);
   if ((action.type === 'save-post-evaluation' || action.type === 'score-post-evaluation') && !canEditSensitiveField(state, actor, 'evaluation')) throw new Error('当前策略禁止编辑评价字段');
   if (action.type === 'finance-config-save' && action.kind === 'rates' && !canEditSensitiveField(state, actor, 'labor-rate')) throw new Error('当前策略禁止编辑人员费率');
+  if (action.type === 'submit-operation-cost' && action.kind === 'labor' && !canEditSensitiveField(state, actor, 'labor-rate')) throw new Error('当前策略禁止编辑人员费率');
   if (action.type === 'submit-acceptance' && !canEditSensitiveField(state, actor, 'contact')) {
     const original = action.id ? state.acceptanceDetails[action.id]?.customerContact ?? '' : '';
     if (action.detail.customerContact !== original) throw new Error('当前策略禁止编辑客户联系方式');
