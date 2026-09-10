@@ -33,18 +33,20 @@ const registration: ContractRegistration = {
   ],
 };
 
-function planned(plannedStartDate = AS_OF_DATE) {
+function planned(plannedStartDate?: string) {
   const initial = createBusinessState();
-  initial.projects.find((project) => project.id === planId)!.plannedStartDate =
-    plannedStartDate;
-  initial.planningDrafts[planId].plannedStartDate = plannedStartDate;
+  if (plannedStartDate) {
+    initial.projects.find((project) => project.id === planId)!.plannedStartDate =
+      plannedStartDate;
+    initial.planningDrafts[planId].plannedStartDate = plannedStartDate;
+  }
   const currentAppointment = initial.projectTeams[planId].appointments.find(
     (appointment) =>
       appointment.userId === initial.projects.find((project) => project.id === planId)!.pmId &&
       appointment.status === '已接受',
   )!;
-  currentAppointment.nominatedAt = plannedStartDate;
-  currentAppointment.respondedAt = plannedStartDate;
+  currentAppointment.nominatedAt = plannedStartDate ?? initial.projects.find((project) => project.id === planId)!.plannedStartDate;
+  currentAppointment.respondedAt = plannedStartDate ?? initial.projects.find((project) => project.id === planId)!.plannedStartDate;
   let state = transition(
     initial,
     { type: 'submit-planning', projectId: planId },

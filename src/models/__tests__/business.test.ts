@@ -180,3 +180,17 @@ describe('领导待决策与到期回款', () => {
     const changed = transition(initial, { type: 'review', approvalId: change.id, approve: true, opinion: '同意成本变更' }, leader);
     expect(changed.changes.find((c) => c.id === change.sourceChangeId)?.newBaselineId).toBe(`BASE-${change.id}`);
   });
+
+
+it('演示重置返回独立深拷贝，审批快照与审计不串入下一会话', () => {
+  const first = createDemoBusinessState();
+  const expected = structuredClone(first);
+  first.projects[0].name = '被修改的会话';
+  first.approvals[0].budget.items[0].amount += 100;
+  first.audit[0].actor = '被修改的审计';
+  first.accessConfiguration.versions[0].actions.length = 0;
+  const second = createDemoBusinessState();
+  expect(second).toEqual(expected);
+  expect(second).not.toBe(first);
+  expect(second.approvals[0].budget.items).not.toBe(first.approvals[0].budget.items);
+});

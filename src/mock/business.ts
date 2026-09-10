@@ -366,7 +366,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
 }
 
 /** Pending approvals quote real budget, estimate and baseline objects; no dashboard-only fake decisions. */
-export function createDemoBusinessState(): BusinessState {
+function buildDemoBusinessState(): BusinessState {
   let state = createBusinessState();
   state.decisions = [];
   const candidates = state.projects.filter((p) => !p.isMaintenance && !state.lockedProjects.includes(p.id) && state.budgets.some(b=>b.projectId===p.id&&b.status==='已生效')).slice(0, 45);
@@ -404,6 +404,14 @@ export function createDemoBusinessState(): BusinessState {
     state.decisions.push({ id: item.id, projectId: p.id, projectName: p.name, type: item.type, title: item.reason, impactAmount: item.impactAmount, level: '高管审批', status: '待决策', targetRoute: `/management-approvals/${item.id}`, createdAt: '2026-09-05' });
   }
   return state;
+}
+
+// The fixed demo seed is built through the real transitions once. Never expose
+// the private snapshot: each reset gets an independent object graph.
+let demoSnapshot: BusinessState | undefined;
+export function createDemoBusinessState(): BusinessState {
+  demoSnapshot ??= buildDemoBusinessState();
+  return structuredClone(demoSnapshot);
 }
 
 export const useBusinessStore = create<{ data: BusinessState; dispatch: (action: BusinessAction, actor: Actor) => void; recordAccess: (route: string, allowed: boolean, actor: Actor) => void }>((set, get) => ({
