@@ -25,7 +25,7 @@
   "acceptance_dependencies": [],
   "acceptance_ready": true,
   "acceptance_group": "UI-GS1",
-  "status": "integrated_pending_acceptance",
+  "status": "accepted",
   "writer": "",
   "last_confirmed_at": "2026-09-11",
   "acceptance_checklist": [
@@ -36,5 +36,6 @@
   ],
   "scenarios": "原页面功能保持，优化信息层次、筛选与动作分区；正常、空态、只读、旧深链",
   "fixtures": "统一现有演示数据；P-001、P-PLAN-001及商机OPP-2026-001",
-  "next_action": "当前R0038完成后GS01-04正式验收"
+  "next_action": "四页新UI验收通过",
+  "formal_round": "R0039"
 }

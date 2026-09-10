@@ -1,0 +1,37 @@
+{
+  "package_id": "UI-GS2",
+  "items": [
+    "GS-05",
+    "GS-06",
+    "GS-07"
+  ],
+  "owner": "/root/ui_opportunities",
+  "writer": "",
+  "integration_root": "/home/shengjunqiu/code/pms-demo",
+  "workdir": "/tmp/pms-ui-presales",
+  "branch": "pms/ui-presales",
+  "base_commit": "29743ee",
+  "contract_commit": "29743ee",
+  "owned_paths": [
+    "src/pages/opportunities/SolutionPage.tsx",
+    "src/pages/opportunities/TechCostPage.tsx",
+    "src/pages/opportunities/PresalesReviewPage.tsx",
+    "e2e/ui-presales.spec.ts"
+  ],
+  "shared_changes": [],
+  "development_dependencies": [],
+  "acceptance_dependencies": [],
+  "acceptance_ready": false,
+  "acceptance_group": "UI-GS2",
+  "status": "submitted",
+  "last_confirmed_at": "2026-09-11",
+  "acceptance_checklist": [
+    "工程检查",
+    "真实方案/成本/评审链路",
+    "1440/1280截图和console",
+    "正式accept"
+  ],
+  "scenarios": "方案保存/范围变化、成本同源、冻结评审整改新版本及旧深链；权限不变",
+  "fixtures": "现有presales.spec.ts真实transition初评准备，页面创建方案成本和评审",
+  "next_action": "待UI-GS1验收及经营分析包消化后范围检查并集成"
+}

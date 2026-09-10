@@ -24,9 +24,9 @@
   "shared_changes": [],
   "development_dependencies": [],
   "acceptance_dependencies": [],
-  "acceptance_ready": false,
+  "acceptance_ready": true,
   "acceptance_group": "UI-GL1",
-  "status": "submitted",
+  "status": "integrated",
   "writer": "",
   "last_confirmed_at": "2026-09-11",
   "acceptance_checklist": [
@@ -37,5 +37,5 @@
   ],
   "scenarios": "原页面功能保持，优化信息层次、筛选与动作分区；正常、空态、只读、旧深链",
   "fixtures": "统一现有演示数据；P-001、P-PLAN-001及商机OPP-2026-001",
-  "next_action": "等待当前验收库存降至2包以内后范围检查并合入"
+  "next_action": "已通过范围检查并单向合入fa27b70+edd06ce；开始正式验收"
 }

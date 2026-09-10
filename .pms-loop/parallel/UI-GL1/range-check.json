@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "base": "56390394ccbdf4a7c513264c3c4acde5c1bf3493",
+  "head": "3021706bdfbcb2a05a198cf0d74b433d3e9177e5",
+  "paths": [
+    "e2e/ui-executive.spec.ts",
+    "src/pages/executive/GL02FourCalculationsPage.tsx",
+    "src/pages/executive/GL03ProjectDrilldownPage.tsx",
+    "src/pages/executive/GL04PortfolioPage.tsx",
+    "src/pages/executive/GL05ExceptionsPage.tsx",
+    "src/pages/executive/GL06DecisionsPage.tsx"
+  ],
+  "shared_paths": [],
+  "outside_owned_paths": [],
+  "merge_commits": [],
+  "unresolved_conflicts": []
+}

@@ -23,7 +23,7 @@ async function capture(page: Page, name: string) {
     await page.setViewportSize({ width, height: 900 });
     await page.evaluate(() => window.scrollTo(0, 0));
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
-    await page.screenshot({ path: join(artifacts, `${name}-${width}.png`), animations: 'disabled' });
+    await page.screenshot({ path: join(artifacts, `${name}-${width}.png`), animations: 'disabled', fullPage: true });
   }
 }
 async function select(page: Page, label: string, option: string) {
