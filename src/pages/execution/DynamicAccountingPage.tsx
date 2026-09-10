@@ -8,7 +8,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { AS_OF_DATE, mockCostSources, mockDepartments, mockProcurements, mockOutsources, mockExpenses, mockTimesheets } from '@/mock';
 import { mockCostSnapshots } from '@/mock/cost-history';
 import { formatPercent, percentage, sumMoney } from '@/utils/money';
-import { DEMO_HEALTH_RULES } from '@/utils/health';
+import { selectAlertRules } from '@/mock/configuration-finance';
 import { PageHeader } from '@/components/common/PageHeader';
 import { StateView } from '@/components/common/StateView';
 import { MoneyText } from '@/components/common/MoneyText';
@@ -61,7 +61,7 @@ export function DynamicAccountingPage() {
     </Card>
     <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>{metrics.map(([name, value]) => <Col span={6} key={name}><Card size="small"><Statistic title={name} value={value} formatter={() => <MoneyText value={value} signed={name === '预测成本偏差'} />} valueStyle={{ fontSize: 21, color: name === '预测成本偏差' && value > 0 ? '#cf1322' : undefined }} /></Card></Col>)}</Row>
     <Space wrap size={24} style={{ marginBottom: 16 }}><span>预算执行率：<b>{formatPercent(percentage(calc.actual, calc.budget.totalAmount))}</b></span><span>滚动偏差率：<b>{formatPercent(percentage(calc.variance, calc.budget.totalAmount))}</b></span><span>预测毛利率：<b>{formatPercent(calc.grossMarginRate)}</b></span><span>拟签/预计收入：<MoneyText value={calc.income} /> 万元</span></Space>
-    <Alert showIcon type={calc.variance > 0 ? 'warning' : 'success'} message={p.healthReason} description={`${DEMO_HEALTH_RULES.label} ${DEMO_HEALTH_RULES.version}：滚动偏差达到 ${DEMO_HEALTH_RULES.costWarning}% 为预警、${DEMO_HEALTH_RULES.costHigh}% 为高风险；点击科目查看构成，判断原因需结合原始凭证。`} style={{ marginBottom: 16 }} />
+    <Alert showIcon type={calc.variance > 0 ? 'warning' : 'success'} message={p.healthReason} description={`演示规则 ${selectAlertRules(data,p).get('cost')?.id??'成本预警已停用'}：滚动偏差达到 ${selectAlertRules(data,p).get('cost')?.warningThreshold??'—'}% 为预警、${selectAlertRules(data,p).get('cost')?.highThreshold??'—'}% 为高风险；点击科目查看构成，判断原因需结合原始凭证。`} style={{ marginBottom: 16 }} />
     <Card size="small"><Tabs activeKey={tab} onChange={(key) => update('tab', key)} items={[
       { key: 'subjects', label: '成本科目与偏差', children: <>
         <Table rowKey="subjectId" size="small" dataSource={calc.subjects} pagination={false} scroll={{ x: 900 }} columns={[

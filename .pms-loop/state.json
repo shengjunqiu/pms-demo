@@ -2,7 +2,7 @@
   "schema_version": 1,
   "catalog_sha256": "afabe9c27b289a2aa00a72d116be344fdbb01683443388e367536a99feb1f05e",
   "status": "in_progress",
-  "active": null,
+  "active": "R0022",
   "completion_revision": null,
   "created_at": "2026-09-09T14:33:07+00:00",
   "items": {
@@ -203,12 +203,12 @@
       "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
     },
     "JS-03": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "active",
+      "round": "R0022"
     },
     "JS-04": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "active",
+      "round": "R0022"
     },
     "JS-05": {
       "status": "pending",
@@ -865,6 +865,21 @@
         ".pms-loop/runs/R0021/artifacts/YS08-1280.png": "c30379ac8eb216186f6c39cbe5ffc3451cdc771e930c7d91bba8d36ca3de981a",
         ".pms-loop/runs/R0021/checks.json": "a2de915a2ebb54d19cf1c94c09bd8d1d8c12b8492037ef0b0c531fca65bba027",
         ".pms-loop/runs/R0021/evidence.json": "cbc3195e568dff6841ae2253a030cf2e4b59b277f4242ba04f3723dbda5f1112"
+      }
+    },
+    {
+      "id": "R0022",
+      "items": [
+        "JS-03",
+        "JS-04"
+      ],
+      "started_at": "2026-09-10T04:03:28+00:00",
+      "status": "awaiting_evidence",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
       }
     }
   ],

@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "round": "R0022",
+  "revision": "4e9904bc27ebed83f7b2ed9f16cca1bcdf293a786e52ac210acaa3cf854d9e97",
+  "items": {
+    "JS-03": {
+      "entry": "/projects/P-006/customer-acceptance",
+      "covered_features": [
+        "JS-011",
+        "JS-012",
+        "JS-013",
+        "JS-014",
+        "JS-015",
+        "JS-016",
+        "JS-017"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单150行及769行；详细功能清单381–387行，客户准备、申请、过程、整改、证明、计量与确认。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "P006客户验收原单→历史第1轮→新增第2轮；同项目报验后返回客户验收，累计已确认200万元。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "P006智慧园区项目、CTR-005合同1860万元；客户联系人、参与人员、范围、时间、签署文件及PMO确认均在原单展示。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "主PM回复整改后新增第2轮，登记四项检查依据与过程，上传两份签署文件；PMO确认后按钮禁用，旧轮整改与回复仍保留。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "验收轮次从1增加到2，报验金额独立读取财务确认原单；客户通过尚未报验时累计为0，财务确认后为200，不叠加历史轮次。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "浏览器验证准备清单8/8、筛选无匹配空表、未知验收原单404、方案角色403；主PM不能进行PMO确认，整改轮不能直接登记通过。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已查看当前版本1440及1280截图，轮次表与准备清单无全局溢出，历史整改和通过状态文字清楚，关闭抽屉后截图。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "两个正式浏览器场景passed，控制台及pageerror均为空。"
+        },
+        "business-1": {
+          "requirement": "准备材料客户会议验收问题结果及报告确认",
+          "passed": true,
+          "observation": "准备清单列内部验收、基线、WBS、需求BUG、重大问题、质量、必交材料、供应商履约；本次填写范围/客户/参与人、四项依据、过程、意见和两份签章文件后PMO确认。"
+        },
+        "business-2": {
+          "requirement": "准备→待验收→整改→通过，轮次追加，累计金额校验",
+          "passed": true,
+          "observation": "ACC-P-006-3整改中保留，新轮ACC-NEW-198完成复验；旧回复未覆盖。客户验收累计与报验财务确认同步，超合同报验被拒。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "主PM回复整改后新增第2轮，登记四项检查依据与过程，上传两份签署文件；PMO确认后按钮禁用，旧轮整改与回复仍保留。",
+          "expected": "准备→待验收→整改→通过，轮次追加，累计金额校验",
+          "observed": "验收轮次从1增加到2，报验金额独立读取财务确认原单；客户通过尚未报验时累计为0，财务确认后为200，不叠加历史轮次。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0022/artifacts/settlement-de12aa92550dfc05fc637feb24a0bed95c0734f2.json",
+        ".pms-loop/runs/R0022/artifacts/settlement-de12aa92550dfc05fc634c9031b0d965037cf83b.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0022/artifacts/JS03-P006-confirmed-1440.png",
+        "1280": ".pms-loop/runs/R0022/artifacts/JS03-P006-confirmed-1280.png"
+      }
+    },
+    "JS-04": {
+      "entry": "/projects/P-006/report-acceptance",
+      "covered_features": [
+        "JS-016"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单151行、任务书455行及详细功能清单JS-016（386行），实现报验类型、金额、分税点和材料。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "从P006客户验收进入报验，关联新复验原单；财务从报验行详情确认后返回列表和客户验收，状态保持。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "CTR-005合同1860万元；批次E2E-P006-FINAL-01、最终报验、6%税率120万及0%税率80万，两份材料与财务核定意见均可追溯。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "先提交1860+80万元被合同上限拦截，表单保留；改为120+80成功待确认；切财务核定后已确认且重复确认按钮禁用。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "已确认/待确认从0/200变为200/0，剩余可提交1660；返回客户验收显示累计200，单一批次未重复计量。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "初始无报验记录显示空表；财务不能新建；未知项目显示404，方案角色显示403；超额错误明确提示本次加已确认及待确认超过合同。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已查看1440和1280财务确认后截图，金额右对齐、单位清楚，税点与状态无截断，全局无横向溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "正式浏览器场景passed，控制台及pageerror均为空。"
+        },
+        "business-1": {
+          "requirement": "报验类型、本次/累计金额、分税点及验收材料",
+          "passed": true,
+          "observation": "最终报验关联已PMO确认的第2轮验收，本次200万元分6%/0%两行，提交两份材料及范围说明；财务可见含税、不含税、税额明细。"
+        },
+        "business-2": {
+          "requirement": "金额按统一口径汇总，超合同规则阻断并解释",
+          "passed": true,
+          "observation": "真实尝试1940万元超过1860万元合同被拒，未新增原单；调整到200后确认，合同/报验/客户验收累计一致。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "先提交1860+80万元被合同上限拦截，表单保留；改为120+80成功待确认；切财务核定后已确认且重复确认按钮禁用。",
+          "expected": "金额按统一口径汇总，超合同规则阻断并解释",
+          "observed": "已确认/待确认从0/200变为200/0，剩余可提交1660；返回客户验收显示累计200，单一批次未重复计量。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0022/artifacts/settlement-de12aa92550dfc05fc637feb24a0bed95c0734f2.json",
+        ".pms-loop/runs/R0022/artifacts/settlement-de12aa92550dfc05fc634c9031b0d965037cf83b.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0022/artifacts/JS04-P006-confirmed-1440.png",
+        "1280": ".pms-loop/runs/R0022/artifacts/JS04-P006-confirmed-1280.png"
+      }
+    }
+  }
+}

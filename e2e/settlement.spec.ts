@@ -88,7 +88,7 @@ test('P006客户整改创建复验轮次，签署证明经PMO确认后分税点�
   await drawer.getByRole('button', { name: '登记签署证明', exact: true }).click();
   await page.getByLabel('验收签署证明', { exact: true }).fill('园区客户复验签章确认函.pdf\n客户培训签收记录.pdf');
   await submitAcceptanceModal(page);
-  await expect(drawer.getByText('园区客户复验签章确认函.pdf、客户培训签收记录.pdf', { exact: true })).toBeVisible();
+  await expect(drawer.locator('.ant-descriptions').getByText('园区客户复验签章确认函.pdf、客户培训签收记录.pdf', { exact: true })).toBeVisible();
 
   // Reopening the original round must retain its correction and original status.
   await navigate(page, `${base}?record=${oldId}`);
@@ -110,8 +110,8 @@ test('P006客户整改创建复验轮次，签署证明经PMO确认后分税点�
   await role(page, '项目经理');
   await navigate(page, '/projects/P-006/report-acceptance');
   await page.getByRole('button', { name: '新建报验', exact: true }).click();
-  const reportDialog = page.locator('.ant-modal:visible');
-  await page.getByLabel('关联客户验收', { exact: true }).click();
+  const reportDialog = page.getByRole('dialog', { name: '新建项目报验', exact: true });
+  await page.getByRole('combobox', { name: '关联客户验收', exact: true }).click();
   await page.locator('.ant-select-dropdown:visible .ant-select-item-option').filter({ hasText: newId! }).click();
   await reportDialog.locator('.ant-form-item').filter({ has: page.getByText('报验类型', { exact: true }) }).locator('.ant-select').click();
   await page.locator('.ant-select-dropdown:visible .ant-select-item-option').filter({ hasText: /^最终报验$/ }).click();
@@ -121,6 +121,13 @@ test('P006客户整改创建复验轮次，签署证明经PMO确认后分税点�
   await page.getByLabel('第2行报验金额', { exact: true }).fill('80');
   await page.getByLabel('报验材料', { exact: true }).fill('园区客户复验签章确认函.pdf\n分税点报验清单.xlsx');
   await page.getByLabel('报验说明', { exact: true }).fill('关联第2轮客户复验及PMO确认，6%税点120万元、0%税点80万元，本次合计200万元。');
+  await page.getByLabel('第1行报验金额', { exact: true }).fill('1860');
+  await reportDialog.getByRole('button', { name: '提交财务确认', exact: true }).click();
+  await page.locator('.ant-modal-confirm:visible').getByRole('button', { name: /^确\s*定$/ }).click();
+  await expect(page.getByText('本次加已确认及待确认金额超过合同金额', { exact: true })).toBeVisible();
+  await expect(page.locator('.ant-modal-confirm:visible')).toHaveCount(0);
+  await expect(reportDialog).toBeVisible();
+  await page.getByLabel('第1行报验金额', { exact: true }).fill('120');
   await reportDialog.getByRole('button', { name: '提交财务确认', exact: true }).click();
   await page.locator('.ant-modal-confirm:visible').getByRole('button', { name: /^确\s*定$/ }).click();
   await expect(page.locator('.ant-modal:visible')).toHaveCount(0);
@@ -150,6 +157,31 @@ test('P006客户整改创建复验轮次，签署证明经PMO确认后分税点�
   await expect(page.getByText(/累计已确认报验 200 万元/)).toBeVisible();
 });
 
+test('客户验收与报验的空态、未知对象和角色限制', async ({ page }) => {
+  await page.goto('/workbench/project-manager');
+  await navigate(page, '/projects/P-006/customer-acceptance');
+  await page.getByRole('tab', { name: /准备清单/ }).click();
+  await expect(page.getByText('验收准入条件与补齐入口', { exact: true })).toBeVisible();
+  await screenshots(page, 'JS03-P006-preparation');
+  await page.getByRole('tab', { name: /验收轮次/ }).click();
+  await page.getByLabel('验收查询', { exact: true }).fill('NO-MATCH-E2E');
+  await expect(page.locator('.ant-table-placeholder')).toContainText('暂无数据');
+  await page.getByRole('button', { name: '重置查询', exact: true }).click();
+  await navigate(page, '/projects/P-006/customer-acceptance?record=UNKNOWN');
+  await expect(page.getByText('验收记录不存在', { exact: true })).toBeVisible();
+  await navigate(page, '/projects/UNKNOWN/report-acceptance');
+  await expect(page.getByText('404 页面未找到', { exact: true })).toBeVisible();
+  await role(page, '财务专员');
+  await navigate(page, '/projects/P-006/report-acceptance');
+  await expect(page.getByRole('button', { name: '新建报验', exact: true })).toBeDisabled();
+  await expect(page.locator('.ant-table-placeholder')).toContainText('暂无数据');
+  await role(page, '方案架构师');
+  await navigate(page, '/projects/P-006/customer-acceptance');
+  await expect(page.getByText('403 无访问权限', { exact: true })).toBeVisible();
+  await navigate(page, '/projects/P-006/report-acceptance');
+  await expect(page.getByText('403 无访问权限', { exact: true })).toBeVisible();
+});
+
 test('OPS007真实运维原单经财务单次入账，与独立周期关联', async ({ page }) => {
   test.setTimeout(90_000);
   await page.goto('/workbench/project-manager');
@@ -164,7 +196,7 @@ test('OPS007真实运维原单经财务单次入账，与独立周期关联', as
   await dialog.getByLabel('发生事项与凭据', { exact: true }).fill('E2E政务云巡检差旅，客户现场确认巡检记录与费用凭据');
   await dialog.getByRole('button', { name: /^确\s*定$/ }).click();
   await expect(dialog).toBeHidden();
-  const sourceRow = page.locator('.ant-table-tbody > tr').filter({ hasText: 'E2E政务云巡检差旅' }).filter({ hasText: 'OCS-' });
+  const sourceRow = page.locator('.ant-table-tbody > tr[data-row-key^="OCS-"]').filter({ hasText: 'E2E政务云巡检差旅' });
   await expect(sourceRow).toContainText('待审核');
   const sourceId = await sourceRow.locator('td').first().innerText();
   await expect(page.getByRole('button', { name: '确认入账', exact: true })).toHaveCount(0);

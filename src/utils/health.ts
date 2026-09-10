@@ -6,7 +6,8 @@ export const DEMO_HEALTH_RULES = Object.freeze({
   delayWarning: 14, delayHigh: 30, lowMargin: 15,
 });
 export interface HealthFacts { delayDays?: number; majorIssues?: number; majorRisks?: number; overdueReceipt?: number; missingMaterials?: number }
-export function assessHealth(project: Project, facts: HealthFacts = {}, rules = DEMO_HEALTH_RULES) {
+export interface HealthRuleParameters {version:string;label:string;costWarning:number;costHigh:number;delayWarning:number;delayHigh:number;lowMargin:number;}
+export function assessHealth(project: Project, facts: HealthFacts = {}, rules:HealthRuleParameters = DEMO_HEALTH_RULES) {
   const hits: { id: string; severity: number; reason: string }[] = [];
   const rate = percentage(project.rollingCost - project.budgetAmount, project.budgetAmount);
   if (rate !== null && rate > 0) hits.push({ id: 'cost', severity: rate >= rules.costHigh ? 3 : rate >= rules.costWarning ? 2 : 1, reason: `滚动成本超预算 ${rate.toFixed(2)}%` });

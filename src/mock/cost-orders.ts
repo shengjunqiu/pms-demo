@@ -1,3 +1,4 @@
+import {mapCostSource} from './configuration-finance';
 import {assertNewProjectCommitment} from './unsigned';
 import { assertConstructionWritable } from '@/mock/construction-lock';
 import { AS_OF_DATE } from '@/mock';
@@ -9,6 +10,7 @@ export type CostOrderKind = 'procurement' | 'outsource' | 'expense';
 export const costOrderLabels = { procurement: '采购', outsource: '外包', expense: '费用' };
 export const costOrderPaths = { procurement: 'procurement', outsource: 'outsourcing', expense: 'expenses' };
 export interface CostOrder {
+  mappingVersion?:string; sourceCode?:string;
   id: string; projectId: string; kind: CostOrderKind; subjectId: string; subjectName: string; title: string; amount: number;
   supplier: string; contractNo: string; scope: string; taskId?: string; baselineId: string; dueDate: string;
   applicant: string; applicantId: string; submittedAt: string; status: '待审批' | '驳回' | '已批准' | '验收通过' | '已入账';
@@ -43,15 +45,15 @@ export function applyCostOrderAction(state: BusinessState, action: CostOrderActi
   if (action.type === 'submit-cost-order') {
     if (!pm && !(action.kind === 'expense' && actor.role === 'solution-tech' && p.memberIds?.includes(actor.id))) throw new Error('仅主PM或项目费用成员可提交');
     const budget = state.budgets.find((b) => b.projectId === p.id && b.status === '已生效'); const baseline = state.baselines.find((b) => b.projectId === p.id && b.status === '已生效');
-    const subject = budget?.items.find((s) => s.subjectId === action.subjectId);
+    const mapping=mapCostSource(state,action.kind,action.subjectId,p.departmentId,p.type); const subject = budget?.items.find((s) => s.subjectId === mapping.id);
     if (!subject || !baseline || !isCostSubject(action.kind, subject.subjectId)) throw new Error('须引用生效基线及对应成本科目');
     if (!Number.isFinite(action.amount) || action.amount <= 0 || money(action.amount) !== action.amount) throw new Error('金额必须大于0且精确到分（万元至多六位小数）');
     if (!action.title.trim() || !action.scope.trim() || !action.supplier.trim()) throw new Error('申请标题、范围/用途和供应商/收款方必填');
     if (!/^\d{4}-\d{2}-\d{2}$/.test(action.dueDate) || !Number.isFinite(Date.parse(action.dueDate)) || action.dueDate < AS_OF_DATE) throw new Error('计划日期不得早于基准日');
     if (action.kind !== 'expense' && (!action.contractNo.trim() || state.costOrders.some((o) => o.contractNo === action.contractNo && o.status !== '驳回'))) throw new Error('合同编号必填且不能重复');
     if (action.kind === 'outsource' && !state.tasks.some((t) => t.id === action.taskId && t.projectId === p.id)) throw new Error('外包必须引用本项目WBS范围');
-    checkLimit(action.amount, action.subjectId);
-    state.costOrders.push({ id: `CO-${state.costOrders.length + 1}`, projectId: p.id, kind: action.kind, subjectId: subject.subjectId, subjectName: subject.subjectName, title: action.title.trim(), amount: action.amount, supplier: action.supplier.trim(), contractNo: action.kind === 'expense' ? '费用申请，无采购合同' : action.contractNo.trim(), scope: action.scope.trim(), taskId: action.taskId, baselineId: baseline.id, dueDate: action.dueDate, applicant: actor.name, applicantId: actor.id, submittedAt: AS_OF_DATE, status: '待审批', progress: 0, recognized: 0, history: [{ date: AS_OF_DATE, actor: actor.name, action: '提交申请', note: action.scope }] });
+    checkLimit(action.amount, subject.subjectId);
+    state.costOrders.push({ mappingVersion:mapping.mappingVersion,sourceCode:action.subjectId, id: `CO-${state.costOrders.length + 1}`, projectId: p.id, kind: action.kind, subjectId: subject.subjectId, subjectName: subject.subjectName, title: action.title.trim(), amount: action.amount, supplier: action.supplier.trim(), contractNo: action.kind === 'expense' ? '费用申请，无采购合同' : action.contractNo.trim(), scope: action.scope.trim(), taskId: action.taskId, baselineId: baseline.id, dueDate: action.dueDate, applicant: actor.name, applicantId: actor.id, submittedAt: AS_OF_DATE, status: '待审批', progress: 0, recognized: 0, history: [{ date: AS_OF_DATE, actor: actor.name, action: '提交申请', note: action.scope }] });
   } else {
     const o = existing!; if (!action.note.trim()) throw new Error('办理说明必填');
     if (action.operation === 'approve' || action.operation === 'reject') {

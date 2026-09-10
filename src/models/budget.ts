@@ -25,7 +25,7 @@ export interface ProjectTeam {
  appointments:{id:string;userId:string;name:string;status:'待接受'|'已接受'|'已拒绝';nominatedAt:string;nominatedBy:string;opinion?:string;respondedAt?:string}[];
  history:{date:string;actor:string;description:string}[];
 }
-export interface BudgetLine {
+export interface BudgetLine { subjectName?:string;expenseDailyYuan?:number;expenseRateVersion?:string; hourlyYuan?:number;rateVersion?:string;mappingVersion?:string;
  id:string;name:string;kind:'labor'|'procurement'|'outsource'|'expense'|'third-party'|'reserve';subjectId:string;
  amount:number;userId?:string;grade?:string;plannedDays:number;travelDays:number;taskId?:string;stage:string;
  sourceEstimateItemId?:string;justification:string;department:string;supplyMode:string;

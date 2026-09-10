@@ -1,0 +1,99 @@
+{
+  "round": "R0022",
+  "items": [
+    {
+      "id": "JS-03",
+      "title": "客户验收",
+      "route": "/projects/:id/customer-acceptance",
+      "kind": "表单/流程",
+      "roles": "项目经理、项目主办部门",
+      "phase": 7,
+      "feature_ids": [
+        "JS-011",
+        "JS-012",
+        "JS-013",
+        "JS-014",
+        "JS-015",
+        "JS-016",
+        "JS-017"
+      ],
+      "upstream_feature_scope": "验收准备、客户验收、整改、报告",
+      "source_lines": {
+        "pages": 150,
+        "brief": 454
+      },
+      "criteria": [
+        "准备材料客户会议验收问题结果及报告确认",
+        "准备→待验收→整改→通过，轮次追加，累计金额校验"
+      ]
+    },
+    {
+      "id": "JS-04",
+      "title": "项目报验",
+      "route": "/projects/:id/report-acceptance",
+      "kind": "表单",
+      "roles": "项目经理",
+      "phase": 7,
+      "feature_ids": [
+        "JS-016"
+      ],
+      "upstream_feature_scope": "报验类型、金额、分税点、验收材料",
+      "source_lines": {
+        "pages": 151,
+        "brief": 455
+      },
+      "criteria": [
+        "报验类型、本次/累计金额、分税点及验收材料",
+        "金额按统一口径汇总，超合同规则阻断并解释"
+      ]
+    }
+  ],
+  "sources": {
+    "prd": {
+      "path": "docs/项目管理平台PRD_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "6dac675ca22237b7fa59129eccc466a9e242d20f948c0b68e958a7227bb2bd1b"
+    },
+    "features": {
+      "path": "docs/项目管理平台详细功能清单_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "fabfac73b480ccaf01aa831ae3c5d0a6485e33fff80f517468b2b6c52829ddfb"
+    },
+    "pages": {
+      "path": "docs/项目管理平台页面清单与原型设计说明_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "db1c548b5f5ef025eb90fef06422e132f003665fc7e6156dd706b7f095c994dc"
+    },
+    "brief": {
+      "path": "docs/项目管理平台高保真原型_AgentLoop开发任务书_V1.0.md",
+      "sha256": "286f917d5edc99a4a0c7da97515a3d6308cae7395fb287bbcd1846de60045b43"
+    }
+  },
+  "feature_references": {
+    "JS-011": {
+      "title": "验收准备清单",
+      "line": 381
+    },
+    "JS-012": {
+      "title": "验收申请",
+      "line": 382
+    },
+    "JS-013": {
+      "title": "验收会议/过程记录",
+      "line": 383
+    },
+    "JS-014": {
+      "title": "验收整改",
+      "line": 384
+    },
+    "JS-015": {
+      "title": "验收报告上传",
+      "line": 385
+    },
+    "JS-016": {
+      "title": "验收金额",
+      "line": 386
+    },
+    "JS-017": {
+      "title": "验收完成确认",
+      "line": 387
+    }
+  }
+}

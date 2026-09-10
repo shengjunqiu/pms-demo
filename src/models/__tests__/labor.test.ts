@@ -19,7 +19,7 @@ it('成员、任务、有效日期、同日重复和跨项目累计工时执行�
 });
 it('审核后按提交费率一次计成本，消耗承诺不重复增加滚动；审核权限和锁定有效',()=>{
  const before=createBusinessState(); before.projects[0].memberIds=['U-005'];
- let s=transition(before,request,tech); expect(s.laborEntries[0]).toMatchObject({hourlyYuan:180,amount:0.072,rateVersion:'LAB-2026-01'});
+ let s=transition(before,request,tech); expect(s.laborEntries[0]).toMatchObject({hourlyYuan:180,amount:0.072,rateVersion:'RATE-TECH-V1'});
  expect(s.projects[0].actualCost).toBe(before.projects[0].actualCost);expect(s.costs).toHaveLength(before.costs.length);
  const approve={type:'review-labor' as const,id:'LAB-1',approve:true,opinion:'主PM核实完成'};
  expect(()=>transition(s,approve,tech)).toThrow(/主PM/);

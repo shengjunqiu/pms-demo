@@ -1,3 +1,4 @@
+import {selectCostRate,projectCostRegion} from './configuration-finance';
 import {assertNewProjectCommitment} from './unsigned';
 import { AS_OF_DATE, mockTimesheets } from '@/mock';
 import type { Actor, BusinessState } from '@/mock/business';
@@ -50,8 +51,8 @@ export function applyLaborAction(state: BusinessState, action: LaborAction, acto
     if (all.reduce((n,e) => n + e.hours,0) + action.hours > LABOR_RULE.dailyLimit) throw new Error('跨项目每日累计工时超过8小时');
     const baseline = state.baselines.find((b) => b.projectId === p.id && b.status === '已生效');
     if (!baseline) throw new Error('须引用已生效基线');
-    const hourlyYuan = hourlyRate(actor.id); const amount = money(action.hours * hourlyYuan / 10000); limit(amount);
-    state.laborEntries.push({ id: `LAB-${state.laborEntries.length + 1}`, projectId: p.id, taskId: action.taskId, userId: actor.id, userName: actor.name, date: action.date, hours: action.hours, description: action.description.trim(), status: '待审核', rateVersion: LABOR_RULE.version, hourlyYuan, amount, baselineId: baseline.id });
+    const rate = selectCostRate(state,{userId:actor.id,orgId:p.departmentId,projectType:p.type,region:projectCostRegion(state,p),date:action.date}); const hourlyYuan = rate.hourlyYuan; const amount = money(action.hours * hourlyYuan / 10000); limit(amount);
+    state.laborEntries.push({ id: `LAB-${state.laborEntries.length + 1}`, projectId: p.id, taskId: action.taskId, userId: actor.id, userName: actor.name, date: action.date, hours: action.hours, description: action.description.trim(), status: '待审核', rateVersion: rate.versionId, hourlyYuan, amount, baselineId: baseline.id });
   } else {
     if (actor.role !== 'project-manager' || actor.id !== p.pmId || entry!.status !== '待审核') throw new Error('仅项目主PM可审核待审核工时');
     if (!action.opinion.trim()) throw new Error('审核意见必填');

@@ -1,3 +1,4 @@
+import {financeConfigurationRoutes} from '@/routes/modules/configuration-finance';
 import {unsignedRoutes} from '@/routes/modules/unsigned';
 import { configurationRoutes } from '@/routes/modules/configuration';
 import { budgetRoutes } from '@/routes/modules/budget';
@@ -41,6 +42,7 @@ export const AppRouter: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<MainLayout />}>
+        {financeConfigurationRoutes.map(route=><Route key={route.path} path={route.path} element={route.element}/>)}
         {unsignedRoutes.map(route=><Route key={route.path} path={route.path} element={route.element}/>)}
         {configurationRoutes.map(route=><Route key={route.path} path={route.path} element={route.element}/>)}
         {budgetRoutes.map(route=><Route key={route.path} path={route.path} element={route.element}/>)}
@@ -82,6 +84,7 @@ export const AppRouter: React.FC = () => {
         {PAGE_MANIFEST.map((item) => {
           const relativeRoute = item.route.startsWith('/') ? item.route.slice(1) : item.route;
           // 跳过已实现的页面
+          if (financeConfigurationRoutes.some(r=>r.path===relativeRoute)) return null;
           if (unsignedRoutes.some(r=>r.path===relativeRoute)) return null;
           if (configurationRoutes.some(r=>r.path===relativeRoute)) return null;
           if (budgetRoutes.some(r=>r.path===relativeRoute)) return null;

@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "typecheck": "tsc -b --noEmit",
-    "test:domain": "vitest run src",
+    "test:domain": "vitest run src --maxWorkers=1",
     "test:e2e": "playwright test"
   },
   "dependencies": {

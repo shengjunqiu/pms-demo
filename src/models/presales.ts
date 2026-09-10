@@ -3,7 +3,7 @@ export interface SolutionDraft {
   customerSituation: string; goals: string; scope: string; boundaries: string; architecture: string; implementation: string; deliverables: string; dependencies: string; assumptions: string;
   ownerId: string; participants: string[]; startDate: string; endDate: string; attachments: string[]; changeReason: string;
 }
-export interface PresalesCostLine { id: string; subjectId: string; name: string; scope: string; quantity: number; unit: string; unitPrice: number; taxRate: number; taxBasis: '含税' | '不含税'; basis: string; risk: string; supplier?: string; quotationSource?: string; quotationExpiry?: string; laborUserId?: string; laborGrade?: string; baselineVersion?: string }
+export interface PresalesCostLine { mappingVersion?:string; id: string; subjectId: string; name: string; scope: string; quantity: number; unit: string; unitPrice: number; taxRate: number; taxBasis: '含税' | '不含税'; basis: string; risk: string; supplier?: string; quotationSource?: string; quotationExpiry?: string; laborUserId?: string; laborGrade?: string; baselineVersion?: string }
 export interface CostDraft { solutionFingerprint: string; feasibility: '可行' | '有条件可行' | '不可行'; architecture: string; reuse: string; customization: string; environment: string; security: string; dependencies: string; risk: string; lines: PresalesCostLine[]; attachments: string[]; financeCheck?: { fingerprint: string; by: string; date: string; opinion: string } }
 export interface SolutionVersion extends SolutionDraft { id: string; version: number; submittedAt: string; submittedBy: string }
 export interface CostVersion extends CostDraft { id: string; version: number; solutionVersionId: string; total: number; submittedAt: string; submittedBy: string }
