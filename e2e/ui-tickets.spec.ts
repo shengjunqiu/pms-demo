@@ -37,10 +37,12 @@ async function operation(page: Page, name: string, note: string, nextStatus?: st
   if (nextStatus) await expect(page.getByTestId('ticket-status')).toHaveText(nextStatus);
 }
 async function formEvidence(page: Page, name: string) {
+  await expect(page.locator('.ant-message-notice')).toHaveCount(0, { timeout: 6000 });
   await expect(page.getByRole('dialog')).toBeVisible();
   for (const width of [1440, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+    await expect(page.getByRole('dialog').getByRole('button', { name: /^确\s*定$/ })).toBeVisible();
     await page.screenshot({ path: join(artifactDir, `${name}-${width}.png`), fullPage: true, animations: 'disabled' });
   }
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -193,6 +195,7 @@ test('风险与问题真实闭环：5×4评分、PMO督办、风险转问题及�
 test('需求影响基线：阻断解决、真实计划申请和PMO批准后再闭环', async ({ page }) => {
   test.setTimeout(240_000);
   const title = 'UI需求：新增联调窗口影响基线';
+  const query = 'projectId=P-001&kind=requirement&status=待处理';
   const id = await create(page, 'requirement', title, { baseline: true });
   await role(page, '方案架构师'); await detail(page, 'requirement', id, title);
   await page.getByRole('button', { name: '提交解决结果', exact: true }).click();
@@ -202,7 +205,7 @@ test('需求影响基线：阻断解决、真实计划申请和PMO批准后再�
   await expect(page.getByText('影响基线的需求须先通过关联变更', { exact: true })).toBeVisible();
   await expect(dialog).toBeVisible(); expect((await state(page)).requirements.find((r) => r.id === id)?.status).toBe('待处理');
   await dialog.getByRole('button', { name: /^取\s*消$/ }).click();
-  await role(page, '项目经理'); await detail(page, 'requirement', id, title);
+  await role(page, '项目经理'); await detail(page, 'requirement', id, title, query);
   const before = await state(page);
   await page.getByRole('button', { name: '转计划变更申请', exact: true }).click();
   await expect(page.getByLabel('申请理由', { exact: true })).toHaveValue(`需求${id}影响进度：${title}`);
@@ -210,8 +213,9 @@ test('需求影响基线：阻断解决、真实计划申请和PMO批准后再�
   await page.getByRole('button', { name: '提交PMO审批', exact: true }).click();
   const planId = (await state(page)).ticketMeta[id].changeRequestId!;
   expect(planId).toBeTruthy();
-  await expect(page).toHaveURL(`/projects/P-001/plan-requests/${planId}`);
-  await role(page, 'PMO负责人'); await navigate(page, `/projects/P-001/plan-requests/${planId}`);
+  await expect(page).toHaveURL(`/projects/P-001/plan-requests/${planId}?ticketQuery=${encodeURIComponent(new URLSearchParams(query).toString())}`);
+  const planUrl = page.url();
+  await role(page, 'PMO负责人'); await navigate(page, planUrl);
   await expect(page.getByRole('heading', { name: '项目计划变更原单', exact: true })).toBeVisible();
   await page.getByLabel('审批意见', { exact: true }).fill('同意新增联调窗口，追加计划基线');
   await page.getByRole('button', { name: '通过申请', exact: true }).click();
@@ -219,6 +223,8 @@ test('需求影响基线：阻断解决、真实计划申请和PMO批准后再�
   await expect(page.getByRole('dialog')).toBeHidden();
   expect((await state(page)).planRequests.find((r) => r.id === planId)?.status).toBe('通过');
   await page.getByRole('button', { name: `查看来源需求 ${id}`, exact: true }).click();
+  expect(new URL(page.url()).searchParams.get('projectId')).toBe('P-001');
+  expect(new URL(page.url()).searchParams.get('status')).toBe('待处理');
   await expect(page.getByTestId('ticket-title')).toHaveText(title);
   await expect(page.getByRole('button', { name: planId, exact: true })).toBeVisible();
   await role(page, '方案架构师'); await detail(page, 'requirement', id, title);

@@ -61,7 +61,7 @@ export const MainLayout: React.FC = () => {
   const allowed = (!currentPage || canAccessPage(data, currentUser, currentPage.id)) && (!routeProject || canAccessProject(data, currentUser, routeProject));
   const activeGroup = currentPage?.id.split('-')[0];
   const isWorkspace = [
-    'WK-01', 'WK-02', 'HS-02', 'HS-03', 'HS-04', 'HS-16', 'HS-17', 'GL-01', 'HS-01',
+    'WK-01', 'WK-02', 'HS-02', 'HS-03', 'HS-04', 'HS-05', 'HS-06', 'HS-07', 'HS-08', 'HS-16', 'HS-17', 'GL-01', 'HS-01',
     'GS-01', 'GS-02', 'GS-03', 'GS-04', 'GS-05', 'GS-06', 'GS-07', 'GS-08', 'GS-09', 'GS-10', 'GS-11',
     'GL-02', 'GL-03', 'GL-04', 'GL-05', 'GL-06',
     'YS-01', 'YS-02', 'YS-03', 'YS-04', 'YS-05', 'YS-06', 'YS-07', 'YS-08', 'YS-09', 'YS-10', 'YS-11', 'YS-12', 'YS-13', 'YS-14', 'YS-15',
