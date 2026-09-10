@@ -1,3 +1,4 @@
+import { canAccessOpportunityScope } from './access-scope';
 import { selectGradingRule, selectTemplate } from '@/mock/configuration';
 import { AS_OF_DATE, mockCustomers, mockDepartments, mockUsers } from '@/mock';
 import type { Actor, BusinessState } from '@/mock/business';
@@ -19,6 +20,7 @@ export function opportunityMeta(state: BusinessState, o: Opportunity): Opportuni
   return state.opportunityMeta[o.id] ?? { source: '客户需求', projectType: '综合集成', description: `${o.customerName}数字化建设与业务协同需求。`, competition: '客户处于方案选型阶段，需持续跟踪竞争与采购进展。', businessLine: '数字政务', region: mockCustomers.find(c => c.id === o.customerId)?.region ?? '福建省', collaborators: ['U-005'], attachments: [], followups: [], assessments: [], pauses: [] };
 }
 export function canViewOpportunity(state: BusinessState, o: Opportunity, actor: Actor) {
+  if (!canAccessOpportunityScope(state, actor, o)) return false;
   if (['executive', 'pmo', 'finance', 'solution-tech', 'admin'].includes(actor.role)) return true;
   if (actor.role === 'market') return o.ownerId === actor.id || o.departmentId === 'D-002';
   return state.projects.some(p => p.opportunityId === o.id && (p.pmId === actor.id || p.memberIds?.includes(actor.id)));

@@ -1,3 +1,4 @@
+import { canAccessTargetScope, canAccessOpportunityScope, canAccessOrganization } from './access-scope';
 import type { Actor, BusinessAction, BusinessState } from '@/mock/business';
 import { canAccessAction, canAccessProject } from '@/mock/configuration-access';
 
@@ -25,6 +26,13 @@ export function projectForTarget(state: BusinessState, id: string) {
 export function assertActionAccess(state: BusinessState, action: BusinessAction, actor: Actor) {
   const target = actionTarget(action);
   if (!canAccessAction(state, actor, action.type, target)) throw new Error('当前访问策略不允许办理此业务动作');
+  if (!canAccessTargetScope(state, actor, target)) throw new Error('当前访问策略不允许访问该业务对象');
+  if ('input' in action && 'opportunityId' in action.input) {
+    const sourceId = action.input.opportunityId;
+    const opportunity = state.opportunities.find((o) => o.id === sourceId);
+    if (opportunity && !canAccessOpportunityScope(state, actor, opportunity)) throw new Error('当前访问策略不允许访问来源商机');
+  }
+  if (action.type === 'save-opportunity' && !canAccessOrganization(state, actor, action.input.departmentId, action.input.ownerId === actor.id || action.input.collaborators.includes(actor.id))) throw new Error('当前访问策略不允许将商机保存到该组织');
   const project = projectForTarget(state, target);
   if (project && !canAccessProject(state, actor, project)) throw new Error('当前访问策略不允许访问该项目');
 }
