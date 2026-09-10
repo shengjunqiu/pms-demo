@@ -24,7 +24,7 @@
   "acceptance_dependencies": [],
   "acceptance_ready": true,
   "acceptance_group": "UI-HS1",
-  "status": "integrated_pending_acceptance",
+  "status": "accepted",
   "last_confirmed_at": "2026-09-11",
   "acceptance_checklist": [
     "工程检查",
@@ -34,7 +34,7 @@
   ],
   "scenarios": "按/tmp/pms-ui-progress-preparation.md，保留stage与schedule共用原单和原审批/冻结规则",
   "fixtures": "统一selectTodos与真实transition前置",
-  "next_action": "root静态修复后准备R0046验收",
+  "next_action": "R0046已正式验收；新UI37/72",
   "delivery_commit": "f1a7257",
   "integration_commit": "4341133"
 }

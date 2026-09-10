@@ -19,8 +19,8 @@
       "round": "R0037"
     },
     "WK-02": {
-      "status": "pending",
-      "reason": "继续全页面UI改造：本人待办、项目进度与阶段门/计划原单主要动作前置，保留执行与审批。"
+      "status": "done",
+      "round": "R0046"
     },
     "GS-01": {
       "status": "done",
@@ -131,8 +131,8 @@
       "round": "R0037"
     },
     "HS-02": {
-      "status": "pending",
-      "reason": "继续全页面UI改造：本人待办、项目进度与阶段门/计划原单主要动作前置，保留执行与审批。"
+      "status": "done",
+      "round": "R0046"
     },
     "HS-03": {
       "status": "pending",
@@ -189,8 +189,8 @@
       "round": "R0032"
     },
     "HS-16": {
-      "status": "pending",
-      "reason": "继续全页面UI改造：本人待办、项目进度与阶段门/计划原单主要动作前置，保留执行与审批。"
+      "status": "done",
+      "round": "R0046"
     },
     "HS-17": {
       "status": "pending",
@@ -1532,6 +1532,45 @@
         ".pms-loop/runs/R0045/checks.json": "d99ada092f4ce84eed06d83ee9d0a8f564e5d4be8275abbc6dda304fe5f5003a",
         ".pms-loop/runs/R0045/evidence.json": "1d1a0b24bf9272f315327a5ec9fdc95cb0007ff7b6482e9aaeeb0a27f8e0f5a8"
       }
+    },
+    {
+      "id": "R0046",
+      "items": [
+        "WK-02",
+        "HS-02",
+        "HS-16"
+      ],
+      "started_at": "2026-09-10T20:43:32+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-10T20:53:58+00:00",
+      "revision": "00c72480667a712bb365f3b7b9b3eb0e28e91b808698fd551ba237e79385cd03",
+      "proof": {
+        ".pms-loop/runs/R0046/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0046/build.log": "5b830bc7cbd1fd9f22efd37bc99af4a26a586e988b7876bf9c79583656f35acb",
+        ".pms-loop/runs/R0046/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0046/test-domain.log": "21a92aad0531d9ddbcb9ac9cdc8b5381e0401af69c1f98194150a6d0e1efc3ca",
+        ".pms-loop/runs/R0046/browser-final.log": "0306573b3ce92307b74fb3195837dabd96c3dbd38e48b14bfcd01605485726b1",
+        ".pms-loop/runs/R0046/browser-verified.log": "9bd972c2140d8a3b39018c6148d34800dcadf9b6496ba93e262d75fcd52f9ef0",
+        ".pms-loop/runs/R0046/artifacts/r0024-d2045523082410c83585d393d0fd88b2527658ec.json": "e4fba6980de5590e538ac3370d1c6d9ec3679f7bdcf8746dadb1485c94e04050",
+        ".pms-loop/runs/R0046/artifacts/r0024-d2045523082410c8358578c9d87defee3e0c7934.json": "ba0422e1fa416db0ec75d39919d255a22323e3e604fbc182bfc43b0295601f83",
+        ".pms-loop/runs/R0046/artifacts/r0024-d2045523082410c83585c31a11219e7d8cf54d7e.json": "01b0ab970861b62e7ca78eae01d25e9e7ad193bfdfb772a9d2bbdc27a4be0121",
+        ".pms-loop/runs/R0046/artifacts/r0024-d2045523082410c83585a260f6e316aa0029dbb5.json": "55d99f8fac346f21e2e7bd5a6e393d2c92c073805bf76bca232818bcd6ce587f",
+        ".pms-loop/runs/R0046/artifacts/r0024-d2045523082410c83585e6961f1e58fd4358ab0b.json": "5baf5231240874e4e140b1f80db0a8aeb78f7d183df4867e48a8098f083bfec6",
+        ".pms-loop/runs/R0046/artifacts/UI-WK02-1440.png": "c08f5f3a0bfcaa185b8598ba2d9c46704b16d4245d7af4754d240e3b70901210",
+        ".pms-loop/runs/R0046/artifacts/UI-WK02-1280.png": "1b47a08628cc3f338fa72b6e08128434e53ba7b27e5c3026e9c6070fae0ba616",
+        ".pms-loop/runs/R0046/artifacts/UI-HS02-1440.png": "a6e13f30813df8b0d6e52875fd3fbcce49f4afbfd277aac60b2c6a0672610d91",
+        ".pms-loop/runs/R0046/artifacts/UI-HS02-1280.png": "4fbefe2d0d7b6896df79f8da4ba788611cfcc6bcebc0b3590ad9efdcf2e28964",
+        ".pms-loop/runs/R0046/artifacts/UI-HS16-1440.png": "30258f7639518f18c501d718c12029e760b871fc713edbc0dfa6cfe069ab1c64",
+        ".pms-loop/runs/R0046/artifacts/UI-HS16-1280.png": "c22932b4b71da11a2dc0e67d27bdbe02ebec03f8855f46116374318257f632b8",
+        ".pms-loop/runs/R0046/checks.json": "650952a9f785f81e0725256e4609c1e5169150d5f10371be05a2fba3354239b8",
+        ".pms-loop/runs/R0046/evidence.json": "28fc3d69b74cb75a2902cb547b74f5542896fe62a324d3298dfaa7e03f1d29ff"
+      }
     }
   ],
   "notes": [
@@ -1770,6 +1809,14 @@
     {
       "at": "2026-09-10T20:43:12+00:00",
       "text": "reopen FINAL, HS-05, HS-06, HS-07, HS-08: 继续全页面UI改造：需求BUG和问题风险台账详情，当前动作、责任与流转轨迹清晰。"
+    },
+    {
+      "at": "2026-09-10T20:48:34+00:00",
+      "text": "R0046 e28e2f8工程235领域和7浏览器全部exit0通过；三页及计划原单8张双宽已查看。计划原单非72清单路由仍套旧外层白底，同轮仅将/projects/:id/plan-requests/:requestId纳入工作区，随后重查并刷新当前计划及三页UI观察。"
+    },
+    {
+      "at": "2026-09-10T20:54:16+00:00",
+      "text": "R0046待办进度阶段3页验收，新UI37/72。最终00c72480工程235领域及5真实UI均exit0，三页六截图与计划原单两宽查看；首版7例含工作台下钻两宽通过。修复阶段字段遗漏/跨项目弹窗、动态7天范围、URL连续筛选；计划原单补灰工作区。继续HS2最终d41d4dd（含af37020/47fc7ad）已范围检查；HS3需求风险待提交，后续跨PlanRequest来源返回筛选由root集成时处理。"
     }
   ],
   "history": [

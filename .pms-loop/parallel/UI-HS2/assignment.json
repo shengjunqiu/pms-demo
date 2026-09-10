@@ -32,6 +32,6 @@
   ],
   "scenarios": "按/tmp/pms-ui-reporting-preparation.md三链",
   "fixtures": "真实UI写入；合法transition仅明确的前置",
-  "next_action": "范围检查通过；等待R45及HS1后集成，浏览器未执行",
-  "delivery_commit": "47fc7add3b56c89bbadf86611b2fa33e3116cb7f"
+  "next_action": "最终head范围通过，准备集成",
+  "delivery_commit": "d41d4dd16d126aa44b987e029071cb96d9f572f8"
 }
