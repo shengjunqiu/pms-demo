@@ -1,3 +1,5 @@
+import { applyEarlyInvestmentAction, type EarlyInvestmentAction } from '@/mock/early-investments';
+import type { EarlyInvestmentRequest, EarlyCostRecord } from '@/models/early-investments';
 import { applySettlementAction, type SettlementAction } from '@/mock/settlement';
 import type { SettlementRequest, SettlementCostReview, SettlementCostDisposition, SettlementAnalysis } from '@/models/settlement';
 import { applyEstimateAction, type EstimateAction } from '@/mock/estimates';
@@ -47,6 +49,7 @@ export interface PlanRequest {
 }
 export interface Material extends DocumentDetails { id: string; projectId: string; name: string; required: boolean; status: '缺失' | '待提交' | '待审核' | '通过' | '驳回' }
 export interface BusinessState {
+  earlyInvestmentRequests: EarlyInvestmentRequest[]; earlyCosts: EarlyCostRecord[];
   settlementRequests: SettlementRequest[]; settlementCostReviews: SettlementCostReview[]; settlementCostDispositions: SettlementCostDisposition[]; settlementAnalyses: Record<string, SettlementAnalysis[]>;
   settlementForecastSnapshots: Record<string, {date:string;total:number;subjects:Record<string,number>}>;
   estimateDrafts: Record<string, EstimateDraft>; estimateMeta: Record<string, EstimateMetadata>;
@@ -65,7 +68,7 @@ export interface BusinessState {
   audit: { id: string; actor: string; action: string; target: string; date: string }[];
 }
 export function createBusinessState(): BusinessState {
-  const state: BusinessState = structuredClone({ settlementRequests: [], settlementCostReviews: [], settlementCostDispositions: [], settlementAnalyses: {}, settlementForecastSnapshots: {}, estimateDrafts: {}, estimateMeta: {}, projectTeams: {}, budgetDrafts: {}, presales: {}, planningDrafts: {}, planningReviews: [], acceptanceDetails: {}, acceptanceReports: [], opportunities: mockOpportunities, opportunityMeta: {}, contracts: mockContracts, receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
+  const state: BusinessState = structuredClone({ earlyInvestmentRequests: [], earlyCosts: [], settlementRequests: [], settlementCostReviews: [], settlementCostDispositions: [], settlementAnalyses: {}, settlementForecastSnapshots: {}, estimateDrafts: {}, estimateMeta: {}, projectTeams: {}, budgetDrafts: {}, presales: {}, planningDrafts: {}, planningReviews: [], acceptanceDetails: {}, acceptanceReports: [], opportunities: mockOpportunities, opportunityMeta: {}, contracts: mockContracts, receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
     estimates: mockEstimateVersions, milestones: mockMilestones, settlements: mockSettlements,
     issues: mockIssues, risks: mockRisks, bugs: mockBugs, costs: mockCostItems, approvals: [], changes: mockChanges, managementApprovals: [],
     decisions: mockDecisions, acceptances: mockAcceptances, lockedProjects: ['P-008'], maintenanceCosts: [], audit: [],
@@ -83,7 +86,7 @@ export function createBusinessState(): BusinessState {
   initAcceptanceFixture(state);
   return state;
 }
-export type BusinessAction = SettlementAction | EstimateAction | TeamAction | BudgetDraftAction | PresalesAction | BudgetPlanningAction | AcceptanceAction | OpportunityAction | LaborAction | DeliverableAction | ReportAction | CostOrderAction | TicketAction
+export type BusinessAction = EarlyInvestmentAction | SettlementAction | EstimateAction | TeamAction | BudgetDraftAction | PresalesAction | BudgetPlanningAction | AcceptanceAction | OpportunityAction | LaborAction | DeliverableAction | ReportAction | CostOrderAction | TicketAction
   | { type: 'submit-budget'; projectId: string; budget: BudgetVersion; reason: string }
   | { type: 'review'; approvalId: string; approve: boolean; opinion: string }
   | { type: 'review-management'; id: string; approve: boolean; opinion: string }
@@ -107,7 +110,9 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     return value;
   };
   let target = '';
-  if (action.type === 'estimate-create-draft' || action.type === 'estimate-save-draft' || action.type === 'estimate-publish' || action.type === 'estimate-freeze') {
+  if (action.type === 'save-early-investment' || action.type === 'review-early-investment' || action.type === 'record-early-cost') {
+    target = applyEarlyInvestmentAction(state, action, actor);
+  } else if (action.type === 'estimate-create-draft' || action.type === 'estimate-save-draft' || action.type === 'estimate-publish' || action.type === 'estimate-freeze') {
     target = applyEstimateAction(state, action, actor);
   } else if (action.type === 'presales-research' || action.type === 'presales-save-solution' || action.type === 'presales-save-cost' || action.type === 'presales-finance-check' || action.type === 'presales-submit-review' || action.type === 'presales-expert-opinion' || action.type === 'presales-review-decision' || action.type === 'presales-correction-reply') {
     target = applyPresalesAction(state, action, actor);
