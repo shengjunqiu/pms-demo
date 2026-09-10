@@ -104,6 +104,7 @@ export interface Project {
   rollingCost: number; // 滚动成本 万元
   actualCost: number; // 已发生成本 万元
   commitmentBySubject?: Record<string, number>;
+  forecastBySubject?: Record<string, number>;
   committedCost: number; // 未发生承诺 万元
   forecastRemainingCost: number; // 剩余预测 万元
   costVariance: number; // 滚动成本偏差 万元

@@ -114,25 +114,10 @@ describe('审批、权限及成本锁定', () => {
     expect(() => transition(state, { type: 'confirm-cost', cost: { ...cost, id: 'ANOTHER' } }, finance)).toThrow('重复');
     expect(() => transition(state, { type: 'confirm-cost', cost: { ...cost, id: 'UNSIGNED-COST', projectId: 'P-004', sourceId: 'NEW', amount: 100 } }, finance)).toThrow('额度');
   });
-  it('结算需最新客户验收及零未决成本；锁定后禁止建设成本，运维独立', () => {
+  it('旧直接结算入口不可绕过客户确认与正式评审', () => {
     const original = createBusinessState();
-    const acceptance = original.acceptances.find((a) => a.projectId === 'P-001' && a.type === '客户终验')!;
-    expect(() => transition(original, { type: 'settle', projectId: 'P-001' }, finance)).toThrow('验收');
-    acceptance.status = '已通过';
-    expect(() => transition(original, { type: 'settle', projectId: 'P-001' }, finance)).toThrow('未决成本');
-    original.projects[0].committedCost = 0; original.projects[0].forecastRemainingCost = 0;
-    original.acceptances.push({ id: 'NEW-ROUND', projectId: 'P-001', type: '客户终验', round: 2, status: '整改中', amount: 1 });
-    expect(() => transition(original, { type: 'settle', projectId: 'P-001' }, finance)).toThrow('验收');
-    original.acceptances[original.acceptances.length - 1].status = '已通过';
-    const settled = transition(original, { type: 'settle', projectId: 'P-001' }, finance);
-    expect(settled.lockedProjects).toContain('P-001');
-    expect(selectFourCalculations(settled.projects[0], settled).settlement?.finalCost).toBe(settled.projects[0].actualCost);
-    expect(() => transition(settled, { type: 'settle', projectId: 'P-001' }, finance)).toThrow('重复');
-    const cost = { ...original.costs[0], id: 'NEW', sourceId: 'VOUCHER-NEW', amount: 10 };
-    expect(() => transition(settled, { type: 'confirm-cost', cost }, finance)).toThrow('锁定');
-    const maintenance = transition(settled, { type: 'confirm-cost', cost: { ...cost, projectId: 'P-007' }, maintenance: true }, finance);
-    expect(maintenance.maintenanceCosts).toHaveLength(1);
-    expect(maintenance.projects[6].actualCost).toBe(settled.projects[6].actualCost);
+    expect(() => transition(original, { type: 'settle', projectId: 'P-001' }, finance)).toThrow('项目结算申请');
+    expect(original.lockedProjects).not.toContain('P-001');
   });
 });
 

@@ -1,3 +1,5 @@
+import { applySettlementAction, type SettlementAction } from '@/mock/settlement';
+import type { SettlementRequest, SettlementCostReview, SettlementCostDisposition, SettlementAnalysis } from '@/models/settlement';
 import { applyEstimateAction, type EstimateAction } from '@/mock/estimates';
 import type { EstimateDraft, EstimateMetadata } from '@/models/estimates';
 import { applyTeamAction, type TeamAction } from './team';
@@ -45,6 +47,8 @@ export interface PlanRequest {
 }
 export interface Material extends DocumentDetails { id: string; projectId: string; name: string; required: boolean; status: '缺失' | '待提交' | '待审核' | '通过' | '驳回' }
 export interface BusinessState {
+  settlementRequests: SettlementRequest[]; settlementCostReviews: SettlementCostReview[]; settlementCostDispositions: SettlementCostDisposition[]; settlementAnalyses: Record<string, SettlementAnalysis[]>;
+  settlementForecastSnapshots: Record<string, {date:string;total:number;subjects:Record<string,number>}>;
   estimateDrafts: Record<string, EstimateDraft>; estimateMeta: Record<string, EstimateMetadata>;
   projectTeams: Record<string,ProjectTeam>; budgetDrafts: Record<string,BudgetDraft>;
   presales: Record<string, PresalesWorkspace>;
@@ -61,7 +65,7 @@ export interface BusinessState {
   audit: { id: string; actor: string; action: string; target: string; date: string }[];
 }
 export function createBusinessState(): BusinessState {
-  const state: BusinessState = structuredClone({ estimateDrafts: {}, estimateMeta: {}, projectTeams: {}, budgetDrafts: {}, presales: {}, planningDrafts: {}, planningReviews: [], acceptanceDetails: {}, acceptanceReports: [], opportunities: mockOpportunities, opportunityMeta: {}, contracts: mockContracts, receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
+  const state: BusinessState = structuredClone({ settlementRequests: [], settlementCostReviews: [], settlementCostDispositions: [], settlementAnalyses: {}, settlementForecastSnapshots: {}, estimateDrafts: {}, estimateMeta: {}, projectTeams: {}, budgetDrafts: {}, presales: {}, planningDrafts: {}, planningReviews: [], acceptanceDetails: {}, acceptanceReports: [], opportunities: mockOpportunities, opportunityMeta: {}, contracts: mockContracts, receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
     estimates: mockEstimateVersions, milestones: mockMilestones, settlements: mockSettlements,
     issues: mockIssues, risks: mockRisks, bugs: mockBugs, costs: mockCostItems, approvals: [], changes: mockChanges, managementApprovals: [],
     decisions: mockDecisions, acceptances: mockAcceptances, lockedProjects: ['P-008'], maintenanceCosts: [], audit: [],
@@ -79,7 +83,7 @@ export function createBusinessState(): BusinessState {
   initAcceptanceFixture(state);
   return state;
 }
-export type BusinessAction = EstimateAction | TeamAction | BudgetDraftAction | PresalesAction | BudgetPlanningAction | AcceptanceAction | OpportunityAction | LaborAction | DeliverableAction | ReportAction | CostOrderAction | TicketAction
+export type BusinessAction = SettlementAction | EstimateAction | TeamAction | BudgetDraftAction | PresalesAction | BudgetPlanningAction | AcceptanceAction | OpportunityAction | LaborAction | DeliverableAction | ReportAction | CostOrderAction | TicketAction
   | { type: 'submit-budget'; projectId: string; budget: BudgetVersion; reason: string }
   | { type: 'review'; approvalId: string; approve: boolean; opinion: string }
   | { type: 'review-management'; id: string; approve: boolean; opinion: string }
@@ -109,6 +113,8 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     target = applyPresalesAction(state, action, actor);
   } else if (action.type === 'save-opportunity' || action.type === 'start-opportunity-assessment' || action.type === 'save-opportunity-dimension' || action.type === 'conclude-opportunity' || action.type === 'follow-opportunity') {
     target = applyOpportunityAction(state, action, actor);
+  } else if (action.type === 'save-settlement' || action.type === 'review-settlement' || action.type === 'resolve-settlement-source' || action.type === 'dispose-settlement-balance' || action.type === 'save-settlement-analysis') {
+    target = applySettlementAction(state, action, actor);
   } else if (action.type === 'submit-acceptance' || action.type === 'review-acceptance' || action.type === 'reply-acceptance' || action.type === 'confirm-acceptance' || action.type === 'save-acceptance-proof' || action.type === 'save-acceptance-report' || action.type === 'confirm-acceptance-report') {
     target = applyAcceptanceAction(state, action, actor);
   } else if (action.type === 'save-planning' || action.type === 'submit-planning' || action.type === 'review-planning' || action.type === 'reply-planning' || action.type === 'confirm-budget-baseline') {
@@ -277,13 +283,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     if (failed.length) throw new Error(failed.map((c) => `${c.name}：${c.detail}`).join('；'));
     p.phase = STAGE_RULE.targetPhase; p.subPhase = STAGE_RULE.targetSubPhase; p.releasedBudgetPercent = STAGE_RULE.releasePercent;
   } else if (action.type === 'settle') {
-    requireRole('finance'); const p = project(action.projectId); target = p.id;
-    if (state.lockedProjects.includes(p.id)) throw new Error('禁止重复结算');
-    const rounds = state.acceptances.filter((a) => a.projectId === p.id && a.type === '客户终验').sort((a, b) => b.round - a.round);
-    if (rounds[0]?.status !== '已通过') throw new Error('客户最终验收未通过');
-    if (p.committedCost > 0 || p.forecastRemainingCost > 0) throw new Error('存在未决成本');
-    state.settlements.push({ id: `SET-${state.settlements.length + 1}`, projectId: p.id, finalIncome: p.revenueAmount ?? p.contractAmount, finalCost: p.actualCost, finalGrossMargin: money((p.revenueAmount ?? p.contractAmount) - p.actualCost), finalGrossMarginRate: percentage((p.revenueAmount ?? p.contractAmount) - p.actualCost, p.revenueAmount ?? p.contractAmount) ?? 0, status: '已锁定已生效', isCostLocked: true, settledDate: AS_OF_DATE });
-    state.lockedProjects.push(p.id); p.status = '已结算'; p.phase = '已关闭';
+    throw new Error('请通过项目结算申请、财务核算与PMO评审完成正式结算，不允许直接锁定');
   } else if (action.type === 'confirm-cost') {
     requireRole('finance'); const p = project(action.cost.projectId); target = p.id;
     if (!Number.isFinite(action.cost.amount) || action.cost.amount <= 0 || !action.cost.sourceId) throw new Error('成本金额及来源无效');
