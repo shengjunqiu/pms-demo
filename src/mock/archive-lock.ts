@@ -3,7 +3,7 @@ const lifecycleActions=new Set(['submit-operation-cost','reject-operation-cost',
 /** Resolve actual business objects, never infer a project from an ID prefix. */
 export function assertArchiveActionWritable(state:BusinessState,action:{type:string;projectId?:string;opportunityId?:string;id?:string;approvalId?:string;cost?:{projectId:string};report?:{projectId:string};maintenance?:boolean}){
  if(action.type==='configuration-save'||action.type==='configuration-publish'||action.type==='finance-config-save'||action.type==='finance-config-publish')return;
- if(lifecycleActions.has(action.type)||action.type==='confirm-cost'&&action.maintenance)return;
+ if(action.type==='confirm-project-receipt'||lifecycleActions.has(action.type)||action.type==='confirm-cost'&&action.maintenance)return;
  let projectId=action.projectId??action.cost?.projectId??action.report?.projectId;
  if(projectId&&!state.projects.some((p)=>p.id===projectId))throw new Error('原项目不存在');
  if(!projectId&&action.opportunityId){if(!state.opportunities.some((o)=>o.id===action.opportunityId))throw new Error('原商机不存在');projectId=state.projects.find((p)=>p.opportunityId===action.opportunityId)?.id;}
