@@ -1,3 +1,5 @@
+import { EstimatePage } from '@/pages/opportunities/EstimatePage';
+import { EstimateComparePage } from '@/pages/opportunities/EstimateComparePage';
 import { SolutionPage } from '@/pages/opportunities/SolutionPage';
 import { TechCostPage } from '@/pages/opportunities/TechCostPage';
 import { PresalesReviewPage } from '@/pages/opportunities/PresalesReviewPage';
@@ -6,6 +8,8 @@ import { OpportunityFormPage } from '@/pages/opportunities/OpportunityFormPage';
 import { OpportunityDetailPage } from '@/pages/opportunities/OpportunityDetailPage';
 import { OpportunityAssessmentPage } from '@/pages/opportunities/OpportunityAssessmentPage';
 export const opportunityRoutes = [
+  { path:'opportunities/:id/estimate', element:<EstimatePage/> },
+  { path:'opportunities/:id/estimate/compare', element:<EstimateComparePage/> },
   { path:'opportunities/:id/solution', element:<SolutionPage/> },
   { path:'opportunities/:id/tech-cost', element:<TechCostPage/> },
   { path:'opportunities/:id/review', element:<PresalesReviewPage/> },
