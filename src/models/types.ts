@@ -43,7 +43,7 @@ export interface Opportunity {
   departmentId: string;
   departmentName: string;
   estimatedAmount: number; // 万元
-  status: '跟进中' | '方案评审中' | '已转立项' | '暂缓' | '已终止';
+  status: '草稿' | '待评估' | '拟立项' | '跟进中' | '方案评审中' | '已转立项' | '暂缓' | '已终止';
   winRate: number; // 0-100
   expectedSignDate: string;
   currentEstimateVersionId?: string;

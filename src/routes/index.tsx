@@ -1,3 +1,4 @@
+import { opportunityRoutes } from '@/routes/modules/opportunities';
 import { ProjectManagerWorkbenchPage } from '@/pages/workbench/ProjectManagerWorkbenchPage';
 import { LaborCostPage } from '@/pages/execution/LaborCostPage';
 import { ReportsPage } from '@/pages/execution/ReportsPage';
@@ -40,6 +41,7 @@ export const AppRouter: React.FC = () => {
         <Route index element={<RoleHome />} />
         <Route path="/routes-manifest" element={<RoutesManifestPage />} />
 
+        {opportunityRoutes.map(r=><Route key={r.path} path={r.path} element={r.element}/>)}
         {/* Phase 2: GL 驾驶舱与专题分析 */}
         <Route path="executive/dashboard" element={<GL01DashboardPage />} />
         <Route path="executive/four-calculations" element={<GL02FourCalculationsPage />} />
@@ -72,6 +74,7 @@ export const AppRouter: React.FC = () => {
         {PAGE_MANIFEST.map((item) => {
           const relativeRoute = item.route.startsWith('/') ? item.route.slice(1) : item.route;
           // 跳过已实现的页面
+          if (opportunityRoutes.some(r=>r.path===relativeRoute)) return null;
           if (['workbench/project-manager', 'projects/:id/stage-switch', 'projects/:id/labor-cost', 'projects/:id/daily-reports', 'projects/:id/weekly-reports', 'projects/:id/deliverables', 'projects/:id/procurement', 'projects/:id/outsourcing', 'projects/:id/expenses', 'requirements-bugs', 'requirements-bugs/:id', 'issues-risks', 'issues-risks/:id', 'workbench/todos', 'projects/:id/progress', 'projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/four-calculations', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions', 'executive/decisions'].includes(relativeRoute)) {
             return null;
           }
