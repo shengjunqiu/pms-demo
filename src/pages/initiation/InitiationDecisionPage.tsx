@@ -1,3 +1,4 @@
+import { useActionAccess } from '@/hooks/useActionAccess';
 import { canViewSensitiveField } from "@/mock/configuration-access";
 import { configuredApprovalTimeout } from "@/mock/configuration";
 import { canViewInitiation } from "@/mock/initiation";
@@ -34,6 +35,7 @@ import {
   SourceSummary,
 } from "./InitiationShared";
 export function InitiationDecisionPage() {
+ const {canDo}=useActionAccess();
   const { id } = useParams();
   const { data, dispatch } = useBusinessStore();
   const actor = useAppStore((s) => s.currentUser);
@@ -99,13 +101,17 @@ export function InitiationDecisionPage() {
   const approval = round.approvalProgress;
   const activeNode = approval?.snapshot.nodes[approval.node];
   const decisionRole = round.path === "PMC决策会" ? "executive" : "pmo";
-  const canDecide =
+  const canDecide = canDo("decide-initiation",app.id) && (
     result === "通过"
       ? activeNode
         ? activeNode.roles.includes(actor.role)
         : actor.role === decisionRole
       : actor.role === decisionRole ||
-        (result === "否决" && !!activeNode?.roles.includes(actor.role));
+        (result === "否决" && !!activeNode?.roles.includes(actor.role)));
+  const canDecisionFields=canDo("decide-initiation",app.id)&&(actor.role===decisionRole||!!activeNode?.roles.includes(actor.role));
+  const canSign=round.status==="会签中"&&canDo("sign-initiation",app.id)&&INITIATION_SIGNATURES.some(n=>n.role===actor.role&&!round.signatures.some(s=>s.node===n.node));
+  const canClassify=actor.role==="pmo"&&round.status==="待分级"&&canDo("classify-initiation",app.id);
+  const canResume=actor.role==="pmo"&&app.status==="暂缓"&&canDo("resume-initiation",app.id);
   const timeout = approval ? configuredApprovalTimeout(approval) : undefined;
   const rows = INITIATION_SIGNATURES.map((x) => ({
     ...x,
@@ -146,7 +152,7 @@ export function InitiationDecisionPage() {
             <Select
               value={level}
               style={{ width: 160 }}
-              disabled={actor.role !== "pmo" || round.status !== "待分级"}
+              disabled={!canClassify}
               onChange={setLevel}
               options={["一般", "重点", "重大", "特大型"].map((value) => ({
                 value,
@@ -158,19 +164,19 @@ export function InitiationDecisionPage() {
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="分级确认或人工调整的具体依据"
-              disabled={actor.role !== "pmo" || round.status !== "待分级"}
+              disabled={!canClassify}
             />
             <Select
               mode="tags"
               style={{ width: "100%", marginBottom: 12 }}
-              disabled={actor.role !== "pmo" || round.status !== "待分级"}
+              disabled={!canClassify}
               value={requiredDeliverables}
               onChange={setRequiredDeliverables}
               placeholder="PMO 补充必须交付物（系统必交材料不可移除）"
             />
             <Button
               type="primary"
-              disabled={actor.role !== "pmo" || round.status !== "待分级"}
+              disabled={!canClassify}
               onClick={() =>
                 run(() =>
                   dispatch(
@@ -239,7 +245,7 @@ export function InitiationDecisionPage() {
           <Space style={{ marginTop: 16 }}>
             <Select
               style={{ width: 200 }}
-              placeholder="选择本人待办节点"
+              disabled={!canSign} placeholder="选择本人待办节点"
               value={node || undefined}
               onChange={setNode}
               options={rows
@@ -247,7 +253,7 @@ export function InitiationDecisionPage() {
                 .map((r) => ({ value: r.node, label: r.node }))}
             />
             <Select
-              value={signConclusion}
+              disabled={!canSign} value={signConclusion}
               onChange={setSignConclusion}
               options={["同意", "否决"].map((value) => ({
                 value,
@@ -255,7 +261,7 @@ export function InitiationDecisionPage() {
               }))}
             />
             <Button
-              disabled={round.status !== "会签中" || !node}
+              disabled={!canSign || !node}
               onClick={() =>
                 run(() =>
                   dispatch(
@@ -325,7 +331,7 @@ export function InitiationDecisionPage() {
         <p>办理意见（会签与决策均须填写）</p>
         <Input.TextArea
           rows={3}
-          disabled={ended}
+          disabled={ended || (!canDecisionFields && !canSign)}
           value={opinion}
           onChange={(e) => setOpinion(e.target.value)}
         />
@@ -334,12 +340,12 @@ export function InitiationDecisionPage() {
             <Space style={{ marginTop: 16 }}>
               <span>会议日期</span>
               <DatePicker
-                disabled={ended}
+                disabled={ended || !canDecisionFields}
                 value={meetingDate ? dayjs(meetingDate) : null}
                 onChange={(v) => setMeetingDate(v?.format("YYYY-MM-DD") ?? "")}
               />
               <Select
-                disabled={ended}
+                disabled={ended || !canDecisionFields}
                 mode="multiple"
                 style={{ width: 350 }}
                 placeholder="至少两位参会人"
@@ -349,7 +355,7 @@ export function InitiationDecisionPage() {
               />
             </Space>
             <Input.TextArea
-              disabled={ended}
+              disabled={ended || !canDecisionFields}
               rows={3}
               style={{ marginTop: 12 }}
               placeholder="会议纪要与表决结果"
@@ -361,7 +367,7 @@ export function InitiationDecisionPage() {
         <Space style={{ margin: "16px 0" }}>
           <span>决策结果</span>
           <Select
-            disabled={ended}
+            disabled={ended || !canDecisionFields}
             value={result}
             onChange={setResult}
             options={["通过", "整改", "否决", "暂缓"].map((value) => ({
@@ -370,7 +376,7 @@ export function InitiationDecisionPage() {
             }))}
           />
           {result === "暂缓" && (
-            <DatePicker
+            <DatePicker disabled={ended || !canDecisionFields}
               placeholder="复评日期"
               value={resumeDate ? dayjs(resumeDate) : null}
               onChange={(v) => setResumeDate(v?.format("YYYY-MM-DD") ?? "")}
@@ -380,6 +386,7 @@ export function InitiationDecisionPage() {
         {result === "整改" && (
           <>
             <Button
+              disabled={ended || !canDecisionFields}
               onClick={() =>
                 setRectifications([
                   ...rectifications,
@@ -391,7 +398,7 @@ export function InitiationDecisionPage() {
             </Button>
             {rectifications.map((r, i) => (
               <Space key={i} style={{ display: "flex", margin: "12px 0" }}>
-                <Input
+                <Input disabled={ended || !canDecisionFields}
                   placeholder="整改事项"
                   value={r.content}
                   onChange={(e) =>
@@ -402,7 +409,7 @@ export function InitiationDecisionPage() {
                     )
                   }
                 />
-                <Select
+                <Select disabled={ended || !canDecisionFields}
                   style={{ width: 140 }}
                   placeholder="责任人"
                   value={r.ownerId || undefined}
@@ -416,7 +423,7 @@ export function InitiationDecisionPage() {
                     )
                   }
                 />
-                <DatePicker
+                <DatePicker disabled={ended || !canDecisionFields}
                   value={r.deadline ? dayjs(r.deadline) : null}
                   onChange={(v) =>
                     setRectifications((rows) =>
@@ -437,12 +444,12 @@ export function InitiationDecisionPage() {
             direction="vertical"
             style={{ width: "100%", marginBottom: 16 }}
           >
-            <Input.TextArea
+            <Input.TextArea disabled={ended || !canDecisionFields}
               value={costDisposition}
               onChange={(e) => setCostDisposition(e.target.value)}
               placeholder="沉没成本处置与复盘计划（登记说明，不自动冲销已发生成本）"
             />
-            <Select
+            <Select disabled={ended || !canDecisionFields}
               value={trackingOwnerId || undefined}
               placeholder="跟踪责任人"
               style={{ width: 200 }}
@@ -461,6 +468,7 @@ export function InitiationDecisionPage() {
                 content: "本轮提交资料、专业意见与决策结果将留存。",
                 onOk: () => {
                   try {
+                    if (!canDo("decide-initiation",app.id)||!canDecide) throw new Error("当前策略不允许提交此决策");
                     dispatch(
                       {
                         type: "decide-initiation",
@@ -499,12 +507,12 @@ export function InitiationDecisionPage() {
             {round.decision?.trackingOwnerId}
           </p>
           <Input.TextArea
-            value={resumeReason}
+            disabled={!canResume} value={resumeReason}
             onChange={(e) => setResumeReason(e.target.value)}
             placeholder="复评触发依据与风险变化"
           />
           <Button
-            disabled={actor.role !== "pmo"}
+            disabled={!canResume}
             style={{ marginTop: 12 }}
             onClick={() =>
               run(() =>

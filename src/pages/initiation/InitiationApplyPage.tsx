@@ -1,3 +1,4 @@
+import { useActionAccess } from '@/hooks/useActionAccess';
 import { canViewSensitiveField } from "@/mock/configuration-access";
 import { selectTemplate } from "@/mock/configuration";
 import { canViewInitiation } from "@/mock/initiation";
@@ -39,6 +40,7 @@ import {
   SourceSummary,
 } from "./InitiationShared";
 export function InitiationApplyPage() {
+ const {canDo}=useActionAccess();
   const { data, dispatch } = useBusinessStore();
   const actor = useAppStore((s) => s.currentUser);
   const viewMargin = canViewSensitiveField(data, actor, "margin");
@@ -67,7 +69,7 @@ export function InitiationApplyPage() {
       ? initiationSource(data, o.id)
       : undefined);
   const locked = !!app && !["草稿", "整改"].includes(app.status);
-  const canEdit = !!o && canManageOpportunity(data, o, actor) && !locked;
+  const canEdit = canDo("save-initiation", app?.id ?? o?.id) && !!o && canManageOpportunity(data, o, actor) && !locked;
   const type = Form.useWatch("type", form) ?? input?.type;
   const template = selectTemplate(
     {
@@ -106,6 +108,7 @@ export function InitiationApplyPage() {
   );
   const save = async (submit: boolean) => {
     try {
+      if (!canEdit || !canDo("save-initiation", app?.id ?? o?.id) || (submit && !canDo("submit-initiation", app?.id ?? o?.id))) throw new Error("当前策略不允许保存或提交立项申请");
       await form.validateFields();
       const v = form.getFieldsValue(true);
       const next: InitiationInput = {
@@ -488,7 +491,7 @@ export function InitiationApplyPage() {
               保存草稿
             </Button>
             <Button
-              disabled={!canEdit}
+              disabled={!canEdit || !canDo("submit-initiation", app?.id ?? o?.id)}
               type="primary"
               onClick={() => save(true)}
             >
