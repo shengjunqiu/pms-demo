@@ -1,5 +1,5 @@
 import { useActionAccess } from '@/hooks/useActionAccess';
-import { App, Alert, Button, Card, Col, DatePicker, Form, Input, InputNumber, Row, Select, Space, Upload } from 'antd';
+import { App, Alert, Button, Col, DatePicker, Form, Input, InputNumber, Row, Select, Space, Upload } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
@@ -8,6 +8,7 @@ import { canManageOpportunity, canViewOpportunity, opportunityLocked, opportunit
 import type { OpportunityInput } from '@/models/opportunities';
 import { useAppStore } from '@/store/useAppStore';
 import { mockCustomers, mockDepartments, mockUsers } from '@/mock';
+import { PageSection } from '@/components/common/PageSection';
 import { PageHeader } from '@/components/common/PageHeader';
 import { StateView } from '@/components/common/StateView';
 import { PAGE_MANIFEST } from '@/routes/manifest';
@@ -30,7 +31,7 @@ export function OpportunityFormPage() {
   return <><PageHeader item={PAGE_MANIFEST.find(p=>p.id==='GS-02')} title={id?'商机编辑':'新建商机'} breadcrumbs={[{title:'商机台账',href:'/opportunities'},{title:id?'商机编辑':'新建商机'}]} description="明确客户、经营责任与业务需求，形成后续初评的统一输入。" extra={<Button disabled={false} onClick={()=>navigate(o?`/opportunities/${o.id}`:'/opportunities')}>返回</Button>}/>
     {locked&&<Alert style={{marginBottom:16}} type="warning" showIcon message={canDo('save-opportunity',id)?'商机已冻结或进入评估，基础输入只读':'当前策略禁止保存商机，基础输入只读'} description="请保留当前评审输入；后续范围变化通过重新评估或项目变更处理。"/>}
     <Form form={form} layout="vertical" disabled={locked} initialValues={{...o,...m,source:m?.source??'客户需求',projectType:m?.projectType??'综合集成',departmentId:o?.departmentId??'D-002',ownerId:o?.ownerId??actor.id,estimatedAmount:o?.estimatedAmount??0,winRate:o?.winRate??50,expectedSignDate:o?.expectedSignDate?dayjs(o.expectedSignDate):undefined,files:m?.attachments.map((name,i)=>({uid:String(i),name,status:'done'}))??[]}}>
-      <Card title="基础与责任信息" size="small"><Row gutter={24}>
+      <PageSection title="1. 基础与责任信息" description="明确客户和经营责任，是创建商机的基础。"><Row gutter={24}>
         <Col span={16}><Form.Item name="name" label="商机名称" rules={[{required:true,whitespace:true,max:100}]}><Input placeholder="客户可识别的项目机会名称" maxLength={100}/></Form.Item></Col>
         <Col span={8}><Form.Item name="customerId" label="客户" rules={[{required:true}]}><Select showSearch optionFilterProp="label" options={mockCustomers.map(c=>({value:c.id,label:c.name}))}/></Form.Item></Col>
         <Col span={8}><Form.Item name="departmentId" label="项目主办部门" rules={[{required:true}]}><Select options={mockDepartments.filter(d=>d.level!=='group').map(d=>({value:d.id,label:d.name}))}/></Form.Item></Col>
@@ -39,15 +40,15 @@ export function OpportunityFormPage() {
         <Col span={8}><Form.Item name="source" label="商机来源" rules={[{required:true}]}><Select options={['客户需求','招标信息','市场线索','合作伙伴推荐'].map(value=>({value,label:value}))}/></Form.Item></Col>
         <Col span={8}><Form.Item name="projectType" label="项目类型" rules={[{required:true}]}><Select options={['综合集成','软件开发','硬件工程','纯运维','整体外包'].map(value=>({value,label:value}))}/></Form.Item></Col>
         <Col span={8}><Form.Item name="businessLine" label="业务线"><Select options={['数字政务','智慧城市','公共安全','产业数字化'].map(value=>({value,label:value}))}/></Form.Item></Col>
-      </Row></Card>
-      <Card title="商务预期" size="small" style={{marginTop:16}}><Row gutter={24}>
+      </Row></PageSection>
+      <PageSection title="2. 商务预期" description="预计金额与签约时间用于跟踪机会成熟度，不计入已签合同。"><Row gutter={24}>
         <Col span={8}><Form.Item name="estimatedAmount" label="预计项目金额（万元）" rules={[{required:true},{type:'number',min:0}]}><InputNumber min={0} precision={2} style={{width:'100%'}}/></Form.Item></Col>
         <Col span={8}><Form.Item name="expectedSignDate" label="预计签约日期"><DatePicker style={{width:'100%'}}/></Form.Item></Col>
         <Col span={8}><Form.Item name="winRate" label="赢单概率（%）" rules={[{required:true},{type:'number',min:0,max:100}]}><InputNumber min={0} max={100} style={{width:'100%'}}/></Form.Item></Col>
         <Col span={8}><Form.Item name="region" label="区域"><Select allowClear options={Array.from(new Set(mockCustomers.map(c=>c.region))).map(value=>({value,label:value}))}/></Form.Item></Col>
         <Col span={16}><Form.Item name="competition" label="竞争情况"><Input.TextArea rows={2}/></Form.Item></Col>
-      </Row></Card>
-      <Card title="背景、需求与材料" size="small" style={{marginTop:16}}><Form.Item name="description" label="业务背景、建设目标与主要需求" rules={[{required:true,whitespace:true}]}><Input.TextArea rows={4} maxLength={2000} showCount/></Form.Item><Form.Item name="files" label="客户需求 / 招标材料" valuePropName="fileList" getValueFromEvent={e=>e.fileList} extra="前端演示仅记录文件名，不上传服务器。"><Upload beforeUpload={()=>false} maxCount={8}><Button icon={<UploadOutlined/>}>选择附件</Button></Upload></Form.Item></Card>
-      <Space style={{marginTop:16}}><Button onClick={()=>save(false)}>保存草稿</Button><Button type="primary" onClick={()=>save(true)}>提交商机</Button><Button disabled={false} onClick={()=>navigate(o?`/opportunities/${o.id}`:'/opportunities')}>取消</Button></Space>
+      </Row></PageSection>
+      <PageSection title="3. 背景、需求与材料" description="补充建设目标与需求，供各专业开展初步评估。"><Form.Item name="description" label="业务背景、建设目标与主要需求" rules={[{required:true,whitespace:true}]}><Input.TextArea rows={4} maxLength={2000} showCount/></Form.Item><Form.Item name="files" label="客户需求 / 招标材料" valuePropName="fileList" getValueFromEvent={e=>e.fileList} extra="前端演示仅记录文件名，不上传服务器。"><Upload beforeUpload={()=>false} maxCount={8}><Button icon={<UploadOutlined/>}>选择附件</Button></Upload></Form.Item></PageSection>
+      <div className="pms-form-actions"><span style={{color:"#64748b",marginRight:"auto"}}>草稿可继续补充；提交后进入待评估。</span><Space><Button onClick={()=>save(false)}>保存草稿</Button><Button type="primary" onClick={()=>save(true)}>提交商机</Button><Button disabled={false} onClick={()=>navigate(o?`/opportunities/${o.id}`:'/opportunities')}>取消</Button></Space></div>
     </Form></>;
 }

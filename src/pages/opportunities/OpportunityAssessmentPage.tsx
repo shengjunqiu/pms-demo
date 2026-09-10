@@ -5,7 +5,6 @@ import {
   Alert,
   App,
   Button,
-  Card,
   Col,
   Descriptions,
   Empty,
@@ -17,6 +16,7 @@ import {
   Select,
   Space,
   Statistic,
+  Progress,
   Table,
   Tag,
   Upload,
@@ -33,6 +33,7 @@ import {
 } from "@/mock/opportunities";
 import type { AssessmentDimension } from "@/models/opportunities";
 import { useAppStore } from "@/store/useAppStore";
+import { PageSection } from "@/components/common/PageSection";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StateView } from "@/components/common/StateView";
 import { MoneyText } from "@/components/common/MoneyText";
@@ -127,6 +128,9 @@ export function OpportunityAssessmentPage() {
           </Button>
         }
       />
+      <PageSection className="pms-record-summary" title="本轮评估进度" extra={<Tag color={round?.status==='评估中'?'blue':'default'}>{round?.status??'未发起'}</Tag>}>
+        <Row gutter={24} align="middle"><Col span={12}><strong>已提交 {summary.complete} / 6 维专业意见</strong><Progress percent={Math.round(summary.complete/6*100)} showInfo={false}/></Col><Col span={12}><span style={{color:'#64748b'}}>下一步</span><div>{!round?'发起初步评估，邀请各专业填写意见':summary.missing.length?`补齐 ${summary.missing.length} 项条件后，由主办确认结论`:'由主办结合系统建议确认综合结论'}</div></Col></Row>
+      </PageSection>
       <Alert
         type="info"
         showIcon
@@ -136,8 +140,7 @@ export function OpportunityAssessmentPage() {
       />
       <Row gutter={16}>
         <Col span={16}>
-          <Card
-            size="small"
+          <PageSection
             title="专业评估工作区"
             extra={
               <Select
@@ -278,8 +281,8 @@ export function OpportunityAssessmentPage() {
                 />
               </>
             )}
-          </Card>
-          <Card size="small" title="毛利预判（万元）" style={{ marginTop: 16 }}>
+          </PageSection>
+          <PageSection title="毛利预判（万元）">
             <Descriptions
               column={2}
               items={[
@@ -316,10 +319,10 @@ export function OpportunityAssessmentPage() {
             <p style={{ color: "#8c8c8c" }}>
               预估毛利＝预计收入−初步成本；此处为初评测算，正式概算以冻结版本为准。
             </p>
-          </Card>
+          </PageSection>
         </Col>
         <Col span={8}>
-          <Card size="small" title="综合评估与条件检查">
+          <PageSection title="综合评估与条件检查">
             <Row gutter={8}>
               <Col span={12}>
                 <Statistic
@@ -428,7 +431,7 @@ export function OpportunityAssessmentPage() {
                 }
               />
             )}
-          </Card>
+          </PageSection>
         </Col>
       </Row>
       <Modal
