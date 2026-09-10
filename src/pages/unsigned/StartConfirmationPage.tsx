@@ -146,7 +146,7 @@ export function StartConfirmationPage() {
             <Alert
               showIcon
               type="info"
-              message="执行事项引用当前 BusinessState 中的WBS和日报规则；按钮继续服从当前动作策略，不在启动页直接代办。"
+              message="执行事项已按生效计划生成，请由责任人进入对应业务页面办理。"
               style={{ marginBottom: 16 }}
             />
             <Table

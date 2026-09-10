@@ -235,6 +235,9 @@ test('YS-15 阻断原因完整且满足条件后原子启动', async ({ page }) 
   await expect(page.getByText('日报待办', { exact: true })).toBeVisible();
   await expect(page.getByText('工时填报入口', { exact: true })).toBeVisible();
   await expect(page.getByText('已生成', { exact: true })).toHaveCount(4);
+  await expect(page.locator('tr').filter({ has: page.getByRole('cell', { name: '李主任', exact: true }) })).toContainText('PMO负责人');
+  await expect(page.locator('tr').filter({ has: page.getByRole('cell', { name: '刘敏', exact: true }) })).toContainText('财务专员');
+  await expect(page.locator('tr').filter({ has: page.getByRole('cell', { name: '赵工', exact: true }) })).toContainText('方案架构师');
   const screenshots = await capturePageEvidence(page, 'YS-15');
   await expect(page.getByRole('button', { name: '确认正式启动', exact: true })).toHaveCount(0);
   await role(page, '项目经理');

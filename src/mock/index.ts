@@ -64,7 +64,7 @@ export const mockUsers: User[] = Array.from({ length: 50 }).map((_, i) => {
   return {
     id,
     name,
-    role: roles[i % roles.length],
+    role: ['项目经理', 'PMO负责人', '集团领导', '财务专员', '方案架构师', '市场商务经理'][i] ?? roles[i % roles.length],
     departmentId: depts[i % depts.length],
     email: `user_${i + 1}@pms-group.com`,
     phone: `13800138${String(i).padStart(3, '0')}`,
