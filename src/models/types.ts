@@ -1,3 +1,4 @@
+import type { FullBaselineSnapshot } from './budget';
 import type { ReportSnapshot } from '@/mock/reports';
 // 组织架构
 export interface Department {
@@ -145,7 +146,7 @@ export interface BudgetVersion {
   id: string;
   projectId: string;
   version: string;
-  status: '草稿' | '审批中' | '已生效' | '已废弃';
+  status: '草稿' | '审批中' | '待确认' | '已生效' | '已废弃';
   isOverEstimate: boolean; // 是否超概算
   totalAmount: number; // 万元
   laborCost: number;
@@ -164,6 +165,7 @@ export interface BudgetVersion {
 
 // 基线版本
 export interface BaselineVersion {
+  snapshot?: FullBaselineSnapshot;
   id: string;
   projectId: string;
   version: string;
@@ -177,6 +179,7 @@ export interface BaselineVersion {
 
 // WBS任务
 export interface WbsTask {
+  predecessorIds?: string[]; plannedHours?: number; completionCondition?: string; milestoneId?: string; description?: string;
   id: string;
   projectId: string;
   taskCode: string;
@@ -197,6 +200,7 @@ export interface WbsTask {
 
 // 里程碑
 export interface Milestone {
+  ownerId?: string; ownerName?: string; completionCondition?: string; acceptanceBasis?: string; isKey?: boolean; templateRequired?: boolean;
   completionNote?: string;
   id: string;
   projectId: string;

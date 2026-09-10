@@ -56,6 +56,8 @@ describe('审批、权限及成本锁定', () => {
     expect(state.approvals[0].estimate.totalCost).toBe(quotedEstimate);
     expect(() => transition(state, { type: 'review', approvalId: 'APR-1', approve: true, opinion: '同意' }, pmo)).toThrow('角色');
     state = transition(state, { type: 'review', approvalId: 'APR-1', approve: true, opinion: '同意追加范围及预算' }, leader);
+    expect(state.projects[0].budgetAmount).toBe(original.projects[0].budgetAmount);
+    state = transition(state, {type:'confirm-budget-baseline',approvalId:'APR-1'}, pmo);
     expect(state.projects[0].budgetAmount).toBe(4000);
     expect(selectFourCalculations(state.projects[0], state).budget?.totalAmount).toBe(4000);
     expect(state.baselines).toHaveLength(original.baselines.length + 1);
@@ -146,13 +148,16 @@ describe('领导待决策与到期回款', () => {
       expect(sumMoney(approval.budget.items.map((i) => i.amount))).toBe(approval.budget.totalAmount);
     }
     const pending = initial.approvals.find((a) => a.status === '待审批')!;
-    const next = transition(initial, { type: 'review', approvalId: pending.id, approve: true, opinion: '同意所引版本和交付范围' }, leader);
+    let next = transition(initial, { type: 'review', approvalId: pending.id, approve: true, opinion: '同意所引版本和交付范围' }, leader);
     expect(next.decisions.filter((d) => d.status === '待决策')).toHaveLength(18);
+    expect(next.projects.find((p) => p.id === pending.projectId)?.budgetAmount).toBe(initial.projects.find(p=>p.id===pending.projectId)?.budgetAmount);
+    next = transition(next,{type:'confirm-budget-baseline',approvalId:pending.id},pmo);
     expect(next.projects.find((p) => p.id === pending.projectId)?.budgetAmount).toBe(pending.budget.totalAmount);
     expect(pending.status).toBe('待审批');
     const second = initial.approvals.find((a) => a.projectId === 'P-003')!;
     const imported = { ...initial, baselines: initial.baselines.filter((b) => b.projectId !== 'P-003' || b.status === '已生效') };
-    const upgraded = transition(imported, { type: 'review', approvalId: second.id, approve: true, opinion: '按引用版本批准' }, leader);
+    let upgraded = transition(imported, { type: 'review', approvalId: second.id, approve: true, opinion: '按引用版本批准' }, leader);
+    upgraded=transition(upgraded,{type:'confirm-budget-baseline',approvalId:second.id},pmo);
     expect(upgraded.projects.find((p) => p.id === 'P-003')?.currentBaselineVersion).toBe('V3.0');
     expect(new Set(upgraded.baselines.filter((b) => b.projectId === 'P-003').map((b) => b.version)).size).toBe(2);
   });

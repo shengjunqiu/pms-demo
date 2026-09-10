@@ -1,3 +1,5 @@
+import { applyBudgetPlanningAction, budgetBaselineProposal, confirmBudgetBaseline, initializePlanning, planningSnapshot, type BudgetPlanningAction } from '@/mock/budget';
+import type { PlanningDraft, PlanningReview } from '@/models/budget';
 import { initAcceptanceFixture } from '@/mock/acceptance-fixture';
 import { applyAcceptanceAction, type AcceptanceAction } from '@/mock/acceptance';
 import type { AcceptanceDetail, AcceptanceReport } from '@/models/settlement';
@@ -23,7 +25,7 @@ export interface Approval {
   id: string; projectId: string; kind: 'budget' | 'change'; status: '待审批' | '通过' | '驳回';
   budget: BudgetVersion; baseline: BaselineVersion; submittedBy: string; reason: string;
   requiredRole: 'pmo' | 'executive'; opinion?: string;
-  estimate: EstimateVersion; sourceChangeId?: string;
+  estimate: EstimateVersion; sourceChangeId?: string; baselineConfirmedAt?: string; baselineConfirmedBy?: string;
 }
 export interface ManagementApproval {
   id: string; projectId: string; sourceId: string; type: DecisionItem['type'];
@@ -37,6 +39,7 @@ export interface PlanRequest {
 }
 export interface Material extends DocumentDetails { id: string; projectId: string; name: string; required: boolean; status: '缺失' | '待提交' | '待审核' | '通过' | '驳回' }
 export interface BusinessState {
+  planningDrafts: Record<string,PlanningDraft>; planningReviews: PlanningReview[];
   opportunities: Opportunity[]; opportunityMeta: Record<string, OpportunityMeta>;
   contracts: Contract[]; acceptanceDetails: Record<string, AcceptanceDetail>; acceptanceReports: AcceptanceReport[];
   receiptPlans: ReceiptPlan[];
@@ -49,7 +52,7 @@ export interface BusinessState {
   audit: { id: string; actor: string; action: string; target: string; date: string }[];
 }
 export function createBusinessState(): BusinessState {
-  const state: BusinessState = structuredClone({ acceptanceDetails: {}, acceptanceReports: [], opportunities: mockOpportunities, opportunityMeta: {}, contracts: mockContracts, receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
+  const state: BusinessState = structuredClone({ planningDrafts: {}, planningReviews: [], acceptanceDetails: {}, acceptanceReports: [], opportunities: mockOpportunities, opportunityMeta: {}, contracts: mockContracts, receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
     estimates: mockEstimateVersions, milestones: mockMilestones, settlements: mockSettlements,
     issues: mockIssues, risks: mockRisks, bugs: mockBugs, costs: mockCostItems, approvals: [], changes: mockChanges, managementApprovals: [],
     decisions: mockDecisions, acceptances: mockAcceptances, lockedProjects: ['P-008'], maintenanceCosts: [], audit: [],
@@ -58,10 +61,11 @@ export function createBusinessState(): BusinessState {
       status: p.status === '已结算' || name === '实施计划' && mockMilestones.some((m) => m.projectId === p.id && m.type === '启动' && m.status === '已达成') ? '通过' as const : '缺失' as const,
     }))),
   });
+  initializePlanning(state);
   initAcceptanceFixture(state);
   return state;
 }
-export type BusinessAction = AcceptanceAction | OpportunityAction | LaborAction | DeliverableAction | ReportAction | CostOrderAction | TicketAction
+export type BusinessAction = BudgetPlanningAction | AcceptanceAction | OpportunityAction | LaborAction | DeliverableAction | ReportAction | CostOrderAction | TicketAction
   | { type: 'submit-budget'; projectId: string; budget: BudgetVersion; reason: string }
   | { type: 'review'; approvalId: string; approve: boolean; opinion: string }
   | { type: 'review-management'; id: string; approve: boolean; opinion: string }
@@ -89,6 +93,8 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     target = applyOpportunityAction(state, action, actor);
   } else if (action.type === 'submit-acceptance' || action.type === 'review-acceptance' || action.type === 'reply-acceptance' || action.type === 'confirm-acceptance' || action.type === 'save-acceptance-proof' || action.type === 'save-acceptance-report' || action.type === 'confirm-acceptance-report') {
     target = applyAcceptanceAction(state, action, actor);
+  } else if (action.type === 'save-planning' || action.type === 'submit-planning' || action.type === 'review-planning' || action.type === 'reply-planning' || action.type === 'confirm-budget-baseline') {
+    target = applyBudgetPlanningAction(state, action, actor);
   } else if (action.type === 'submit-labor' || action.type === 'review-labor') {
     target = applyLaborAction(state, action, actor);
   } else if (action.type === 'document-action' || action.type === 'add-document' || action.type === 'quality-plan' || action.type === 'quality-check' || action.type === 'complete-milestone') {
@@ -107,13 +113,13 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     if (action.budget.projectId !== p.id || action.budget.totalAmount < 0 || !Number.isFinite(action.budget.totalAmount)) throw new Error('预算数据无效');
     const sum = action.budget.items.reduce((total, item) => total + item.amount, 0);
     if (Math.abs(sum - action.budget.totalAmount) > 0.000001 || action.budget.items.some((i) => i.amount < 0 || !Number.isFinite(i.amount))) throw new Error('预算科目合计不符');
-    if (state.approvals.some((a) => a.projectId === p.id && a.status === '待审批')) throw new Error('已有待审批预算');
+    if (state.approvals.some((a) => a.projectId === p.id && (a.status === '待审批' || a.kind === 'budget' && a.status === '通过' && !a.baselineConfirmedAt))) throw new Error('已有待审批预算');
     const estimate = projectEstimate(p, state.estimates);
     if (!estimate) throw new Error('缺少冻结概算');
     const isOverEstimate = action.budget.totalAmount > estimate.totalCost;
     if (isOverEstimate && !action.reason.trim()) throw new Error('超概算提交必须说明原因');
-    const baseline = state.baselines.find((b) => b.projectId === p.id && b.status === '已生效');
-    if (!baseline) throw new Error('缺少当前基线');
+    const baseline = budgetBaselineProposal(state, p.id);
+    baseline.snapshot = { ...planningSnapshot(state,p.id), budget: structuredClone(action.budget), estimateVersionId: estimate.id, planningReviewId: state.planningDrafts[p.id]?.reviewId };
     const id = `APR-${state.approvals.length + 1}`;
     state.approvals.push({ id, projectId: p.id, kind: 'budget', status: '待审批', budget: { ...structuredClone(action.budget), isOverEstimate }, estimate: structuredClone(estimate),
       baseline: structuredClone(baseline), submittedBy: actor.id, reason: action.reason,
@@ -129,18 +135,9 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     const p = project(approval.projectId); target = approval.id;
     assertConstructionWritable(state, p.id);
     if (action.approve) {
-      const baseline = state.baselines.find((b) => b.projectId === p.id && b.status === '已生效');
-      if (baseline?.id !== approval.baseline.id) throw new Error('基线已变化，请重新提交审批');
-      const latestMajor = Math.max(0, ...state.baselines.filter((b) => b.projectId === p.id).map((b) => Number(/^V(\d+)/.exec(b.version)?.[1] ?? 0)));
-      const version = `V${latestMajor + 1}.0`;
-      // Preserve all prior values; only validity metadata changes, then append a new snapshot.
-      state.budgets.filter((b) => b.projectId === p.id && b.status === '已生效').forEach((b) => { b.status = '已废弃'; });
-      baseline.status = '历史';
-      state.budgets.push({ ...approval.budget, id: `BUD-${approval.id}`, version, status: '已生效', createdAt: AS_OF_DATE, createdBy: actor.id });
-      state.baselines.push({ ...approval.baseline, id: `BASE-${approval.id}`, version, status: '已生效', budgetAmount: approval.budget.totalAmount, createdAt: AS_OF_DATE });
-      p.budgetAmount = approval.budget.totalAmount; p.currentBaselineVersion = version;
-      p.costVariance = money(p.rollingCost - p.budgetAmount);
-      p.costVarianceRate = percentage(p.costVariance, p.budgetAmount) ?? 0;
+      if (approval.kind === 'change') confirmBudgetBaseline(state, approval, actor);
+      // Regular budget approval waits for a separate PMO baseline confirmation.
+
     }
     if (approval.sourceChangeId) {
       const change = state.changes.find((c) => c.id === approval.sourceChangeId)!;
@@ -295,7 +292,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
 export function createDemoBusinessState(): BusinessState {
   let state = createBusinessState();
   state.decisions = [];
-  const candidates = state.projects.filter((p) => !p.isMaintenance && !state.lockedProjects.includes(p.id)).slice(0, 45);
+  const candidates = state.projects.filter((p) => !p.isMaintenance && !state.lockedProjects.includes(p.id) && state.budgets.some(b=>b.projectId===p.id&&b.status==='已生效')).slice(0, 45);
   for (const p of candidates) {
     const budget = state.budgets.find((b) => b.projectId === p.id && b.status === '已生效')!;
     const estimate = projectEstimate(p, state.estimates)!;

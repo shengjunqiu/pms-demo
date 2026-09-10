@@ -1,3 +1,4 @@
+import { projectEstimate } from './versions';
 import { mockProjects, mockDepartments, mockCustomers, mockContracts, mockCostItems, mockBudgetVersions, mockEstimateVersions, mockSettlements, mockReceiptPlans, AS_OF_DATE } from '@/mock';
 import type { BusinessState } from '@/mock/business';
 import type { Project } from '@/models/types';
@@ -48,11 +49,14 @@ export function selectFourCalculations(project: Project, data: Pick<BusinessStat
   const budget = data.budgets.find((v) => v.projectId === project.id && v.status === '已生效');
   const settlement = data.settlements.find((v) => v.projectId === project.id && v.status === '已锁定已生效');
   const costs = data.costs.filter((c) => c.projectId === project.id);
-  const weights = (budget?.items ?? []).map((item) => item.amount);
+  // A project awaiting its first budget still has estimate/cost subjects. Preserve every leaf.
+  const subjectIds = [...new Set([...(budget?.items ?? []).map(i=>i.subjectId), ...(estimate?.items ?? []).map(i=>i.subjectId), ...costs.map(i=>i.subjectId), ...Object.keys(project.commitmentBySubject ?? {})])];
+  const leafItems = subjectIds.map(subjectId=>({subjectId, subjectName: budget?.items.find(i=>i.subjectId===subjectId)?.subjectName ?? estimate?.items.find(i=>i.subjectId===subjectId)?.subjectName ?? costs.find(i=>i.subjectId===subjectId)?.subjectName ?? subjectId, amount:budget?.items.find(i=>i.subjectId===subjectId)?.amount ?? 0}));
+  const weights = leafItems.map((item) => item.amount);
   const allocationWeights = weights.some((w) => w > 0) ? weights : weights.map(() => 1);
-  const committed = project.commitmentBySubject ? (budget?.items ?? []).map((item) => project.commitmentBySubject![item.subjectId] ?? 0) : allocationWeights.length ? allocateMoney(project.committedCost, allocationWeights) : [];
+  const committed = project.commitmentBySubject ? leafItems.map((item) => project.commitmentBySubject![item.subjectId] ?? 0) : allocationWeights.length ? allocateMoney(project.committedCost, allocationWeights) : [];
   const remaining = allocationWeights.length ? allocateMoney(project.forecastRemainingCost, allocationWeights) : [];
-  const subjects = (budget?.items ?? []).map((item, index) => {
+  const subjects = leafItems.map((item, index) => {
     const actual = sumMoney(costs.filter((c) => c.subjectId === item.subjectId).map((c) => c.amount));
     const rolling = sumMoney([actual, committed[index], remaining[index]]);
     return { ...item, estimate: estimate?.items.find((e) => e.subjectId === item.subjectId)?.amount ?? 0,
