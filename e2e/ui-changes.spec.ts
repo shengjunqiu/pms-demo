@@ -98,8 +98,30 @@ for (const scenario of [{ name: '正常', amount: 20, days: 14 }, { name: '重�
     await capturePageEvidence(page, `UI-HS15-${scenario.name}-review`);
     await decide(page, true, '同意按批准的范围、计划和预算执行');
     const result = await state(page);
-    expect(result.baselines.find(b => b.id === original.id)?.plannedEndDate).toBe(original.plannedEndDate);
-    expect(result.baselines.find(b => b.projectId === 'P-001' && b.status === '已生效')?.budgetAmount).toBe(original.budgetAmount + scenario.amount);
+    const retained = result.baselines.find(b => b.id === original.id);
+    // Archiving may change only status; all original fields and the full snapshot remain intact.
+    expect(retained).toEqual({ ...original, status: '历史' });
+    const effective = result.baselines.find(b => b.projectId === 'P-001' && b.status === '已生效')!;
+    expect(effective).toBeDefined();
+    expect(effective.scopeDesc).toBe(request.proposed.scope);
+    expect(effective.plannedStartDate).toBe(request.proposed.plannedStartDate);
+    expect(effective.plannedEndDate).toBe(request.proposed.plannedEndDate);
+    expect(effective.budgetAmount).toBe(request.proposedBudget.totalAmount);
+    expect(effective.budgetAmount).toBe(original.budgetAmount + scenario.amount);
+    // Approval assigns budget identity/version metadata, while every proposed business field stays frozen.
+    expect(effective.snapshot).toEqual({
+      ...request.proposed,
+      budget: {
+        ...request.proposedBudget,
+        id: `BUD-CHANGE-${id}`,
+        version: effective.version,
+        status: '已生效',
+        createdAt: effective.createdAt,
+        createdBy: scenario.name === '重大' ? 'U-003' : 'U-002',
+      },
+    });
+    expect(result.budgets.find(b => b.id === effective.snapshot?.budget.id)).toEqual(effective.snapshot?.budget);
+    expect(result.changeRequests.find(r => r.id === id)?.proposed).toEqual(request.proposed);
     expect(result.baselines.filter(b => b.projectId === 'P-001')).toHaveLength(initial.baselines.filter(b => b.projectId === 'P-001').length + 1);
     expect(result.costs).toEqual(initial.costs);
     for (const task of initial.tasks.filter(t => t.projectId === 'P-001')) {
