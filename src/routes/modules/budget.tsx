@@ -1,3 +1,5 @@
+import {ChangesPage} from '@/pages/changes/ChangesPage';
+import {ChangeFormPage} from '@/pages/changes/ChangeFormPage';
 import {TeamPage} from '@/pages/budget/TeamPage';
 import {BudgetEditorPage} from '@/pages/budget/BudgetEditorPage';
 import {EstimateBudgetPage} from '@/pages/budget/EstimateBudgetPage';
@@ -7,6 +9,8 @@ import { WbsPlanningPage } from '@/pages/budget/WbsPlanningPage';
 import { MilestonePlanningPage } from '@/pages/budget/MilestonePlanningPage';
 import { PlanReviewPage } from '@/pages/budget/PlanReviewPage';
 export const budgetRoutes=[
+ {path:'project-changes',element:<ChangesPage/>},
+ {path:'project-changes/new',element:<ChangeFormPage/>},
  {path:'projects/:id/team',element:<TeamPage/>},
  {path:'projects/:id/budget',element:<BudgetEditorPage/>},
  {path:'projects/:id/estimate-budget',element:<EstimateBudgetPage/>},
