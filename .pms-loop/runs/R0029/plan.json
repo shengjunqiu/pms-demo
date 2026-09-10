@@ -1,0 +1,94 @@
+{
+  "round": "R0029",
+  "items": [
+    {
+      "id": "GS-10",
+      "title": "提前投入申请",
+      "route": "/opportunities/:id/early-investment",
+      "kind": "表单",
+      "roles": "项目主办部门",
+      "phase": 4,
+      "feature_ids": [
+        "GS-037",
+        "GS-038",
+        "GS-039",
+        "GS-040"
+      ],
+      "upstream_feature_scope": "GS-037~040",
+      "source_lines": {
+        "pages": 114,
+        "brief": 403
+      },
+      "criteria": [
+        "原因、额度、资源、周期、签约计划、风险和退出方案",
+        "模拟分级审批显示规则，批准形成商机可用额度"
+      ]
+    },
+    {
+      "id": "GS-11",
+      "title": "提前投入台账",
+      "route": "/early-investments",
+      "kind": "台账",
+      "roles": "PMO、财务、主办部门",
+      "phase": 4,
+      "feature_ids": [
+        "GS-040",
+        "GS-041",
+        "GS-042"
+      ],
+      "upstream_feature_scope": "GS-040~042",
+      "source_lines": {
+        "pages": 115,
+        "brief": 404
+      },
+      "criteria": [
+        "商机维度批准/发生/剩余额度、时限及异常",
+        "超额/超期新增投入阻断或升级，前期成本来源可查"
+      ]
+    }
+  ],
+  "sources": {
+    "prd": {
+      "path": "docs/项目管理平台PRD_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "6dac675ca22237b7fa59129eccc466a9e242d20f948c0b68e958a7227bb2bd1b"
+    },
+    "features": {
+      "path": "docs/项目管理平台详细功能清单_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "fabfac73b480ccaf01aa831ae3c5d0a6485e33fff80f517468b2b6c52829ddfb"
+    },
+    "pages": {
+      "path": "docs/项目管理平台页面清单与原型设计说明_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "db1c548b5f5ef025eb90fef06422e132f003665fc7e6156dd706b7f095c994dc"
+    },
+    "brief": {
+      "path": "docs/项目管理平台高保真原型_AgentLoop开发任务书_V1.0.md",
+      "sha256": "286f917d5edc99a4a0c7da97515a3d6308cae7395fb287bbcd1846de60045b43"
+    }
+  },
+  "feature_references": {
+    "GS-037": {
+      "title": "提前投入判断",
+      "line": 106
+    },
+    "GS-038": {
+      "title": "投入申请",
+      "line": 107
+    },
+    "GS-039": {
+      "title": "分级审批",
+      "line": 108
+    },
+    "GS-040": {
+      "title": "投入额度控制",
+      "line": 109
+    },
+    "GS-041": {
+      "title": "前期成本归集",
+      "line": 110
+    },
+    "GS-042": {
+      "title": "投入风险预警",
+      "line": 111
+    }
+  }
+}

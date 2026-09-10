@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "round": "R0029",
+  "revision": "c125ed974601fc5d67aeb19e1748fbeafdfa27e915b3d8ab571233b6d754e360",
+  "items": {
+    "GS-10": {
+      "entry": "",
+      "covered_features": [],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": false,
+          "observation": ""
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": false,
+          "observation": ""
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": false,
+          "observation": ""
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": false,
+          "observation": ""
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": false,
+          "observation": ""
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": false,
+          "observation": ""
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": false,
+          "observation": ""
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": false,
+          "observation": ""
+        },
+        "business-1": {
+          "requirement": "原因、额度、资源、周期、签约计划、风险和退出方案",
+          "passed": false,
+          "observation": ""
+        },
+        "business-2": {
+          "requirement": "模拟分级审批显示规则，批准形成商机可用额度",
+          "passed": false,
+          "observation": ""
+        }
+      },
+      "scenarios": [
+        {
+          "action": "",
+          "expected": "",
+          "observed": ""
+        }
+      ],
+      "artifacts": [],
+      "screenshots": {
+        "1440": "",
+        "1280": ""
+      }
+    },
+    "GS-11": {
+      "entry": "",
+      "covered_features": [],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": false,
+          "observation": ""
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": false,
+          "observation": ""
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": false,
+          "observation": ""
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": false,
+          "observation": ""
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": false,
+          "observation": ""
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": false,
+          "observation": ""
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": false,
+          "observation": ""
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": false,
+          "observation": ""
+        },
+        "business-1": {
+          "requirement": "商机维度批准/发生/剩余额度、时限及异常",
+          "passed": false,
+          "observation": ""
+        },
+        "business-2": {
+          "requirement": "超额/超期新增投入阻断或升级，前期成本来源可查",
+          "passed": false,
+          "observation": ""
+        }
+      },
+      "scenarios": [
+        {
+          "action": "",
+          "expected": "",
+          "observed": ""
+        }
+      ],
+      "artifacts": [],
+      "screenshots": {
+        "1440": "",
+        "1280": ""
+      }
+    }
+  }
+}

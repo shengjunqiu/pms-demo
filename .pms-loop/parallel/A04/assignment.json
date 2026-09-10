@@ -5,25 +5,28 @@
     "GS-11"
   ],
   "owner": "develop_gs",
-  "integration_root": "/Users/shengjunqiu/Documents/Code/pms-demo",
+  "integration_root": "/home/shengjunqiu/code/pms-demo",
   "workdir": "/private/tmp/pms-parallel-gs",
   "branch": "pms/estimate",
   "base_commit": "527fa20",
   "contract_commit": "1d2c49e",
-  "status": "integrated",
+  "status": "integrated_pending_acceptance",
   "writer": "",
   "last_confirmed_at": "2026-09-10",
-  "owned_paths": "按docs/PARALLEL_DEVELOPMENT.md对应业务域",
+  "owned_paths": [
+    "src/pages/opportunities/EarlyInvestmentPage.tsx",
+    "src/pages/opportunities/EarlyInvestmentsPage.tsx",
+    "src/mock/early-investments.ts",
+    "src/models/__tests__/early-investments.test.ts"
+  ],
   "shared_changes": "已确认使用统一BusinessState扩展；公共补丁单列，由主agent最终集成",
   "development_dependencies": [
     "P0领域接入契约；领域可在分支先兼容实现"
   ],
-  "acceptance_dependencies": [
-    "按catalog和并发方案，所有真实下钻已集成可操作"
-  ],
+  "acceptance_dependencies": [],
   "scenarios": "catalog对应页面的全部条件及正常/阻断/角色/版本同步场景",
   "fixtures": "现有固定故事；B01另建合法规划期对象",
-  "next_action": "验收冲刺库存；只准备场景与缺陷，不从旧分支继续普通开发",
+  "next_action": "R0029 GS10/11 integration precheck, engineering check and browser acceptance",
   "delivery_commits": [
     "da90ade",
     "5fea9bb"
@@ -32,5 +35,14 @@
     "28439c0",
     "f3164aa"
   ],
-  "acceptance_ready": false
+  "acceptance_ready": true,
+  "acceptance_group": "early-investment-control",
+  "acceptance_owner": "/root",
+  "acceptance_workdir": "/home/shengjunqiu/code/pms-demo",
+  "acceptance_checklist": [
+    "engineering checks",
+    "UI application approval and financial costs",
+    "dual-width screenshots",
+    "Loop acceptance"
+  ]
 }

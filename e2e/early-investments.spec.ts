@@ -80,7 +80,8 @@ async function select(page: Page, label: string, text: string) {
   await input.focus();
   await input.press('ArrowDown');
   await page.locator('.ant-select-dropdown:visible .ant-select-item-option:visible').filter({ hasText: text }).last().click();
-  await input.press('Escape');
+  if (await input.evaluate(el => !!el.closest('.ant-select-multiple'))) await input.press('Escape');
+  await expect(page.locator('.ant-select-dropdown:visible')).toHaveCount(0);
 }
 async function snapshot(page: Page, id: string) {
   return page.evaluate(async target => {
@@ -134,6 +135,7 @@ test('GS-10/11 草稿提交、审批意见必填、批准额度与真实成本�
   await submit(page);
   await expect(page.getByText('投入申请已提交至规则指定审批角色', { exact: true })).toBeVisible();
   state = await snapshot(page, id);
+  expect(state.requests).toHaveLength(1);
   expect(state.requests[0].status).toBe('待审批');
   const frozenSource = state.requests[0].estimateSnapshot;
   expect(frozenSource?.isFrozen).toBe(true);
@@ -144,7 +146,7 @@ test('GS-10/11 草稿提交、审批意见必填、批准额度与真实成本�
   await confirmation.getByRole('button', { name: /确\s*定/ }).click();
   await expect(page.getByText('审批意见必填', { exact: true })).toBeVisible();
   expect((await snapshot(page, id)).requests[0].status).toBe('待审批');
-  if (await confirmation.isVisible()) await confirmation.getByRole('button', { name: /取\s*消/ }).click();
+  await expect(confirmation).toBeHidden();
   await approve(page, id, requestId);
   state = await snapshot(page, id);
   expect(state.opportunity.earlyInvestmentQuota).toBe(50);
@@ -252,7 +254,7 @@ test('GS-10 驳回保留原申请且不增加额度，新申请超累计硬上�
   await submit(page);
   await expect(page.getByText('累计投入额度超过预计金额10%的演示硬上限', { exact: true })).toBeVisible();
   const confirmation = page.getByRole('dialog', { name: '提交提前投入申请？', exact: true });
-  if (await confirmation.isVisible()) await confirmation.getByRole('button', { name: /取\s*消/ }).click();
+  await expect(confirmation).toBeHidden();
   const state = await snapshot(page, id);
   expect(state.requests).toEqual([rejected]);
   expect(state.opportunity.earlyInvestmentQuota).toBe(0);
@@ -304,4 +306,106 @@ test('GS-10/11 未知商机及申请404、协作角色只读、真实组织规�
   await expect(page.locator('.ant-table-tbody tr.ant-table-row')).toHaveCount(0);
   await expect(page.locator('main')).not.toContainText('提前投入验收数据共享项目');
   observations.set(page, { id, deniedOrganization: 'D-002', allowedOrganization: 'D-003', screenshots: await capturePageEvidence(page, 'GS11-organization-empty') });
+});
+
+test('GS-11 配置临期提醒与真实立项成本继承，保留商机来源且不重复计费', async ({ page }) => {
+  test.setTimeout(90_000);
+  const id = await seed(page);
+  await page.evaluate(async id => {
+    const path = '/src/mock/business.ts'; const b = await import(/* @vite-ignore */ path) as BusinessModule;
+    let state = b.useBusinessStore.getState().data;
+    const market: Actor = { id: 'U-006', name: '陈亮', role: 'market' };
+    const pmo: Actor = { id: 'U-002', name: '李主任', role: 'pmo' };
+    const finance: Actor = { id: 'U-004', name: '刘敏', role: 'finance' };
+    const admin: Actor = { id: 'U-ADMIN', name: '系统管理员', role: 'admin' };
+    const act = (action: BusinessAction, actor: Actor) => { state = b.transition(state, action, actor); };
+    const current = state.configuration.grading[0];
+    act({ type: 'configuration-save', kind: 'grading', sourceId: current.id, value: { ...current, unsignedWarningDays: 30, changeReason: '提前30天复核未签投入' } }, admin);
+    act({ type: 'configuration-publish', kind: 'grading', id: state.configuration.grading.at(-1)!.id }, admin);
+    const o = state.opportunities.find(o => o.id === id)!;
+    act({ type: 'save-early-investment', id, submit: true, input: {
+      reason: '客户验证需要提前投入', amount: 50, resourceTypes: ['人力'], department: o.departmentName, people: ['U-005'],
+      startDate: '2026-09-09', endDate: '2026-09-30', signPlanDate: '2026-11-30', signPlan: '按周核对签约进度',
+      riskLevel: '一般', risks: '控制客户联调窗口', exitPlan: '暂停投入并保留原成本', estimateId: o.currentEstimateVersionId!,
+    } }, market);
+    const requestId = state.earlyInvestmentRequests.at(-1)!.id;
+    act({ type: 'review-early-investment', id, requestId, approve: true, opinion: '按配置30天预警复核' }, pmo);
+    act({ type: 'record-early-cost', id, requestId, sourceId: 'PRE-A04-INHERIT-001', subjectId: 'SUB-01', amount: 20, occurredDate: '2026-09-09', description: '客户验证人力原凭证' }, finance);
+    b.useBusinessStore.setState({ data: state });
+  }, id);
+  await role(page, '财务专员');
+  let row = await filterLedger(page, id);
+  await expect(row).toContainText('投入有效期临近');
+  const warningScreenshots = await capturePageEvidence(page, 'GS11-warning');
+  const filteredUrl = page.url();
+  await navigate(page, '/early-investments?search=NO-MATCH-A04');
+  await expect(page.getByLabel('商机 / 客户', { exact: true })).toHaveValue('NO-MATCH-A04');
+  await expect(page.locator('.ant-table-tbody tr.ant-table-row')).toHaveCount(0);
+  await page.goBack();
+  await expect(page).toHaveURL(filteredUrl);
+  await expect(page.getByLabel('商机 / 客户', { exact: true })).toHaveValue('提前投入验收数据共享项目');
+  await expect(page.locator('.ant-table-tbody tr.ant-table-row')).toHaveCount(1);
+  const original = await snapshot(page, id);
+  expect(original.requests[0].gradingSnapshot?.unsignedWarningDays).toBe(30);
+  const inherited = await page.evaluate(async id => {
+    const path = '/src/mock/business.ts'; const b = await import(/* @vite-ignore */ path) as BusinessModule;
+    const initiationPath = '/src/mock/initiation.ts';
+    const initiation = await import(/* @vite-ignore */ initiationPath) as typeof import('../src/mock/initiation');
+    let state = b.useBusinessStore.getState().data;
+    const market: Actor = { id: 'U-006', name: '陈亮', role: 'market' };
+    const pmo: Actor = { id: 'U-002', name: '李主任', role: 'pmo' };
+    const actors: Record<string, Actor> = { pmo, finance: { id: 'U-004', name: '刘敏', role: 'finance' }, 'solution-tech': { id: 'U-005', name: '赵工', role: 'solution-tech' }, 'project-manager': { id: 'U-001', name: '张伟', role: 'project-manager' } };
+    const act = (action: BusinessAction, actor: Actor) => { state = b.transition(state, action, actor); };
+    act({ type: 'save-initiation', input: { ...initiation.defaultInitiationInput(state, id), necessity: '验证成果转正式交付', customerNeeds: '统一数据共享与上线培训', recommendation: '按规则分级立项', region: '福建省', attachments: ['立项申请.pdf'] } }, market);
+    const appId = state.initiations.at(-1)!.id;
+    act({ type: 'submit-initiation', id: appId }, market);
+    let round = state.initiations.find(a => a.id === appId)!.rounds.at(-1)!;
+    const level = initiation.riskScore(round.source.risks);
+    act({ type: 'assess-initiation-risk', id: appId, risks: round.source.risks, level, explanation: '保留全部上游风险并核对控制措施' }, pmo);
+    round = state.initiations.find(a => a.id === appId)!.rounds.at(-1)!;
+    const classification = initiation.initiationClassification(round.input, round.source, level, state, round.configurationSnapshot);
+    act({ type: 'classify-initiation', id: appId, level: classification.level, reason: '遵照金额和风险分级规则' }, pmo);
+    round = state.initiations.find(a => a.id === appId)!.rounds.at(-1)!;
+    if (round.path === '线上会签') {
+      for (const node of initiation.INITIATION_SIGNATURES) act({ type: 'sign-initiation', id: appId, node: node.node, conclusion: '同意', opinion: `${node.node}确认来源与投入金额` }, actors[node.role]);
+    }
+    act({ type: 'decide-initiation', id: appId, result: '通过', opinion: '批准立项，继承真实前期成本', meetingDate: '2026-09-10', participants: ['U-002', 'U-004'], minutes: '与会核对投入凭证，按来源继承一次', rectifications: [] }, pmo);
+    const projectId = state.initiations.find(a => a.id === appId)!.projectId!;
+    b.useBusinessStore.setState({ data: state });
+    return { appId, project: state.projects.find(p => p.id === projectId)!, costs: state.costs.filter(c => c.sourceId === 'PRE-A04-INHERIT-001') };
+  }, id);
+  expect(inherited.project.id).toBeTruthy();
+  expect(inherited.project.actualCost).toBe(20);
+  expect(inherited.costs).toHaveLength(1);
+  expect(inherited.costs[0]).toMatchObject({ projectId: inherited.project.id, amount: 20 });
+  const after = await snapshot(page, id);
+  expect(after.costs).toHaveLength(1);
+  expect(after.costs[0]).toMatchObject({ sourceId: 'PRE-A04-INHERIT-001', projectId: inherited.project.id, amount: 20 });
+  expect(after.opportunity.earlyInvestmentUsed).toBe(20);
+  row = await filterLedger(page, id);
+  await expect(row).toContainText('已转立项');
+  await expect(row.getByRole('button', { name: '登记成本', exact: true })).toBeDisabled();
+  const inheritedScreenshots = await capturePageEvidence(page, 'GS11-inherited');
+  await row.getByRole('button', { name: '查看来源', exact: true }).click();
+  const drawer = page.locator('.ant-drawer-content:visible');
+  await expect(drawer).toContainText('PRE-A04-INHERIT-001');
+  await expect(drawer).toContainText(`已继承至 ${inherited.project.id}`);
+  const sourceScreenshots: Record<string, string> = {};
+  for (const width of [1440, 1280]) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect(drawer).toBeVisible();
+    const path = `${process.env.PMS_LOOP_ARTIFACT_DIR ?? 'test-results'}/GS11-source-${width}.png`;
+    await page.screenshot({ path, fullPage: true, animations: 'disabled' });
+    sourceScreenshots[String(width)] = path;
+  }
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await drawer.getByRole('link', { name: `已继承至 ${inherited.project.id}`, exact: true }).click();
+  await expect(page).toHaveURL(`/projects/${inherited.project.id}/dynamic-accounting`);
+  await expect(page.getByText('尚无生效预算', { exact: true })).toBeVisible();
+  // The newly initiated project has no approved budget yet; the actual cost remains in its authoritative ledger.
+  expect(await page.evaluate(async () => {
+    const path = '/src/mock/business.ts'; const b = await import(/* @vite-ignore */ path) as BusinessModule;
+    return b.useBusinessStore.getState().data.costs.filter(c => c.sourceId === 'PRE-A04-INHERIT-001');
+  })).toEqual(inherited.costs);
+  observations.set(page, { id, original, inherited, warningScreenshots, inheritedScreenshots, sourceScreenshots, downstreamState: '正式项目尚无生效预算，未伪造预算以绕过动态核算门禁' });
 });

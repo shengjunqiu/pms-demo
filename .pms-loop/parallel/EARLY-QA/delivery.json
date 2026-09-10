@@ -1,0 +1,27 @@
+{
+  "package_id": "EARLY-QA",
+  "status": "integrated",
+  "source_commit": "c6d648db569b0cad7e839d3f18b75bcfbbe9a449",
+  "integration_commit": "bedbbf6",
+  "owned_paths": [
+    "e2e/early-investments.spec.ts"
+  ],
+  "scope_check": "passed before single cherry-pick; no merge/shared/outside-owned files",
+  "worker_checks": [
+    "scoped eslint",
+    "TypeScript transpile",
+    "git diff --check"
+  ],
+  "root_prechecks": [
+    {
+      "path": ".pms-loop/parallel/EARLY-QA/precheck/browser.log",
+      "result": "2 passed / 2 failed: found rapid draft save duplicate request; expected-rejection confirmation cancel race"
+    },
+    {
+      "path": ".pms-loop/parallel/EARLY-QA/precheck2/browser.log",
+      "result": "3 passed / 1 failed: extra Escape in Select test helper closed the cost modal"
+    }
+  ],
+  "formal_round": "R0029",
+  "note": "Worker stopped writing; root owns integrated test refinements and real browser acceptance. Worktree retained."
+}

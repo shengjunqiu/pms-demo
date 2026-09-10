@@ -2,7 +2,7 @@
   "schema_version": 1,
   "catalog_sha256": "afabe9c27b289a2aa00a72d116be344fdbb01683443388e367536a99feb1f05e",
   "status": "in_progress",
-  "active": null,
+  "active": "R0029",
   "completion_revision": null,
   "created_at": "2026-09-09T14:33:07+00:00",
   "items": {
@@ -59,12 +59,12 @@
       "round": "R0027"
     },
     "GS-10": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "active",
+      "round": "R0029"
     },
     "GS-11": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "active",
+      "round": "R0029"
     },
     "YS-01": {
       "status": "pending",
@@ -1114,6 +1114,21 @@
         ".pms-loop/runs/R0028/checks.json": "a0778dd34b2a2a4b0476e347ac93e8fb0ee4b9a812a4b7fa267984312496f346",
         ".pms-loop/runs/R0028/evidence.json": "63802f50866254acebbf958e76df3fa2564d5c5bb4ba482233be666926a8d40c"
       }
+    },
+    {
+      "id": "R0029",
+      "items": [
+        "GS-10",
+        "GS-11"
+      ],
+      "started_at": "2026-09-10T15:05:02+00:00",
+      "status": "awaiting_evidence",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      }
     }
   ],
   "notes": [
@@ -1220,6 +1235,14 @@
     {
       "at": "2026-09-10T14:57:51+00:00",
       "text": "本次按多agent并发完成R0027 GS08/09及R0028 JS01/02，累计42/72，无活动轮次。R28最终revision=35e18b7bc6c0382faf5228d666b90315f49ea04d1d9c1e6b07027456aa64e13b，typecheck/lint/build及234领域测试通过，6条正式浏览器验收与客户报验运维回归通过，主页面双宽截图均已查看，consoleErrors为空。概算修复同路径URL反向比较不同步，补偏离源成本冻结阻断及实际历史深链；供应商修复同轮次新建后误打开历史原单，验证整改复验、证明阻断、原单同步不增加成本。6个createDemoBusinessState测试文件将首次种子构建移到beforeAll，每例仍独立深拷贝，未提高超时或放宽断言；两次旧超时日志保留R27/attempts。两个子agent独占交付范围检查通过：c3b0eb3→bbc2b7f预算行UUID/概算毛利率及测试；faafa38→31560c6内部供应商e2e。主集成补毛利率四舍五入与抽屉动画定位，预算新增2场景通过。工作副本已停写，保留分支；支持包已归档。下一步继续消化库存：B02仍缺主PM接任的项目级菜单/动作/领域权限闭环、可响应候选及YS10科目下钻；CF07收入成本粒度仍待。C02 JS05/06/07需真实办理P006变更与管理审批、结清承诺预测后补正式结算闭环，不可借直接改状态fixture验收。所启浏览器测试和服务器已退出，尚余30页及FINAL，未推送。"
+    },
+    {
+      "at": "2026-09-10T15:07:17+00:00",
+      "text": "R0029 GS10/11：原文指纹一致，42/72恢复。A04实际依赖GS01/03/08已验收，投入domain/页面已集成；EARLY-QA在/tmp/pms-early-investment-qa从d8d8ca8独占e2e/early-investments.spec.ts，root串行重型检查。已修复审批预期拒绝Promise泄漏、批准申请重复额度告警、GS11 URL筛选回填、临期提醒采用申请分级配置快照，以及草稿/终止等状态不允许新增批准。7条定向领域通过；正式check未开始，待agent交付再预检。"
+    },
+    {
+      "at": "2026-09-10T15:26:28+00:00",
+      "text": "用户要求先push，保存R0029开发检查点，正式仍42/72、GS10/11活动未accept。修复快速保存草稿后提交重复建单，批准额度重复告警、状态门禁、配置临期提醒及URL筛选回填；EARLY-QA c6d648d范围检查后单向集成bedbbf6，工作副本已停写归档。最新工程revision=cde167712af632e9e298413d4fdb65c719876a397ab3c75557d3a2e86279cc36，typecheck/lint/build及235领域测试通过。前版本5条正式浏览器场景全部通过、consoleErrors空，成本20万元真实立项继承一次、配置30天提醒和URL返回已验证；1440来源抽屉截图抓到展开动画，因此测试截图新增animations disabled并重新check。旧证据保留R0029/attempts/drawer-animation，不充作最新正式证据。下一步保持源码冻结，在R0029/artifacts重新跑e2e/early-investments.spec.ts全部5条，查看双宽主页面及来源抽屉，填evidence后accept。当前没有运行测试或所启服务，构建约2.29MB告警仍待优化。"
     }
   ]
 }
