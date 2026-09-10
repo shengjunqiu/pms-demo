@@ -4,7 +4,8 @@ import { App, Button, DatePicker, Form, Input, Modal, Select, Space, Tooltip } f
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { useBusinessStore } from '@/mock/business';
-import { canManageOpportunity, opportunityLocked, opportunityMeta, initiationMissing } from '@/mock/opportunities';
+import { canManageOpportunity, opportunityLocked, opportunityMeta } from '@/mock/opportunities';
+import { initiationPrerequisites } from '@/mock/initiation';
 import { useAppStore } from '@/store/useAppStore';
 import { mockUsers } from '@/mock';
 import type { Opportunity } from '@/models/types';
@@ -12,7 +13,7 @@ export function OpportunityActions({ opportunity: o, compact = false }: { opport
  const {canDo}=useActionAccess();
   const { data, dispatch } = useBusinessStore(); const actor = useAppStore(s => s.currentUser); const navigate = useNavigate(); const { message } = App.useApp();
   const [mode,setMode] = useState<'暂缓'|'已终止'>(); const [form] = Form.useForm();
-  const manage = canManageOpportunity(data,o,actor); const readonly = ['已转立项','已终止'].includes(o.status); const missing = initiationMissing(data,o);
+  const manage = canManageOpportunity(data,o,actor); const readonly = ['已转立项','已终止'].includes(o.status); const missing = initiationPrerequisites(data,o);
   const start = () => { try { if (opportunityMeta(data,o).assessments.at(-1)?.status !== '评估中') dispatch({type:'start-opportunity-assessment',id:o.id},actor); navigate(`/opportunities/${o.id}/evaluation`); } catch(e) { message.error((e as Error).message); } };
   return <><Space wrap size={compact ? 0 : 8}>
     {compact && <Button type="link" size="small" onClick={() => navigate(`/opportunities/${o.id}`)}>查看</Button>}
