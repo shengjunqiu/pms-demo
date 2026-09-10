@@ -21,6 +21,7 @@ import { PageHeader } from "@/components/common/PageHeader";
 import { StateView } from "@/components/common/StateView";
 import { MoneyText } from "@/components/common/MoneyText";
 import { useBusinessStore } from "@/mock/business";
+import { canViewSensitiveField } from "@/mock/configuration-access";
 import { visibleProjects } from "@/mock/selectors";
 import {
   evaluationPeople,
@@ -44,10 +45,15 @@ export function PostEvaluationPage() {
   const [confirm, setConfirm] = useState<boolean>();
   const p = data.projects.find((p) => p.id === id);
   if (!p) return <StateView type="404" />;
-  if (!visibleProjects(currentRole, data.projects, data).some((p) => p.id === id))
+  if (
+    !visibleProjects(currentRole, data.projects, data).some((p) => p.id === id)
+  )
     return <StateView type="403" />;
   const e = data.postEvaluations[p.id];
   const archive = data.projectArchives[p.id];
+  const viewEvaluation = canViewSensitiveField(data, currentUser, "evaluation");
+  const viewMargin = canViewSensitiveField(data, currentUser, "margin");
+  const hiddenEvaluation = "评价字段无查看权限";
   const pmo = currentRole === "pmo";
   const pm = currentRole === "project-manager" && currentUser.id === p.pmId;
   const member =
@@ -68,6 +74,13 @@ export function PostEvaluationPage() {
     role: currentRole,
   };
   const templateResult = e ? templateEvaluationResult(e) : undefined;
+  // Writing a single score is independent of viewing existing evaluations.
+  // Without read access, never replace another evaluator's current score.
+  const canEnterTemplate = (rowId: string) =>
+    canScoreTemplate(data, p.id, actor, rowId) &&
+    (viewEvaluation ||
+      !e?.templateScores?.[rowId] ||
+      e.templateScores[rowId].actorId === currentUser.id);
   const run = (action: CloseoutAction) => {
     try {
       dispatch(action, actor);
@@ -79,6 +92,7 @@ export function PostEvaluationPage() {
     }
   };
   const save = (submit: boolean) => {
+    if (!viewEvaluation || !draft) return;
     if (
       run({
         type: "save-post-evaluation",
@@ -127,7 +141,7 @@ export function PostEvaluationPage() {
             ) : (
               <Button
                 type="primary"
-                disabled={!canEdit}
+                disabled={!canEdit || !viewEvaluation}
                 onClick={() => setDraft(structuredClone(e))}
               >
                 编制目标与复盘
@@ -185,7 +199,11 @@ export function PostEvaluationPage() {
                 {
                   key: "margin",
                   label: "结算毛利",
-                  children: <MoneyText value={e.snapshot.margin} />,
+                  children: viewMargin ? (
+                    <MoneyText value={e.snapshot.margin} />
+                  ) : (
+                    "毛利字段无查看权限"
+                  ),
                 },
                 {
                   key: "budget",
@@ -226,7 +244,11 @@ export function PostEvaluationPage() {
                           : "success"
                       }
                       message={`${e.templateSnapshot.name} · V${e.templateSnapshot.version} · ${e.templateSnapshot.id}`}
-                      description={`发起时保存适用模板；已评分 ${templateResult!.scored}/${templateResult!.total} 项，加权分 ${templateResult!.score ?? "尚未形成"}/5。${templateResult!.requiredMissing.length ? `尚缺必填项：${templateResult!.requiredMissing.join("、")}` : "必填评分已完成。"}按已评分条目的权重加权；权重为零的条目不影响加权分。`}
+                      description={
+                        viewEvaluation
+                          ? `发起时保存适用模板；已评分 ${templateResult!.scored}/${templateResult!.total} 项，加权分 ${templateResult!.score ?? "尚未形成"}/5。${templateResult!.requiredMissing.length ? `尚缺必填项：${templateResult!.requiredMissing.join("、")}` : "必填评分已完成。"}按已评分条目的权重加权；权重为零的条目不影响加权分。`
+                          : hiddenEvaluation
+                      }
                     />
                     <Descriptions
                       style={{ margin: "16px 0" }}
@@ -285,33 +307,45 @@ export function PostEvaluationPage() {
                         {
                           title: "当前评分",
                           render: (_, r) =>
-                            e.templateScores?.[r.id]
-                              ? `${e.templateScores[r.id].score}/5`
-                              : "待评分",
+                            !viewEvaluation
+                              ? hiddenEvaluation
+                              : e.templateScores?.[r.id]
+                                ? `${e.templateScores[r.id].score}/5`
+                                : "待评分",
                         },
                         {
                           title: "评价依据",
                           render: (_, r) =>
-                            e.templateScores?.[r.id]?.note ?? "—",
+                            viewEvaluation
+                              ? (e.templateScores?.[r.id]?.note ?? "—")
+                              : hiddenEvaluation,
                         },
                         {
                           title: "评分人 / 日期",
                           render: (_, r) =>
-                            e.templateScores?.[r.id]
-                              ? `${e.templateScores[r.id].actor} / ${e.templateScores[r.id].date}`
-                              : "—",
+                            !viewEvaluation
+                              ? hiddenEvaluation
+                              : e.templateScores?.[r.id]
+                                ? `${e.templateScores[r.id].actor} / ${e.templateScores[r.id].date}`
+                                : "—",
                         },
                         {
                           title: "操作",
                           render: (_, r) => (
                             <Button
-                              disabled={
-                                !canScoreTemplate(data, p.id, actor, r.id)
-                              }
+                              disabled={!canEnterTemplate(r.id)}
                               onClick={() => {
                                 setTemplateRow(r.id);
-                                setScore(e.templateScores?.[r.id]?.score ?? 3);
-                                setNote(e.templateScores?.[r.id]?.note ?? "");
+                                setScore(
+                                  viewEvaluation
+                                    ? (e.templateScores?.[r.id]?.score ?? 3)
+                                    : 3,
+                                );
+                                setNote(
+                                  viewEvaluation
+                                    ? (e.templateScores?.[r.id]?.note ?? "")
+                                    : "",
+                                );
                               }}
                             >
                               记录评分
@@ -327,7 +361,14 @@ export function PostEvaluationPage() {
                     >
                       <Table
                         rowKey={(_, i) => String(i)}
-                        dataSource={e.templateScoreHistory ?? []}
+                        dataSource={
+                          viewEvaluation ? (e.templateScoreHistory ?? []) : []
+                        }
+                        locale={{
+                          emptyText: viewEvaluation
+                            ? "暂无评分历史"
+                            : hiddenEvaluation,
+                        }}
                         columns={[
                           {
                             title: "模板条目",
@@ -354,7 +395,9 @@ export function PostEvaluationPage() {
               {
                 key: "goals",
                 label: "目标达成与经验",
-                children: (
+                children: !viewEvaluation ? (
+                  <Alert type="info" message={hiddenEvaluation} />
+                ) : (
                   <>
                     <Table
                       rowKey="goal"
@@ -437,8 +480,10 @@ export function PostEvaluationPage() {
                         {
                           title: "评价记录",
                           render: (_, person) =>
-                            e.staff.filter((s) => s.userId === person.id)
-                              .length,
+                            viewEvaluation
+                              ? e.staff.filter((s) => s.userId === person.id)
+                                  .length
+                              : hiddenEvaluation,
                         },
                         {
                           title: "操作",
@@ -466,7 +511,12 @@ export function PostEvaluationPage() {
                       style={{ marginTop: 16 }}
                       rowKey={(_, i) => String(i)}
                       size="small"
-                      dataSource={e.staff}
+                      dataSource={viewEvaluation ? e.staff : []}
+                      locale={{
+                        emptyText: viewEvaluation
+                          ? "暂无人员评价"
+                          : hiddenEvaluation,
+                      }}
                       columns={[
                         { title: "人员", dataIndex: "name" },
                         { title: "评分", render: (_, s) => `${s.score}/5` },
@@ -573,8 +623,11 @@ export function PostEvaluationPage() {
                 </Tag>
               )}
             </Space>
+            {!viewEvaluation && (
+              <Alert type="info" message={hiddenEvaluation} />
+            )}
             <Timeline
-              items={e.history.map((h) => ({
+              items={(viewEvaluation ? e.history : []).map((h) => ({
                 children: (
                   <>
                     <b>
@@ -598,7 +651,7 @@ export function PostEvaluationPage() {
         title="编制后评价"
         width={820}
         styles={{ body: { maxHeight: "65vh", overflowY: "auto" } }}
-        open={!!draft}
+        open={!!draft && viewEvaluation}
         onCancel={() => setDraft(undefined)}
         footer={
           <Space>
@@ -610,7 +663,7 @@ export function PostEvaluationPage() {
           </Space>
         }
       >
-        {draft && (
+        {draft && viewEvaluation && (
           <Form layout="vertical">
             {EVALUATION_GOALS.map((g) => (
               <Form.Item key={g} label={g} required>
@@ -677,6 +730,7 @@ export function PostEvaluationPage() {
         open={!!templateRow}
         onCancel={() => setTemplateRow(undefined)}
         onOk={() => {
+          if (!templateRow || !canEnterTemplate(templateRow)) return;
           if (
             run({
               type: "score-post-evaluation",
