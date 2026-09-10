@@ -1,0 +1,39 @@
+{
+  "package_id": "UI-JS1",
+  "items": [
+    "JS-01",
+    "JS-02",
+    "JS-03",
+    "JS-04"
+  ],
+  "owner": "/root/ui_executive",
+  "writer": "/root/ui_executive",
+  "integration_root": "/home/shengjunqiu/code/pms-demo",
+  "workdir": "/tmp/pms-ui-acceptance",
+  "branch": "pms/ui-acceptance",
+  "base_commit": "a931440",
+  "contract_commit": "a931440",
+  "owned_paths": [
+    "src/pages/settlement/AcceptancePage.tsx",
+    "src/pages/settlement/ReportAcceptancePage.tsx",
+    "e2e/ui-acceptance.spec.ts",
+    "e2e/internal-supplier-acceptance.spec.ts",
+    "e2e/settlement.spec.ts"
+  ],
+  "shared_changes": [],
+  "development_dependencies": [],
+  "acceptance_dependencies": [],
+  "acceptance_ready": false,
+  "acceptance_group": "UI-JS1",
+  "status": "assigned",
+  "last_confirmed_at": "2026-09-11",
+  "acceptance_checklist": [
+    "工程检查",
+    "真实验收报验及整改版本链",
+    "双宽与权限",
+    "正式accept"
+  ],
+  "scenarios": "准备文档及addendum",
+  "fixtures": "旧transition前置如实保留，验收评审/报验真实UI",
+  "next_action": "独立实现静态检查提交"
+}

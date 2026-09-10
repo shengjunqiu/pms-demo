@@ -159,24 +159,24 @@
       "round": "R0048"
     },
     "HS-09": {
-      "status": "pending",
-      "reason": "继续全页面UI改造：工时/采购/外包/费用核算与原单，成本互斥和权限保持。"
+      "status": "done",
+      "round": "R0049"
     },
     "HS-10": {
-      "status": "pending",
-      "reason": "继续全页面UI改造：工时/采购/外包/费用核算与原单，成本互斥和权限保持。"
+      "status": "done",
+      "round": "R0049"
     },
     "HS-11": {
-      "status": "pending",
-      "reason": "继续全页面UI改造：工时/采购/外包/费用核算与原单，成本互斥和权限保持。"
+      "status": "done",
+      "round": "R0049"
     },
     "HS-12": {
-      "status": "pending",
-      "reason": "继续全页面UI改造：工时/采购/外包/费用核算与原单，成本互斥和权限保持。"
+      "status": "done",
+      "round": "R0049"
     },
     "HS-13": {
-      "status": "pending",
-      "reason": "继续全页面UI改造：工时/采购/外包/费用核算与原单，成本互斥和权限保持。"
+      "status": "done",
+      "round": "R0049"
     },
     "HS-14": {
       "status": "pending",
@@ -1647,6 +1647,52 @@
         ".pms-loop/runs/R0048/checks.json": "ed5a59e485fae8097a0e770c5a26a1db80b463ce1c8fc613638583781a836882",
         ".pms-loop/runs/R0048/evidence.json": "95f533935d34b5eefe6351d43d1be29567c43c2df2c9d9212bbe807f302f10d6"
       }
+    },
+    {
+      "id": "R0049",
+      "items": [
+        "HS-09",
+        "HS-10",
+        "HS-11",
+        "HS-12",
+        "HS-13"
+      ],
+      "started_at": "2026-09-10T21:37:20+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-10T21:45:49+00:00",
+      "revision": "7b451b07e1f4ac9f44da60d215a06a41cfdf9d1457bef4229a4a62eec2283117",
+      "proof": {
+        ".pms-loop/runs/R0049/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0049/build.log": "894abe7407bcd15eb6e6240b614fe857b01a86c085c90386b03da5ebafbbafad",
+        ".pms-loop/runs/R0049/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0049/test-domain.log": "fd518d98493c0f835ad6b6dfed618e1bcae60852de46e7920275449eb199bb5f",
+        ".pms-loop/runs/R0049/browser-costs.log": "d32eef739f931a5f564efca2a98f00dce7a5536905d8a0b751cd45d8bf57040f",
+        ".pms-loop/runs/R0049/browser-costs.exit.json": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+        ".pms-loop/runs/R0049/artifacts/r0024-cd006778dd0c4a52972c3e9eb1475078d6588816.json": "210eba6210386a938a5a1aa0dfa56f11d14b2f653896ac5b96f83eae5fc2669f",
+        ".pms-loop/runs/R0049/artifacts/r0024-cd006778dd0c4a52972c32a8cc93abc31ac22e7a.json": "c7dcb18c9b7b92e22bbd91c4964c5b397983df357b875719802012c1a56c26b5",
+        ".pms-loop/runs/R0049/artifacts/r0024-cd006778dd0c4a52972c6b2e2f6c62b96d3a34eb.json": "9da07a7e8a8713dc8dc575330e792321efd9d1f9e099a562687f8dfba9845902",
+        ".pms-loop/runs/R0049/artifacts/r0024-cd006778dd0c4a52972c084fad3b556d3017fda5.json": "82789e652bc51c0f628e87e4c4b7c3a35b629e984723081caa7e3f3f5b70c610",
+        ".pms-loop/runs/R0049/artifacts/access-9e7a053a61b60e2af93da706af198d87b613fed7.json": "0e038547853937918e63f715b8e50388e934c792ab81bc178af0b0c775762cad",
+        ".pms-loop/runs/R0049/artifacts/access-9e7a053a61b60e2af93d0f1769df6fce02bce62d.json": "643a81fdb377460b2f3721b599e4a84e07fdfae7ef71de50b31a91683939b342",
+        ".pms-loop/runs/R0049/artifacts/UI-HS09-1440.png": "46b244c2511542015f2c148a27683f01899cbe7abc58b18f75b5ad7ef2c5cbf3",
+        ".pms-loop/runs/R0049/artifacts/UI-HS09-1280.png": "937f56086295ef58e776fe0856813e3e18b1015cd44d05242d520593db91b5b4",
+        ".pms-loop/runs/R0049/artifacts/UI-HS10-1440.png": "5d208de36f6d1e87b73d7efe67dab434327ad5394448a00b818127d42b8a4a90",
+        ".pms-loop/runs/R0049/artifacts/UI-HS10-1280.png": "4366c7d4384a045f4ee2886167421bb3dd620ade059175ddb488e9ab0acc2e97",
+        ".pms-loop/runs/R0049/artifacts/UI-HS11-1440.png": "d173a3000491947f12b0b2be129e2b3feaf741995f82cd0c21be3720dc7c50d9",
+        ".pms-loop/runs/R0049/artifacts/UI-HS11-1280.png": "5a1a7d90b6e1fff63e952a58e5d317095eabed4bcc9ff2ed8f8119054fb0d783",
+        ".pms-loop/runs/R0049/artifacts/UI-HS12-1440.png": "633c3d21e34d28d9e51e652f7c6508a8cbbaec1301f8598091b56697daae0de3",
+        ".pms-loop/runs/R0049/artifacts/UI-HS12-1280.png": "408c092df1bf362b862f6264a6b534e81f122b6369e912b51a9e67ba0defa6fc",
+        ".pms-loop/runs/R0049/artifacts/UI-HS13-1440.png": "1c901aa22d68866c08bc1781f4367376b6f455131064d6c7a6d92d6c0f698f53",
+        ".pms-loop/runs/R0049/artifacts/UI-HS13-1280.png": "babbe5526a8333312d7d832395670e963e1b8e07c731d04cf257a04f63b5710f",
+        ".pms-loop/runs/R0049/checks.json": "33b45ed6d86d0c071d495ace6f2117be645f425ff7c2f655a4657c2d73b4b488",
+        ".pms-loop/runs/R0049/evidence.json": "4e52c13ed301104af45bb82edc925b08959f006f94a1f79e30d0fc74b6135089"
+      }
     }
   ],
   "notes": [
@@ -1933,6 +1979,10 @@
     {
       "at": "2026-09-10T21:37:03+00:00",
       "text": "reopen FINAL, JS-01, JS-02, JS-03, JS-04: 继续全页面UI改造：内部供应商客户验收与报验当前办理、准备条件和版本清晰。"
+    },
+    {
+      "at": "2026-09-10T21:46:15+00:00",
+      "text": "R0049成本五页验收，新UI49/72。7b451b07工程235领域及7浏览器4.5min exit0，五页十张双宽查看；真实采购外包费用/工时一次入账及承诺互斥、预测不变，三权限回归通过。setsid nohup参数化 /tmp/pms-run-tests.py ROUND LABEL specs...稳定完成，等exit.json。继续HS5 93987a5+acdad9d需root旧审批返回筛选和originalIncome快照；JS1 a931440独立开发5owned文件含旧两e2e。"
     }
   ],
   "history": [

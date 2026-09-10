@@ -25,7 +25,7 @@
   "acceptance_dependencies": [],
   "acceptance_ready": true,
   "acceptance_group": "UI-HS4",
-  "status": "integrated_pending_acceptance",
+  "status": "accepted",
   "last_confirmed_at": "2026-09-11",
   "acceptance_checklist": [
     "工程检查",
@@ -35,7 +35,7 @@
   ],
   "scenarios": "按/tmp/pms-ui-costs-preparation.md",
   "fixtures": "真实原单UI链，不伪造金额和状态",
-  "next_action": "正式工程与真实成本入账链",
+  "next_action": "R0049已正式验收",
   "delivery_commit": "df55d7eef0de17d1b4f41caf35cbd26d228f217c",
   "scope_check": "passed",
   "integration_commit": "b79eff0"

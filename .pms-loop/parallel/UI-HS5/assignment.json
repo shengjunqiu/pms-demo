@@ -34,5 +34,5 @@
   "scenarios": "按/tmp/pms-ui-changes-preparation.md",
   "fixtures": "真实UI评估审批，不直接伪造通过状态",
   "next_action": "范围检查已通过，等待工单和成本验收后集成",
-  "delivery_commit": "93987a5cdcadb43439bc1bda6dfed225216b3502"
+  "delivery_commit": "acdad9d0e45b53854ff0869d7df2d31f7430fb3d"
 }
