@@ -1,0 +1,154 @@
+- complementary:
+  - img "safety-certificate":
+  - generic: 企业四算管控平台
+  - menu:
+    - menuitem "dashboard 领导经营驾驶舱" [expanded]:
+      - img "dashboard":
+      - generic: 领导经营驾驶舱
+    - menu:
+      - menuitem "GL-01 项目经营驾驶舱":
+        - generic: GL-01 项目经营驾驶舱
+      - menuitem "GL-02 四算经营专题":
+        - generic: GL-02 四算经营专题
+      - menuitem "GL-03 项目穿透分析":
+        - generic: GL-03 项目穿透分析
+      - menuitem "GL-04 项目组合分析":
+        - generic: GL-04 项目组合分析
+      - menuitem "GL-05 项目异常中心":
+        - generic: GL-05 项目异常中心
+      - menuitem "GL-06 领导待决策事项":
+        - generic: GL-06 领导待决策事项
+    - menuitem "appstore 工作台与待办" [expanded]:
+      - img "appstore":
+      - generic: 工作台与待办
+    - menu:
+      - menuitem "WK-01 项目经理工作台":
+        - generic: WK-01 项目经理工作台
+      - menuitem "WK-02 我的待办中心":
+        - generic: WK-02 我的待办中心
+    - menuitem "dollar 商机与概算阶段":
+      - img "dollar":
+      - generic: 商机与概算阶段
+    - menuitem "project 预算与立项阶段":
+      - img "project":
+      - generic: 预算与立项阶段
+    - menuitem "schedule 核算与执行阶段" [expanded]:
+      - img "schedule":
+      - generic: 核算与执行阶段
+    - menu:
+      - menuitem "HS-01 项目详情总览":
+        - generic: HS-01 项目详情总览
+      - menuitem "HS-02 项目进度":
+        - generic: HS-02 项目进度
+      - menuitem "HS-03 项目日报":
+        - generic: HS-03 项目日报
+      - menuitem "HS-04 项目周报":
+        - generic: HS-04 项目周报
+      - menuitem "HS-05 需求BUG台账":
+        - generic: HS-05 需求BUG台账
+      - menuitem "HS-06 需求BUG详情":
+        - generic: HS-06 需求BUG详情
+      - menuitem "HS-07 问题风险台账":
+        - generic: HS-07 问题风险台账
+      - menuitem "HS-08 问题风险详情":
+        - generic: HS-08 问题风险详情
+      - menuitem "HS-09 工时与人力成本":
+        - generic: HS-09 工时与人力成本
+      - menuitem "HS-10 采购成本":
+        - generic: HS-10 采购成本
+      - menuitem "HS-11 外包成本":
+        - generic: HS-11 外包成本
+      - menuitem "HS-12 项目费用":
+        - generic: HS-12 项目费用
+      - menuitem "HS-13 动态核算":
+        - generic: HS-13 动态核算
+      - menuitem "HS-14 项目变更台账":
+        - generic: HS-14 项目变更台账
+      - menuitem "HS-15 项目变更申请":
+        - generic: HS-15 项目变更申请
+      - menuitem "HS-16 阶段切换申请":
+        - generic: HS-16 阶段切换申请
+      - menuitem "HS-17 阶段交付物":
+        - generic: HS-17 阶段交付物
+    - menuitem "check-circle 结算与收尾阶段":
+      - img "check-circle":
+      - generic: 结算与收尾阶段
+- banner:
+  - button "折叠或展开导航":
+    - img "menu-fold":
+  - generic: WK-02
+  - strong: 我的待办中心
+  - generic: 工作台/列表
+  - generic: "基准日: 2026-09-09"
+  - generic: "角色:"
+  - generic "模拟身份":
+    - combobox "模拟身份"
+    - img "user":
+    - generic: 项目经理 (张建国)
+  - img "user":
+  - generic: 张建国
+- main:
+  - navigation:
+    - list:
+      - link "首页":
+        - /url: /
+      - listitem: /
+      - listitem: 我的待办
+  - heading "WK-02 我的待办中心" [level=4]
+  - generic: 张建国 · 2026-09-09 · 原业务状态实时聚合
+  - separator
+  - generic "待办项目":
+    - combobox "待办项目"
+    - generic: 全部项目
+  - generic "业务类型":
+    - combobox "业务类型"
+    - generic: 业务类型
+  - generic "到期范围":
+    - combobox "到期范围"
+    - generic: 全部时限
+  - textbox "待办搜索":
+    - /placeholder: 编号或标题
+    - text: DAILY-P-001
+  - button "重置筛选":
+    - generic: 重置筛选
+  - paragraph: 演示规则 TODO-1：审批办理期限为提交后3天，任务使用计划截止日；超期在此提醒，不发送外部通知。会签中本人已处理节点进入已办，原单仍等待其他节点。
+  - tablist:
+    - tab "待办（0）"
+    - tab "已办（1）" [active] [selected]
+  - tabpanel "已办（1）"
+  - table:
+    - rowgroup:
+      - row "编号 / 事项 项目 业务类型 / 当前节点 责任人 到期 / 状态 办理意见 原业务":
+        - columnheader "编号 / 事项"
+        - columnheader "项目"
+        - columnheader "业务类型 / 当前节点"
+        - columnheader "责任人"
+        - columnheader "到期 / 状态"
+        - columnheader "办理意见"
+        - columnheader "原业务"
+    - rowgroup:
+      - row "DAILY-P-001-2026-09-09 2026-09-09 项目日报 福建省晋江市岸海防综合治理平台 日报 主PM填报 张建国 2026-09-09 已提交 无进展：客户测试环境尚未开放，已发起协调 进入原业务":
+        - cell "DAILY-P-001-2026-09-09 2026-09-09 项目日报":
+          - text: DAILY-P-001-2026-09-09
+          - generic: 2026-09-09 项目日报
+        - cell "福建省晋江市岸海防综合治理平台"
+        - cell "日报 主PM填报":
+          - text: 日报
+          - generic: 主PM填报
+        - cell "张建国"
+        - cell "2026-09-09 已提交":
+          - text: 2026-09-09
+          - generic: 已提交
+        - cell "无进展：客户测试环境尚未开放，已发起协调"
+        - cell "进入原业务":
+          - button "进入原业务":
+            - generic: 进入原业务
+  - list:
+    - listitem "上一页":
+      - button "left" [disabled]:
+        - img "left":
+    - listitem "1":
+      - generic: "1"
+    - listitem "下一页":
+      - button "right" [disabled]:
+        - img "right":

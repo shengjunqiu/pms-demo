@@ -1,0 +1,218 @@
+- complementary:
+  - img "safety-certificate":
+  - generic: 企业四算管控平台
+  - menu:
+    - menuitem "dashboard 领导经营驾驶舱" [expanded]:
+      - img "dashboard":
+      - generic: 领导经营驾驶舱
+    - menu:
+      - menuitem "GL-01 项目经营驾驶舱":
+        - generic: GL-01 项目经营驾驶舱
+      - menuitem "GL-02 四算经营专题":
+        - generic: GL-02 四算经营专题
+      - menuitem "GL-03 项目穿透分析":
+        - generic: GL-03 项目穿透分析
+      - menuitem "GL-04 项目组合分析":
+        - generic: GL-04 项目组合分析
+      - menuitem "GL-05 项目异常中心":
+        - generic: GL-05 项目异常中心
+      - menuitem "GL-06 领导待决策事项":
+        - generic: GL-06 领导待决策事项
+    - menuitem "appstore 工作台与待办" [expanded]:
+      - img "appstore":
+      - generic: 工作台与待办
+    - menu:
+      - menuitem "WK-01 项目经理工作台":
+        - generic: WK-01 项目经理工作台
+      - menuitem "WK-02 我的待办中心":
+        - generic: WK-02 我的待办中心
+    - menuitem "dollar 商机与概算阶段":
+      - img "dollar":
+      - generic: 商机与概算阶段
+    - menuitem "project 预算与立项阶段":
+      - img "project":
+      - generic: 预算与立项阶段
+    - menuitem "schedule 核算与执行阶段" [expanded]:
+      - img "schedule":
+      - generic: 核算与执行阶段
+    - menu:
+      - menuitem "HS-01 项目详情总览":
+        - generic: HS-01 项目详情总览
+      - menuitem "HS-02 项目进度":
+        - generic: HS-02 项目进度
+      - menuitem "HS-03 项目日报":
+        - generic: HS-03 项目日报
+      - menuitem "HS-04 项目周报":
+        - generic: HS-04 项目周报
+      - menuitem "HS-05 需求BUG台账":
+        - generic: HS-05 需求BUG台账
+      - menuitem "HS-06 需求BUG详情":
+        - generic: HS-06 需求BUG详情
+      - menuitem "HS-07 问题风险台账":
+        - generic: HS-07 问题风险台账
+      - menuitem "HS-08 问题风险详情":
+        - generic: HS-08 问题风险详情
+      - menuitem "HS-09 工时与人力成本":
+        - generic: HS-09 工时与人力成本
+      - menuitem "HS-10 采购成本":
+        - generic: HS-10 采购成本
+      - menuitem "HS-11 外包成本":
+        - generic: HS-11 外包成本
+      - menuitem "HS-12 项目费用":
+        - generic: HS-12 项目费用
+      - menuitem "HS-13 动态核算":
+        - generic: HS-13 动态核算
+      - menuitem "HS-14 项目变更台账":
+        - generic: HS-14 项目变更台账
+      - menuitem "HS-15 项目变更申请":
+        - generic: HS-15 项目变更申请
+      - menuitem "HS-16 阶段切换申请":
+        - generic: HS-16 阶段切换申请
+      - menuitem "HS-17 阶段交付物":
+        - generic: HS-17 阶段交付物
+    - menuitem "check-circle 结算与收尾阶段":
+      - img "check-circle":
+      - generic: 结算与收尾阶段
+- banner:
+  - button "折叠或展开导航":
+    - img "menu-fold":
+  - generic: HS-04
+  - strong: 项目周报
+  - generic: 列表/表单
+  - generic: "基准日: 2026-09-09"
+  - generic: "角色:"
+  - generic "模拟身份":
+    - combobox "模拟身份"
+    - img "user":
+    - generic: 项目经理 (张建国)
+  - img "user":
+  - generic: 张建国
+- main:
+  - navigation:
+    - list:
+      - link "首页":
+        - /url: /
+      - listitem: /
+      - link "福建省晋江市岸海防综合治理平台":
+        - /url: /projects/P-001
+      - listitem: /
+      - listitem: 周报
+  - heading "HS-04 项目周报" [level=4]
+  - generic: P-001 · 福建省晋江市岸海防综合治理平台 · 执行/开发实施
+  - button "查看项目日报":
+    - generic: 查看项目日报
+  - button "打开本周周报":
+    - generic: 打开本周周报
+  - separator
+  - alert:
+    - img "info-circle":
+    - generic: 演示规则 REPORT-1：本周2026-09-07至2026-09-13，仅汇集截至2026-09-09的事实；周五18:00前上报PMO及主责部门，重大项目追加PMC。
+  - table:
+    - rowgroup:
+      - row "WBS实际 / 计划 62.5% / 66.2% 预算 / 实际 / 滚动 2847.7 / 1650 / 2986.2 万元 未关闭问题 / 监控风险 2 / 2":
+        - rowheader "WBS实际 / 计划"
+        - cell "62.5% / 66.2%"
+        - rowheader "预算 / 实际 / 滚动"
+        - cell "2847.7 / 1650 / 2986.2 万元"
+        - rowheader "未关闭问题 / 监控风险"
+        - cell "2 / 2"
+  - textbox "报告查询":
+    - /placeholder: 日期、编号或进展
+  - button "重置查询":
+    - generic: 重置查询
+  - button "查看WBS及里程碑":
+    - generic: 查看WBS及里程碑
+  - button "维护必交材料":
+    - generic: 维护必交材料
+  - button "新增或查看问题风险":
+    - generic: 新增或查看问题风险
+  - generic: 周报记录 · 已上报版本只读
+  - table:
+    - rowgroup:
+      - row "周报周期 进展摘要 成本快照 状态 填报人":
+        - columnheader "周报周期"
+        - columnheader "进展摘要"
+        - columnheader "成本快照"
+        - columnheader "状态"
+        - columnheader "填报人"
+    - rowgroup:
+      - row "2026-09-07 ~ 2026-09-13 截至2026-09-09，汇集3份日报；WBS实际62.5%，计划66.2%。 2026-09-09：无进展：客户测试环境尚未开放，已发起协调 2026-09-08：完成系统核心模块接口对接联调与单元测试 2026-09-07：完成系统核心模块接口对接联调与单元测试 预算2847.7 / 已发生1650 / 滚动2986.2万元 已上报 张建国":
+        - cell "2026-09-07 ~ 2026-09-13":
+          - button "2026-09-07 ~ 2026-09-13":
+            - generic: 2026-09-07 ~ 2026-09-13
+        - cell "截至2026-09-09，汇集3份日报；WBS实际62.5%，计划66.2%。 2026-09-09：无进展：客户测试环境尚未开放，已发起协调 2026-09-08：完成系统核心模块接口对接联调与单元测试 2026-09-07：完成系统核心模块接口对接联调与单元测试"
+        - cell "预算2847.7 / 已发生1650 / 滚动2986.2万元"
+        - cell "已上报":
+          - generic: 已上报
+        - cell "张建国"
+      - row "2026-W36 (09.01 - 09.07) 当前累计完工比例62.5%，详见项目有效计划 滚动成本高于预算138.5万元 历史导入 张建国":
+        - cell "2026-W36 (09.01 - 09.07)":
+          - button "2026-W36 (09.01 - 09.07)":
+            - generic: 2026-W36 (09.01 - 09.07)
+        - cell "当前累计完工比例62.5%，详见项目有效计划"
+        - cell "滚动成本高于预算138.5万元"
+        - cell "历史导入":
+          - generic: 历史导入
+        - cell "张建国"
+      - row "2026-W35 (08.25 - 08.31) 当前累计完工比例62.5%，详见项目有效计划 滚动成本高于预算138.5万元 历史导入 张建国":
+        - cell "2026-W35 (08.25 - 08.31)":
+          - button "2026-W35 (08.25 - 08.31)":
+            - generic: 2026-W35 (08.25 - 08.31)
+        - cell "当前累计完工比例62.5%，详见项目有效计划"
+        - cell "滚动成本高于预算138.5万元"
+        - cell "历史导入":
+          - generic: 历史导入
+        - cell "张建国"
+  - list:
+    - listitem "上一页":
+      - button "left" [disabled]:
+        - img "left":
+    - listitem "1":
+      - generic: "1"
+    - listitem "下一页":
+      - button "right" [disabled]:
+        - img "right":
+- dialog "周报快照与上报范围":
+  - button "关闭":
+    - img "close":
+  - generic: 周报快照与上报范围
+  - table:
+    - rowgroup:
+      - row "原报告 WR-NEW-111":
+        - rowheader "原报告"
+        - cell "WR-NEW-111"
+      - row "状态 已上报":
+        - rowheader "状态"
+        - cell "已上报"
+      - row "本期进展 截至2026-09-09，汇集3份日报；WBS实际62.5%，计划66.2%。 2026-09-09：无进展：客户测试环境尚未开放，已发起协调 2026-09-08：完成系统核心模块接口对接联调与单元测试 2026-09-07：完成系统核心模块接口对接联调与单元测试":
+        - rowheader "本期进展"
+        - cell "截至2026-09-09，汇集3份日报；WBS实际62.5%，计划66.2%。 2026-09-09：无进展：客户测试环境尚未开放，已发起协调 2026-09-08：完成系统核心模块接口对接联调与单元测试 2026-09-07：完成系统核心模块接口对接联调与单元测试":
+          - generic: 截至2026-09-09，汇集3份日报；WBS实际62.5%，计划66.2%。 2026-09-09：无进展：客户测试环境尚未开放，已发起协调 2026-09-08：完成系统核心模块接口对接联调与单元测试 2026-09-07：完成系统核心模块接口对接联调与单元测试
+      - row "下期计划 待客户确认测试环境后继续联调":
+        - rowheader "下期计划"
+        - cell "待客户确认测试环境后继续联调"
+      - row "协调事项 请PMO协调客户开放联调环境":
+        - rowheader "协调事项"
+        - cell "请PMO协调客户开放联调环境"
+      - row "模拟上报范围 PMO负责人 李主任、交付中心一部负责人、PMC委员会":
+        - rowheader "模拟上报范围"
+        - cell "PMO负责人 李主任、交付中心一部负责人、PMC委员会"
+      - row "提交/生成时快照 截至2026-09-09，WBS实际62.5% / 计划66.2%；预算2847.7 / 实际1650 / 滚动2986.2万元":
+        - rowheader "提交/生成时快照"
+        - cell "截至2026-09-09，WBS实际62.5% / 计划66.2%；预算2847.7 / 实际1650 / 滚动2986.2万元"
+      - row "里程碑快照 启动：已达成（计划2026-08-01 / 实际2026-08-01）；开发完成：已达成（计划2026-08-01 / 实际2026-08-01）；内部初验：未达成（计划2026-09-20 / 实际未达成）；客户终验：未达成（计划2026-12-31 / 实际未达成）":
+        - rowheader "里程碑快照"
+        - cell "启动：已达成（计划2026-08-01 / 实际2026-08-01）；开发完成：已达成（计划2026-08-01 / 实际2026-08-01）；内部初验：未达成（计划2026-09-20 / 实际未达成）；客户终验：未达成（计划2026-12-31 / 实际未达成）"
+  - generic: 独立业务来源
+  - paragraph: 日报 DR-NEW-311、DR-0001、DR-0066；WBS 8项
+  - button "ISSUE-0001":
+    - generic: ISSUE-0001
+  - button "ISSUE-0066":
+    - generic: ISSUE-0066
+  - button "RSK-0001":
+    - generic: RSK-0001
+  - button "RSK-0002":
+    - generic: RSK-0002
+  - paragraph: 报告保留当时数量和成本快照，原问题风险继续独立流转；不覆盖WBS基线。
+  - alert:
+    - generic: 已于2026-09-09完成站内模拟上报，历史快照已保留。

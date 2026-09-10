@@ -1,3 +1,4 @@
+import type { ReportSnapshot } from '@/mock/reports';
 // 组织架构
 export interface Department {
   id: string;
@@ -184,6 +185,7 @@ export interface WbsTask {
 
 // 里程碑
 export interface Milestone {
+  completionNote?: string;
   id: string;
   projectId: string;
   name: string;
@@ -248,6 +250,7 @@ export interface Risk {
 
 // 日报
 export interface DailyReport {
+  status?: '草稿' | '已提交'; reportedProgress?: number; hasProgress?: boolean; noProgressReason?: string; coordination?: string; linkedIds?: string[]; snapshot?: ReportSnapshot;
   id: string;
   projectId: string;
   date: string;
@@ -259,6 +262,7 @@ export interface DailyReport {
 
 // 周报
 export interface WeeklyReport {
+  status?: '草稿' | '已上报'; weekStart?: string; submittedAt?: string; coordination?: string; recipients?: string[]; snapshot?: ReportSnapshot;
   id: string;
   projectId: string;
   weekSpan: string;

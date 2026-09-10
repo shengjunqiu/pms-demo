@@ -135,12 +135,12 @@
       "round": "R0013"
     },
     "HS-03": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0017"
     },
     "HS-04": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0017"
     },
     "HS-05": {
       "status": "done",
@@ -191,8 +191,8 @@
       "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
     },
     "HS-17": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0017"
     },
     "JS-01": {
       "status": "pending",
@@ -304,7 +304,7 @@
     },
     "FINAL": {
       "status": "pending",
-      "reason": "按真实依赖拆分验收轮次，先验收进度与待办；工作台待原业务入口完成后继续。"
+      "reason": "合并交付物依赖后继续同一业务闭环"
     }
   },
   "runs": [
@@ -688,6 +688,53 @@
         ".pms-loop/runs/R0015/checks.json": "3b6ad9459e08e2ef150eafafc0a8afbaa770a26fcc7da7b91f1d3af71b6805b4",
         ".pms-loop/runs/R0015/evidence.json": "1e3e696bbdd8d61da93dc33833fb8b74c0a1c83bb2679fb8d8da0995b41fd0bc"
       }
+    },
+    {
+      "id": "R0016",
+      "items": [
+        "HS-03",
+        "HS-04"
+      ],
+      "started_at": "2026-09-09T18:07:13+00:00",
+      "status": "deferred",
+      "reason": "日报里程碑达成需审核通过的材料，合并HS-17阶段交付物实现同一验收闭环",
+      "ended_at": "2026-09-09T18:07:41+00:00"
+    },
+    {
+      "id": "R0017",
+      "items": [
+        "HS-03",
+        "HS-04",
+        "HS-17"
+      ],
+      "started_at": "2026-09-09T18:07:52+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-10T00:42:22+00:00",
+      "revision": "9fc8c2c293f505ee25a4374197bbf0eb301aed0daf51783c26f1a5e37d3f64fe",
+      "proof": {
+        ".pms-loop/runs/R0017/test-domain.log": "63a8bc43927237142b39fc95219dacfd286b6b5691db596d9c7a967d3caea53a",
+        ".pms-loop/runs/R0017/build.log": "39215f48e35890248bf6e19ac5a59023569250ac370ac356fac811a15aa51e62",
+        ".pms-loop/runs/R0017/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0017/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0017/artifacts/console.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        ".pms-loop/runs/R0017/artifacts/daily-todo.txt": "6b958387c3b4045a7fd65181c3d9fb9a2f599f80c357271520af59d62a6cbd08",
+        ".pms-loop/runs/R0017/artifacts/hs-03-1440.png": "5e9833c57e5c7e58c8e6e95c72d334a669d978190ea6c9b1fd7b1f6613bd6347",
+        ".pms-loop/runs/R0017/artifacts/hs-03-1280.png": "f799de0b13703d437ab94d3d907586571a9f67b5e2538184076722e4dcf7061a",
+        ".pms-loop/runs/R0017/artifacts/weekly-snapshot.txt": "0635ba4c704cc896ea999f6354fa423177d80f6e24a5f48b1773c95d1ddf4bfa",
+        ".pms-loop/runs/R0017/artifacts/hs-04-1440.png": "a2021cb2d8fbd661d13f9ede497f7570c9f32bd6c1ddd0dc63478292cbdea445",
+        ".pms-loop/runs/R0017/artifacts/hs-04-1280.png": "fe30989e54a0860128fae032ed416758a1af91db78b7bd3fb7a5959a91eea4d0",
+        ".pms-loop/runs/R0017/artifacts/hs-17-versions.png": "9a653c58df90afe84dd5cece4137f1b8a2972cdb0c31b9c9b4b4f3721e64c245",
+        ".pms-loop/runs/R0017/artifacts/hs-17-1440.png": "fe5fac3088531a6a20065da322e46de9fab0aa2648d5bb304da6d266a2fb3a49",
+        ".pms-loop/runs/R0017/artifacts/hs-17-1280.png": "4da321bbf794495ce00f9034bbef4e03aa8b87bf2db93e5a31377a19d6a8565c",
+        ".pms-loop/runs/R0017/checks.json": "5a8485bafdc7284da6defc50d101de1aabc67e79d0705880deb0c369bbae3971",
+        ".pms-loop/runs/R0017/evidence.json": "b31392955d84bcb0aff9f7c8ed42553bed17e784c49c664479e60307ec861606"
+      }
     }
   ],
   "notes": [
@@ -734,6 +781,26 @@
     {
       "at": "2026-09-09T17:11:16+00:00",
       "text": "R0013正在实现HS02/WK02：真实任务执行更新、计划变更/阶段原单、超过30天PMO+财务全通过会签。浏览器已验证P001任务完成62.5→75，待办转已办；35天会签PMO后待审、财务后V2与终验2027-02-04；阶段缺材料通过被拒、驳回原单。需最终check（最近修改待办只保留指定责任角色、合同验收日期字段、完成任务日期缺失文案）、双宽度截图、控制台及验收提交。WK01仍待采购外包等原表单依赖。"
+    },
+    {
+      "at": "2026-09-09T18:07:41+00:00",
+      "text": "R0016阻塞: 日报里程碑达成需审核通过的材料，合并HS-17阶段交付物实现同一验收闭环"
+    },
+    {
+      "at": "2026-09-09T18:07:52+00:00",
+      "text": "reopen FINAL, HS-03, HS-04: 合并交付物依赖后继续同一业务闭环"
+    },
+    {
+      "at": "2026-09-09T18:24:17+00:00",
+      "text": "R0017（HS-03/HS-04/HS-17）已实现日报草稿/提交/独立问题关联、周报快照与模拟上报、交付物版本/质量整改/PMO审核/归档、里程碑材料日期校验及WK02联动。39领域测试已通过；新增实施计划导入目录后正在重跑最终check。浏览器曾成功打开日报初态，但CUA随后超时并重置，getState连续返回apps=[]/browsers=[]，createBrowserTab返回Browser is not available: iab；open_in_codex预览未响应已终止等待。evidence保持未验收；恢复浏览器后继续当前轮次，不重复begin。待验证：日报无进展草稿→提交/待办、周报生成补充上报/来源快照、文档质量失败→独立整改→复查、文件v1退回→v2通过、材料通过后里程碑实际达成，三页1440/1280截图及控制台。R0015已提交02a7041，累计17/72页；所有R0017源码尚未提交。"
+    },
+    {
+      "at": "2026-09-09T18:24:37+00:00",
+      "text": "R0017最终check已通过：revision=9d79d16b0a83735864a516b54d11fa73318e298902307882d85b389b792ba168，typecheck/lint/build/test:domain全通过（39测试）。仅剩实际浏览器业务回归、三页双宽截图和证据验收；浏览器连接未恢复，不能accept或按完成提交。继续时先恢复CUA可用浏览器，再沿R0017验证。"
+    },
+    {
+      "at": "2026-09-10T00:20:20+00:00",
+      "text": "用户指出此前验证标签页过多。2026-09-10复查CUA：内置浏览器连接已恢复，当前tabs=[]，无遗留页可关闭。后续浏览器验收只复用一个测试标签页，通过站内导航切换页面和角色；完成证据保存后及时关闭，不再逐轮新建并累积标签页。标签过多可能增加负载，但尚无证据证明是上次断连的直接原因。R0017仍待浏览器验收。"
     }
   ]
 }

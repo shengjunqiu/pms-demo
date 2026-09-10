@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "round": "R0017",
+  "revision": "9fc8c2c293f505ee25a4374197bbf0eb301aed0daf51783c26f1a5e37d3f64fe",
+  "items": {
+    "HS-03": {
+      "entry": "/projects/P-001/daily-reports",
+      "covered_features": [
+        "HS-013",
+        "HS-014",
+        "HS-015",
+        "HS-016",
+        "HS-017"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "plan.json来源：页面清单第133行、任务书第432行；逐项落实HS-013、HS-014、HS-015、HS-016、HS-017。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "实际从执行菜单进入P-001日报，日报→周报、交付物及WK-02原业务返回均保留项目。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "P-001中文报告；已提交与历史缺省字段区分；WBS实际62.5%、计划66.2%，成本2847.7/1650/2986.2万元。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "无进展原因留空提交被拦截；填写后保存草稿、恢复、确认提交DR-NEW-311；不可重复提交。材料待审核阻断内部初验，全部通过后实际达成2026-09-09。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "日报提交不改写WBS；WK-02 DAILY-P-001-2026-09-09待办0/已办1且意见保留无进展原因；里程碑计划2026-09-20未改。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "实际查询不存在关键词显示暂无数据，重置恢复；UNKNOWN项目显示404，主PM访问P-002显示403。数据为同步本地共享状态，路由加载沿用公共加载组件；业务错误保留表单并显示具体原因。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "实际查看1440×900和1280×900 PNG；表格局部横滚、字段与操作可用。修复Modal被Drawer遮挡，文档操作已重测通过。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "浏览器全流程及404/403检查后读取error/warn均为空，保存console.json。"
+        },
+        "business-1": {
+          "requirement": "自动日报待办，项目带入、进展/无进展原因、下一步和里程碑",
+          "passed": true,
+          "observation": "执行项目日报自动聚合为主PM待办；草稿恢复、无进展必填、下一步及项目比例已实际操作，日报提交进入已办。"
+        },
+        "business-2": {
+          "requirement": "问题风险独立关联；里程碑完成需实际时间和材料",
+          "passed": true,
+          "observation": "领域测试拒绝跨项目问题风险关联；同项目关联ID保持独立对象。浏览器证明待审核测试报告阻断里程碑，PMO通过后可登记实际日期，计划日期不变。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "无进展原因留空提交被拦截；填写后保存草稿、恢复、确认提交DR-NEW-311；不可重复提交。材料待审核阻断内部初验，全部通过后实际达成2026-09-09。",
+          "expected": "自动日报待办，项目带入、进展/无进展原因、下一步和里程碑；问题风险独立关联；里程碑完成需实际时间和材料",
+          "observed": "日报提交不改写WBS；WK-02 DAILY-P-001-2026-09-09待办0/已办1且意见保留无进展原因；里程碑计划2026-09-20未改。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0017/artifacts/console.json",
+        ".pms-loop/runs/R0017/test-domain.log",
+        ".pms-loop/runs/R0017/artifacts/daily-todo.txt"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0017/artifacts/hs-03-1440.png",
+        "1280": ".pms-loop/runs/R0017/artifacts/hs-03-1280.png"
+      }
+    },
+    "HS-04": {
+      "entry": "/projects/P-001/weekly-reports",
+      "covered_features": [
+        "HS-018",
+        "HS-019"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "plan.json来源：页面清单第134行、任务书第433行；逐项落实HS-018、HS-019。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "日报与周报互跳，打开WR-NEW-111快照抽屉并关闭返回原项目；来源列出日报、WBS和独立问题风险原ID。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "本周2026-09-07至09-13汇集截至09-09的3份日报，历史导入记录明确标记；成本与WBS摘要显示来源口径。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "生成本周草稿，补充协调事项后确认模拟上报；已上报抽屉显示日期及只读状态。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "周报汇集DR-NEW-311、DR-0001、DR-0066及8项WBS；内部初验随后达成，但已上报快照仍保留当时未达成状态；成本1650/滚动2986.2不变。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "实际查询不存在关键词显示暂无数据，重置恢复；UNKNOWN项目显示404，主PM访问P-002显示403。数据为同步本地共享状态，路由加载沿用公共加载组件；业务错误保留表单并显示具体原因。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "实际查看1440×900和1280×900 PNG；表格局部横滚、字段与操作可用。修复Modal被Drawer遮挡，文档操作已重测通过。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "浏览器全流程及404/403检查后读取error/warn均为空，保存console.json。"
+        },
+        "business-1": {
+          "requirement": "由日报/计划/成本/风险聚合周报草稿",
+          "passed": true,
+          "observation": "实际生成周报草稿，自动包含3份日报、62.5%/66.2%进度、成本和2问题2风险。"
+        },
+        "business-2": {
+          "requirement": "可补充提交，模拟上报范围/历史保留且不发送真实消息",
+          "passed": true,
+          "observation": "补充“请PMO协调客户开放联调环境”后模拟上报；范围PMO李主任、交付中心一部负责人、PMC委员会。仅共享前端状态，没有外部消息调用，历史快照只读。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "生成本周草稿，补充协调事项后确认模拟上报；已上报抽屉显示日期及只读状态。",
+          "expected": "由日报/计划/成本/风险聚合周报草稿；可补充提交，模拟上报范围/历史保留且不发送真实消息",
+          "observed": "周报汇集DR-NEW-311、DR-0001、DR-0066及8项WBS；内部初验随后达成，但已上报快照仍保留当时未达成状态；成本1650/滚动2986.2不变。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0017/artifacts/console.json",
+        ".pms-loop/runs/R0017/test-domain.log",
+        ".pms-loop/runs/R0017/artifacts/weekly-snapshot.txt"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0017/artifacts/hs-04-1440.png",
+        "1280": ".pms-loop/runs/R0017/artifacts/hs-04-1280.png"
+      }
+    },
+    "HS-17": {
+      "entry": "/projects/P-001/deliverables",
+      "covered_features": [
+        "HS-020",
+        "HS-021",
+        "HS-022",
+        "HS-023",
+        "HS-075",
+        "HS-076",
+        "HS-077",
+        "PT-015",
+        "PT-016",
+        "PT-017",
+        "PT-018",
+        "PT-019",
+        "PT-020"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "plan.json来源：页面清单第147行、任务书第446行；逐项落实HS-020、HS-021、HS-022、HS-023、HS-075、HS-076、HS-077、PT-015、PT-016、PT-017、PT-018、PT-019、PT-020。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "日报进入P-001交付物；质量整改按钮进入HS-08独立问题，浏览器返回保留质量Tab；PM/PMO菜单进入原材料审核。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "DOC-1目录含测试报告、验收确认函、实施计划及阶段、必交、责任人时点。导入已通过但缺原文件的记录明确提示。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "不合格检查生成ISSUE-NEW-106重大整改；整改未关闭拦截复查，责任人提交解决+PM最终关闭后复查通过。测试报告V1被PMO驳回，PM上传V2并重新送审，PMO通过；旧意见仍保留。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "质量整改使用原问题台账流转，关闭后材料送审开放；必交通过3/3联动日报里程碑。PM不能审核、PMO不能上传；执行期归档按钮禁用。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "实际查询不存在关键词显示暂无数据，重置恢复；UNKNOWN项目显示404，主PM访问P-002显示403。数据为同步本地共享状态，路由加载沿用公共加载组件；业务错误保留表单并显示具体原因。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "实际查看1440×900和1280×900 PNG；表格局部横滚、字段与操作可用。修复Modal被Drawer遮挡，文档操作已重测通过。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "浏览器全流程及404/403检查后读取error/warn均为空，保存console.json。"
+        },
+        "business-1": {
+          "requirement": "类型阶段模板、必交责任时点、文件名版本审核归档",
+          "passed": true,
+          "observation": "浏览器验证模板目录、文件名登记、V1/V2历史与PMO意见。领域测试覆盖收尾归档后写入锁定及执行期禁止归档；本次浏览器未执行收尾归档。"
+        },
+        "business-2": {
+          "requirement": "模拟上传不出网，必交审核未通过阻断阶段，质量检查整改关联",
+          "passed": true,
+          "observation": "文件仅登记名称，未上传外部；质量未通过时提交被拦截，待审核材料阻断内部初验，独立整改关闭后复查及材料送审成功。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "不合格检查生成ISSUE-NEW-106重大整改；整改未关闭拦截复查，责任人提交解决+PM最终关闭后复查通过。测试报告V1被PMO驳回，PM上传V2并重新送审，PMO通过；旧意见仍保留。",
+          "expected": "类型阶段模板、必交责任时点、文件名版本审核归档；模拟上传不出网，必交审核未通过阻断阶段，质量检查整改关联",
+          "observed": "质量整改使用原问题台账流转，关闭后材料送审开放；必交通过3/3联动日报里程碑。PM不能审核、PMO不能上传；执行期归档按钮禁用。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0017/artifacts/console.json",
+        ".pms-loop/runs/R0017/test-domain.log",
+        ".pms-loop/runs/R0017/artifacts/hs-17-versions.png"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0017/artifacts/hs-17-1440.png",
+        "1280": ".pms-loop/runs/R0017/artifacts/hs-17-1280.png"
+      }
+    }
+  }
+}
