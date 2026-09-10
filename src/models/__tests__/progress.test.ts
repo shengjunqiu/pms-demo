@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { createBusinessState, transition } from '@/mock/business';
+import { createBusinessState, transition } from '@/mock/business-domain';
 import { useAppStore } from '@/store/useAppStore';
 import { selectTodos } from '@/mock/todos';
 const pm = { id: 'U-001', name: '张建国', role: 'project-manager' as const };

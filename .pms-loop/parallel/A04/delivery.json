@@ -12,10 +12,11 @@
     "integration_domain": "116 tests passed after C03 integration"
   },
   "artifacts": [],
-  "remaining_dependencies": [
-    "正式双宽度浏览器与业务验收"
-  ],
+  "remaining_dependencies": [],
   "formal_rounds": [],
   "status": "integrated",
-  "next_action": "验收冲刺库存；只准备场景与缺陷，不从旧分支继续普通开发"
+  "next_action": "验收冲刺库存；只准备场景与缺陷，不从旧分支继续普通开发",
+  "acceptance_checklist": [
+    "正式双宽度浏览器与业务验收"
+  ]
 }

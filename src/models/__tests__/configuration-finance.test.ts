@@ -1,5 +1,5 @@
 import { describe,it,expect } from 'vitest';
-import { createBusinessState,transition,type Actor } from '@/mock/business';
+import { createBusinessState,transition,type Actor } from '@/mock/business-domain';
 import { collectConfiguredAlerts,configuredSubjects,mapCostSource,selectConfiguredHealth,selectCostRate } from '@/mock/configuration-finance';
 import { selectFourCalculations } from '@/mock/selectors';
 import { getBudgetDraft,lineAmount,toBudgetVersion } from '@/mock/budget-drafts';

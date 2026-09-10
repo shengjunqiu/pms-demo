@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { createBusinessState, transition } from '@/mock/business';
+import { createBusinessState, transition } from '@/mock/business-domain';
 import { costAvailability, type CostOrderAction } from '@/mock/cost-orders';
 import { selectFourCalculations } from '@/mock/selectors';
 import { sumMoney } from '@/utils/money';

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createBusinessState, transition } from '@/mock/business';
+import { createBusinessState, transition } from '@/mock/business-domain';
 import { projectEstimate } from '@/mock/versions';
 import { selectFourCalculations, selectReceipts } from '@/mock/selectors';
 import { projectExceptions } from '@/mock/exceptions';

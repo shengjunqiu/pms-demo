@@ -34,7 +34,7 @@ python3 skills/pms-prototype-loop/scripts/check_delivery.py \
   --allow 'src/models/__tests__/closeout.test.ts'
 ```
 
-`business.ts` 逐包保持薄的组合入口：新模块导出状态类型、初始化函数和动作处理器；业务校验留在本域。拆分时保持单一 store、纯 transition 与现有领域行为，不同时重写所有模块。
+`business.ts` 保留UI Store及兼容导出，`business-domain.ts`承载无Store初始化副作用的状态工厂与transition，两者都由协调者单写。领域测试从`business-domain.ts`导入，仅Store集成测试导入`business.ts`；不从纯领域入口反向导入运行时Store。领域测试仍保持隔离和统一真实业务规则，不通过关闭隔离或放宽超时提速。逐包保持薄的组合入口：新模块导出状态类型、初始化函数和动作处理器；业务校验留在本域。拆分时保持单一 store、纯 transition 与现有领域行为，不同时重写所有模块。
 
 ## 分配单与交付单
 
@@ -49,6 +49,7 @@ python3 skills/pms-prototype-loop/scripts/check_delivery.py \
 | `contract_commit` | 本包依赖的公共接口提交号 |
 | `owned_paths / shared_changes` | 独占路径、已确认共享改动清单 |
 | `development_dependencies / acceptance_dependencies` | 开始实现与可正式验收的计划前置，分开记录；delivery存在时，其`remaining_dependencies`是当前未解决项的权威列表，依赖解决后允许为空数组 |
+| `acceptance_checklist` | 正式轮次内待执行的工程检查、浏览器动作、截图和accept；不属于开始验收的前置依赖，不预填实际结果 |
 | `acceptance_ready / acceptance_group` | 仅协调者核对集成版本后将前者设为`true`；后者标识≤5页且共享角色、fixture、业务状态和连续跳转的闭环。缺字段表示尚未确认，不可直接begin |
 | `scenarios / fixtures` | 正常、阻断、角色、跨页场景，真实对象ID或创建步骤 |
 | `status / next_action` | `assigned / in_progress / submitted / integrated / integrated_pending_acceptance / needs_revision / blocked / accepted / archived / superseded` 与准确下一步；页面是否done只读正式状态。`accepted`只表示该包所含页面已在正式状态完成，`superseded`必须指向替代包，均不得自行改页面状态 |
@@ -71,6 +72,12 @@ python3 skills/pms-prototype-loop/scripts/pipeline.py --root "$PWD"
 ```
 
 该脚本只读取 `.pms-loop/state.json` 与 `.pms-loop/parallel/*/{assignment,delivery}.json`，不修改正式状态或调度记录。它输出活动轮次、基于run阶段的集成冻结状态、已集成待验收库存、重复页面归属、活跃包中的已验收页面、空包、未覆盖页面和显式就绪的验收分组。缺少`acceptance_ready: true`、`acceptance_group`或仍有验收依赖时只列为库存，不直接建议`begin`；`--batch-size`只控制库存展示切片。需要机器处理时用 `--format json`；治理检查用 `--strict`，任何错误或WIP超限都返回非零。
+
+派发普通页面开发包前运行 `pipeline.py --root "$PWD" --check-dispatch`，返回0才继续派发；达到任一WIP上限或有调度错误时返回1，先处理报告原因。此门禁不启动agent，也不能阻止绕过命令的手动派发。验收准备、自动化和当前缺陷修复按现有空闲席位分配，仍遵守单写者和资源队列。
+
+`acceptance_ready`表示协调者已核对真实依赖、入口及fixture，可以开始正式验收；不是已通过验收。缺失接口、未实现下钻及阻断缺陷写入`remaining_dependencies`，正式检查/截图/accept写入`acceptance_checklist`。旧记录迁移不能自动把ready设为true。命名闭环中的未集成成员也会阻断整组，不能仅选其中已经集成的成员开始验收。
+
+支持包使用`package_kind: acceptance-test-support / acceptance-preparation / cross-cutting-delivery`，可没有页面归属，但仍计入开发WIP；不得靠该标记隐藏普通页面任务。当前轮正式check之前先执行本轮定向业务预检，把可发现的缺陷留在冻结前修复。
 
 默认WIP上限如下；可用命令行参数临时收紧，但提高上限不能代替处理瓶颈：
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createBusinessState, transition, type Actor } from "@/mock/business";
+import { createBusinessState, transition, type Actor } from "@/mock/business-domain";
 import { closeChecks, operationExpiry } from "@/mock/operations";
 import { AS_OF_DATE, mockSettlements } from "@/mock";
 import type { OperationHandover } from "@/models/operations";

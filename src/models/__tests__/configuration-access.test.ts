@@ -1,5 +1,5 @@
 import { describe,it,expect } from 'vitest';
-import { createBusinessState,type Actor } from '@/mock/business';
+import { createBusinessState,type Actor } from '@/mock/business-domain';
 import { applyAccessConfiguration,buildAuditChanges,canAccessAction,canAccessPage,canAccessProject,canViewSensitiveField,createAccessConfiguration,redactAuditEvent,selectAccessPolicy } from '@/mock/configuration-access';
 import type { AuditEvent } from '@/models/configuration-access';
 const admin:Actor={id:'U-ADMIN',name:'Admin',role:'admin'},pm:Actor={id:'U-001',name:'张建国',role:'project-manager'},finance:Actor={id:'U-004',name:'刘敏',role:'finance'},tech:Actor={id:'U-005',name:'赵工',role:'solution-tech'};

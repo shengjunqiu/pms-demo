@@ -1,6 +1,6 @@
 import { describe,it,expect } from 'vitest';
 import { mockProjects } from '@/mock';
-import {createBusinessState,transition,type Actor,type BusinessState} from '@/mock/business';
+import {createBusinessState,transition,type Actor,type BusinessState} from '@/mock/business-domain';
 import {acceptanceConditions,acceptanceDetail,checkNames,confirmedReportedAmount,reportAmount,supplierSources} from '@/mock/acceptance';
 import type { AcceptanceRecord } from '@/models/types';
 import type {AcceptanceReport} from '@/models/settlement';

@@ -4,7 +4,7 @@ import {
   transition,
   type Actor,
   type BusinessState,
-} from "@/mock/business";
+} from "@/mock/business-domain";
 import {
   archiveChecks,
   archiveSources,

@@ -14,7 +14,9 @@ export default defineConfig({
     trace: 'off',
     baseURL: 'http://127.0.0.1:4179',
     browserName: 'chromium',
-    channel: 'chrome',
+    channel: process.env.PMS_BROWSER_EXECUTABLE ? undefined : 'chrome',
+    launchOptions: process.env.PMS_BROWSER_EXECUTABLE
+      ? { executablePath: process.env.PMS_BROWSER_EXECUTABLE } : undefined,
     viewport: { width: 1440, height: 900 },
   },
   webServer: { command: 'pnpm dev --host 127.0.0.1 --port 4179 --strictPort', url: 'http://127.0.0.1:4179', reuseExistingServer: false, gracefulShutdown: { signal: 'SIGTERM', timeout: 5000 } },

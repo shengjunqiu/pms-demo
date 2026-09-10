@@ -10,7 +10,7 @@ SCRIPT = Path(__file__).with_name('check_delivery.py')
 
 class DeliveryTests(unittest.TestCase):
     def test_shared_interfaces_cannot_be_whitelisted(self):
-        self.check_paths(['src/hooks/useActionAccess.ts', 'src/mock/access.ts',
+        self.check_paths(['src/mock/business-domain.ts', 'src/hooks/useActionAccess.ts', 'src/mock/access.ts',
                           'src/mock/configuration-access.ts', 'src/models/configuration-access.ts'], False)
 
     def test_owned_domain_delivery_is_allowed(self):

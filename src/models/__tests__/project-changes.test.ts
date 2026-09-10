@@ -1,5 +1,5 @@
 import {it,expect} from 'vitest';
-import {createBusinessState,createDemoBusinessState,transition,type Actor,type BusinessState} from '@/mock/business';
+import {createBusinessState,createDemoBusinessState,transition,type Actor,type BusinessState} from '@/mock/business-domain';
 import {defaultChangeInput} from '@/mock/changes';
 const pm:Actor={id:'U-001',name:'张建国',role:'project-manager'},pmo:Actor={id:'U-002',name:'李主任',role:'pmo'},leader:Actor={id:'U-003',name:'王总',role:'executive'};
 const experts:Actor[]=[{id:'U-005',name:'赵工',role:'solution-tech'},{id:'U-004',name:'刘敏',role:'finance'},{id:'U-006',name:'陈亮',role:'market'}];

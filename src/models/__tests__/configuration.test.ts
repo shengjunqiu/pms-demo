@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createBusinessState, transition, type Actor } from '@/mock/business';
+import { createBusinessState, transition, type Actor } from '@/mock/business-domain';
 import { configuredApprovalTimeout, effectiveVersions, evaluateProjectGrading, instantiateProjectTemplates, reviewConfiguredApproval, selectApprovalRule } from '@/mock/configuration';
 import type { ApprovalProgress } from '@/models/configuration';
 const pmo:Actor={id:'U-002',name:'李主任',role:'pmo'},finance:Actor={id:'U-004',name:'刘敏',role:'finance'},executive:Actor={id:'U-003',name:'王总',role:'executive'};

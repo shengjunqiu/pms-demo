@@ -4,7 +4,7 @@ import { assertActionAccess } from '@/mock/access';
 import {AS_OF_DATE,mockCustomers} from '@/mock';
 import {configuredApprovalTimeout} from '@/mock/configuration';
 import {describe,it,expect} from 'vitest';
-import {createBusinessState,transition,type Actor} from '@/mock/business';
+import {createBusinessState,transition,type Actor} from '@/mock/business-domain';
 import {defaultInitiationInput,INITIATION_SIGNATURES} from '@/mock/initiation';
 import {opportunityMeta} from '@/mock/opportunities';
 import {visibleProjects} from '@/mock/selectors';

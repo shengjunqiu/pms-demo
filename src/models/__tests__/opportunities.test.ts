@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createBusinessState, transition, type Actor, type BusinessState } from '@/mock/business';
+import { createBusinessState, transition, type Actor, type BusinessState } from '@/mock/business-domain';
 import { assessmentSummary, DIMENSIONS, opportunityMeta } from '@/mock/opportunities';
 import type { OpportunityInput } from '@/models/opportunities';
 const market:Actor={id:'U-006',name:'陈亮',role:'market'};

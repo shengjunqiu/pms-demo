@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { createDemoBusinessState, transition } from '@/mock/business';
+import { createDemoBusinessState, transition } from '@/mock/business-domain';
 import { archiveSources } from '@/mock/closeout';
 import { closeChecks } from '@/mock/operations';
 import { settlementChecks } from '@/mock/settlement';

@@ -25,6 +25,7 @@ STATUS_RANK = {
     'superseded': 8,
     'archived': 9,
 }
+SUPPORT_KINDS = {'acceptance-test-support', 'acceptance-preparation', 'cross-cutting-delivery'}
 DEFAULT_WIP = {'development': 3, 'submitted': 2, 'integrated': 2}
 
 
@@ -113,12 +114,19 @@ def load_packages(root):
             raise PipelineError(f'{package_id}: acceptance_group 必须是非空字符串')
         if len(set(group_values)) > 1:
             raise PipelineError(f'{package_id}: assignment 与 delivery 的 acceptance_group 冲突')
+        package_kind = assignment.get('package_kind', 'development')
+        if not isinstance(package_kind, str) or not package_kind:
+            raise PipelineError(f'{package_id}: package_kind 必须是非空字符串')
+        checklist = string_list(assignment.get('acceptance_checklist'), f'{package_id}.acceptance_checklist')
+        checklist += string_list(delivery.get('acceptance_checklist'), f'{package_id}.delivery.acceptance_checklist')
         packages.append({
             'id': package_id,
             'path': label,
             'items': items,
             'status': package_status(assignment, delivery, package_id),
             'owner': assignment.get('owner', ''),
+            'package_kind': package_kind,
+            'acceptance_checklist': list(dict.fromkeys(checklist)),
             'writer': assignment.get('writer', ''),
             'workdir': assignment.get('workdir', ''),
             'branch': assignment.get('branch', ''),
@@ -200,7 +208,8 @@ def build_report(root, batch_size=5, wip=None):
         stale = [item for item in package['items'] if item in done]
         if stale and package['status'] not in TERMINAL_STATUSES:
             package_done_items.append({'package': package['id'], 'items': stale})
-        if not package['items'] and package['status'] in DEVELOPMENT_STATUSES | SUBMITTED_STATUSES:
+        if (not package['items'] and package['package_kind'] not in SUPPORT_KINDS
+                and package['status'] in DEVELOPMENT_STATUSES | SUBMITTED_STATUSES):
             empty_packages.append(package['id'])
 
     covered = [item for item in pending if live_owners[item]]
@@ -250,6 +259,7 @@ def build_report(root, batch_size=5, wip=None):
                 'part': index,
                 'acceptance_ready': not blockers,
                 'blockers': blockers,
+                'acceptance_checklist': list(dict.fromkeys(package['acceptance_checklist'])),
             })
         if blockers:
             readiness_blockers.append({'package': package_id, 'items': items, 'reasons': blockers})
@@ -258,6 +268,17 @@ def build_report(root, batch_size=5, wip=None):
                 'package': package_id,
                 'items': items,
                 'blockers': blockers,
+            })
+
+    # A named business loop includes unfinished members that are not integrated yet.
+    represented = {record['package'] for records in group_records.values() for record in records}
+    for package in packages:
+        items = [item for item in package['items'] if item in pending]
+        if (package['acceptance_group'] and items and package['status'] not in TERMINAL_STATUSES
+                and package['id'] not in represented):
+            group_records[package['acceptance_group']].append({
+                'package': package['id'], 'items': items,
+                'blockers': ['成员包尚未集成或仍在活动轮次'] + package['acceptance_dependencies'],
             })
 
     ready_batches = []
@@ -368,8 +389,19 @@ def build_report(root, batch_size=5, wip=None):
     else:
         next_action = '没有可调度的验收库存；检查阻塞依赖或 FINAL 条件。'
 
+    dispatch_reasons = [warning['message'] for warning in warnings if warning['severity'] == 'error']
+    for stage, count in counts.items():
+        if count >= wip[stage]:
+            dispatch_reasons.append(f'{stage} 已达到WIP上限 {count}/{wip[stage]}')
+    dispatch = {
+        'ordinary_development_allowed': not dispatch_reasons,
+        'reasons': dispatch_reasons,
+        'recommended_roles': ['当前轮次验收', '下一轮验收准备', '测试自动化', '当前缺陷修复']
+            if mode == 'acceptance_sprint' else ['协调集成验收', '依赖就绪的独立开发'],
+    }
     return {
         'schema_version': 1,
+        'dispatch': dispatch,
         'mode': mode,
         'active_round': active_round,
         'active_run_status': active_run_status,
@@ -416,6 +448,9 @@ def print_text(report):
         freeze = {True: '已冻结', False: '未进入冻结', None: '冻结状态未知'}[report['freeze_integration']]
         print(f'活动轮次: {report["active_round"]} ({", ".join(report["active_items"])})；{freeze}')
     print(f'下一步: {report["next_action"]}')
+    print('普通开发派发: ' + ('允许' if report['dispatch']['ordinary_development_allowed'] else '暂停；' + '；'.join(report['dispatch']['reasons'])))
+    if report['mode'] == 'acceptance_sprint':
+        print('席位安排: ' + ' / '.join(report['dispatch']['recommended_roles']))
     if report['ready_acceptance_batches']:
         print('\n显式就绪的验收分组:')
         for number, batch in enumerate(report['ready_acceptance_batches'], 1):
@@ -452,6 +487,7 @@ def main(argv=None):
     parser.add_argument('--development-wip', type=int, default=DEFAULT_WIP['development'])
     parser.add_argument('--submitted-wip', type=int, default=DEFAULT_WIP['submitted'])
     parser.add_argument('--integrated-wip', type=int, default=DEFAULT_WIP['integrated'])
+    parser.add_argument('--check-dispatch', action='store_true', help='普通开发派发门禁：达到WIP上限或调度错误时返回1；只读，不创建任务')
     parser.add_argument('--strict', action='store_true', help='error/warning 告警存在时返回非零')
     args = parser.parse_args(argv)
     try:
@@ -464,6 +500,8 @@ def main(argv=None):
             print(json.dumps(report, ensure_ascii=False, indent=2))
         else:
             print_text(report)
+        if args.check_dispatch and not report['dispatch']['ordinary_development_allowed']:
+            return 1
         if args.strict and any(item['severity'] in {'error', 'warning'} for item in report['warnings']):
             return 1
         return 0

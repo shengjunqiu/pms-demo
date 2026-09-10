@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { AS_OF_DATE } from '@/mock';
-import { createBusinessState, type Actor } from '@/mock/business';
+import { createBusinessState, type Actor } from '@/mock/business-domain';
 import { defaultInitiationInput, INITIATION_SIGNATURES } from '@/mock/initiation';
 import { selectInitiationTodos } from '@/mock/initiation-todos';
 import { reviewConfiguredApproval } from '@/mock/configuration';

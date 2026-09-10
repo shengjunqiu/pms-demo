@@ -41,6 +41,8 @@ python3 "$SKILL_DIR/scripts/loop.py" --root "$PWD" next
 
 ```bash
 python3 "$SKILL_DIR/scripts/pipeline.py" --root "$PWD"
+# 派发普通页面开发前，达到容量上限就暂停；验收支持按席位和资源单独安排
+python3 "$SKILL_DIR/scripts/pipeline.py" --root "$PWD" --check-dispatch
 # CI/调度治理需要把重复归属、漏分配和WIP超限视为失败时：
 python3 "$SKILL_DIR/scripts/pipeline.py" --root "$PWD" --strict --format json
 ```

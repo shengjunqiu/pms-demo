@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createBusinessState, createDemoBusinessState, transition, type Actor } from '@/mock/business';
+import { createBusinessState, createDemoBusinessState, transition, type Actor } from '@/mock/business-domain';
 import { mockProjects } from '@/mock';
 import { selectProjects, selectFourCalculations, selectReceipts } from '@/mock/selectors';
 import { calculateCockpitKPIs } from '@/utils/calculator';

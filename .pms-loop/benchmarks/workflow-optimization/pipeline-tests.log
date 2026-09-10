@@ -1,0 +1,23 @@
+test_audit_finds_duplicates_uncovered_done_and_empty_packages (__main__.PipelineTests.test_audit_finds_duplicates_uncovered_done_and_empty_packages) ... ok
+test_begin_before_check_does_not_freeze_but_checked_round_does (__main__.PipelineTests.test_begin_before_check_does_not_freeze_but_checked_round_does) ... ok
+test_checking_freezes_integration (__main__.PipelineTests.test_checking_freezes_integration) ... ok
+test_checklist_is_not_a_readiness_dependency (__main__.PipelineTests.test_checklist_is_not_a_readiness_dependency) ... ok
+test_cross_package_group_is_atomic_when_one_package_is_blocked (__main__.PipelineTests.test_cross_package_group_is_atomic_when_one_package_is_blocked) ... ok
+test_delivery_remaining_dependencies_override_historical_assignment_plan (__main__.PipelineTests.test_delivery_remaining_dependencies_override_historical_assignment_plan) ... ok
+test_delivery_status_can_advance_stale_assignment (__main__.PipelineTests.test_delivery_status_can_advance_stale_assignment) ... ok
+test_dependencies_or_missing_group_keep_inventory_out_of_ready_batches (__main__.PipelineTests.test_dependencies_or_missing_group_keep_inventory_out_of_ready_batches) ... ok
+test_dispatch_stops_at_capacity_without_blocking_diagnostics (__main__.PipelineTests.test_dispatch_stops_at_capacity_without_blocking_diagnostics) ... ok
+test_duplicate_ready_packages_cannot_begin (__main__.PipelineTests.test_duplicate_ready_packages_cannot_begin) ... ok
+test_explicit_group_over_five_is_not_mechanically_split (__main__.PipelineTests.test_explicit_group_over_five_is_not_mechanically_split) ... ok
+test_invalid_package_kind_returns_controlled_error (__main__.PipelineTests.test_invalid_package_kind_returns_controlled_error) ... ok
+test_invalid_structures_and_limits_return_controlled_errors (__main__.PipelineTests.test_invalid_structures_and_limits_return_controlled_errors) ... ok
+test_nonintegrated_member_blocks_whole_group (__main__.PipelineTests.test_nonintegrated_member_blocks_whole_group) ... ok
+test_only_explicit_dependency_free_group_becomes_ready_batch (__main__.PipelineTests.test_only_explicit_dependency_free_group_becomes_ready_batch) ... ok
+test_returned_delivery_is_not_still_ready (__main__.PipelineTests.test_returned_delivery_is_not_still_ready) ... ok
+test_support_package_can_have_no_page_ownership (__main__.PipelineTests.test_support_package_can_have_no_page_ownership) ... ok
+test_terminal_package_does_not_cover_reopened_page (__main__.PipelineTests.test_terminal_package_does_not_cover_reopened_page) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.069s
+
+OK

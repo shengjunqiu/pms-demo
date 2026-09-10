@@ -4,7 +4,7 @@ import {
   transition,
   type Actor,
   type BusinessState,
-} from "@/mock/business";
+} from "@/mock/business-domain";
 import { AS_OF_DATE } from "@/mock";
 import { closeChecks } from "@/mock/operations";
 import { settlementSnapshot } from "@/mock/settlement";

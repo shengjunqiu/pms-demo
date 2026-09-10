@@ -1,6 +1,6 @@
 import { AS_OF_DATE } from '@/mock';
 import { describe, expect, it } from 'vitest';
-import { createBusinessState, transition, type Actor } from '@/mock/business';
+import { createBusinessState, transition, type Actor } from '@/mock/business-domain';
 import {
   canViewUnsignedProject,
   startupChecks,

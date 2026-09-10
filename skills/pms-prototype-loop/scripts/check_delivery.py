@@ -11,7 +11,7 @@ SHARED = (
     'src/mock/configuration-access.ts', 'src/models/configuration-access.ts',
     'src/mock/configuration.ts', 'src/models/configuration.ts',
     'src/mock/configuration-finance.ts', 'src/models/configuration-finance.ts',
-    'src/mock/business.ts', 'src/mock/index.ts', 'src/models/types.ts',
+    'src/mock/business.ts', 'src/mock/business-domain.ts', 'src/mock/index.ts', 'src/models/types.ts',
     'src/mock/selectors.ts', 'src/mock/todos.ts', 'src/mock/exceptions.ts',
     'src/mock/archive-lock.ts', 'src/mock/construction-lock.ts',
     'src/utils/*', 'src/store/*', 'src/components/*', 'src/styles/*',

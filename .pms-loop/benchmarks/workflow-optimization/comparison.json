@@ -1,0 +1,18 @@
+{
+  "base_commit": "492c31b1e5c0ca8942cc8092310d643bc70c2d79",
+  "command": "pnpm test:domain",
+  "workers": 1,
+  "test_files": 32,
+  "tests": 233,
+  "before": {
+    "total_seconds": 168.37,
+    "collect_seconds": 117.72,
+    "tests_seconds": 42.18
+  },
+  "after": {
+    "total_seconds": 91.01,
+    "collect_seconds": 18.1,
+    "tests_seconds": 64.21
+  },
+  "note": "Same host, sequential single runs. Demo setup is now paid only by tests requesting the full demo or Store. These are engineering benchmarks, not formal page acceptance evidence."
+}

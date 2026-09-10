@@ -1,5 +1,5 @@
 import { expect,it } from 'vitest';
-import { createBusinessState,transition,type Actor } from '@/mock/business';
+import { createBusinessState,transition,type Actor } from '@/mock/business-domain';
 import { getBudgetDraft,toBudgetVersion,budgetOverruns,lineAmount } from '@/mock/budget-drafts';
 import {visibleProjects} from '@/mock/selectors';
 import { PLANNING_PROJECT_ID as id } from '@/mock/budget';

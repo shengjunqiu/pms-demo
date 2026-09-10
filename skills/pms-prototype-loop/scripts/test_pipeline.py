@@ -30,6 +30,41 @@ class PipelineTests(unittest.TestCase):
             'runs': [],
         })
 
+    def test_invalid_package_kind_returns_controlled_error(self):
+        self.package('A', [], status='assigned', assignment={'package_kind': []})
+        with contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(pipeline.main(['--root', str(self.root)]), 2)
+
+    def test_checklist_is_not_a_readiness_dependency(self):
+        self.package('A', ['GS-01'], assignment={
+            'acceptance_ready': True, 'acceptance_group': 'A',
+            'acceptance_checklist': ['正式工程检查', '浏览器观察与accept'],
+        })
+        self.assertEqual(pipeline.build_report(self.root)['ready_acceptance_batches'][0]['items'], ['GS-01'])
+
+    def test_nonintegrated_member_blocks_whole_group(self):
+        self.package('A', ['GS-01'], assignment={'acceptance_ready': True, 'acceptance_group': 'chain'})
+        self.package('B', ['GS-02'], status='in_progress', assignment={'acceptance_group': 'chain'})
+        report = pipeline.build_report(self.root)
+        self.assertEqual(report['ready_acceptance_batches'], [])
+        self.assertIn('GS-02', report['blocked_acceptance_groups'][0]['items'])
+
+    def test_dispatch_stops_at_capacity_without_blocking_diagnostics(self):
+        self.package('A', ['GS-01', 'GS-02'], assignment={'acceptance_ready': True, 'acceptance_group': 'A'})
+        self.package('B', ['GS-03', 'YS-01'], assignment={'acceptance_ready': True, 'acceptance_group': 'B'})
+        report = pipeline.build_report(self.root)
+        self.assertFalse(report['dispatch']['ordinary_development_allowed'])
+        self.assertEqual(report['mode'], 'balanced')
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(pipeline.main(['--root', str(self.root), '--check-dispatch']), 1)
+            self.assertEqual(pipeline.main(['--root', str(self.root)]), 0)
+
+    def test_support_package_can_have_no_page_ownership(self):
+        self.package('QA', [], status='assigned', assignment={'package_kind': 'acceptance-test-support'})
+        report = pipeline.build_report(self.root)
+        self.assertEqual(report['empty_live_packages'], [])
+        self.assertEqual(report['counts']['development_wip'], 1)
+
     def test_returned_delivery_is_not_still_ready(self):
         self.package('A', ['GS-01'], status='needs_revision', assignment={
             'acceptance_ready': True, 'acceptance_group': 'A',

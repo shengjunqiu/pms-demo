@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest';
-import { createDemoBusinessState, transition } from '@/mock/business';
+import { createDemoBusinessState, transition } from '@/mock/business-domain';
 import { selectTodos } from '@/mock/todos';
 
 it('预算审批办理后转为独立PMO确认待办，确认后原节点进入已办且不重复生成', () => {

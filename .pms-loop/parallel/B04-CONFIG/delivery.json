@@ -14,9 +14,10 @@
     "scope": "passed",
     "worker_domain": "151 passed"
   },
-  "remaining_dependencies": [
-    "formal browser acceptance"
-  ],
+  "remaining_dependencies": [],
   "writer": "",
-  "next_action": "验收冲刺库存；只准备场景与缺陷，不从旧分支继续普通开发"
+  "next_action": "验收冲刺库存；只准备场景与缺陷，不从旧分支继续普通开发",
+  "acceptance_checklist": [
+    "formal browser acceptance"
+  ]
 }

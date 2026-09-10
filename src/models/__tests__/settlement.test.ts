@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {createBusinessState,transition,type Actor,type BusinessState} from '@/mock/business';
+import {createBusinessState,transition,type Actor,type BusinessState} from '@/mock/business-domain';
 import {acceptanceDetail,checkNames} from '@/mock/acceptance';
 import {pendingSettlementSources,settlementChecks} from '@/mock/settlement';
 import {selectFourCalculations} from '@/mock/selectors';
