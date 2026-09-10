@@ -30,6 +30,7 @@ async function screenshots(page: Page, name: string) {
   await expect(page.locator('.ant-modal-mask:visible')).toHaveCount(0);
   await expect(page.locator('.ant-drawer-mask:visible')).toHaveCount(0);
   await expect(page.locator('.ant-select-dropdown:visible')).toHaveCount(0);
+  await expect(page.locator('.ant-message-notice')).toHaveCount(0);
   for (const width of [1440, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     await page.evaluate(() => window.scrollTo(0, 0));
@@ -106,6 +107,8 @@ test('指定组织约束商机与立项来源，审计收窄只隐藏日志且�
   await expect(page.locator('.ant-result-403')).toHaveCount(0);
   await expect(page.locator('h4').first()).toContainText('立项');
 
+  await navigate(page, '/settings/audit-log');
+  await expect(page.locator('.ant-result-403')).toBeVisible();
   await admin(page);
   await navigate(page, '/settings/audit-log');
   await page.getByLabel('审计对象搜索', { exact: true }).fill('E2E-SCOPE-OUTSIDE');
@@ -148,6 +151,14 @@ test('指定组织约束商机与立项来源，审计收窄只隐藏日志且�
   await page.getByLabel('审计对象搜索', { exact: true }).fill(originalId);
   const restored = auditRows(page);
   await expect(restored).toHaveCount(1);
-  await expect(restored).toHaveText(originalText);
+  await expect(restored).toHaveText(originalText, { useInnerText: true });
+  for (const [label, text] of [['操作人筛选', '刘敏'], ['审计动作筛选', 'page-access'], ['审计结果筛选', '成功']]) {
+    await page.locator(`.ant-select[aria-label="${label}"] .ant-select-selector`).click();
+    await page.locator('.ant-select-dropdown:visible .ant-select-item-option').filter({ hasText: new RegExp(`^${text}$`) }).click();
+  }
+  await page.getByLabel('审计开始日期', { exact: true }).fill('2026-09-09');
+  await page.getByLabel('审计结束日期', { exact: true }).fill('2026-09-09');
+  await expect(auditRows(page)).toHaveCount(1);
+  await expect(auditRows(page)).toHaveText(originalText, { useInnerText: true });
   await screenshots(page, 'CF08-original-event-restored-without-rewrite');
 });

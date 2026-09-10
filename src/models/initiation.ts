@@ -30,3 +30,5 @@ export interface InitiationApplication {
  id:string;input:InitiationInput;draftRevision:number;rounds:InitiationRound[];status:'草稿'|InitiationRound['status'];
  createdBy:string;createdAt:string;projectId?:string;followups?:{by:string;date:string;reason:string}[];
 }
+
+export const INITIATION_SIGNATURES=[{node:'技术',role:'solution-tech'},{node:'方案',role:'solution-tech'},{node:'交付',role:'project-manager'},{node:'财务',role:'finance'},{node:'法务协同（PMO代办）',role:'pmo'},{node:'PMO',role:'pmo'}] as const;

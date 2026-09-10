@@ -361,7 +361,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     const health=selectConfiguredHealth(state,p);
     p.health = health.level; p.healthReason = health.reasons.join('；');
   }
-  state.audit.push({ id: `AUD-${state.audit.length + 1}`, actor: actor.name, actorId: actor.id, actorRole: actor.role, action: action.type, target, date: AS_OF_DATE, result: '成功', ruleVersion: selectAccessPolicy(previous, actor.role)?.id, changes: buildAuditChanges(previous, state, target) });
+  state.audit.push({ id: `AUD-${state.audit.length + 1}`, actor: actor.name, actorId: actor.id, actorRole: actor.role, action: action.type, target, date: AS_OF_DATE, result: '成功', reason: 'opinion' in action && typeof action.opinion === 'string' ? action.opinion : 'reason' in action && typeof action.reason === 'string' ? action.reason : 'note' in action && typeof action.note === 'string' ? action.note : undefined, ruleVersion: selectAccessPolicy(previous, actor.role)?.id, changes: buildAuditChanges(previous, state, target) });
   return state;
 }
 

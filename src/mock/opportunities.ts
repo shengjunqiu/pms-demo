@@ -1,4 +1,4 @@
-import { canAccessOpportunityScope } from './access-scope';
+import { canAccessOpportunityScope, isInitiationParticipant } from './access-scope';
 import { selectGradingRule, selectTemplate } from '@/mock/configuration';
 import { AS_OF_DATE, mockCustomers, mockDepartments, mockUsers } from '@/mock';
 import type { Actor, BusinessState } from '@/mock/business';
@@ -23,7 +23,7 @@ export function canViewOpportunity(state: BusinessState, o: Opportunity, actor: 
   if (!canAccessOpportunityScope(state, actor, o)) return false;
   if (['executive', 'pmo', 'finance', 'solution-tech', 'admin'].includes(actor.role)) return true;
   if (actor.role === 'market') return o.ownerId === actor.id || o.departmentId === 'D-002';
-  return state.projects.some(p => p.opportunityId === o.id && (p.pmId === actor.id || p.memberIds?.includes(actor.id)));
+  return isInitiationParticipant(state, actor, o.id) || state.projects.some(p => p.opportunityId === o.id && (p.pmId === actor.id || p.memberIds?.includes(actor.id)));
 }
 export function canManageOpportunity(state: BusinessState, o: Opportunity, actor: Actor) { return actor.role === 'market' && canViewOpportunity(state, o, actor); }
 export function opportunityLocked(state: BusinessState, o: Opportunity) { return ['拟立项', '方案评审中', '已转立项', '已终止'].includes(o.status) || state.estimates.some(e => e.opportunityId === o.id && e.isFrozen); }

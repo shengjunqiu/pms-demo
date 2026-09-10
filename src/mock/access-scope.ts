@@ -1,3 +1,4 @@
+import { INITIATION_SIGNATURES } from '@/models/initiation';
 import { mockUsers } from '@/mock';
 import type { Actor, BusinessState } from './business';
 import type { Opportunity } from '@/models/types';
@@ -20,8 +21,19 @@ export function canAccessOrganization(state: BusinessState, actor: Actor, depart
   }
 }
 
+export function isInitiationParticipant(state: BusinessState, actor: Actor, opportunityId: string) {
+  return state.initiations.some((app) => app.input.opportunityId === opportunityId && app.rounds.some((round, index) => {
+    const current = index === app.rounds.length - 1;
+    const priorSigner = round.signatures.some((signature) => signature.role === actor.role && signature.by === actor.name)
+      || round.approvalProgress?.reviews.some((review) => review.role === actor.role && review.by === actor.name);
+    const pendingSigner = current && round.status === '会签中' && INITIATION_SIGNATURES.some((node) => node.role === actor.role && !round.signatures.some((signature) => signature.node === node.node));
+    const pendingDecision = current && round.status === '待决策' && round.approvalProgress?.snapshot.nodes[round.approvalProgress.node]?.roles.includes(actor.role);
+    return priorSigner || pendingSigner || pendingDecision;
+  }));
+}
+
 export function canAccessOpportunityScope(state: BusinessState, actor: Actor, opportunity: Opportunity) {
-  const related = opportunity.ownerId === actor.id
+  const related = isInitiationParticipant(state, actor, opportunity.id) || opportunity.ownerId === actor.id
     || (state.opportunityMeta[opportunity.id]?.collaborators ?? ['U-005']).includes(actor.id)
     || state.projects.some((p) => p.opportunityId === opportunity.id && canAccessProject(state, actor, p));
   return canAccessOrganization(state, actor, opportunity.departmentId, related);
@@ -63,10 +75,11 @@ export function canAccessTargetScope(state: BusinessState, actor: Actor, target:
 }
 
 function allowsScope(state: BusinessState, actor: Actor, scope: { projectIds: string[]; opportunityIds: string[] }) {
-  return scope.projectIds.every((id) => {
+  if (scope.projectIds.length) return scope.projectIds.every((id) => {
     const project = state.projects.find((p) => p.id === id);
     return !!project && canAccessProject(state, actor, project);
-  }) && scope.opportunityIds.every((id) => {
+  });
+  return scope.opportunityIds.every((id) => {
     const opportunity = state.opportunities.find((o) => o.id === id);
     return !!opportunity && canAccessOpportunityScope(state, actor, opportunity);
   });

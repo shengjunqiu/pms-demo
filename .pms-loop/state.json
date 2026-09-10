@@ -299,8 +299,8 @@
       "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
     },
     "CF-08": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0023"
     },
     "FINAL": {
       "status": "pending",
@@ -897,6 +897,39 @@
         ".pms-loop/runs/R0022/checks.json": "9334c6cc108d5445faf18cf333853c08112462e943c6464a09d8c1f37a6bd320",
         ".pms-loop/runs/R0022/evidence.json": "f4dc16f53ef9c428db8e076303f55c4d85fbcf9dd903cc904dbbea432f20d6cd"
       }
+    },
+    {
+      "id": "R0023",
+      "items": [
+        "CF-08"
+      ],
+      "started_at": "2026-09-10T05:42:33+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-10T06:00:03+00:00",
+      "revision": "15087a0989284b85ea66d9525fe5aa5f2a457c136eb54fad12bb1daaca49abb1",
+      "proof": {
+        ".pms-loop/runs/R0023/test-domain.log": "fe28ebc2bca6da25a67f72f85b4ef00f9f0a76ea9e443b3a04057181e4d78e69",
+        ".pms-loop/runs/R0023/lint.log": "257e04ddd8733fd59f16ff528f593b88c1fe59f044ef033b555c85568c03f33d",
+        ".pms-loop/runs/R0023/typecheck.log": "0cbb735b6f0f0beb07e73868e143e2a41ee87411e874d273088e1adceeb7efe0",
+        ".pms-loop/runs/R0023/build.log": "b7833af5ec3eb77e3a2becf49c48083e75d7de1910713285577a59bdf0506f8e",
+        ".pms-loop/runs/R0023/browser.log": "2e3eb8253c538330dc414fdda9f39bcb03b3989c031f3742a36056a3cbdf269b",
+        ".pms-loop/runs/R0023/browser-retry.log": "988831b3c82a50d7446cb554962bb7ae26f6453aade319d03aa3aecff558fd12",
+        ".pms-loop/runs/R0023/artifacts/access-9e7a053a61b60e2af93d0f1769df6fce02bce62d.json": "643a81fdb377460b2f3721b599e4a84e07fdfae7ef71de50b31a91683939b342",
+        ".pms-loop/runs/R0023/artifacts/access-9e7a053a61b60e2af93da706af198d87b613fed7.json": "0e038547853937918e63f715b8e50388e934c792ab81bc178af0b0c775762cad",
+        ".pms-loop/runs/R0023/artifacts/access-scope-5f2e2f5367ea60d930bccf8eb30cf2768f1f07ec.json": "77365ba13d0218195eab19ca2d55be2ae683c89bfe390c2763f76e77f1b770f7",
+        ".pms-loop/runs/R0023/artifacts/receipts-bb2a7a9b25a1c3115b01172ca1dec03662676519.json": "ed32fe7b78e397496e7195bfff3c6e17be85709c6658c2ec94ee7582c95adbb2",
+        ".pms-loop/runs/R0023/artifacts/receipts-bb2a7a9b25a1c3115b01d02847ac6096ddee9167.json": "c31604ed4c8583673cb024e88f4a85bd79d71d47a53fb123210996d2f250c22f",
+        ".pms-loop/runs/R0023/artifacts/CF08-original-event-restored-without-rewrite-1440.png": "336d36a77152b8f90430699d3657e955fd852ff33827ec3c9dbbb2eb471c11c5",
+        ".pms-loop/runs/R0023/artifacts/CF08-original-event-restored-without-rewrite-1280.png": "a7a7c6bd8d0050b43f6cc41d82c16e18bcf605e32dada1a8a20e54def6ec4636",
+        ".pms-loop/runs/R0023/checks.json": "a13520b30dbf1b838b6c7a667b26c0b50cf6a38640f42cd2c8de69cb12e45ad3",
+        ".pms-loop/runs/R0023/evidence.json": "b0a34f6a79b41218830525713fc151af4933ccf681b0afc4b3e3a676ec91fd0b"
+      }
     }
   ],
   "notes": [
@@ -971,6 +1004,10 @@
     {
       "at": "2026-09-10T05:20:32+00:00",
       "text": "本次恢复已合入 access e2e 4be6ffc→a650360、D09 d978009→fb5c20c；主集成6408766保存字段展示权限、团队总览真实成员、JS13按检查项名定位补办路由及回归证据。typecheck/lint/build通过，access.spec.ts 2条及receipts.spec.ts 2条真实浏览器共4通过，无控制台error；1440/1280截图已保存parallel/access-e2e并抽查。修复helpers只匹配可见下拉；团队场景先由领导驳回APR-1再修改成员，遵守原业务门禁。仍29/72、无活动轮次；CF07/08不得直接accept：尚须补齐商机/审计组织范围、按钮级策略展示、完整审批轨迹及对应浏览器场景。D09五页只完成工程检查，字段隐藏后的保存及跨页链仍需专项浏览器观察；bundle约2.257MB分包待办。当前无运行服务和浏览器测试。后续先补访问范围再开始CF07/08正式轮次，禁止复用旧截图修改hash验收。"
+    },
+    {
+      "at": "2026-09-10T06:00:43+00:00",
+      "text": "R0023 CF08已正式验收，累计30/72，无活动轮次。组织权限补齐商机/立项、统计/URL预填/匿名查重；审计统一按对象归属过滤，未知历史仅all可查。默认PM会签临时角色关系及本人签署历史可访问但显式组织限制仍适用。审计记录真实opinion/reason/note，个人工时金额、消耗承诺及type labor账本副本全带敏感标记。最终revision15087a0989284b85ea66d9525fe5aa5f2a457c136eb54fad12bb1daaca49abb1，typecheck/lint/build与217领域测试通过；access-scope/access/receipts共5场景最新执行通过，1条复选框点击瞬态失败后同源码原样重跑通过，两次browser日志均保留R0023。1440/1280列表、签署意见和脱敏抽屉已查看。E01 b8f2c36→b66cdbd、E02 6b610fb→c40ace4范围检查通过且无冲突。CF07仍待按钮级动作可用性、字段可编辑及收入/采购/外包粒度等原文范围，不能直接accept；后续独立页面/链路按依赖分批验收，不重用旧版本截图。项目未完成，无服务/浏览器测试运行。"
     }
   ]
 }

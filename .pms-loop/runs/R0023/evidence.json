@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "round": "R0023",
+  "revision": "15087a0989284b85ea66d9525fe5aa5f2a457c136eb54fad12bb1daaca49abb1",
+  "items": {
+    "CF-08": {
+      "entry": "/settings/audit-log",
+      "covered_features": [
+        "PT-050",
+        "PT-051",
+        "PT-052",
+        "PT-053"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单174行、任务书488行及详细功能清单534–537行：关键操作、前后值、签署轨迹和关键访问。沿用固定演示日期与管理员查询身份，不宣称真实登录系统或持久化安全审计。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "从权限页进入审计查询，关闭详情抽屉保留当前筛选。预算APR-1详情关联链接指向已真实办理的/approvals/APR-1；商机原访问路由OPP-001及权限版本均可对应。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "日志显示真实模拟操作人及ID、当时角色、2026-09-09基准日、动作、业务对象、成功/拒绝、权限版本与前后字段。旧记录没有差异时明确保留缺失说明，不补造历史。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "财务权限V2发布后产生真实发布差异和被拒绝访问记录；领导驳回APR-1后显示本人意见、待审批→驳回与原业务轨迹；PM实际审核成员工时后产生人力成本账本差异。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "管理员组织范围收紧后搜索原AUD-82记录为空；恢复all后同一ID与每列内容逐项相同。所有统计、筛选项、列表、抽屉和轨迹先按同一visibleAuditEvents过滤；217项领域测试通过。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "财务直接访问CF08出现403；组织范围外日志搜索为空，恢复范围原记录重现；成功/拒绝、未保留差异等状态均有文字。查询为本地同步状态，无异步加载请求。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已实际查看本版1440与1280列表组合筛选截图、预算签署抽屉和审核后工时脱敏抽屉；筛选允许换行、抽屉可滚动，无页面横向溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "五个独立场景最新执行JSON均status=passed且consoleErrors=[]。首次完整运行4通过、1在复选框点击未切换处失败；相同源码单独重跑该场景通过，保留两次原日志，未更改验收断言。"
+        },
+        "business-1": {
+          "requirement": "操作人时间对象动作前后值流程轨迹筛选",
+          "passed": true,
+          "observation": "真实组合筛选操作人刘敏、page-access、成功、对象AUD-82及起止2026-09-09，仅得到原访问事件。发布状态草稿→已发布前后值、领导王总签署意见和PM审核意见可查。"
+        },
+        "business-2": {
+          "requirement": "关键业务动作产生日志，正式历史不可删，敏感字段脱敏",
+          "passed": true,
+          "observation": "同一UI链生成访问/拒绝/发布/审批日志，页面无修改删除入口。撤管理员labor-rate后，实际review-labor审计的costs[LEDGER-LAB-1]及consumedCommitment后值均为脱敏，原工时仍已通过；新旧成本对象的敏感标记及不改原记录由领域测试验证。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "发布财务D003组织策略，并直接访问OPP-001与新建立项来源URL；管理员收窄审计范围后恢复all。",
+          "expected": "范围外商机及来源403，原审计记录仅改变可见性。",
+          "observed": "商机列表为空、详情和来源403；原AUD-82先隐藏、恢复后各列原样一致；组合筛选保持唯一结果。"
+        },
+        {
+          "action": "PM填报本人工时，发布财务JS08与单价限制，再在CF08查看发布、拒绝访问及原工时差异。",
+          "expected": "实际权限生效，审计绑定发布时策略并显示前后值，个人字段隐藏。",
+          "observed": "ACCESS-finance-V2生效；发布日志绑定ACCESS-admin-V1、拒绝访问绑定finance-V2；个人费率字段脱敏。"
+        },
+        {
+          "action": "领导实际驳回APR-1、PM加入成员、成员填工时、PM审核通过；管理员撤销自身labor-rate再查看review-labor日志。",
+          "expected": "保留签署意见、原审批前后状态与成本来源，所有明确个人金额副本脱敏。",
+          "observed": "APR-1状态与领导意见可见，LAB-1已通过；审核事件costs[LEDGER-LAB-1]和consumedCommitment的变更后值均为***（已脱敏）。同版重跑该完整场景通过。"
+        },
+        {
+          "action": "回归P006全额收款与部分收款重复流水阻断。",
+          "expected": "合同余额正确变化，其他项目关闭门槛不被跳过，重复流水不重复入账。",
+          "observed": "两条收款浏览器场景通过；全额收清1023万元仅解除应收条件；重复部分收款余额与原流水保持。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0023/browser.log",
+        ".pms-loop/runs/R0023/browser-retry.log",
+        ".pms-loop/runs/R0023/artifacts/access-9e7a053a61b60e2af93d0f1769df6fce02bce62d.json",
+        ".pms-loop/runs/R0023/artifacts/access-9e7a053a61b60e2af93da706af198d87b613fed7.json",
+        ".pms-loop/runs/R0023/artifacts/access-scope-5f2e2f5367ea60d930bccf8eb30cf2768f1f07ec.json",
+        ".pms-loop/runs/R0023/artifacts/receipts-bb2a7a9b25a1c3115b01172ca1dec03662676519.json",
+        ".pms-loop/runs/R0023/artifacts/receipts-bb2a7a9b25a1c3115b01d02847ac6096ddee9167.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0023/artifacts/CF08-original-event-restored-without-rewrite-1440.png",
+        "1280": ".pms-loop/runs/R0023/artifacts/CF08-original-event-restored-without-rewrite-1280.png"
+      }
+    }
+  }
+}

@@ -1,0 +1,75 @@
+
+> pms-demo@1.0.0 test:e2e /Users/shengjunqiu/Documents/Code/pms-demo
+> playwright test e2e/access-scope.spec.ts e2e/access.spec.ts e2e/receipts.spec.ts
+
+[WebServer] (node:93827) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:93850) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:93861) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/access-scope.spec.ts:97:1 › 指定组织约束商机与立项来源，审计收窄只隐藏日志且恢复后原事件仍存在 (37.1s)
+  ✓  2 e2e/access.spec.ts:106:1 › CF07发布财务页面与人员单价限制，CF08保留发布差异及访问拒绝 (33.5s)
+  ✘  3 e2e/access.spec.ts:197:1 › 默认PM仍可审核真实团队成员工时，个人单价和金额保持隐藏 (27.9s)
+(node:93997) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  4 e2e/receipts.spec.ts:76:1 › P006财务收清1023万元后应收门禁解除，其他关闭条件仍待办理 (15.6s)
+  ✓  5 e2e/receipts.spec.ts:125:1 › P006部分收款后重复流水被拒，合同余额及原流水条数保持不变 (9.5s)
+
+
+  1) e2e/access.spec.ts:197:1 › 默认PM仍可审核真实团队成员工时，个人单价和金额保持隐藏 ───────────────────────────────────────
+
+    Error: locator.uncheck: Clicking the checkbox did not change its state
+    Call log:
+      - waiting for locator('.ant-drawer-content:visible').getByRole('checkbox', { name: '人员成本单价', exact: true })
+        - locator resolved to <input checked type="checkbox" value="labor-rate" class="ant-checkbox-input"/>
+      - attempting click action
+        2 × waiting for element to be visible, enabled and stable
+          - element is not stable
+        - retrying click action
+        - waiting 20ms
+        - waiting for element to be visible, enabled and stable
+        - element is not stable
+      - retrying click action
+        - waiting 100ms
+        - waiting for element to be visible, enabled and stable
+        - element is visible, enabled and stable
+        - scrolling into view if needed
+        - done scrolling
+        - performing click action
+        - click action done
+        - waiting for scheduled navigations to finish
+        - navigations have finished
+
+
+      88 |   await page.getByRole('button', { name: '另存策略草稿', exact: true }).click();
+      89 |   const adminEditor = page.locator('.ant-drawer-content:visible');
+    > 90 |   await adminEditor.getByRole('checkbox', { name: '人员成本单价', exact: true }).uncheck();
+         |                                                                            ^
+      91 |   await adminEditor.getByLabel('变更原因', { exact: true }).fill('审计查看不展示个人成本字段，历史原记录保持不变。');
+      92 |   await adminEditor.getByRole('button', { name: '保存草稿', exact: true }).click();
+      93 |   await expect(adminEditor).toBeHidden();
+        at hideAdminLabor (/Users/shengjunqiu/Documents/Code/pms-demo/e2e/access.spec.ts:90:76)
+        at /Users/shengjunqiu/Documents/Code/pms-demo/e2e/access.spec.ts:250:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/access-默认PM仍可审核真实团队成员工时，个人单价和金额保持隐藏/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/access-默认PM仍可审核真实团队成员工时，个人单价和金额保持隐藏/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/access-默认PM仍可审核真实团队成员工时，个人单价和金额保持隐藏/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/access-默认PM仍可审核真实团队成员工时，个人单价和金额保持隐藏/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/access.spec.ts:197:1 › 默认PM仍可审核真实团队成员工时，个人单价和金额保持隐藏 ────────────────────────────────────────
+  4 passed (2.2m)
+ ELIFECYCLE  Command failed with exit code 1.

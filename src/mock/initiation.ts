@@ -11,7 +11,8 @@ import {inheritEarlyCosts} from './early-investments';
 import {milestoneTemplate,validPlanDate} from './budget';
 import {percentage} from '@/utils/money';
 export const INITIATION_RULE={version:'INIT-2026-01',majorAmount:5000,superAmount:10000,keyAmount:2000,minimumMargin:20,highRiskScore:16,mediumRiskScore:9};
-export const INITIATION_SIGNATURES=[{node:'技术',role:'solution-tech'},{node:'方案',role:'solution-tech'},{node:'交付',role:'project-manager'},{node:'财务',role:'finance'},{node:'法务协同（PMO代办）',role:'pmo'},{node:'PMO',role:'pmo'}] as const;
+import { INITIATION_SIGNATURES } from '@/models/initiation';
+export { INITIATION_SIGNATURES } from '@/models/initiation';
 export function canViewInitiation(state:BusinessState,app:InitiationApplication,actor:Actor){const o=state.opportunities.find(o=>o.id===app.input.opportunityId);return !!o&&canAccessOpportunityScope(state,actor,o)&&(actor.role!=='market'||canManageOpportunity(state,o,actor));}
 export function initiationPrerequisites(state:BusinessState,o:BusinessState['opportunities'][number]){const missing=initiationMissing(state,o);const review=state.presales[o.id]?.reviews.at(-1),estimate=state.estimates.find(e=>e.id===o.currentEstimateVersionId&&e.opportunityId===o.id&&e.isFrozen),meta=estimate?state.estimateMeta[estimate.id]:undefined;if(!review||!meta||meta.reviewId!==review.id||meta.solutionVersionId!==review.solutionVersionId||meta.costVersionId!==review.costVersionId)missing.push('冻结概算与当前通过的方案/专家评审版本链不一致');if(!state.presales[o.id]?.solutionVersions.some(s=>s.id===review?.solutionVersionId))missing.push('缺少可解析的评审方案版本');return missing;}
 export function initiationSource(state:BusinessState,opportunityId:string):InitiationSource {

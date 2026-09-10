@@ -1,3 +1,6 @@
+import { canViewInitiation } from '@/mock/initiation';
+import { canAccessOpportunityScope } from '@/mock/access-scope';
+import { assertActionAccess } from '@/mock/access';
 import {AS_OF_DATE,mockCustomers} from '@/mock';
 import {configuredApprovalTimeout} from '@/mock/configuration';
 import {describe,it,expect} from 'vitest';
@@ -29,4 +32,20 @@ describe('立项评审与正式项目承接',()=>{
 
  it('第六专业签完成时才开始正式节点计时，保留规则快照与既有签署',()=>{let state=classified();const earlier=new Date(Date.parse(AS_OF_DATE)-10*86400000).toISOString().slice(0,10);state.initiations[0].rounds[0].approvalProgress!.enteredAt=earlier;const snapshot=structuredClone(state.initiations[0].rounds[0].approvalProgress!.snapshot);for(const node of INITIATION_SIGNATURES.slice(0,5)){const actor=({pmo,finance,'solution-tech':tech,'project-manager':pm})[node.role];state=transition(state,{type:'sign-initiation',id:'INIT-1',node:node.node,conclusion:'同意',opinion:'专业确认'},actor);}expect(state.initiations[0].status).toBe('会签中');expect(state.initiations[0].rounds[0].approvalProgress!.enteredAt).toBe(earlier);const original=structuredClone(state);const last=INITIATION_SIGNATURES[5];state=transition(state,{type:'sign-initiation',id:'INIT-1',node:last.node,conclusion:'同意',opinion:'第六专业确认'},pmo);const round=state.initiations[0].rounds[0];expect(round.status).toBe('待决策');expect(round.approvalProgress!.enteredAt).toBe(AS_OF_DATE);expect(configuredApprovalTimeout(round.approvalProgress!)).toMatchObject({elapsedDays:0,overdue:false});expect(round.approvalProgress!.snapshot).toEqual(snapshot);expect(round.approvalProgress!.reviews).toEqual([]);expect(round.signatures.slice(0,5)).toEqual(original.initiations[0].rounds[0].signatures);expect(original.initiations[0].rounds[0].approvalProgress!.enteredAt).toBe(earlier);});
 
+});
+
+it('主PM可办理未转项目的交付会签并保留本人历史，显式组织范围仍有效',()=>{
+ let state=classified(); const app=state.initiations[0]; const o=state.opportunities.find(o=>o.id===app.input.opportunityId)!;
+ expect(state.projects.some(p=>p.opportunityId===o.id)).toBe(false);
+ expect(canViewInitiation(state,app,pm)).toBe(true);
+ expect(canAccessOpportunityScope(state,pm,o)).toBe(true);
+ const action={type:'sign-initiation' as const,id:app.id,node:'交付',conclusion:'同意' as const,opinion:'交付资源确认'};
+ expect(()=>assertActionAccess(state,action,pm)).not.toThrow();
+ state=transition(state,action,pm);
+ state.initiations[0].status='待决策';state.initiations[0].rounds[0].status='待决策';
+ expect(canViewInitiation(state,state.initiations[0],pm)).toBe(true);
+ expect(canViewInitiation(state,state.initiations[0],{...pm,id:'different-pm',name:'另一位项目经理'})).toBe(false);
+ const policy=state.accessConfiguration.versions.find(v=>v.role===pm.role)!;
+ policy.dataScope='organizations';policy.orgIds=['D-NOT-ASSIGNED'];
+ expect(canViewInitiation(state,state.initiations[0],pm)).toBe(false);
 });

@@ -1,0 +1,25 @@
+{
+  "package_id": "E01",
+  "owner": "develop_ys",
+  "workdir": "/private/tmp/pms-parallel-ys",
+  "branch": "pms/scope-entry-points",
+  "base_commit": "91ad9e6",
+  "owned_paths": [
+    "src/pages/initiation/InitiationReviewPage.tsx",
+    "src/pages/initiation/InitiationApplyPage.tsx",
+    "src/pages/opportunities/OpportunityFormPage.tsx"
+  ],
+  "scenarios": [
+    "all initiation KPI respect accessible application set",
+    "new application URL cannot show out-of-scope source",
+    "duplicate hints redact inaccessible records but preserve duplicate check"
+  ],
+  "status": "integrated",
+  "delivery_commits": [
+    "b8f2c367483531548cae6cdbd7ad91c1732fe72d"
+  ],
+  "integration_commits": [
+    "b66cdbd"
+  ],
+  "formal_acceptance": false
+}

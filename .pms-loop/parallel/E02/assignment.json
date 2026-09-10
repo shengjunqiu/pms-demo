@@ -1,0 +1,23 @@
+{
+  "package_id": "E02",
+  "owner": "develop_gs",
+  "workdir": "/private/tmp/pms-parallel-gs",
+  "branch": "pms/scope-browser",
+  "base_commit": "91ad9e6",
+  "owned_paths": [
+    "e2e/access-scope.spec.ts"
+  ],
+  "scenarios": [
+    "finance org restriction filters opportunities and direct sources",
+    "admin scope filters audit list and search",
+    "restore admin all policy and old events persist"
+  ],
+  "status": "integrated",
+  "delivery_commits": [
+    "6b610fb29cf5fe4e40efad682dd0dcaadaa50c80"
+  ],
+  "integration_commits": [
+    "c40ace4"
+  ],
+  "formal_acceptance": false
+}

@@ -28,6 +28,7 @@ async function screenshots(page: Page, name: string, drawerOpen = false) {
   await expect(page.locator('.ant-modal-mask:visible')).toHaveCount(0);
   await expect(page.locator('.ant-select-dropdown:visible')).toHaveCount(0);
   if (!drawerOpen) await expect(page.locator('.ant-drawer-mask:visible')).toHaveCount(0);
+  await expect(page.locator('.ant-message-notice')).toHaveCount(0);
   for (const width of [1440, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     await page.evaluate(() => window.scrollTo(0, 0));
@@ -78,6 +79,22 @@ async function expectHiddenLabor(page: Page) {
   await expect(drawer).not.toContainText('RATE-PM-V1');
   await expect(drawer).not.toContainText('RATE-TECH-V1');
   return drawer;
+}
+
+async function hideAdminLabor(page: Page) {
+  await navigate(page, '/settings/permissions');
+  await page.locator('.ant-select[aria-label="配置角色"] .ant-select-selector').click();
+  await page.locator('.ant-select-dropdown:visible .ant-select-item-option').filter({ hasText: '系统管理员' }).click();
+  await page.getByRole('button', { name: '另存策略草稿', exact: true }).click();
+  const adminEditor = page.locator('.ant-drawer-content:visible');
+  await adminEditor.getByRole('checkbox', { name: '人员成本单价', exact: true }).uncheck();
+  await adminEditor.getByLabel('变更原因', { exact: true }).fill('审计查看不展示个人成本字段，历史原记录保持不变。');
+  await adminEditor.getByRole('button', { name: '保存草稿', exact: true }).click();
+  await expect(adminEditor).toBeHidden();
+  await expect(page.locator('.ant-drawer-mask:visible')).toHaveCount(0);
+  await page.getByRole('button', { name: '发布选中版本', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: /^确\s*定$/ }).click();
+  await expect(page.locator('.ant-modal-mask:visible')).toHaveCount(0);
 }
 
 function auditRows(page: Page, action: string) {
@@ -163,6 +180,18 @@ test('CF07发布财务页面与人员单价限制，CF08保留发布差异及访
   await rejected.getByRole('button', { name: '查看详情', exact: true }).click();
   await expect(page.locator('.ant-drawer-content:visible').getByText('ACCESS-finance-V2', { exact: true })).toBeVisible();
   await screenshots(page, 'CF08-finance-page-access-rejected', true);
+  await closeDrawer(page);
+  await hideAdminLabor(page);
+  await navigate(page, '/settings/audit-log');
+  await page.getByLabel('审计对象搜索', { exact: true }).fill('P-001');
+  const laborEvent = auditRows(page, 'submit-labor');
+  await expect(laborEvent).toHaveCount(1);
+  await laborEvent.getByRole('button', { name: '查看详情', exact: true }).click();
+  const maskedAudit = page.locator('.ant-drawer-content:visible');
+  await expect(maskedAudit).toContainText('***（已脱敏）');
+  await expect(maskedAudit).not.toContainText('RATE-PM-V1');
+  await screenshots(page, 'CF08-personal-labor-audit-fields-masked', true);
+
 });
 
 test('默认PM仍可审核真实团队成员工时，个人单价和金额保持隐藏', async ({ page }) => {
@@ -205,4 +234,32 @@ test('默认PM仍可审核真实团队成员工时，个人单价和金额保持
   await expect(drawer.getByRole('button', { name: '审核工时通过', exact: true })).toBeDisabled();
   await expectHiddenLabor(page);
   await screenshots(page, 'HS09-PM-team-labor-approved-rates-hidden', true);
+  await closeDrawer(page);
+  await admin(page);
+  await navigate(page, '/settings/audit-log');
+  await page.getByLabel('审计对象搜索', { exact: true }).fill('APR-1');
+  const decision = auditRows(page, 'review').filter({ has: page.getByRole('cell', { name: 'APR-1', exact: true }) });
+  await expect(decision).toHaveCount(1);
+  await decision.getByRole('button', { name: '查看详情', exact: true }).click();
+  const audit = page.locator('.ant-drawer-content:visible');
+  await expect(audit).toContainText('先明确新增成员与资源范围后重提预算，保留当前生效基线。');
+  await expect(audit).toContainText('executive');
+  await expect(audit.getByRole('link', { name: '查看当前原业务 →', exact: true })).toHaveAttribute('href', '/approvals/APR-1');
+  await screenshots(page, 'CF08-budget-decision-signed-opinion', true);
+  await closeDrawer(page);
+  await hideAdminLabor(page);
+  await navigate(page, '/settings/audit-log');
+  await page.getByLabel('审计对象搜索', { exact: true }).fill('P-001');
+  const reviewedLabor = auditRows(page, 'review-labor');
+  await expect(reviewedLabor).toHaveCount(1);
+  await reviewedLabor.getByRole('button', { name: '查看详情', exact: true }).click();
+  const reviewedAudit = page.locator('.ant-drawer-content:visible');
+  const costChange = reviewedAudit.locator('.ant-table-tbody > tr[data-row-key]').filter({ hasText: 'costs[LEDGER-LAB-1]' });
+  const commitmentChange = reviewedAudit.locator('.ant-table-tbody > tr[data-row-key]').filter({ hasText: 'consumedCommitment' });
+  await expect(costChange).toHaveCount(1);
+  await expect(costChange.locator('td').nth(2)).toHaveText('***（已脱敏）');
+  await expect(commitmentChange).toHaveCount(1);
+  await expect(commitmentChange.locator('td').nth(2)).toHaveText('***（已脱敏）');
+  await screenshots(page, 'CF08-reviewed-labor-ledger-and-commitment-masked', true);
+
 });
