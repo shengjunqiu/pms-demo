@@ -135,12 +135,12 @@
       "round": "R0046"
     },
     "HS-03": {
-      "status": "pending",
-      "reason": "继续全页面UI改造：日报周报当前动作与历史快照分区，交付物及质量审核版本清晰。"
+      "status": "done",
+      "round": "R0047"
     },
     "HS-04": {
-      "status": "pending",
-      "reason": "继续全页面UI改造：日报周报当前动作与历史快照分区，交付物及质量审核版本清晰。"
+      "status": "done",
+      "round": "R0047"
     },
     "HS-05": {
       "status": "pending",
@@ -193,8 +193,8 @@
       "round": "R0046"
     },
     "HS-17": {
-      "status": "pending",
-      "reason": "继续全页面UI改造：日报周报当前动作与历史快照分区，交付物及质量审核版本清晰。"
+      "status": "done",
+      "round": "R0047"
     },
     "JS-01": {
       "status": "done",
@@ -1571,6 +1571,42 @@
         ".pms-loop/runs/R0046/checks.json": "650952a9f785f81e0725256e4609c1e5169150d5f10371be05a2fba3354239b8",
         ".pms-loop/runs/R0046/evidence.json": "28fc3d69b74cb75a2902cb547b74f5542896fe62a324d3298dfaa7e03f1d29ff"
       }
+    },
+    {
+      "id": "R0047",
+      "items": [
+        "HS-03",
+        "HS-04",
+        "HS-17"
+      ],
+      "started_at": "2026-09-10T20:54:49+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-10T21:08:02+00:00",
+      "revision": "c011aa03f970b4afc93d4301ef772160fa5f20da1c5a2283f5a6ac7aa108f550",
+      "proof": {
+        ".pms-loop/runs/R0047/test-domain.log": "9eba944cb1a7a92466e7015e396059be2b007e513edf0b5d3d7ba0c62d7199d4",
+        ".pms-loop/runs/R0047/build.log": "2baaceed431df1ec43a4d0845969725ca778d340fa0346793a50063ea1068d8e",
+        ".pms-loop/runs/R0047/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0047/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0047/browser-final.log": "6c995c483d1f6d9c27b22a325bceb6d1f7ad9f904015d8b8f2779a5527ee32cc",
+        ".pms-loop/runs/R0047/artifacts/r0024-aab319e959db4d4a4184d4356c5889bd7a5eae10.json": "aa17d007e117b4548a397e4769b36988da2faccbcae91df71c901831111629f5",
+        ".pms-loop/runs/R0047/artifacts/r0024-aab319e959db4d4a41847d40cbf421a29a9c1052.json": "7c3181d99a1399ddb5937f84c63e6a8afce19f61e45ab63d0dde0034a1575dd7",
+        ".pms-loop/runs/R0047/artifacts/r0024-aab319e959db4d4a4184a56fa5286f6abe821577.json": "5a6017caf91852c71a325d92ca42013eca7777fe46e38cfc98fff0071f200925",
+        ".pms-loop/runs/R0047/artifacts/UI-HS03-1440.png": "593690f2356c01edc503541c55db7df23af33865482740e3176e6fea49791b8d",
+        ".pms-loop/runs/R0047/artifacts/UI-HS03-1280.png": "5265ed80457be9083c8902ee5a405c53c56f7c08b15b7c9943f4ee5f5849444b",
+        ".pms-loop/runs/R0047/artifacts/UI-HS04-1440.png": "5960b3b8f351ea028ba8eff34d1ca27a88ba091a86810117a6eb0a39e0601689",
+        ".pms-loop/runs/R0047/artifacts/UI-HS04-1280.png": "49b3a0db7e4c543789eddfe1d78b9ac4615e584653a92fd37261c4d9112386bb",
+        ".pms-loop/runs/R0047/artifacts/UI-HS17-1440.png": "f7b6a565098055d0c72ab0dafa82e3f3fbec2d0acdab9c8c1e42500ebbd2205f",
+        ".pms-loop/runs/R0047/artifacts/UI-HS17-1280.png": "b39170fe784b3e96da32ff0e21e1285c19d7a9f1819033a6784ca54b26b3bf7d",
+        ".pms-loop/runs/R0047/checks.json": "4bd0bd48b5b0d458d68ca4f60ddf4c7e0f59e080b72c7f4600e6fe106fbcba4b",
+        ".pms-loop/runs/R0047/evidence.json": "7ae0ee69ddc49887c960c84f769b305c73f81a64a8f6dd065880baae8ece266b"
+      }
     }
   ],
   "notes": [
@@ -1821,6 +1857,14 @@
     {
       "at": "2026-09-10T20:54:29+00:00",
       "text": "reopen FINAL, HS-09, HS-10, HS-11, HS-12, HS-13: 继续全页面UI改造：工时/采购/外包/费用核算与原单，成本互斥和权限保持。"
+    },
+    {
+      "at": "2026-09-10T21:02:35+00:00",
+      "text": "R0047首浏览器2pass1fail：日报周报与归档通过；质量整改版本链已完成，最后角色切换误命中已关闭Drawer容器中的隐藏close按钮。截图发现1280日报周报三金额与风险摘要重叠，同轮拆独立金额标签，修正测试只定位打开Drawer后重查。"
+    },
+    {
+      "at": "2026-09-10T21:08:16+00:00",
+      "text": "R0047报告交付三页验收，新UI40/72。当前c011aa03工程235领域及3浏览器全部通过exit0，三页六双宽及表单/快照/版本/质量图查看。修复1280摘要金额重叠、测试隐藏drawer close定位，旧失败日志保留。继续HS3 663c577集成并补PlanRequest来源筛选；HS4 fe6bf2b+df55d7e已交付。"
     }
   ],
   "history": [

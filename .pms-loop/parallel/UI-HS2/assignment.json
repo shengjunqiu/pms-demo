@@ -22,7 +22,7 @@
   "acceptance_dependencies": [],
   "acceptance_ready": true,
   "acceptance_group": "UI-HS2",
-  "status": "integrated_pending_acceptance",
+  "status": "accepted",
   "last_confirmed_at": "2026-09-11",
   "acceptance_checklist": [
     "工程检查",
@@ -32,7 +32,7 @@
   ],
   "scenarios": "按/tmp/pms-ui-reporting-preparation.md三链",
   "fixtures": "真实UI写入；合法transition仅明确的前置",
-  "next_action": "R0047工程/报告及材料质量真实链验收",
+  "next_action": "R0047已正式验收",
   "delivery_commit": "d41d4dd16d126aa44b987e029071cb96d9f572f8",
   "integration_commit": "c810586"
 }
