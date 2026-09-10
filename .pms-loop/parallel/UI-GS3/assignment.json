@@ -25,9 +25,9 @@
   "shared_changes": [],
   "development_dependencies": [],
   "acceptance_dependencies": [],
-  "acceptance_ready": false,
+  "acceptance_ready": true,
   "acceptance_group": "UI-GS3",
-  "status": "submitted",
+  "status": "integrated",
   "last_confirmed_at": "2026-09-11",
   "acceptance_checklist": [
     "工程检查",
@@ -37,6 +37,7 @@
   ],
   "scenarios": "版本来源清晰、申请分区、台账常用动作与金额正确；原冻结与额度规则保留",
   "fixtures": "existing estimates/early-investments real transitions",
-  "next_action": "等待范围检查；已有3包提交，暂停普通派发优先消化验收库存",
-  "delivery_commit": "095fcb7"
+  "next_action": "范围与静态审查通过，准备正式四页验收",
+  "delivery_commit": "095fcb7",
+  "integration_commit": "3161a06"
 }
