@@ -79,7 +79,7 @@ for (const approve of [true, false]) {
     await navigate(page, `/unsigned-projects/${projectId}?tab=investment`);
     await page.getByPlaceholder('审批意见，批准/驳回前必填').fill(approve ? '核对依据，批准追加额度和申请期限' : '签约依据不足，驳回追加额度');
     const row = page.locator('.ant-table-tbody tr').filter({ hasText: approval.id });
-    await row.getByRole('button', { name: approve ? '批准' : '驳回', exact: true }).click();
+    await row.getByRole('button', { name: approve ? /^批\s*准$/ : /^驳\s*回$/ }).click();
     await confirm(page);
     await expect(row).toContainText(approve ? '通过' : '驳回');
     const after = await snapshot(page, projectId);
@@ -90,8 +90,8 @@ for (const approve of [true, false]) {
     expect(after.costs).toEqual(before.costs);
     await role(page, '客户经理');
     await navigate(page, `/unsigned-projects/${projectId}?tab=investment`);
-    await expect(page.locator('.ant-descriptions-item').filter({ hasText: '批准额度' }).first()).toContainText(String(after.quota));
-    await expect(page.locator('.ant-descriptions-item').filter({ hasText: '投入有效期' }).first()).toContainText(after.validUntil);
+    await expect(page.getByRole('rowheader', { name: '批准额度', exact: true }).locator('xpath=following-sibling::td[1]')).toContainText(String(after.quota));
+    await expect(page.getByRole('rowheader', { name: '投入有效期', exact: true }).locator('xpath=following-sibling::td[1]')).toContainText(after.validUntil);
     observations.set(page, { before, pending, after, screenshots: await capturePageEvidence(page, `YS-14-investment-${approve ? 'approve' : 'reject'}`) });
   });
 }

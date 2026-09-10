@@ -222,7 +222,8 @@ export function StartConfirmationPage() {
                     message.success('项目已正式启动');
                   } catch (error) {
                     message.error((error as Error).message);
-                    return Promise.reject(error);
+                    // Business validation is shown inline; do not create an unhandled rejection.
+                    return;
                   }
                 },
               })
