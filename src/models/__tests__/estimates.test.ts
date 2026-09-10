@@ -1,5 +1,5 @@
 import { describe,expect,it } from 'vitest';
-import { createBusinessState,transition,type Actor } from '@/mock/business';
+import { createBusinessState,transition,useBusinessStore,type Actor } from '@/mock/business';
 import { estimateFreezeMissing,estimateTotals } from '@/mock/estimates';
 import type { CostVersion,SolutionVersion } from '@/models/presales';
 const tech:Actor={id:'U-005',name:'赵工',role:'solution-tech'},pmo:Actor={id:'U-002',name:'李主任',role:'pmo'};
@@ -9,4 +9,23 @@ describe('概算版本与冻结',()=>{
  it('修改评审成本仍可存草稿和版本，冻结被阻断',()=>{const {state,id}=ready();const draft=structuredClone(state.estimateDrafts[id]);draft.lines[0].quantity=11;let next=transition(state,{type:'estimate-save-draft',id,draft},tech);next=transition(next,{type:'estimate-publish',id},tech);const e=next.estimates.at(-1)!;expect(estimateFreezeMissing(next,e.id).join()).toContain('偏离');expect(()=>transition(next,{type:'estimate-freeze',id,estimateId:e.id,opinion:'确认'},pmo)).toThrow('重新评审');});
  it('PMO冻结只更新商机引用，旧项目绑定和旧版本均保持',()=>{const readyState=ready();let state=readyState.state;const id=readyState.id;state.projects[0].frozenEstimateVersionId=state.estimates[0].id;const old=structuredClone(state.estimates[0]);const projectId=state.projects[0].frozenEstimateVersionId;state=transition(state,{type:'estimate-publish',id},tech);const first=state.estimates.at(-1)!;expect(()=>transition(state,{type:'estimate-freeze',id,estimateId:first.id,opinion:'确认'},tech)).toThrow('PMO');state=transition(state,{type:'estimate-freeze',id,estimateId:first.id,opinion:'已核对评审明细与税口径'},pmo);expect(state.opportunities.find(o=>o.id===id)?.currentEstimateVersionId).toBe(first.id);expect(state.projects[0].frozenEstimateVersionId).toBe(projectId);expect(state.estimates[0]).toEqual(old);const snapshot=structuredClone(state.estimates.at(-1));state=transition(state,{type:'estimate-publish',id},tech);expect(state.estimates.at(-2)).toEqual(snapshot);expect(state.estimates.at(-1)?.id).not.toBe(first.id);});
  it('零收入不产生NaN，未通过评审不能生成概算',()=>{const {state,id}=ready();const d=structuredClone(state.estimateDrafts[id]);d.income=0;expect(estimateTotals(d).rate).toBeNull();state.presales[id].reviews[0].status='不通过';expect(()=>transition(state,{type:'estimate-create-draft',id,reviewId:'R1'},tech)).toThrow('已通过');});
+});
+
+it('概算禁改单价保留数量与说明编辑，新增或改编号科目不能绕过费率限制',()=>{
+ const {state,id}=ready();
+ const labor={...state.estimateDrafts[id].lines[0],id:'LABOR-GUARD',subjectId:'SUB-01',unit:'人天',unitPrice:0.12};
+ state.estimateDrafts[id].lines.push(labor);
+ state.accessConfiguration.versions.find(v=>v.role===tech.role)!.editableFields=[];
+ const original=structuredClone(state.estimateDrafts[id]);
+ for(const change of [{unitPrice:0.2},{id:'NEW-LABOR'},{subjectId:'SUB-03'}]){
+   useBusinessStore.setState({data:structuredClone(state)});
+   const draft=structuredClone(original);Object.assign(draft.lines[1],change);
+   expect(()=>useBusinessStore.getState().dispatch({type:'estimate-save-draft',id,draft},tech)).toThrow('禁止编辑概算人员费率');
+   expect(useBusinessStore.getState().data.estimateDrafts[id]).toEqual(original);
+   expect(useBusinessStore.getState().data.audit.at(-1)).toMatchObject({result:'拒绝',changes:[]});
+ }
+ useBusinessStore.setState({data:structuredClone(state)});
+ const draft=structuredClone(original);draft.lines[1].quantity+=1;draft.changeReason='只调整人天和说明，保留费率';
+ useBusinessStore.getState().dispatch({type:'estimate-save-draft',id,draft},tech);
+ expect(useBusinessStore.getState().data.estimateDrafts[id]).toEqual(draft);
 });

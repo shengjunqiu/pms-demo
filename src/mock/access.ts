@@ -28,6 +28,13 @@ export function assertActionAccess(state: BusinessState, action: BusinessAction,
   if ((action.type === 'save-post-evaluation' || action.type === 'score-post-evaluation') && !canEditSensitiveField(state, actor, 'evaluation')) throw new Error('当前策略禁止编辑评价字段');
   if (action.type === 'finance-config-save' && action.kind === 'rates' && !canEditSensitiveField(state, actor, 'labor-rate')) throw new Error('当前策略禁止编辑人员费率');
   if (action.type === 'submit-operation-cost' && action.kind === 'labor' && !canEditSensitiveField(state, actor, 'labor-rate')) throw new Error('当前策略禁止编辑人员费率');
+  if (action.type === 'estimate-save-draft' && !canEditSensitiveField(state, actor, 'labor-rate')) {
+    const previous = state.estimateDrafts[action.id]?.lines ?? state.presales[action.id]?.costVersions.find(v => v.id === action.draft.costVersionId)?.lines ?? [];
+    for (const line of action.draft.lines) {
+      const old = previous.find(l => l.id === line.id);
+      if ((line.subjectId === 'SUB-01' || old?.subjectId === 'SUB-01') && (!old || old.subjectId !== line.subjectId || old.unitPrice !== line.unitPrice)) throw new Error('当前策略禁止编辑概算人员费率');
+    }
+  }
   if (action.type === 'submit-acceptance' && !canEditSensitiveField(state, actor, 'contact')) {
     const original = action.id ? state.acceptanceDetails[action.id]?.customerContact ?? '' : '';
     if (action.detail.customerContact !== original) throw new Error('当前策略禁止编辑客户联系方式');

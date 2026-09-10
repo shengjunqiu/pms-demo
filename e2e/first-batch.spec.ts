@@ -42,6 +42,9 @@ test('商机提交和重新打开保留同一份业务记录', async ({ page }) 
   await page.getByLabel('商机名称', { exact: true }).fill('浏览器验证园区协同项目');
   await page.getByLabel('客户', { exact: true }).click();
   await page.locator('.ant-select-dropdown:visible .ant-select-item-option').first().click();
+  await page.getByLabel('协同人员', { exact: true }).click();
+  await page.locator('.ant-select-dropdown:visible .ant-select-item-option').filter({ hasText: /^赵工$/ }).click();
+  await page.getByLabel('商机名称', { exact: true }).click();
   await page.getByLabel('预计项目金额（万元）', { exact: true }).fill('1000');
   await page.getByLabel('业务背景、建设目标与主要需求', { exact: true }).fill('统一园区设备台账、巡检计划与运维工单，明确交付范围。');
   await page.getByRole('button', { name: '提交商机', exact: true }).click();
