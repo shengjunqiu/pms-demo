@@ -39,7 +39,7 @@ export function assessmentSummary(o: Opportunity, m: OpportunityMeta) {
 }
 export function initiationMissing(state: BusinessState, o: Opportunity) {
   const m = opportunityMeta(state,o);
-  return [o.status !== '拟立项' && '商机未达到拟立项', !m.solutionTask || m.solutionTask.status !== '已完成' ? '方案及专家评审未通过' : false, !state.estimates.some(e => e.id === o.currentEstimateVersionId && e.isFrozen) && '缺少指定冻结概算版本', state.projects.some(p => p.opportunityId === o.id) && '商机已关联正式项目'].filter(Boolean) as string[];
+  return [o.status !== '拟立项' && '商机未达到拟立项', !m.solutionTask || m.solutionTask.status !== '已完成' || state.presales[o.id]?.reviews.at(-1)?.status !== '通过' ? '方案及专家评审未通过' : false, !state.estimates.some(e => e.id === o.currentEstimateVersionId && e.isFrozen) && '缺少指定冻结概算版本', state.projects.some(p => p.opportunityId === o.id) && '商机已关联正式项目'].filter(Boolean) as string[];
 }
 export type OpportunityAction =
  | { type: 'save-opportunity'; id?: string; input: OpportunityInput; submit: boolean; duplicateConfirmed?: boolean }
