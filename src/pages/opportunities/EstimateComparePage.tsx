@@ -13,7 +13,7 @@ import {
   Table,
   Tag,
 } from "antd";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useBusinessStore } from "@/mock/business";
 import { canViewOpportunity } from "@/mock/opportunities";
 import { costLineAmount } from "@/mock/presales";
@@ -27,14 +27,16 @@ export function EstimateComparePage() {
   const { id } = useParams();
   const { data } = useBusinessStore();
   const actor = useAppStore((s) => s.currentUser);
+  const [query, setQuery] = useSearchParams();
   const viewMargin = canViewSensitiveField(data, actor, "margin");
+  const viewLaborRate = canViewSensitiveField(data, actor, "labor-rate");
   const hiddenMargin = "毛利字段无查看权限";
   const displayText = (value?: string) =>
     !viewMargin && /毛利|gross.?margin/i.test(value ?? "")
       ? hiddenMargin
       : value;
-  const [leftId, setLeftId] = useState<string>();
-  const [rightId, setRightId] = useState<string>();
+  const [leftId, setLeftId] = useState<string | undefined>(() => query.get("base") ?? undefined);
+  const [rightId, setRightId] = useState<string | undefined>(() => query.get("compare") ?? undefined);
   const o = data.opportunities.find((o) => o.id === id);
   if (!o) return <StateView type="404" />;
   if (!canViewOpportunity(data, o, actor)) return <StateView type="403" />;
@@ -88,6 +90,13 @@ export function EstimateComparePage() {
     value: e.id,
     label: `${e.version} · ${e.isFrozen ? "冻结" : "待确认"} · ${e.id}`,
   }));
+  const selectVersion = (side: "base" | "compare", value: string) => {
+    if (side === "base") setLeftId(value);
+    else setRightId(value);
+    const next = new URLSearchParams(query);
+    next.set(side, value);
+    setQuery(next, { replace: true });
+  };
   return (
     <>
       <PageHeader
@@ -107,7 +116,7 @@ export function EstimateComparePage() {
             aria-label="基准概算版本"
             style={{ width: 320 }}
             value={left?.id}
-            onChange={setLeftId}
+            onChange={(value) => selectVersion("base", value)}
             options={options}
           />
           <span>对比版本</span>
@@ -115,7 +124,7 @@ export function EstimateComparePage() {
             aria-label="对比概算版本"
             style={{ width: 320 }}
             value={right?.id}
-            onChange={setRightId}
+            onChange={(value) => selectVersion("compare", value)}
             options={options}
           />
         </Space>
@@ -186,9 +195,13 @@ export function EstimateComparePage() {
                       {
                         key: "source",
                         label: "来源方案 / 成本",
-                        children: data.estimateMeta[e.id]
-                          ? `${data.estimateMeta[e.id].solutionVersionId} / ${data.estimateMeta[e.id].costVersionId}`
-                          : "历史导入快照",
+                        children: data.estimateMeta[e.id] ? (
+                          <Space wrap size={4}>
+                            <Link to={`/opportunities/${o.id}/review?review=${data.estimateMeta[e.id].reviewId}`}>评审 {data.estimateMeta[e.id].reviewId}</Link>
+                            <Link to={`/opportunities/${o.id}/solution?version=${data.estimateMeta[e.id].solutionVersionId}`}>方案 {data.estimateMeta[e.id].solutionVersionId}</Link>
+                            <Link to={`/opportunities/${o.id}/tech-cost?version=${data.estimateMeta[e.id].costVersionId}`}>成本 {data.estimateMeta[e.id].costVersionId}</Link>
+                          </Space>
+                        ) : "历史导入快照",
                       },
                       {
                         key: "freeze",
@@ -294,12 +307,10 @@ export function EstimateComparePage() {
                   {
                     title: "单价（万元）",
                     width: 180,
-                    render: (_, r) => (
-                      <>
-                        <MoneyText value={r.a?.unitPrice} /> →{" "}
-                        <MoneyText value={r.b?.unitPrice} />
-                      </>
-                    ),
+                    render: (_, r) =>
+                      !viewLaborRate && (r.a?.subjectId === "SUB-01" || r.b?.subjectId === "SUB-01")
+                        ? "已隐藏"
+                        : <><MoneyText value={r.a?.unitPrice} /> → <MoneyText value={r.b?.unitPrice} /></>,
                   },
                   {
                     title: "税口径（基准→对比）",
