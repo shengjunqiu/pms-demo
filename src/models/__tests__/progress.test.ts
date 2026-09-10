@@ -1,6 +1,7 @@
 import { expect, it } from 'vitest';
 import { createBusinessState, transition } from '@/mock/business';
 import { useAppStore } from '@/store/useAppStore';
+import { selectTodos } from '@/mock/todos';
 const pm = { id: 'U-001', name: '张建国', role: 'project-manager' as const };
 const pmo = { id: 'U-002', name: '李主任', role: 'pmo' as const };
 const finance = { id: 'U-004', name: '刘敏', role: 'finance' as const };
@@ -21,6 +22,13 @@ it('执行事实更新同步总体进度但不改计划或历史基线，并拒�
   expect(() => transition(next, { ...action, progress: 100 }, pm)).toThrow();
   expect(() => transition(state, action, finance)).toThrow();
   expect(state.tasks.find((t) => t.id === task.id)?.progress).toBe(0);
+});
+it('正式启动前不暴露执行任务待办且不能更新WBS执行事实', () => {
+  const state = createBusinessState(); const project = state.projects.find((p) => p.id === 'P-001')!; const task = state.tasks.find((t) => t.projectId === project.id && t.ownerId === pm.id)!;
+  project.phase = '立项'; project.subPhase = 'WBS编制'; project.actualStartDate = undefined;
+  expect(selectTodos(state, pm).some((todo) => todo.id === task.id)).toBe(false);
+  expect(() => transition(state, { type: 'update-task', id: task.id, progress: 10, actualStartDate: '2026-09-08', note: '未正式启动不得执行' }, pm)).toThrow('正式启动');
+  expect(state.tasks.find((item) => item.id === task.id)?.progress).toBe(task.progress);
 });
 it('计划变更超过30天须PMO和财务全通过才追加计划基线，执行事实与原快照保留', () => {
   const state = createBusinessState(); const submitted = transition(state, { type: 'request-plan', projectId: 'P-001', kind: 'schedule', shiftDays: 35, reason: '客户接口延期，申请顺延并评估资源占用' }, pm);

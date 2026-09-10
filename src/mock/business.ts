@@ -252,7 +252,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     const p = project(task.projectId); target = task.id;
     requireRole('project-manager', 'solution-tech');
     if (!(actor.role === 'project-manager' && actor.id === p.pmId) && actor.id !== task.ownerId) throw new Error('仅项目主PM或任务责任人可更新');
-    if (state.lockedProjects.includes(p.id) || p.phase === '已关闭') throw new Error('已关闭项目不可更新建设任务');
+    if (p.phase !== '执行' || p.status === '已终止' || state.lockedProjects.includes(p.id)) throw new Error('项目正式启动并进入执行阶段后才能更新建设任务');
     if (!Number.isFinite(action.progress) || action.progress < task.progress || action.progress > 100) throw new Error('完成率不可回退且须在0到100之间');
     if (!action.note.trim()) throw new Error('执行说明必填');
     const dateValid = (value?: string) => !!value && /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value)) && value <= AS_OF_DATE;
