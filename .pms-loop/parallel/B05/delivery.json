@@ -35,11 +35,7 @@
     "subagent workflow a8c75c15-bf7f-4cd6-be39-eef2f3480c7c deliveries/b05-worker.md",
     "subagent follow-up review for B05: Merge verdict OK with notes"
   ],
-  "remaining_dependencies": [
-    "current integration browser verification for YS-13/14/15",
-    "formal 1440x900/1280x900 screenshots",
-    "formal Loop acceptance"
-  ],
+  "remaining_dependencies": [],
   "integration_commit": "dc7aa7b",
   "integration_commits": [
     "2ded27b",
@@ -49,5 +45,7 @@
   "formal_rounds": [
     "R0024"
   ],
-  "status": "integrated_pending_acceptance"
+  "status": "accepted",
+  "acceptance_dependencies": [],
+  "next_action": "YS-13/14/15 accepted in R0024; preserve delivery history."
 }

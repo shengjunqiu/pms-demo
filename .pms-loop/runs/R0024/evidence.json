@@ -1,0 +1,285 @@
+{
+  "schema_version": 1,
+  "round": "R0024",
+  "revision": "d20df29c63407668d1bc927a43a9516a732e76c21a14f300144ccef463dccbd2",
+  "items": {
+    "YS-13": {
+      "entry": "/unsigned-projects",
+      "covered_features": [
+        "YS-047",
+        "YS-048",
+        "YS-049",
+        "YS-050",
+        "YS-051",
+        "YS-052",
+        "YS-053",
+        "YS-054"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单第128行，任务书第422行；功能范围YS-047~054，详见plan.json的原文定位。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "从未签台账点击 P-PLAN-001 进入同一项目详情，返回台账后可重新检索；签约后同一会话切换含已签转换记录可找到原项目。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "固定基准日2026-09-09，台账显示12个未签项目、已投入17799.50万元、超限10项、到期10项；包含立项金额、日期、授权签约日、额度、成本和风险列。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "投入超限筛选后当前页10行均命中超限标签；清空筛选后搜索项目编号下钻。详情中跟进、追加审批、签订及退出均执行真实状态动作。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "台账与详情消费统一项目及unsignedSummary；浏览器计数与场景数据一致。P-PLAN-001登记1200万元合同后移出默认未签集合，在含已签转换记录下显示已签转换。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "输入不存在的项目编号显示暂无数据；技术身份访问未签详情显示403，未知对象显示404。数据为同步本地Mock，未设置伪造网络加载流程。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已实际查看本次冻结版本1440×900、1280×900视口全页PNG，标题、表格/详情、操作区无明显破版或整体横向溢出；截图无弹窗遮罩。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "本次7个Playwright场景全部通过，pageerror与console.error收集均为空；预期业务拒绝仅显示页面提示。"
+        },
+        "business-1": {
+          "requirement": "未签金额日期额度成本使用率进展风险台账",
+          "passed": true,
+          "observation": "台账呈现未签金额、授权日期、额度、已投入、承诺待审、使用率、跟进与风险；双宽截图可见金额日期和分页，宽表使用局部横向滚动。"
+        },
+        "business-2": {
+          "requirement": "更新签约/追加投入/确认签订/退出可演示，超限时限联动",
+          "passed": true,
+          "observation": "同轮详情浏览器完成跟进保存、批准/驳回、真实合同转换及终止复盘；233项领域回归同时覆盖额度重算、授权逾期阻断新采购及既有实际成本保留。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "筛选投入超限，清空后搜索P-PLAN-001并点击项目",
+          "expected": "风险结果正确且下钻同一项目",
+          "observed": "当前页10条均为超限，进入P-PLAN-001详情；空搜索结果显示暂无数据"
+        },
+        {
+          "action": "详情签约后返回台账搜索项目，再切含已签转换记录",
+          "expected": "已签项目退出未签集合但保留历史入口",
+          "observed": "默认未签列表无该项目，切换后显示已签转换"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0024/artifacts/r0024-9041e22008a7401df18b0a300105f39dc7b6d7d6.json",
+        ".pms-loop/runs/R0024/artifacts/r0024-9041e22008a7401df18b6754c80abe57c2a14c76.json",
+        ".pms-loop/runs/R0024/artifacts/r0024-9041e22008a7401df18bd0ef9b00db93221f4f27.json",
+        ".pms-loop/runs/R0024/artifacts/r0024-9041e22008a7401df18bdcb1a14e71db714cf4bc.json",
+        ".pms-loop/runs/R0024/artifacts/r0024-ddbd7d35d15097f0e7b800d587cb5060835c6f16.json",
+        ".pms-loop/runs/R0024/artifacts/r0024-ddbd7d35d15097f0e7b889dc9c34fa8563cd7313.json",
+        ".pms-loop/runs/R0024/artifacts/r0024-ddbd7d35d15097f0e7b8f4bb973ff82154297878.json",
+        ".pms-loop/runs/R0024/browser.log",
+        ".pms-loop/runs/R0024/test-domain.log",
+        ".pms-loop/runs/R0024/artifacts/review.md"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0024/artifacts/YS-13-1440.png",
+        "1280": ".pms-loop/runs/R0024/artifacts/YS-13-1280.png"
+      }
+    },
+    "YS-14": {
+      "entry": "/unsigned-projects/P-PLAN-001",
+      "covered_features": [
+        "YS-048",
+        "YS-049",
+        "YS-050",
+        "YS-051",
+        "YS-052",
+        "YS-053",
+        "YS-054"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单第129行，任务书第423行；功能范围YS-048~054，详见plan.json的原文定位。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "P-PLAN-001详情可切换签约进展、额外投入、合同和退出Tabs；同一会话由详情到台账、启动确认，合同编号保持CON-R0024-BROWSER。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "详情分别展示拟签1200万元和未签时实际已签0；合同成功后实际已签1200，附原合同号、来源商机、回款节点及双方签章附件。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "客户经理保存跟进；追加100万元形成待审批，集团领导批准后额度0变100、授权日期更新；独立驳回场景额度与日期保持原值。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "只读读取统一状态对账：待审不改变额度/日期/成本；批准只更新授权，驳回不释放；P-004退出前后98.50万元和完整原成本流水及退出快照一致。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "缺签章附件及回款1100不等于合同1200时明确报错且未确认；技术身份403、未知项目404；退出后追加输入、提交、签约确认均禁用。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已实际查看本次冻结版本1440×900、1280×900视口全页PNG，标题、表格/详情、操作区无明显破版或整体横向溢出；截图无弹窗遮罩。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "本次7个Playwright场景全部通过，pageerror与console.error收集均为空；预期业务拒绝仅显示页面提示。"
+        },
+        "business-1": {
+          "requirement": "签约进展、额度/时限、成本来源、沉没成本和追加审批",
+          "passed": true,
+          "observation": "跟进时间线回显；额度/有效期经领导审批后生效，驳回不变；退出记录包含投入资源、可回收资产、责任和建议，保留98.50万元原成本。超限和逾期写入门禁由unsigned领域测试验证。"
+        },
+        "business-2": {
+          "requirement": "签订转正式前检查合同；退出留痕，不把拟签额算成已签额",
+          "passed": true,
+          "observation": "无附件和回款合计不守恒不能转换；合法合同形成原单、回款节点、签署证据与商机绑定轨迹，随后同一合同可作为启动依据。终止保留历史成本，不将拟签额提前记为已签额。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "客户经理提交100万元追加申请，领导分别批准和驳回（独立重置场景）",
+          "expected": "待审不释放；批准更新额度日期；驳回保持原值",
+          "observed": "审批原单待审；批准后0→100、有效期2026-10-31；驳回额度0及原日期不变，成本流水不变"
+        },
+        {
+          "action": "签订1200万元合同，依次不上传附件、错误回款1100、补全附件并修正回款1200",
+          "expected": "前两次阻断，合法原单才确认",
+          "observed": "无附件与不守恒均报错且未确认；合法签署后显示合同、附件、1个节点1200万元，随后同合同启动"
+        },
+        {
+          "action": "PMO终止P-004并填写退出复盘，市场角色再尝试投入和签约",
+          "expected": "保留沉没成本，禁止新增动作",
+          "observed": "98.50万元及原流水不变，退出快照保存，追加输入与提交和签约按钮禁用"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0024/artifacts/r0024-9041e22008a7401df18b0a300105f39dc7b6d7d6.json",
+        ".pms-loop/runs/R0024/artifacts/r0024-9041e22008a7401df18b6754c80abe57c2a14c76.json",
+        ".pms-loop/runs/R0024/artifacts/r0024-9041e22008a7401df18bd0ef9b00db93221f4f27.json",
+        ".pms-loop/runs/R0024/artifacts/r0024-9041e22008a7401df18bdcb1a14e71db714cf4bc.json",
+        ".pms-loop/runs/R0024/artifacts/r0024-ddbd7d35d15097f0e7b800d587cb5060835c6f16.json",
+        ".pms-loop/runs/R0024/artifacts/r0024-ddbd7d35d15097f0e7b889dc9c34fa8563cd7313.json",
+        ".pms-loop/runs/R0024/artifacts/r0024-ddbd7d35d15097f0e7b8f4bb973ff82154297878.json",
+        ".pms-loop/runs/R0024/browser.log",
+        ".pms-loop/runs/R0024/test-domain.log",
+        ".pms-loop/runs/R0024/artifacts/review.md"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0024/artifacts/YS-14-1440.png",
+        "1280": ".pms-loop/runs/R0024/artifacts/YS-14-1280.png"
+      }
+    },
+    "YS-15": {
+      "entry": "/projects/P-PLAN-001/start-confirmation",
+      "covered_features": [
+        "YS-055",
+        "YS-056",
+        "YS-057"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单第130行，任务书第424行；功能范围YS-055~057，详见plan.json的原文定位。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "项目启动确认显示七类前置检查及办理入口；启动后切换项目经理，从真实WBS事项进入同项目progress?task=TASK-PLAN-1，并检查日报和工时办理入口。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "清单包含立项、主PM任命接受、完整四基线、启动里程碑、团队、真实合同与阶段建设锁；启动记录保存V1.0、合同、任命、日期和意见，4条模拟通知的人员角色正确。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "未签合同点击确认被拒；完整条件下提前至2026-09-08被拒，改2026-09-09才正式启动，重复启动按钮消失。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "同一会话新登记CON-R0024-BROWSER后启动依据仍是该合同。独立启动场景依据CON-R0024-START，项目进入执行/开发实施；WBS、日报、工时入口均归属P-PLAN-001。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "缺基线显示未满足，未签合同显示唯一阻断原因；非法日期不产生启动记录。启动后PMO仅查看执行事项，项目经理可进入执行页面办理。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已实际查看本次冻结版本1440×900、1280×900视口全页PNG，标题、表格/详情、操作区无明显破版或整体横向溢出；截图无弹窗遮罩。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "本次7个Playwright场景全部通过，pageerror与console.error收集均为空；预期业务拒绝仅显示页面提示。"
+        },
+        "business-1": {
+          "requirement": "立项、任命接受、基线、合同等启动条件清单",
+          "passed": true,
+          "observation": "分别观察缺基线、只缺真实合同和七项全部满足状态；条件及来源列明示任命、V1.0、启动里程碑和合同原单。"
+        },
+        "business-2": {
+          "requirement": "阻断项列原因，通过才正式启动并激活执行待办",
+          "passed": true,
+          "observation": "阻断场景实际提交被拒；合法确认后生成3类执行事项和4条模拟通知，项目经理更新执行、填报今日日报及填报本人工时入口可用，不能重复确认启动。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "在未签合同场景确认启动，再独立重置完整条件场景并填非法/合法日期",
+          "expected": "未签或日期不合法不能启动，条件完备才通过",
+          "observed": "未签明确拒绝；2026-09-08拒绝；2026-09-09通过，项目进入执行且移除重复启动按钮"
+        },
+        {
+          "action": "启动后查看通知，并切PM打开执行入口",
+          "expected": "人员角色匹配，真实业务入口激活",
+          "observed": "4条模拟通知角色正确，WBS下钻同一项目任务，日报及工时按钮启用"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0024/artifacts/r0024-9041e22008a7401df18b0a300105f39dc7b6d7d6.json",
+        ".pms-loop/runs/R0024/artifacts/r0024-9041e22008a7401df18b6754c80abe57c2a14c76.json",
+        ".pms-loop/runs/R0024/artifacts/r0024-9041e22008a7401df18bd0ef9b00db93221f4f27.json",
+        ".pms-loop/runs/R0024/artifacts/r0024-9041e22008a7401df18bdcb1a14e71db714cf4bc.json",
+        ".pms-loop/runs/R0024/artifacts/r0024-ddbd7d35d15097f0e7b800d587cb5060835c6f16.json",
+        ".pms-loop/runs/R0024/artifacts/r0024-ddbd7d35d15097f0e7b889dc9c34fa8563cd7313.json",
+        ".pms-loop/runs/R0024/artifacts/r0024-ddbd7d35d15097f0e7b8f4bb973ff82154297878.json",
+        ".pms-loop/runs/R0024/browser.log",
+        ".pms-loop/runs/R0024/test-domain.log",
+        ".pms-loop/runs/R0024/artifacts/review.md"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0024/artifacts/YS-15-1440.png",
+        "1280": ".pms-loop/runs/R0024/artifacts/YS-15-1280.png"
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "title": "YS-15 阻断原因完整且满足条件后原子启动",
+  "status": "failed",
+  "url": "http://127.0.0.1:4179/projects/P-PLAN-001/progress?task=TASK-PLAN-1",
+  "consoleErrors": [
+    "真实已签合同：未签项目不能确认正式启动"
+  ],
+  "observations": {}
+}

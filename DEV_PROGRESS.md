@@ -3,15 +3,15 @@
 <!-- pms-loop:begin -->
 ## Loop 当前进度
 
-已验收：**30 / 72 页面**
+已验收：**33 / 72 页面**
 
-状态：`in_progress`；更新时间：2026-09-10T06:38:47+00:00
+状态：`in_progress`；更新时间：2026-09-10T11:24:43+00:00
 
 | 模块 | 已验收 | 待办/活动/阻塞 |
 |---|---:|---|
 | WK | 1/2 | WK-01(pending) |
 | GS | 2/11 | GS-01(pending)、GS-03(pending)、GS-05(pending)、GS-06(pending)、GS-07(pending)、GS-08(pending)、GS-09(pending)、GS-10(pending)、GS-11(pending) |
-| YS | 3/15 | YS-01(pending)、YS-02(pending)、YS-03(pending)、YS-04(pending)、YS-05(pending)、YS-09(pending)、YS-10(pending)、YS-11(pending)、YS-12(pending)、YS-13(pending)、YS-14(pending)、YS-15(pending) |
+| YS | 6/15 | YS-01(pending)、YS-02(pending)、YS-03(pending)、YS-04(pending)、YS-05(pending)、YS-09(pending)、YS-10(pending)、YS-11(pending)、YS-12(pending) |
 | HS | 15/17 | HS-14(pending)、HS-15(pending) |
 | JS | 2/13 | JS-01(pending)、JS-02(pending)、JS-05(pending)、JS-06(pending)、JS-07(pending)、JS-08(pending)、JS-09(pending)、JS-10(pending)、JS-11(pending)、JS-12(pending)、JS-13(pending) |
 | GL | 6/6 | 无 |
@@ -23,8 +23,6 @@
 
 ### 最近轮次与验证
 
-- R0019：HS-16；accepted；证据目录 `.pms-loop/runs/R0019/`
-  验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
 - R0020：GS-02, GS-04；accepted；证据目录 `.pms-loop/runs/R0020/`
   验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
 - R0021：YS-06, YS-07, YS-08；accepted；证据目录 `.pms-loop/runs/R0021/`
@@ -33,10 +31,11 @@
   验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
 - R0023：CF-08；accepted；证据目录 `.pms-loop/runs/R0023/`
   验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
+- R0024：YS-13, YS-14, YS-15；accepted；证据目录 `.pms-loop/runs/R0024/`
+  验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
 
 ### 假设、已知问题与恢复说明
 
-- 2026-09-09T17:11:16+00:00：R0013正在实现HS02/WK02：真实任务执行更新、计划变更/阶段原单、超过30天PMO+财务全通过会签。浏览器已验证P001任务完成62.5→75，待办转已办；35天会签PMO后待审、财务后V2与终验2027-02-04；阶段缺材料通过被拒、驳回原单。需最终check（最近修改待办只保留指定责任角色、合同验收日期字段、完成任务日期缺失文案）、双宽度截图、控制台及验收提交。WK01仍待采购外包等原表单依赖。
 - 2026-09-09T18:07:41+00:00：R0016阻塞: 日报里程碑达成需审核通过的材料，合并HS-17阶段交付物实现同一验收闭环
 - 2026-09-09T18:07:52+00:00：reopen FINAL, HS-03, HS-04: 合并交付物依赖后继续同一业务闭环
 - 2026-09-09T18:24:17+00:00：R0017（HS-03/HS-04/HS-17）已实现日报草稿/提交/独立问题关联、周报快照与模拟上报、交付物版本/质量整改/PMO审核/归档、里程碑材料日期校验及WK02联动。39领域测试已通过；新增实施计划导入目录后正在重跑最终check。浏览器曾成功打开日报初态，但CUA随后超时并重置，getState连续返回apps=[]/browsers=[]，createBrowserTab返回Browser is not available: iab；open_in_codex预览未响应已终止等待。evidence保持未验收；恢复浏览器后继续当前轮次，不重复begin。待验证：日报无进展草稿→提交/待办、周报生成补充上报/来源快照、文档质量失败→独立整改→复查、文件v1退回→v2通过、材料通过后里程碑实际达成，三页1440/1280截图及控制台。R0015已提交02a7041，累计17/72页；所有R0017源码尚未提交。
@@ -46,6 +45,7 @@
 - 2026-09-10T05:20:32+00:00：本次恢复已合入 access e2e 4be6ffc→a650360、D09 d978009→fb5c20c；主集成6408766保存字段展示权限、团队总览真实成员、JS13按检查项名定位补办路由及回归证据。typecheck/lint/build通过，access.spec.ts 2条及receipts.spec.ts 2条真实浏览器共4通过，无控制台error；1440/1280截图已保存parallel/access-e2e并抽查。修复helpers只匹配可见下拉；团队场景先由领导驳回APR-1再修改成员，遵守原业务门禁。仍29/72、无活动轮次；CF07/08不得直接accept：尚须补齐商机/审计组织范围、按钮级策略展示、完整审批轨迹及对应浏览器场景。D09五页只完成工程检查，字段隐藏后的保存及跨页链仍需专项浏览器观察；bundle约2.257MB分包待办。当前无运行服务和浏览器测试。后续先补访问范围再开始CF07/08正式轮次，禁止复用旧截图修改hash验收。
 - 2026-09-10T06:00:43+00:00：R0023 CF08已正式验收，累计30/72，无活动轮次。组织权限补齐商机/立项、统计/URL预填/匿名查重；审计统一按对象归属过滤，未知历史仅all可查。默认PM会签临时角色关系及本人签署历史可访问但显式组织限制仍适用。审计记录真实opinion/reason/note，个人工时金额、消耗承诺及type labor账本副本全带敏感标记。最终revision15087a0989284b85ea66d9525fe5aa5f2a457c136eb54fad12bb1daaca49abb1，typecheck/lint/build与217领域测试通过；access-scope/access/receipts共5场景最新执行通过，1条复选框点击瞬态失败后同源码原样重跑通过，两次browser日志均保留R0023。1440/1280列表、签署意见和脱敏抽屉已查看。E01 b8f2c36→b66cdbd、E02 6b610fb→c40ace4范围检查通过且无冲突。CF07仍待按钮级动作可用性、字段可编辑及收入/采购/外包粒度等原文范围，不能直接accept；后续独立页面/链路按依赖分批验收，不重用旧版本截图。项目未完成，无服务/浏览器测试运行。
 - 2026-09-10T06:38:47+00:00：F01-F07七包已按精确owned_paths范围验证后单向cherry-pick，无共享文件越界或Git冲突。统一useActionAccess按调用时getState重查，覆盖商机/预算/执行/结算/变更/配置/事项按钮、字段、确认；save与submit/publish独立，概算组合写前双权限检查。字段编辑加入费率/评价/contact；概算人工费率漏接已在028cc34修复，禁改单价保留数量说明编辑。028cc34工程typecheck/lint/build及220领域测试通过。61d215f全套16条浏览器15通过1失败：商机测试未指定技术协同人而403；通过真实表单指定赵工后028cc34完整商机评估场景复测1通过，未放宽访问权限。日志和原失败trace保留parallel/action-final，修复与剩余范围在action-verified；费率只读1440/1280及GS04复测截图已查看，GS04仍含短暂toast，不充作新正式验收。正式仍30/72、无活动轮次；CF07须补收入/成本独立查看编辑类别及按对象组织生效规则，再统一接消费者和正式验收。bundle约2.28MB仍待拆包。无运行浏览器/服务，三工作副本交付干净；旧分支保留，下一包从新共享同步点新建分支。
+- 2026-09-10T11:24:43+00:00：R0024已正式验收YS-13/14/15，累计33/72，无活动轮次。demo初始快照惰性构建并独立深拷贝，修复重复构建导致测试超时，未放宽时限；期望业务拒绝不再泄漏Promise控制台错误，统一前六个演示人员角色，启动页移除实现名。最终revision=d20df29c63407668d1bc927a43a9516a732e76c21a14f300144ccef463dccbd2，typecheck/lint/build及233领域测试通过；R24两份真实浏览器测试7/7通过，合同缺附件/回款不守恒、未签/缺基线/非法日期阻断，追加批准驳回、退出成本保留和启动执行链均核验。六张正式双宽截图已查看，通知角色正确，无console error；前置上游状态由统一transition准备，不冒充上游页面UI验收。旧失败日志与前版本截图保留attempts。R24-QA独占测试d394351范围检查后单向回收e20ab56，无冲突，支持任务已归档；B05已accepted。下一步继续验收已集成库存，按pipeline确认具体包依赖和acceptance_ready，不继续堆新页面。CF07收入/成本粒度及组织上下文仍待补齐；最终全量e2e与72页尚未完成。
 
 完整任务状态、历史和证据索引见 `.pms-loop/state.json`。
 <!-- pms-loop:end -->

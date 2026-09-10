@@ -1,0 +1,7 @@
+{
+  "title": "未签页面空结果、无权限及缺基线不会冒充可启动",
+  "status": "failed",
+  "url": "http://127.0.0.1:4179/unsigned-projects",
+  "consoleErrors": [],
+  "observations": {}
+}

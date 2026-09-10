@@ -1,0 +1,31 @@
+{
+  "package_id": "R24-QA",
+  "package_kind": "acceptance-test-support",
+  "items": [],
+  "owner": "develop_ys",
+  "writer": "/root/develop_ys",
+  "status": "archived",
+  "integration_root": "/Users/shengjunqiu/Documents/Code/pms-demo",
+  "workdir": "/private/tmp/pms-parallel-ys",
+  "branch": "pms/r0024-controls-current",
+  "base_commit": "d2e62e6",
+  "contract_commit": "d2e62e6",
+  "owned_paths": [
+    "e2e/r0024-controls.spec.ts"
+  ],
+  "development_dependencies": [],
+  "acceptance_dependencies": [
+    "root browser run on integrated source"
+  ],
+  "scenarios": [
+    "additional investment pending and approval/rejection",
+    "exit preserves old cost and blocks new inputs"
+  ],
+  "fixtures": [
+    "unsigned-base via existing helper; actual project and ownership from store"
+  ],
+  "last_confirmed_at": "2026-09-10",
+  "next_action": "Support delivered and integrated; root runs formal R0024 evidence. No page ownership.",
+  "delivery_commit": "d3943511db9b8f87bac6c4f82519feb7cf584db1",
+  "integrated_commit": "e20ab56"
+}
