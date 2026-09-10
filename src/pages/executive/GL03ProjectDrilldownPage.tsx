@@ -14,6 +14,7 @@ import { mockDepartments, AS_OF_DATE } from '@/mock';
 import { useBusinessStore } from '@/mock/business';
 import { fourStage, selectFourCalculations, selectProjects, selectReceipts } from '@/mock/selectors';
 import { useAppStore } from '@/store/useAppStore';
+import { PageSection } from '@/components/common/PageSection';
 import { PageHeader } from '@/components/common/PageHeader';
 import { StateView } from '@/components/common/StateView';
 import { ProjectFilters } from '@/components/common/ProjectFilters';
@@ -51,7 +52,7 @@ export function GL03ProjectDrilldownPage() {
   if (project && !scope.some((p) => p.id === project.id)) return <>{header}<Alert type="warning" showIcon message="项目不在当前筛选范围内" description="保留上一级组织、健康度和时间条件，返回清单重新选择。" action={<Button onClick={() => view({ projectId: undefined })}>返回筛选清单</Button>} /></>;
   const receipts = selectReceipts(scope, data);
   const totalBudget = sumMoney(scope.map((p) => p.budgetAmount)); const totalRolling = sumMoney(scope.map((p) => p.rollingCost));
-  const list = <>{header}<ProjectFilters params={params} onChange={setParams} />
+  const list = <>{header}<ProjectFilters compact params={params} onChange={setParams} />
     {(params.get('metric') || params.get('stage')) && <Alert style={{ marginBottom: 16 }} message={`继承指标：${(({ overbudget: '预测超预算', unsigned: '未签项目', signed: '已签约项目', construction: '在建项目', closing: '验收收尾', maintenance: '运维项目' } as Record<string, string>)[params.get('metric') ?? ''] ?? '全部')}；阶段：${params.get('stage') ?? '全部'}`} type="info" />}
     <Row gutter={16} style={{ marginBottom: 16 }}>{[
       { label: '项目数量', value: String(scope.length), unit: '个', icon: <ProjectOutlined />, statusText: '在管项目', statusType: 'healthy' as const },
@@ -70,13 +71,13 @@ export function GL03ProjectDrilldownPage() {
         />
       </Col>
     ))}</Row>
-    <Table rowKey="id" size="small" dataSource={scope} scroll={{ x: 1250 }} pagination={{ current: Number(params.get('page')) || 1, pageSize: 10, showSizeChanger: false, showTotal: (n) => `共 ${n} 个项目`, }} onChange={(pagination, _, sorter, extra) => { const sort = Array.isArray(sorter) ? sorter[0] : sorter; view({ page: String(extra.action === 'sort' ? 1 : pagination.current ?? 1), sort: sort.order ? String(sort.columnKey) : undefined, order: sort.order ?? undefined }); }} columns={[
+    <PageSection title="筛选项目清单" description="点击项目查看四算摘要、异常原因与责任链"><Table rowKey="id" size="small" dataSource={scope} scroll={{ x: 1250 }} pagination={{ current: Number(params.get('page')) || 1, pageSize: 10, showSizeChanger: false, showTotal: (n) => `共 ${n} 个项目`, }} onChange={(pagination, _, sorter, extra) => { const sort = Array.isArray(sorter) ? sorter[0] : sorter; view({ page: String(extra.action === 'sort' ? 1 : pagination.current ?? 1), sort: sort.order ? String(sort.columnKey) : undefined, order: sort.order ?? undefined }); }} columns={[
       { title: '项目', width: 260, fixed: 'left', render: (_, p) => <><Button type="link" style={{ padding: 0, whiteSpace: 'normal', textAlign: 'left' }} onClick={() => view({ projectId: p.id })}>{p.name}</Button><div><Typography.Text type="secondary">{p.id} · {p.customerName}</Typography.Text></div></> },
       { title: '责任部门 / PM', width: 160, render: (_, p) => <>{p.departmentName}<div>{p.pmName}</div></> },
       { title: '阶段', width: 100, render: (_, p) => fourStage(p) },
-      ...(['contractAmount', 'budgetAmount', 'rollingCost', 'costVariance'] as const).map((key, i) => ({ title: ['已签合同', '预算', '滚动预测', '预测偏差'][i], dataIndex: key, key, width: 120, sortOrder: params.get('sort') === key ? (params.get('order') === 'ascend' ? 'ascend' as const : 'descend' as const) : null, sorter: (a: typeof scope[number], b: typeof scope[number]) => a[key] - b[key], render: (v: number) => <MoneyText value={v} signed={key === 'costVariance'} /> })),
+      ...(['contractAmount', 'budgetAmount', 'rollingCost', 'costVariance'] as const).map((key, i) => ({ title: ['已签合同', '预算', '滚动预测', '预测偏差'][i], dataIndex: key, align: 'right' as const, key, width: 120, sortOrder: params.get('sort') === key ? (params.get('order') === 'ascend' ? 'ascend' as const : 'descend' as const) : null, sorter: (a: typeof scope[number], b: typeof scope[number]) => a[key] - b[key], render: (v: number) => <MoneyText value={v} signed={key === 'costVariance'} /> })),
       { title: '健康度与原因', width: 250, render: (_, p) => <><HealthBadge status={names[p.health]} /><div>{healthReason(p.healthReason)}</div></> },
-    ]} />
+    ]} /></PageSection>
   </>;
   if (!project) return list;
   const p = project; const calc = selectFourCalculations(p, data);
@@ -103,11 +104,11 @@ export function GL03ProjectDrilldownPage() {
         />
       </Col>
     ))}</Row>
-    <Typography.Paragraph>项目收入 <MoneyText value={calc.income} />；滚动偏差 <MoneyText value={calc.variance} signed />（{formatPercent(percentage(calc.variance, calc.budget?.totalAmount ?? 0))}）；预测毛利 {showMargin ? <><MoneyText value={calc.grossMargin} />（{formatPercent(calc.grossMarginRate)}）</> : '已隐藏'}。未结算显示 —，未签预计收入不计入已签合同。</Typography.Paragraph>
-    <Tabs activeKey={params.get('tab') ?? 'cost'} onChange={(tab) => view({ tab })} items={[
+    <PageSection title="经营结论"><Typography.Paragraph>项目收入 <MoneyText value={calc.income} />；滚动偏差 <MoneyText value={calc.variance} signed />（{formatPercent(percentage(calc.variance, calc.budget?.totalAmount ?? 0))}）；预测毛利 {showMargin ? <><MoneyText value={calc.grossMargin} />（{formatPercent(calc.grossMarginRate)}）</> : '已隐藏'}。未结算显示 —，未签预计收入不计入已签合同。</Typography.Paragraph></PageSection>
+    <PageSection title="原因与原始业务" description="从成本科目、里程碑或风险问题继续追溯"><Tabs activeKey={params.get('tab') ?? 'cost'} onChange={(tab) => view({ tab })} items={[
       { key: 'cost', label: '成本异常原因', children: <Table rowKey="subjectId" size="small" pagination={false} dataSource={calc.subjects} columns={[
         { title: '科目 / 来源', render: (_, r) => <Button type="link" onClick={() => projectLink(undefined, true, r.subjectId)}>{r.subjectName}</Button> },
-        ...(['budget', 'actual', 'committed', 'remaining', 'rolling', 'variance'] as const).map((key, i) => ({ title: ['预算', '已发生', '未发生承诺', '剩余预测', '滚动预测', '偏差'][i], dataIndex: key, render: (v: number) => <MoneyText value={v} signed={key === 'variance'} /> })),
+        ...(['budget', 'actual', 'committed', 'remaining', 'rolling', 'variance'] as const).map((key, i) => ({ title: ['预算', '已发生', '未发生承诺', '剩余预测', '滚动预测', '偏差'][i], dataIndex: key, align: 'right' as const, render: (v: number) => <MoneyText value={v} signed={key === 'variance'} /> })),
       ]} /> },
       { key: 'milestones', label: `里程碑（${milestones.length}）`, children: <Table rowKey="id" size="small" pagination={false} dataSource={milestones} columns={[
         { title: '里程碑', render: (_, m) => <Button type="link" onClick={() => setDetail({ title: m.type, fields: [['编号', m.id], ['责任人', p.pmName], ['计划日期', m.plannedDate], ['实际日期', m.actualDate ?? '尚未达成'], ['状态', m.status], ['材料要求', m.requiredDeliverables.join('、')]] })}>{m.type}</Button> }, { title: '计划日期', dataIndex: 'plannedDate' }, { title: '状态', dataIndex: 'status' },
@@ -117,6 +118,6 @@ export function GL03ProjectDrilldownPage() {
       ]} /> },
       { key: 'related', label: '相关业务', children: <Space wrap>{[['进度', 'progress'], ['需求BUG', 'requirements'], ['变更', 'changes'], ['交付物', 'deliverables'], ['验收结算', 'acceptance'], ['回款合同', 'receipts']].map(([label, tab]) => <Button key={tab} onClick={() => projectLink(tab)}>{label}</Button>)}</Space> },
     ]} />
-    <Drawer title={detail?.title} width={560} open={!!detail} onClose={() => setDetail(undefined)}>{detail ? <Descriptions bordered column={1} items={detail.fields.map(([label, children]) => ({ key: label, label, children }))} /> : <Empty />}</Drawer>
+    </PageSection><Drawer title={detail?.title} width={560} open={!!detail} onClose={() => setDetail(undefined)}>{detail ? <Descriptions bordered column={1} items={detail.fields.map(([label, children]) => ({ key: label, label, children }))} /> : <Empty />}</Drawer>
   </>;
 }

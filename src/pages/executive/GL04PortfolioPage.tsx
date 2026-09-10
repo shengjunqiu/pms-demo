@@ -11,6 +11,7 @@ import { AS_OF_DATE, mockCustomers, mockDepartments } from '@/mock';
 import { useBusinessStore } from '@/mock/business';
 import { fourStage, inOrganization, selectFourCalculations, selectProjects, selectReceipts } from '@/mock/selectors';
 import { useAppStore } from '@/store/useAppStore';
+import { PageSection } from '@/components/common/PageSection';
 import { PageHeader } from '@/components/common/PageHeader';
 import { StateView } from '@/components/common/StateView';
 import { MoneyText } from '@/components/common/MoneyText';
@@ -60,9 +61,9 @@ export function GL04PortfolioPage() {
     if (nextLevel) setParams(next); else navigate(`/executive/project-drilldown?${next}`);
   };
   return <><PageHeader title="GL-04 项目组合分析" description={`集团 → 业务群 → 部门 → 项目 · ${AS_OF_DATE} · 万元`} breadcrumbs={[{ title: '首页', href: '/' }, { title: '组合分析' }]} extra={<Button onClick={() => navigate(-1)}>返回上一级</Button>} />
-    <ProjectFilters params={params} onChange={setParams} /><AnalysisTools storageKey="pms-portfolio-views" params={params} onChange={setParams} exportRows={[
+    <ProjectFilters compact params={params} onChange={setParams} /><details style={{ margin: '12px 0' }}><summary style={{ cursor: 'pointer', color: '#475569' }}>常用视图与导出</summary><div style={{ paddingTop: 12 }}><AnalysisTools storageKey="pms-portfolio-views" params={params} onChange={setParams} exportRows={[
       ['分组', '项目数', '预计收入', '签约金额', '滚动成本', '预测毛利', '加权毛利率'], ...rows.map((r) => [r.label, String(r.count), r.income.toFixed(2), r.receipts.signed.toFixed(2), r.rolling.toFixed(2), showMargin ? r.gross.toFixed(2) : '已隐藏', showMargin ? formatPercent(r.rate) : '已隐藏']),
-    ]} />
+    ]} /></div></details>
     <Space wrap style={{ margin: '16px 0' }}><Select aria-label="组合维度" style={{ width: 180 }} options={dimensions} value={dimension} onChange={(value) => { const next = new URLSearchParams(params); next.set('dimension', value); next.delete('page'); setParams(next); }} />{dimension === 'org' && <><Tag>当前层级：{mockDepartments.find((d) => d.id === root)?.name}</Tag><Button disabled={root === 'D-001'} onClick={() => { const next = new URLSearchParams(params); next.set('org', mockDepartments.find((d) => d.id === root)?.parentId ?? 'D-001'); next.delete('orgExact'); next.delete('page'); setParams(next); }}>上一级组织</Button></>}</Space>
     <Row gutter={12} style={{ marginBottom: 16 }}>{[
       { label: '去重项目数', value: String(total.count), unit: '个', icon: <AppstoreOutlined /> },
@@ -79,7 +80,15 @@ export function GL04PortfolioPage() {
         />
       </Col>
     ))}</Row>
-    <p>各分组互斥，数量与金额可加总。毛利率 = 汇总预测毛利 ÷ 汇总预计收入；未签收入包含拟签收入，合同金额排除未签。回款按到期计划计算。</p>
+    <PageSection title="组合表现" description="比较各组收入规模与风险分布，点击分组继续查看项目"><details><summary style={{ cursor: 'pointer' }}>聚合口径</summary><p>各分组互斥，数量与金额可加总。毛利率 = 汇总预测毛利 ÷ 汇总预计收入；未签收入包含拟签收入，合同金额排除未签。回款按到期计划计算。</p></details>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 12, margin: '16px 0' }}>
+      {[...rows].sort((a, b) => b.income - a.income).slice(0, 3).map((r, index) => <div key={r.key} style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: 12 }}>
+        <Button type="link" style={{ padding: 0, height: 'auto', whiteSpace: 'normal', textAlign: 'left' }} onClick={() => drill(r)}>{index + 1}. {r.label}</Button>
+        <div style={{ margin: '8px 0' }}>预计收入 <MoneyText value={r.income} /></div>
+        <div style={{ height: 6, background: '#f1f5f9', borderRadius: 4 }}><div style={{ height: '100%', width: `${percentage(r.income, total.income) ?? 0}%`, background: '#3b82f6', borderRadius: 4 }} /></div>
+        <div style={{ marginTop: 8, color: '#64748b', fontSize: 12 }}>{r.count} 个项目 · 收入占比 {formatPercent(percentage(r.income, total.income))} · 高风险 {r.red} 个</div>
+      </div>)}
+    </div>
     <Table rowKey="key" size="small" dataSource={rows} scroll={{ x: 1700 }} pagination={{ pageSize: 8, current: Number(params.get('page')) || 1, showSizeChanger: false, showTotal: (n) => `共 ${n} 组`, onChange: (page) => { const next = new URLSearchParams(params); next.set('page', String(page)); setParams(next); } }} columns={[
       { title: '组合分组', width: 220, fixed: 'left', render: (_, r) => <Button type="link" style={{ whiteSpace: 'normal', textAlign: 'left' }} onClick={() => drill(r)}>{r.label}</Button> },
       { title: '项目数', width: 85, dataIndex: 'count' }, { title: '预计收入 / 占比', width: 150, render: (_, r) => <><MoneyText value={r.income} /><div>{formatPercent(percentage(r.income, total.income))}</div></> },
@@ -89,6 +98,6 @@ export function GL04PortfolioPage() {
       { title: '到期应收 / 实收率', width: 150, render: (_, r) => <><MoneyText value={r.receipts.due} /><div>{formatPercent(r.receipts.dueCompletion)}</div></> },
       { title: '已收 / 逾期', width: 150, render: (_, r) => <><MoneyText value={r.receipts.paid} /><div><MoneyText value={r.receipts.overdue} /></div></> },
       { title: '下钻', width: 150, fixed: 'right', render: (_, r) => <Space direction="vertical"><Button size="small" onClick={() => drill(r)}>查看{r.count}个项目</Button>{dimension === 'org' && !r.exact && <Button size="small" onClick={() => drill(r, true)}>进入下级组织</Button>}</Space> },
-    ]} />
+    ]} /></PageSection>
   </>;
 }
