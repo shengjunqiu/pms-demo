@@ -1,5 +1,7 @@
 import {applyInitiationAction,type InitiationAction} from './initiation';
 import type {InitiationApplication} from '@/models/initiation';
+import { applyConfigurationAction, createConfigurationState, type ConfigurationAction } from '@/mock/configuration';
+import type { ConfigurationState } from '@/models/configuration';
 import { applyProjectChangeAction, initializePendingChanges, type ProjectChangeAction } from './changes';
 import type { ChangeRequest } from '@/models/changes';
 import { applyEarlyInvestmentAction, type EarlyInvestmentAction } from '@/mock/early-investments';
@@ -57,6 +59,7 @@ export interface PlanRequest {
 export interface Material extends DocumentDetails { archiveCategory?: ArchiveCategory; sourceId?: string; id: string; projectId: string; name: string; required: boolean; status: '缺失' | '待提交' | '待审核' | '通过' | '驳回' }
 export interface BusinessState {
   initiations: InitiationApplication[];
+  configuration: ConfigurationState; templateApplications: Record<string,{templateVersionId:string;generatedAt:string}>;
   changeRequests: ChangeRequest[];
   earlyInvestmentRequests: EarlyInvestmentRequest[]; earlyCosts: EarlyCostRecord[];
   postEvaluations: Record<string, PostEvaluation>; projectArchives: Record<string, ProjectArchive>;
@@ -78,7 +81,7 @@ export interface BusinessState {
   audit: { id: string; actor: string; action: string; target: string; date: string }[];
 }
 export function createBusinessState(): BusinessState {
-  const state: BusinessState = structuredClone({ initiations: [], postEvaluations: {}, projectArchives: {}, changeRequests: [], earlyInvestmentRequests: [], earlyCosts: [], settlementRequests: [], settlementCostReviews: [], settlementCostDispositions: [], settlementAnalyses: {}, settlementForecastSnapshots: {}, estimateDrafts: {}, estimateMeta: {}, projectTeams: {}, budgetDrafts: {}, presales: {}, planningDrafts: {}, planningReviews: [], acceptanceDetails: {}, acceptanceReports: [], opportunities: mockOpportunities, opportunityMeta: {}, contracts: mockContracts, receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
+  const state: BusinessState = structuredClone({ configuration: createConfigurationState(), templateApplications: {}, initiations: [], postEvaluations: {}, projectArchives: {}, changeRequests: [], earlyInvestmentRequests: [], earlyCosts: [], settlementRequests: [], settlementCostReviews: [], settlementCostDispositions: [], settlementAnalyses: {}, settlementForecastSnapshots: {}, estimateDrafts: {}, estimateMeta: {}, projectTeams: {}, budgetDrafts: {}, presales: {}, planningDrafts: {}, planningReviews: [], acceptanceDetails: {}, acceptanceReports: [], opportunities: mockOpportunities, opportunityMeta: {}, contracts: mockContracts, receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
     estimates: mockEstimateVersions, milestones: mockMilestones, settlements: mockSettlements,
     issues: mockIssues, risks: mockRisks, bugs: mockBugs, costs: mockCostItems, approvals: [], changes: mockChanges, managementApprovals: [],
     decisions: mockDecisions, acceptances: mockAcceptances, lockedProjects: ['P-008'], maintenanceCosts: [], audit: [],
@@ -97,7 +100,7 @@ export function createBusinessState(): BusinessState {
   initAcceptanceFixture(state);
   return state;
 }
-export type BusinessAction = InitiationAction | CloseoutAction | ProjectChangeAction | EarlyInvestmentAction | SettlementAction | EstimateAction | TeamAction | BudgetDraftAction | PresalesAction | BudgetPlanningAction | AcceptanceAction | OpportunityAction | LaborAction | DeliverableAction | ReportAction | CostOrderAction | TicketAction
+export type BusinessAction = ConfigurationAction | InitiationAction | CloseoutAction | ProjectChangeAction | EarlyInvestmentAction | SettlementAction | EstimateAction | TeamAction | BudgetDraftAction | PresalesAction | BudgetPlanningAction | AcceptanceAction | OpportunityAction | LaborAction | DeliverableAction | ReportAction | CostOrderAction | TicketAction
   | { type: 'submit-budget'; projectId: string; budget: BudgetVersion; reason: string }
   | { type: 'review'; approvalId: string; approve: boolean; opinion: string }
   | { type: 'review-management'; id: string; approve: boolean; opinion: string }
@@ -107,7 +110,7 @@ export type BusinessAction = InitiationAction | CloseoutAction | ProjectChangeAc
   | { type: 'close-issue'; id: string }
   | { type: 'close-bug'; id: string }
   | { type: 'risk-to-issue'; id: string; note?: string }
-  | { type: 'stage-gate'; projectId: string }
+  | { type: 'stage-gate'; projectId: string; ruleSnapshot?:StageSnapshot }
   | { type: 'settle'; projectId: string }
   | { type: 'confirm-cost'; cost: CostItem; fromCommitment?: boolean; maintenance?: boolean };
 
@@ -126,6 +129,8 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     target = applyCloseoutAction(state, action, actor);
   } else if (action.type === 'resume-initiation' || action.type === 'save-initiation' || action.type === 'submit-initiation' || action.type === 'assess-initiation-risk' || action.type === 'classify-initiation' || action.type === 'sign-initiation' || action.type === 'decide-initiation') {
     target = applyInitiationAction(state, action, actor);
+  } else if (action.type === 'configuration-save' || action.type === 'configuration-publish' || action.type === 'configuration-apply-template') {
+    target = applyConfigurationAction(state, action, actor);
   } else if (action.type === 'save-early-investment' || action.type === 'review-early-investment' || action.type === 'record-early-cost') {
     target = applyEarlyInvestmentAction(state, action, actor);
   } else if (action.type === 'estimate-create-draft' || action.type === 'estimate-save-draft' || action.type === 'estimate-publish' || action.type === 'estimate-freeze') {
@@ -260,8 +265,8 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     if (action.approve && allPassed) {
       if (request.kind === 'stage') {
         if (state.baselines.find((b) => b.projectId === p.id && b.status === '已生效')?.id !== request.baselineId) throw new Error('基线已变化，请重新申报阶段切换');
-        request.approvalSnapshot = stageSnapshot(state,p.id);
-        const next = transition(state, { type: 'stage-gate', projectId: p.id }, actor);
+        request.approvalSnapshot = stageSnapshot(state,p.id,request.stageSnapshot);
+        const next = transition(state, { type: 'stage-gate', projectId: p.id, ruleSnapshot:request.stageSnapshot }, actor);
         state.projects = next.projects;
       } else {
         assertConstructionWritable(state, p.id);
@@ -304,7 +309,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     requireRole('pmo'); const p = project(action.projectId); target = p.id;
     const failed = stageChecks(state,p.id).filter((c) => !c.passed);
     if (failed.length) throw new Error(failed.map((c) => `${c.name}：${c.detail}`).join('；'));
-    p.phase = STAGE_RULE.targetPhase; p.subPhase = STAGE_RULE.targetSubPhase; p.releasedBudgetPercent = STAGE_RULE.releasePercent;
+    p.phase = STAGE_RULE.targetPhase; p.subPhase = STAGE_RULE.targetSubPhase; p.releasedBudgetPercent = action.ruleSnapshot?.releasePercent??stageSnapshot(state,p.id).releasePercent;
   } else if (action.type === 'settle') {
     throw new Error('请通过项目结算申请、财务核算与PMO评审完成正式结算，不允许直接锁定');
   } else if (action.type === 'confirm-cost') {
