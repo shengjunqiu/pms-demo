@@ -1,0 +1,31 @@
+{
+  "package_id": "C05",
+  "items": [],
+  "owner": "develop_js",
+  "integration_root": "/Users/shengjunqiu/Documents/Code/pms-demo",
+  "workdir": "/private/tmp/pms-parallel-js",
+  "branch": "pms/settlement",
+  "base_commit": "b4e320c",
+  "contract_commit": "b4e320c",
+  "status": "assigned",
+  "writer": "/root/develop_js",
+  "last_confirmed_at": "2026-09-10",
+  "owned_paths": [
+    "src/models/closeout.ts",
+    "src/mock/closeout.ts",
+    "src/pages/settlement/PostEvaluationPage.tsx",
+    "src/models/__tests__/closeout.test.ts"
+  ],
+  "shared_changes": "root only; interface proposal required; existing WIP retained for one-time review",
+  "development_dependencies": [
+    "P0领域接入契约；领域可在分支先兼容实现"
+  ],
+  "acceptance_dependencies": [
+    "按catalog和并发方案，所有真实下钻已集成可操作"
+  ],
+  "scenarios": "catalog对应页面的全部条件及正常/阻断/角色/版本同步场景",
+  "fixtures": "现有固定故事；B01另建合法规划期对象",
+  "next_action": "保存旧分支/WIP；从统一同步点创建新任务分支，仅迁移未交付独占模块；check_delivery.py通过后交付",
+  "delivery_commits": [],
+  "integration_commits": []
+}
