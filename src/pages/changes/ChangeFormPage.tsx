@@ -244,7 +244,7 @@ function ChangeFormContent() {
             {
                 name: "预计毛利万元",
                 before: showMargin
-                    ? request ? "原收入未留存快照" : ((p.revenueAmount ?? p.contractAmount) - (base?.budgetAmount ?? 0)).toFixed(2)
+                    ? request && request.originalIncome === undefined ? "原收入未留存快照" : ((request?.originalIncome ?? p.revenueAmount ?? p.contractAmount) - (base?.budgetAmount ?? 0)).toFixed(2)
                     : "已隐藏",
                 after: showMargin
                     ? (input.proposedIncome - (proposed?.totalAmount ?? 0)).toFixed(2)

@@ -1,7 +1,7 @@
 import { useActionAccess } from '@/hooks/useActionAccess';
 import { useState } from 'react';
 import { Alert, Button, Card, Descriptions, Input, Modal, Space, Table, Tag, Timeline, App } from 'antd';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useBusinessStore } from '@/mock/business';
 import { useAppStore } from '@/store/useAppStore';
 import { PageHeader } from '@/components/common/PageHeader';
@@ -12,7 +12,7 @@ import { visibleProjects } from '@/mock/selectors';
 export function BudgetApprovalPage({ approvalId, embedded = false }: { approvalId?: string; embedded?: boolean } = {}) {
  const {canDo}=useActionAccess();
   const { message, modal } = App.useApp();
-  const { id } = useParams(); const navigate = useNavigate();
+  const { id } = useParams(); const navigate = useNavigate(); const [params] = useSearchParams();
   const { data, dispatch } = useBusinessStore(); const { currentRole, currentUser } = useAppStore();
   const [opinion, setOpinion] = useState(''); const [decision, setDecision] = useState<boolean>();
   const approval = data.approvals.find((a) => a.id === (approvalId ?? id));
@@ -21,7 +21,7 @@ export function BudgetApprovalPage({ approvalId, embedded = false }: { approvalI
   if (!['project-manager','pmo','finance','executive','admin'].includes(currentRole) || !visibleProjects(currentRole, data.projects, data).some((p) => p.id === project.id)) return <StateView type="403" />;
   const original = data.decisions.find((d) => d.id === approval.id);
   const permitted = canDo('review',approval.id) && approval.status === '待审批' && currentRole === approval.requiredRole;
-  return <>{!embedded && <PageHeader title={approval.kind === 'change' ? '重大成本变更原审批' : '预算调整原审批'} description={`${approval.id} · ${project.name} · 审批引用提交时快照`} breadcrumbs={[{ title: '首页', href: '/' }, { title: '预算调整原审批' }]} extra={<Button onClick={() => navigate(-1)}>返回来源</Button>} />}
+  return <>{!embedded && <PageHeader title={approval.kind === 'change' ? '重大成本变更原审批' : '预算调整原审批'} description={`${approval.id} · ${project.name} · 审批引用提交时快照`} breadcrumbs={[{ title: '首页', href: '/' }, { title: '预算调整原审批' }]} extra={<Button onClick={() => { if (params.get('returnTo') === 'changes') { const query = new URLSearchParams(params); query.delete('returnTo'); navigate(`/project-changes?${query}`); } else navigate(-1); }}>返回来源</Button>} />}
     {embedded && <p>审批单 {approval.id} · 引用提交时快照</p>}
     <Descriptions bordered column={3} items={[
       { key: 'id', label: '项目', children: `${project.id} · ${project.name}` }, { key: 'status', label: '审批状态', children: <Tag color={approval.status === '通过' ? 'success' : approval.status === '驳回' ? 'error' : 'processing'}>{approval.status}</Tag> },

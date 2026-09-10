@@ -7,7 +7,7 @@
     "JS-04"
   ],
   "owner": "/root/ui_executive",
-  "writer": "/root/ui_executive",
+  "writer": "",
   "integration_root": "/home/shengjunqiu/code/pms-demo",
   "workdir": "/tmp/pms-ui-acceptance",
   "branch": "pms/ui-acceptance",
@@ -25,7 +25,7 @@
   "acceptance_dependencies": [],
   "acceptance_ready": false,
   "acceptance_group": "UI-JS1",
-  "status": "assigned",
+  "status": "submitted",
   "last_confirmed_at": "2026-09-11",
   "acceptance_checklist": [
     "工程检查",
@@ -35,5 +35,6 @@
   ],
   "scenarios": "准备文档及addendum",
   "fixtures": "旧transition前置如实保留，验收评审/报验真实UI",
-  "next_action": "独立实现静态检查提交"
+  "next_action": "HS5验收后检查交付并集成",
+  "delivery_commit": "7193f00"
 }

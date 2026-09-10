@@ -197,6 +197,9 @@ test('筛选和同项目申请隔离，三类原单与只读权限', async ({ pa
   await navigate(page, `/project-changes?q=${encodeURIComponent(summary.code)}`);
   await page.getByRole('button', { name: '原单与对比', exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`/approvals/${approval.id}`));
+  await page.getByRole('button', { name: '返回来源', exact: true }).click();
+  await expect.poll(() => new URL(page.url()).searchParams.get('q')).toBe(summary.code);
+  await expect(page.getByRole('heading', { name: '变更台账', exact: true })).toBeVisible();
   await role(page, '集团领导'); await open(page, second);
   await expect(page.getByLabel('变更标题', { exact: true })).toBeDisabled();
   await expect(page.getByRole('button', { name: '提交专业评估', exact: true })).toBeDisabled();

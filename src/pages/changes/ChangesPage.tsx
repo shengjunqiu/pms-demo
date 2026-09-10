@@ -26,7 +26,7 @@ export function ChangesPage() {
     else {
         const approval = data.approvals.find(a => a.sourceChangeId === r.id);
         if (approval)
-            navigate(`/approvals/${approval.id}?${params}`);
+            navigate(`/approvals/${approval.id}?${params}&returnTo=changes`);
         else
             setHistorical(r);
     } };

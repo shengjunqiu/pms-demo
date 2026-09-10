@@ -211,24 +211,20 @@
       "reason": "继续全页面UI改造：内部供应商客户验收与报验当前办理、准备条件和版本清晰。"
     },
     "JS-05": {
-      "status": "done",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
-      "round": "R0033"
+      "status": "pending",
+      "reason": "继续全部UI改造：结算申请流程、四算与经营成果和实际收款。"
     },
     "JS-06": {
-      "status": "done",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
-      "round": "R0033"
+      "status": "pending",
+      "reason": "继续全部UI改造：结算申请流程、四算与经营成果和实际收款。"
     },
     "JS-07": {
-      "status": "done",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
-      "round": "R0033"
+      "status": "pending",
+      "reason": "继续全部UI改造：结算申请流程、四算与经营成果和实际收款。"
     },
     "JS-08": {
-      "status": "done",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。",
-      "round": "R0034"
+      "status": "pending",
+      "reason": "继续全部UI改造：结算申请流程、四算与经营成果和实际收款。"
     },
     "JS-09": {
       "status": "done",
@@ -320,7 +316,7 @@
     },
     "FINAL": {
       "status": "pending",
-      "reason": "继续全页面UI改造：内部供应商客户验收与报验当前办理、准备条件和版本清晰。"
+      "reason": "继续全部UI改造：结算申请流程、四算与经营成果和实际收款。"
     }
   },
   "runs": [
@@ -1983,6 +1979,10 @@
     {
       "at": "2026-09-10T21:46:15+00:00",
       "text": "R0049成本五页验收，新UI49/72。7b451b07工程235领域及7浏览器4.5min exit0，五页十张双宽查看；真实采购外包费用/工时一次入账及承诺互斥、预测不变，三权限回归通过。setsid nohup参数化 /tmp/pms-run-tests.py ROUND LABEL specs...稳定完成，等exit.json。继续HS5 93987a5+acdad9d需root旧审批返回筛选和originalIncome快照；JS1 a931440独立开发5owned文件含旧两e2e。"
+    },
+    {
+      "at": "2026-09-10T21:53:50+00:00",
+      "text": "reopen FINAL, JS-05, JS-06, JS-07, JS-08: 继续全部UI改造：结算申请流程、四算与经营成果和实际收款。"
     }
   ],
   "history": [
