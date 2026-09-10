@@ -3,19 +3,20 @@ import { useBusinessStore } from '@/mock/business';
 import { canAccessPage, canAccessProject, selectAccessPolicy } from '@/mock/configuration-access';
 import { projectForTarget } from '@/mock/access';
 import { StateView } from '@/components/common/StateView';
+import { GlobalSearchModal } from '@/components/common/GlobalSearchModal';
 import { Layout, Menu, Select, Space, Typography, Tag, Button, Dropdown, Avatar, theme } from 'antd';
 import {
   DashboardOutlined,
   ProjectOutlined,
   ScheduleOutlined,
   DollarOutlined,
-  SafetyCertificateOutlined,
   SettingOutlined,
   UserOutlined,
   AppstoreOutlined,
   CheckCircleOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
+  SearchOutlined,
 } from '@ant-design/icons';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAppStore, ROLES, UserRole } from '@/store/useAppStore';
@@ -27,6 +28,7 @@ const { Text } = Typography;
 
 export const MainLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { currentRole, setRole, currentUser, asOfDate } = useAppStore();
@@ -63,12 +65,13 @@ export const MainLayout: React.FC = () => {
   }, [location.pathname, location.search, allowed, policyId, currentUser, recordAccess]);
 
   return (
-    <Layout style={{ minHeight: '100vh', width: '100%' }}>
+    <Layout style={{ minHeight: '100vh', width: '100%', background: '#f8fafc' }}>
       <Sider
         trigger={null}
         collapsible
         collapsed={collapsed}
-        width={220}
+        width={240}
+        collapsedWidth={64}
         style={{
           overflow: 'auto',
           height: '100vh',
@@ -77,26 +80,35 @@ export const MainLayout: React.FC = () => {
           top: 0,
           bottom: 0,
           zIndex: 100,
-          background: '#001529',
+          background: '#0f172a',
+          borderRight: '1px solid #1e293b',
         }}
       >
         <div
           style={{
-            height: 56,
+            height: 64,
             display: 'flex',
             alignItems: 'center',
             justifyContent: collapsed ? 'center' : 'flex-start',
             padding: collapsed ? '0' : '0 16px',
-            background: '#002140',
+            background: '#090d16',
             color: '#fff',
             fontWeight: 'bold',
-            fontSize: 16,
+            fontSize: 15,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
+            borderBottom: '1px solid #1e293b',
           }}
         >
-          <SafetyCertificateOutlined style={{ fontSize: 20, color: '#1677ff', marginRight: collapsed ? 0 : 8 }} />
-          {!collapsed && <span>企业四算管控平台</span>}
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-sm flex-shrink-0">
+            PMS
+          </div>
+          {!collapsed && (
+            <div className="ml-3 flex flex-col justify-center">
+              <span className="leading-none text-slate-100 font-bold text-sm">PMS 平台</span>
+              <span className="text-[11px] text-slate-400 font-normal mt-1 leading-none">四算联动全生命周期</span>
+            </div>
+          )}
         </div>
         <Menu
           theme="dark"
@@ -105,23 +117,24 @@ export const MainLayout: React.FC = () => {
           defaultOpenKeys={['GL', 'WK']}
           items={menuItems}
           onClick={({ key }) => navigate(key)}
-          style={{ borderRight: 0 }}
+          style={{ borderRight: 0, background: '#0f172a' }}
         />
       </Sider>
 
-      <Layout style={{ marginLeft: collapsed ? 80 : 220, transition: 'all 0.2s', minWidth: 0, overflow: 'hidden' }}>
+      <Layout style={{ marginLeft: collapsed ? 64 : 240, transition: 'all 0.2s', minWidth: 0, background: '#f8fafc' }}>
         <Header
           style={{
             padding: '0 20px',
-            background: '#fff',
+            background: '#ffffff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            boxShadow: '0 1px 4px rgba(0,21,41,.08)',
+            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
+            borderBottom: '1px solid #e2e8f0',
             position: 'sticky',
             top: 0,
             zIndex: 99,
-            height: 56,
+            height: 64,
           }}
         >
           <Space size={16} align="center">
@@ -132,19 +145,32 @@ export const MainLayout: React.FC = () => {
               onClick={() => setCollapsed(!collapsed)}
               style={{ fontSize: 16, width: 32, height: 32 }}
             />
+
+            {/* Spotlight 风格全局搜索入口 */}
+            <div
+              onClick={() => setSearchOpen(true)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-400 hover:border-blue-400 hover:text-slate-600 cursor-pointer transition-all w-48 sm:w-64 text-xs select-none"
+            >
+              <SearchOutlined className="text-slate-400" />
+              <span className="flex-1 truncate">搜索项目、合同、单据...</span>
+              <kbd className="hidden sm:inline-block px-1.5 py-0.5 bg-white border border-slate-200 rounded font-mono text-[10px] text-slate-500">
+                ⌘K
+              </kbd>
+            </div>
+
             {currentPage ? (
-              <Space size={8}>
-                <Tag color="blue">{currentPage.id}</Tag>
+              <Space size={8} className="hidden md:inline-flex">
+                <Tag color="blue" className="font-mono">{currentPage.id}</Tag>
                 <Text strong style={{ fontSize: 15 }}>{currentPage.title}</Text>
                 <Tag color="default">{currentPage.kind}</Tag>
               </Space>
             ) : (
-              <Text strong style={{ fontSize: 15 }}>项目管理全生命周期平台</Text>
+              <Text strong style={{ fontSize: 15 }} className="hidden md:inline-block">项目管理全生命周期平台</Text>
             )}
           </Space>
 
           <Space size={16} align="center">
-            <Tag color="purple">基准日: {asOfDate}</Tag>
+            <Tag color="purple" className="font-mono">基准日: {asOfDate}</Tag>
             <Space size={4} align="center">
               <Text type="secondary" style={{ fontSize: 12 }}>角色:</Text>
               <Select
@@ -176,8 +202,8 @@ export const MainLayout: React.FC = () => {
               }}
             >
               <Space style={{ cursor: 'pointer' }}>
-                <Avatar size="small" style={{ backgroundColor: '#1677ff' }} icon={<UserOutlined />} />
-                <Text style={{ fontSize: 13 }}>{currentUser.name}</Text>
+                <Avatar size="small" style={{ backgroundColor: '#2563eb' }} icon={<UserOutlined />} />
+                <Text style={{ fontSize: 13, fontWeight: 500 }}>{currentUser.name}</Text>
               </Space>
             </Dropdown>
           </Space>
@@ -187,15 +213,19 @@ export const MainLayout: React.FC = () => {
           style={{
             margin: '16px',
             padding: '20px',
-            background: '#fff',
-            borderRadius: token.borderRadius,
-            minHeight: 'calc(100vh - 88px)',
+            background: '#ffffff',
+            borderRadius: token.borderRadiusLG ?? 12,
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+            minHeight: 'calc(100vh - 96px)',
             overflowX: 'auto',
           }}
         >
           {allowed ? <Outlet /> : <StateView type="403" />}
         </Content>
       </Layout>
+
+      <GlobalSearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
     </Layout>
   );
 };

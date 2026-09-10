@@ -1,7 +1,14 @@
-import { Button, Card, Col, Empty, Progress, Row, Select, Space, Statistic, Table, Tabs, Tag, Typography } from 'antd';
+import { Button, Card, Col, Empty, Progress, Row, Select, Space, Table, Tabs, Tag, Typography } from 'antd';
+import {
+  ProjectOutlined,
+  CarryOutOutlined,
+  ClockCircleOutlined,
+  AlertOutlined,
+} from '@ant-design/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { PageHeader } from '@/components/common/PageHeader';
 import { MoneyText } from '@/components/common/MoneyText';
+import { MetricStatCard } from '@/components/common/MetricStatCard';
 import { AS_OF_DATE } from '@/mock';
 import { useBusinessStore } from '@/mock/business';
 import { selectFourCalculations, selectReceipts, visibleProjects } from '@/mock/selectors';
@@ -40,8 +47,22 @@ export function ProjectManagerWorkbenchPage() {
   return <><PageHeader title="WK-01 项目经理工作台" description={`${currentUser.name} · ${AS_OF_DATE} · 今天要处理什么，项目进展到哪里`} breadcrumbs={[{ title: '首页', href: '/' }, { title: '项目经理工作台' }]} />
     <Tabs activeKey={participating ? 'participating' : 'owned'} onChange={(scope) => setParams({ scope })} items={[{ key: 'owned', label: '我负责' }, { key: 'participating', label: '我参与' }]} />
     <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>{[
-      ['当前项目', mine.length], ['待处理事项', todos.length], ['超期待办', todos.filter((t) => t.due < AS_OF_DATE).length], ['预警与高风险项目', mine.filter((p) => ['orange', 'red'].includes(p.health)).length],
-    ].map(([title, value]) => <Col span={6} key={String(title)}><Card size="small"><Statistic title={title} value={Number(value)} /></Card></Col>)}</Row>
+      { title: '当前项目', value: String(mine.length), unit: '个', icon: <ProjectOutlined />, statusText: '在管', statusType: 'healthy' as const },
+      { title: '待处理事项', value: String(todos.length), unit: '项', icon: <CarryOutOutlined />, statusText: '待办', statusType: todos.length > 0 ? ('warning' as const) : ('healthy' as const) },
+      { title: '超期待办', value: String(todos.filter((t) => t.due < AS_OF_DATE).length), unit: '项', icon: <ClockCircleOutlined />, statusText: todos.filter((t) => t.due < AS_OF_DATE).length > 0 ? '需紧急处理' : '无逾期', statusType: todos.filter((t) => t.due < AS_OF_DATE).length > 0 ? ('danger' as const) : ('healthy' as const) },
+      { title: '预警与高风险项目', value: String(mine.filter((p) => ['orange', 'red'].includes(p.health)).length), unit: '个', icon: <AlertOutlined />, statusText: mine.filter((p) => ['orange', 'red'].includes(p.health)).length > 0 ? '重点跟踪' : '全部健康', statusType: mine.filter((p) => ['orange', 'red'].includes(p.health)).length > 0 ? ('danger' as const) : ('healthy' as const) },
+    ].map((m) => (
+      <Col span={6} key={m.title}>
+        <MetricStatCard
+          title={m.title}
+          value={m.value}
+          unit={m.unit}
+          icon={m.icon}
+          statusText={m.statusText}
+          statusType={m.statusType}
+        />
+      </Col>
+    ))}</Row>
     <Card title="快捷发起" size="small" style={{ marginBottom: 16 }} extra={<Select aria-label="快捷操作项目" value={selected?.id} placeholder="选择项目" style={{ width: 300 }} options={mine.map((p) => ({ value: p.id, label: `${p.id} ${p.name}` }))} onChange={(project) => { const next = new URLSearchParams(params); next.set('project', project); setParams(next); }} />}><Space wrap>{actions.map(([label, path]) => <Button key={label} disabled={!selected} onClick={() => goAction(path)}>{label}</Button>)}</Space><Typography.Paragraph type="secondary" style={{ margin: '12px 0 0' }}>选择项目后进入对应业务页填写与提交；权限、阶段条件和冻结规则由原业务校验。</Typography.Paragraph></Card>
     <Card title="我的项目 · 进度、成本与待处理事项" size="small" style={{ marginBottom: 16 }}><Table rowKey="id" size="small" dataSource={rows} scroll={{ x: 2100 }} pagination={{ pageSize: 5, showSizeChanger: false }} columns={[
       { title: '项目编号 / 名称', fixed: 'left', width: 240, render: (_, p) => <><Button type="link" style={{ padding: 0 }} onClick={() => navigate(`/projects/${p.id}`)}>{p.code}</Button><div>{p.name}</div></> },

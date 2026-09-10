@@ -2,7 +2,7 @@ import { canViewSensitiveField } from '@/mock/configuration-access';
 import { marginReason } from '@/utils/sensitive';
 import { useState } from 'react';
 import { Button, Card, Col, Descriptions, Drawer, Empty, Progress, Row, Select, Space, Statistic, Steps, Table, Tabs, Tag, Timeline, Typography } from 'antd';
-import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, ArrowRightOutlined, DollarOutlined, FundOutlined, LineChartOutlined } from '@ant-design/icons';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useBusinessStore } from '@/mock/business';
 import { useAppStore } from '@/store/useAppStore';
@@ -13,11 +13,12 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { StateView } from '@/components/common/StateView';
 import { ProjectQualityPanel } from '@/components/common/ProjectQualityPanel';
 import { MoneyText } from '@/components/common/MoneyText';
+import { HealthBadge, BusinessStageBadge, DeliveryStageBadge } from '@/components/common/Badges';
+import { MetricStatCard } from '@/components/common/MetricStatCard';
 
 type Detail = { title: string; fields: { label: string; value: string }[] };
 const { Text } = Typography;
 const healthNames = { green: '健康', yellow: '关注', orange: '预警', red: '高风险' };
-const healthColors = { green: 'success', yellow: 'gold', orange: 'orange', red: 'error' };
 
 export function ProjectOverviewPage() {
   const { id } = useParams(); const navigate = useNavigate(); const [params, setParams] = useSearchParams();
@@ -49,10 +50,46 @@ export function ProjectOverviewPage() {
     { label: '未关闭需求', value: requirements.filter((r) => r.status !== '已关闭').length, tab: 'requirements', kind: '需求' },
   ];
   const overview = <Row gutter={20}>
-    <Col span={14}><Card title="项目经营摘要" size="small"><Row gutter={[12, 12]}>{[
-      ['有效预算', calc.budget?.totalAmount], ['滚动预测成本', calc.rolling], ['预测成本偏差', calc.variance], ['预测毛利', calc.grossMargin],
-    ].map(([label, value]) => <Col span={12} key={String(label)}><Button type="text" style={{ height: 'auto', textAlign: 'left', width: '100%', padding: 8 }} onClick={accounting}><Statistic title={label} value={Number(value)} formatter={() => label === '预测毛利' && !showMargin ? '已隐藏' : <MoneyText value={typeof value === 'number' ? value : null} signed={label === '预测成本偏差'} />} valueStyle={{ fontSize: 22 }} /></Button></Col>)}</Row><Button type="link" onClick={accounting}>查看动态核算与原始凭证 <ArrowRightOutlined /></Button></Card>
-      <Card title="当前事项" size="small" style={{ marginTop: 16 }}><Row>{counts.map((c) => <Col span={6} key={c.label}><Button type="text" style={{ height: 'auto', width: '100%' }} onClick={() => selectTab(c.tab, 'kind' in c ? c.kind : undefined)}><Statistic title={c.label} value={c.value} /></Button></Col>)}</Row></Card>
+    <Col span={14}>
+      <Card title="项目经营摘要" size="small">
+        <Row gutter={[12, 12]}>{[
+          { label: '有效预算', value: calc.budget?.totalAmount, icon: <FundOutlined /> },
+          { label: '滚动预测成本', value: calc.rolling, icon: <LineChartOutlined /> },
+          { label: '预测成本偏差', value: calc.variance, icon: <DollarOutlined />, signed: true, statusText: calc.variance > 0 ? '超预算' : '成本受控', statusType: calc.variance > 0 ? ('danger' as const) : ('healthy' as const) },
+          { label: '预测毛利', value: !showMargin ? '已隐藏' : calc.grossMargin, icon: <LineChartOutlined />, unit: !showMargin ? '' : '万元' },
+        ].map((m) => (
+          <Col span={12} key={m.label}>
+            <MetricStatCard
+              title={m.label}
+              value={m.value ?? '—'}
+              unit={m.unit ?? (m.value !== undefined ? '万元' : '')}
+              icon={m.icon}
+              statusText={m.statusText}
+              statusType={m.statusType}
+              onClick={accounting}
+            />
+          </Col>
+        ))}</Row>
+        <div className="mt-3">
+          <Button type="link" onClick={accounting} className="p-0">查看动态核算与原始凭证 <ArrowRightOutlined /></Button>
+        </div>
+      </Card>
+      <Card title="当前事项" size="small" style={{ marginTop: 16 }}>
+        <Row gutter={12}>
+          {counts.map((c) => (
+            <Col span={6} key={c.label}>
+              <MetricStatCard
+                title={c.label}
+                value={String(c.value)}
+                unit="项"
+                statusText={c.value > 0 ? '待处理' : '已清空'}
+                statusType={c.value > 0 ? (c.label.includes('BUG') || c.label.includes('问题') ? 'danger' : 'warning') : 'healthy'}
+                onClick={() => selectTab(c.tab, 'kind' in c ? c.kind : undefined)}
+              />
+            </Col>
+          ))}
+        </Row>
+      </Card>
       <Card title="最近动态" size="small" style={{ marginTop: 16 }}>{data.dailyReports.filter((r) => r.projectId === p.id).slice(0, 1).map((r) => <div key={r.id}><Text strong>{r.date} · {r.reporter}</Text><p>{r.completedTasks}</p><Button size="small" onClick={() => selectTab('reports')}>查看日报周报</Button></div>)}</Card>
     </Col>
     <Col span={10}><Card title="关键里程碑" size="small">{milestoneView}</Card><Card title="验收与交付" size="small" style={{ marginTop: 16 }}><p>材料审核通过 {materials.filter((m) => m.status === '通过').length} / {materials.length} 项</p><Progress percent={materials.length ? Math.round(materials.filter((m) => m.status === '通过').length / materials.length * 100) : 0} /><Space><Button onClick={() => selectTab('deliverables')}>交付物清单</Button><Button onClick={() => selectTab('acceptance')}>验收记录</Button></Space></Card></Col>
@@ -86,7 +123,8 @@ export function ProjectOverviewPage() {
     <Card size="small" style={{ marginBottom: 16 }}><Descriptions column={3} size="small" items={[
       { key: 'source', label: '来源商机', children: source ? <Button type="link" size="small" onClick={() => open(source.name, [['商机编号', source.code], ['客户', source.customerName], ['负责人', source.ownerName], ['状态', source.status], ['概算版本', calc.estimate?.version], ['关联项目', p.id]])}>{source.code}</Button> : '无关联商机' },
       { key: 'customer', label: '客户', children: p.customerName }, { key: 'pm', label: '主项目经理', children: p.pmName }, { key: 'org', label: '主责部门', children: p.departmentName },
-      { key: 'phase', label: '执行阶段', children: `${p.phase} · ${p.subPhase}` }, { key: 'status', label: '健康度', children: <Tag color={healthColors[p.health]}>{healthNames[p.health]}</Tag> }, { key: 'contract', label: '合同状态', children: p.isUnsigned ? '已立项未签约' : '已签约' },
+      { key: 'phase', label: '执行阶段', children: <div className="flex items-center gap-1.5"><BusinessStageBadge stage={p.phase} /><DeliveryStageBadge stage={p.subPhase} /></div> },
+      { key: 'status', label: '健康度', children: <HealthBadge status={healthNames[p.health]} /> }, { key: 'contract', label: '合同状态', children: p.isUnsigned ? <Tag color="warning">已立项未签约</Tag> : <Tag color="success">已签约</Tag> },
       { key: 'income', label: '拟签/项目收入', children: <><MoneyText value={calc.income} /> 万元</> }, { key: 'margin', label: '预测毛利率', children: showMargin?formatPercent(calc.grossMarginRate):'已隐藏' }, { key: 'date', label: '计划验收', children: p.plannedEndDate },
       { key: 'director', label: '项目总监（演示任命）', children: mockDepartments.find((d) => d.id === mockDepartments.find((org) => org.id === p.departmentId)?.parentId)?.leader ?? '王总' },
       { key: 'actual', label: '已发生成本', children: <><MoneyText value={calc.actual} /> 万元</> }, { key: 'signed', label: '已签合同金额', children: <><MoneyText value={receipt.signed} /> 万元</> },

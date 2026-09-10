@@ -1,7 +1,7 @@
 import { canViewSensitiveField } from '@/mock/configuration-access';
 import { marginReason } from '@/utils/sensitive';
 import { useState } from 'react';
-import { Alert, Button, Descriptions, Drawer, Space, Table, Tabs, Tag, type TableColumnsType } from 'antd';
+import { Alert, Button, Descriptions, Drawer, Space, Table, Tabs, type TableColumnsType } from 'antd';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useBusinessStore } from '@/mock/business';
 import { EXCEPTION_TABS, projectExceptions } from '@/mock/exceptions';
@@ -12,11 +12,11 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { StateView } from '@/components/common/StateView';
 import { ProjectFilters } from '@/components/common/ProjectFilters';
 import { AnalysisTools } from '@/components/common/AnalysisTools';
+import { HealthBadge } from '@/components/common/Badges';
 import { readProjectFilter } from '@/utils/project-query';
 import { MoneyText } from '@/components/common/MoneyText';
 
 const names = { green: '健康', yellow: '关注', orange: '预警', red: '高风险' };
-const colors = { green: 'success', yellow: 'gold', orange: 'orange', red: 'error' };
 type ExceptionRow = ReturnType<typeof projectExceptions>[number];
 export function GL05ExceptionsPage() {
   const data = useBusinessStore((s) => s.data); const role = useAppStore((s) => s.currentRole); const showMargin=!!canViewSensitiveField(data,{role},'margin');
@@ -31,7 +31,7 @@ export function GL05ExceptionsPage() {
   const project = (p: ExceptionRow) => navigate(`/executive/project-drilldown?${query({ projectId: p.id })}`);
   const source = (p: ExceptionRow, kind: string) => { const next = query({ projectId: p.id }); next.delete('tab'); if (kind === 'receipt') next.set('tab', 'receipts'); else if (kind === 'schedule') next.set('tab', 'progress'); else if (kind === 'risk') next.set('tab', 'risks'); navigate(`/projects/${p.id}${['cost', 'unsigned', 'margin'].includes(kind) ? '/dynamic-accounting' : ''}?${next}`); };
   const columns: TableColumnsType<ExceptionRow> = [
-    { key: 'project', title: '项目', width: 250, fixed: 'left', render: (_, p) => <><Button type="link" style={{ padding: 0, whiteSpace: 'normal', textAlign: 'left' }} onClick={() => project(p)}>{p.name}</Button><div>{p.id} <Tag color={colors[p.health]}>{names[p.health]}</Tag></div></> },
+    { key: 'project', title: '项目', width: 250, fixed: 'left', render: (_, p) => <><Button type="link" style={{ padding: 0, whiteSpace: 'normal', textAlign: 'left' }} onClick={() => project(p)}>{p.name}</Button><div className="flex items-center gap-2 mt-0.5"><span className="font-mono text-slate-500">{p.id}</span><HealthBadge status={names[p.health]} /></div></> },
     { key: 'amount', title: '项目金额（万元）', width: 130, render: (_, p) => <MoneyText value={p.revenueAmount} /> },
     { key: 'org', title: '责任组织', width: 140, dataIndex: 'departmentName' },
     { key: 'phase', title: '阶段', width: 105, render: (_, p) => fourStage(p) },

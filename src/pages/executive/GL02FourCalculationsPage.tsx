@@ -1,6 +1,13 @@
 import { canViewSensitiveField } from '@/mock/configuration-access';
 import { useState } from 'react';
 import { Alert, Button, Card, Col, Drawer, Row, Table, Tabs, Tag } from 'antd';
+import {
+  AccountBookOutlined,
+  FundOutlined,
+  LineChartOutlined,
+  CheckCircleOutlined,
+  ArrowRightOutlined,
+} from '@ant-design/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AS_OF_DATE } from '@/mock';
 import { useBusinessStore } from '@/mock/business';
@@ -11,6 +18,7 @@ import { ProjectFilters } from '@/components/common/ProjectFilters';
 import { AnalysisTools } from '@/components/common/AnalysisTools';
 import { StateView } from '@/components/common/StateView';
 import { MoneyText } from '@/components/common/MoneyText';
+import { MetricStatCard } from '@/components/common/MetricStatCard';
 import { readProjectFilter } from '@/utils/project-query';
 import { sumMoney, percentage, formatPercent } from '@/utils/money';
 
@@ -37,7 +45,23 @@ export function GL02FourCalculationsPage() {
     <ProjectFilters params={params} onChange={setParams} /><AnalysisTools storageKey="pms-four-views" params={params} onChange={setParams} />
     <Tabs activeKey={settledOnly ? 'settled' : 'all'} onChange={(key) => { const next = new URLSearchParams(params); next.set('sample', key); next.delete('page'); setParams(next); }} items={[{ key: 'all', label: `概算 / 预算同样本（${scope.filter((r) => r.estimate && r.budget).length}）` }, { key: 'settled', label: `已结算同样本（${scope.filter((r) => r.estimate && r.budget && r.settlement).length}）` }]} />
     <Alert showIcon type="info" style={{ marginBottom: 16 }} message={`当前比较 ${rows.length} 个具备冻结概算及生效预算的项目；排除缺失版本 ${scope.filter((r) => !r.estimate || !r.budget).length} 个`} description="结算比较仅使用已锁定结算的同一组项目，未结算显示—。核算为基准日最新滚动值，非历史预测快照；科目承诺及剩余预测按生效预算权重分摊（演示规则）。" />
-    <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>{[['冻结概算成本', estimate], ['生效预算成本', budget], ['最新滚动成本', rolling], ['同样本结算成本', complete ? settlement : undefined]].map(([name, value]) => <Col span={6} key={String(name)}><Card size="small" title={String(name)}><div style={{ fontSize: 24 }}><MoneyText value={value as number | undefined} /></div></Card></Col>)}</Row>
+    <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>{[
+      { name: '冻结概算成本', value: estimate, icon: <AccountBookOutlined />, statusText: '基线V1.0', statusType: 'info' as const },
+      { name: '生效预算成本', value: budget, icon: <FundOutlined />, statusText: '执行基准', statusType: 'healthy' as const },
+      { name: '最新滚动成本', value: rolling, icon: <LineChartOutlined />, statusText: rolling > budget ? '超出预算' : '预算受控', statusType: rolling > budget ? ('danger' as const) : ('healthy' as const) },
+      { name: '同样本结算成本', value: complete ? settlement : undefined, icon: <CheckCircleOutlined />, statusText: complete ? '全量已结算' : '部分在途', statusType: complete ? ('healthy' as const) : ('warning' as const) },
+    ].map((m) => (
+      <Col span={6} key={m.name}>
+        <MetricStatCard
+          title={m.name}
+          value={m.value ?? '—'}
+          unit={m.value !== undefined ? '万元' : ''}
+          icon={m.icon}
+          statusText={m.statusText}
+          statusType={m.statusType}
+        />
+      </Col>
+    ))}</Row>
     <Card size="small" title="毛利变化轨迹 · 同样本预计收入减各阶段成本" style={{ marginBottom: 16 }}>{canViewMargin ? <><Row gutter={12}>{[['概算毛利', sumMoney([income, -estimate])], ['预算毛利', sumMoney([income, -budget])], ['预测毛利', sum((r) => r.grossMargin)], ['实际结算毛利', complete ? sum((r) => r.settlement!.finalGrossMargin) : undefined]].map(([label, value]) => <Col span={6} key={String(label)}>{label}<div><MoneyText value={value as number | undefined} /></div></Col>)}</Row><p>当前预计收入 <MoneyText value={income} />；概算/预算毛利按当前收入统一重算，不冒充历史收入快照。结算毛利使用原结算收入。</p></> : <span>已隐藏：当前策略未开放毛利字段。</span>}</Card>
     <Card size="small" title="偏差分析" style={{ marginBottom: 16 }}><Row gutter={12}><Col span={8}>预算 − 概算<div><MoneyText value={sumMoney([budget, -estimate])} signed /></div></Col><Col span={8}>滚动 − 预算<div><MoneyText value={sumMoney([rolling, -budget])} signed /></div></Col><Col span={8}>结算 − 最新滚动（已结算{closed.length}项）<div><MoneyText value={settlement === undefined ? undefined : sumMoney([settlement, -sumMoney(closed.map((r) => r.rolling))])} signed /></div></Col></Row></Card>
     <Tabs activeKey={tab} onChange={(key) => { const next = new URLSearchParams(params); next.set('tab', key); setParams(next); }} items={[
@@ -46,7 +70,7 @@ export function GL02FourCalculationsPage() {
         { title: '概算', render: (_, r) => <MoneyText value={r.estimate!.totalCost} /> }, { title: '预算', render: (_, r) => <MoneyText value={r.budget!.totalAmount} /> },
         { title: '已发生', render: (_, r) => <MoneyText value={r.actual} /> }, { title: '滚动', render: (_, r) => <MoneyText value={r.rolling} /> },
         { title: '锁定结算', render: (_, r) => <MoneyText value={r.settlement?.finalCost} /> }, { title: '滚动偏差 / 比率', render: (_, r) => <><MoneyText value={r.variance} signed /><div>{formatPercent(percentage(r.variance, r.budget!.totalAmount))}</div></> },
-        { title: '原始来源', fixed: 'right', width: 130, render: (_, r) => <Button onClick={() => go(r.p.id)}>四算穿透</Button> },
+        { title: '原始来源', fixed: 'right', width: 130, render: (_, r) => <Button type="primary" ghost size="small" icon={<ArrowRightOutlined />} onClick={() => go(r.p.id)}>四算穿透</Button> },
       ]} /> },
       { key: 'subjects', label: '成本科目偏差来源', children: <Table rowKey="id" size="small" dataSource={subjects} pagination={false} columns={[
         { title: '成本科目', dataIndex: 'name' }, ...(['estimate', 'budget', 'actual', 'rolling', 'variance'] as const).map((key, i) => ({ title: ['概算', '预算', '已发生', '滚动', '滚动偏差'][i], dataIndex: key, render: (v: number) => <MoneyText value={v} signed={key === 'variance'} /> })),

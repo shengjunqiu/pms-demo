@@ -1,7 +1,15 @@
 import { marginReason } from '@/utils/sensitive';
 import { canViewSensitiveField } from '@/mock/configuration-access';
 import { useState } from 'react';
-import { Alert, Button, Card, Col, Collapse, Empty, Progress, Radio, Row, Space, Statistic, Table, Tabs, Tag, Typography } from 'antd';
+import { Alert, Button, Card, Col, Collapse, Empty, Progress, Radio, Row, Space, Table, Tabs, Tag, Typography } from 'antd';
+import {
+  ProjectOutlined,
+  DollarOutlined,
+  SafetyCertificateOutlined,
+  FundOutlined,
+  LineChartOutlined,
+  AuditOutlined,
+} from '@ant-design/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AS_OF_DATE } from '@/mock';
 import { useBusinessStore } from '@/mock/business';
@@ -16,6 +24,7 @@ import { ProjectFilters } from '@/components/common/ProjectFilters';
 import { AnalysisTools } from '@/components/common/AnalysisTools';
 import { MoneyText } from '@/components/common/MoneyText';
 import { StateView } from '@/components/common/StateView';
+import { MetricStatCard } from '@/components/common/MetricStatCard';
 
 const healths = [{ key: 'green', name: '健康', color: '#52c41a' }, { key: 'yellow', name: '关注', color: '#d4a017' }, { key: 'orange', name: '预警', color: '#fa8c16' }, { key: 'red', name: '高风险', color: '#cf1322' }];
 export function GL01DashboardPage() {
@@ -47,15 +56,27 @@ export function GL01DashboardPage() {
     <ProjectFilters params={params} onChange={setParams} /><AnalysisTools storageKey="pms-dashboard-views" params={params} onChange={setParams} />
     <Space wrap style={{ marginBottom: 12 }}><Typography.Text type="secondary">口径：项目规模含未签与运维；签约额排除未签；毛利按预计项目收入减滚动成本；回款完成率=到期计划实收/到期应收。</Typography.Text></Space>
     <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>{[
-      { label: '在管项目', value: scope.length, count: true, action: () => drill() },
-      { label: '已签合同总额', value: receipt.signed, action: () => drill({ metric: 'signed' }) },
-      { label: '有效预算', value: kpi.totalBudgetAmount, action: () => drill() },
-      { label: '实时滚动成本', value: kpi.totalRollingCost, action: () => drill() },
-      { label: '预测毛利', value: kpi.totalGrossMargin, action: () => drill() },
-      { label: '已发生成本', value: kpi.totalActualCost, action: () => drill() },
-      { label: '到期应收', value: receipt.due, action: () => drill({ metric: 'signed' }) },
-      { label: '回款完成率', value: receipt.dueCompletion, ratio: true, action: () => drill({ metric: 'signed' }) },
-    ].map((m) => <Col span={6} key={m.label}><Card size="small"><Button type="text" style={{ height: 'auto', width: '100%', textAlign: 'left', padding: 0 }} disabled={!scope.length} onClick={m.action}><Statistic title={m.label} value={m.value ?? 0} valueStyle={{ fontSize: 23 }} formatter={() => m.label === '预测毛利' && !canViewMargin ? '已隐藏' : m.count ? String(m.value) : m.ratio ? formatPercent(m.value) : <MoneyText value={m.value} />} /></Button></Card></Col>)}</Row>
+      { label: '在管项目', value: String(scope.length), unit: '个', icon: <ProjectOutlined />, action: () => drill(), statusText: '运行正常', statusType: 'healthy' as const },
+      { label: '已签合同总额', value: receipt.signed, icon: <DollarOutlined />, action: () => drill({ metric: 'signed' }) },
+      { label: '有效预算', value: kpi.totalBudgetAmount, icon: <FundOutlined />, action: () => drill() },
+      { label: '实时滚动成本', value: kpi.totalRollingCost, icon: <LineChartOutlined />, action: () => drill() },
+      { label: '预测毛利', value: !canViewMargin ? '已隐藏' : kpi.totalGrossMargin, icon: <LineChartOutlined />, action: () => drill() },
+      { label: '已发生成本', value: kpi.totalActualCost, icon: <DollarOutlined />, action: () => drill() },
+      { label: '到期应收', value: receipt.due, icon: <AuditOutlined />, action: () => drill({ metric: 'signed' }) },
+      { label: '回款完成率', value: formatPercent(receipt.dueCompletion), unit: '', icon: <SafetyCertificateOutlined />, action: () => drill({ metric: 'signed' }) },
+    ].map((m) => (
+      <Col span={6} key={m.label}>
+        <MetricStatCard
+          title={m.label}
+          value={m.value}
+          unit={m.unit}
+          icon={m.icon}
+          statusText={m.statusText}
+          statusType={m.statusType}
+          onClick={scope.length ? m.action : undefined}
+        />
+      </Col>
+    ))}</Row>
     <Space wrap size={[20, 8]} style={{ marginBottom: 16 }}><span>预计项目收入 <MoneyText value={kpi.totalRevenue} /></span><span>冻结概算 <MoneyText value={estimate} /></span><span>预算毛利 {canViewMargin ? <MoneyText value={sumMoney([kpi.totalRevenue, -kpi.totalBudgetAmount])} /> : '已隐藏'}</span><span>预测毛利率 {canViewMargin ? formatPercent(kpi.weightedGrossMarginRate) : '已隐藏'}</span><span>毛利偏差 {canViewMargin ? <MoneyText value={-kpi.totalCostVariance} signed /> : '已隐藏'}</span><span>已收 <MoneyText value={receipt.paid} /></span><Button type="link" onClick={() => exception({ exception: 'receipt' })}>逾期 <MoneyText value={receipt.overdue} /></Button></Space>
     <Space wrap style={{ marginBottom: 16 }}>{[{ label: '在建', rows: scope.filter((p) => p.phase === '执行'), metric: 'construction' }, { label: '未签立项', rows: scope.filter((p) => p.isUnsigned), metric: 'unsigned' }, { label: '验收收尾', rows: scope.filter((p) => p.phase === '收尾'), metric: 'closing' }, { label: '运维', rows: scope.filter((p) => p.isMaintenance), metric: 'maintenance' }].map((group) => <Button key={group.label} disabled={!group.rows.length} onClick={() => drill({ metric: group.metric })}>{group.label} {group.rows.length} 个 · <MoneyText value={sumMoney(group.rows.map((p) => p.revenueAmount ?? p.contractAmount))} /></Button>)}</Space>
     {!scope.length ? <Empty description="当前筛选无项目，请调整条件" /> : <>

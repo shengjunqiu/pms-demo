@@ -28,8 +28,8 @@ export function GL06DecisionsPage() {
   const detail = data.decisions.find((d) => d.id === selected); const approval = selected ? source(selected) : undefined;
   const labels = [{ value: 'project', label: '项目' }, { value: 'type', label: '类型' }, { value: 'amount', label: '项目金额' }, { value: 'impact', label: '影响摘要' }, { value: 'node', label: '节点状态' }, { value: 'owner', label: '发起人与责任人' }, { value: 'date', label: '时间与等待' }];
   const columns: TableColumnsType<DecisionItem> = [
-      { title: '事项编号', key: 'id', width: 100, fixed: 'left' as const, render: (_, d) => <Button type="link" onClick={() => setSelected(d.id)}>{d.id}</Button> },
-      { title: '项目', key: 'project', width: 240, render: (_, d) => <>{d.projectName}<div>{d.projectId}</div></> },
+      { title: '事项编号', key: 'id', width: 110, fixed: 'left' as const, render: (_, d) => <Button type="link" className="font-mono" onClick={() => setSelected(d.id)}>{d.id}</Button> },
+      { title: '项目', key: 'project', width: 240, render: (_, d) => <>{d.projectName}<div className="font-mono text-xs text-slate-400">{d.projectId}</div></> },
       { title: '事项类型', key: 'type', width: 120, dataIndex: 'type' },
       { title: '项目金额', key: 'amount', width: 120, render: (_, d) => <MoneyText value={data.projects.find((p) => p.id === d.projectId)?.revenueAmount} /> },
       { title: '影响金额 / 摘要', key: 'impact', sorter: (a, b) => a.impactAmount - b.impactAmount, sortOrder: params.get('decisionSort') === 'impact' ? (params.get('decisionOrder') === 'ascend' ? 'ascend' : 'descend') : null, width: 250, render: (_, d) => <><MoneyText value={d.impactAmount} signed /><div>{source(d.id)?.reason}</div></> },

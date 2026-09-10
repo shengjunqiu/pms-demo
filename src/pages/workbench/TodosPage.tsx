@@ -19,9 +19,9 @@ export function TodosPage() {
     <p>演示规则 TODO-1：配置审批按提交快照节点时限，普通审批为提交后3天，任务使用计划截止日；超期在此提醒，不发送外部通知。会签中本人已处理节点进入已办，原单仍等待其他节点。</p>
     <Tabs activeKey={history ? 'done' : 'pending'} onChange={(key) => update('status', key)} items={[{ key: 'pending', label: `待办（${rows.filter((r) => !r.done).length}）` }, { key: 'done', label: `已办（${rows.filter((r) => r.done).length}）` }]} />
     <Table rowKey="id" size="small" dataSource={filtered} scroll={{ x: 1200 }} pagination={{ pageSize: 10, current: Number(params.get('page')) || 1, showSizeChanger: false, onChange: (page) => { const next = new URLSearchParams(params); next.set('page', String(page)); setParams(next); } }} columns={[
-      { title: '编号 / 事项', width: 230, fixed: 'left', render: (_, r) => <>{r.id}<div>{r.title}</div></> }, { title: '项目 / 立项来源', width: 250, render: (_, r) => projects.find((p) => p.id === r.projectId)?.name ?? r.sourceName },
+      { title: '编号 / 事项', width: 230, fixed: 'left', render: (_, r) => <><span className="font-mono text-xs text-blue-600 font-semibold">{r.id}</span><div>{r.title}</div></> }, { title: '项目 / 立项来源', width: 250, render: (_, r) => projects.find((p) => p.id === r.projectId)?.name ?? r.sourceName },
       { title: '业务类型 / 当前节点', width: 180, render: (_, r) => <>{r.type}<div>{r.node}</div></> }, { title: '责任人', width: 120, dataIndex: 'owner' },
-      { title: '到期 / 状态', width: 180, render: (_, r) => <>{r.due}<div><Tag color={!r.done && r.due < AS_OF_DATE ? 'error' : 'blue'}>{r.status}{!r.done && r.due < AS_OF_DATE ? ' · 已超期' : ''}</Tag></div></> },
+      { title: '到期 / 状态', width: 180, render: (_, r) => <><span className="font-mono text-xs">{r.due}</span><div><Tag color={!r.done && r.due < AS_OF_DATE ? 'error' : 'blue'}>{r.status}{!r.done && r.due < AS_OF_DATE ? ' · 已超期' : ''}</Tag></div></> },
       { title: '办理意见', width: 200, render: (_, r) => r.opinion ?? '尚无办理意见' }, { title: '原业务', width: 140, fixed: 'right', render: (_, r) => <Button onClick={() => navigate(r.route)}>进入原业务</Button> },
     ]} />
   </>;

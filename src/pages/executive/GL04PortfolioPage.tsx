@@ -1,5 +1,11 @@
 import { canViewSensitiveField } from '@/mock/configuration-access';
-import { Button, Card, Col, Row, Select, Space, Table, Tag } from 'antd';
+import { Button, Col, Row, Select, Space, Table, Tag } from 'antd';
+import {
+  AppstoreOutlined,
+  DollarOutlined,
+  SafetyCertificateOutlined,
+  FundOutlined,
+} from '@ant-design/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AS_OF_DATE, mockCustomers, mockDepartments } from '@/mock';
 import { useBusinessStore } from '@/mock/business';
@@ -8,6 +14,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { PageHeader } from '@/components/common/PageHeader';
 import { StateView } from '@/components/common/StateView';
 import { MoneyText } from '@/components/common/MoneyText';
+import { MetricStatCard } from '@/components/common/MetricStatCard';
 import { ProjectFilters } from '@/components/common/ProjectFilters';
 import { AnalysisTools } from '@/components/common/AnalysisTools';
 import { readProjectFilter } from '@/utils/project-query';
@@ -57,7 +64,21 @@ export function GL04PortfolioPage() {
       ['分组', '项目数', '预计收入', '签约金额', '滚动成本', '预测毛利', '加权毛利率'], ...rows.map((r) => [r.label, String(r.count), r.income.toFixed(2), r.receipts.signed.toFixed(2), r.rolling.toFixed(2), showMargin ? r.gross.toFixed(2) : '已隐藏', showMargin ? formatPercent(r.rate) : '已隐藏']),
     ]} />
     <Space wrap style={{ margin: '16px 0' }}><Select aria-label="组合维度" style={{ width: 180 }} options={dimensions} value={dimension} onChange={(value) => { const next = new URLSearchParams(params); next.set('dimension', value); next.delete('page'); setParams(next); }} />{dimension === 'org' && <><Tag>当前层级：{mockDepartments.find((d) => d.id === root)?.name}</Tag><Button disabled={root === 'D-001'} onClick={() => { const next = new URLSearchParams(params); next.set('org', mockDepartments.find((d) => d.id === root)?.parentId ?? 'D-001'); next.delete('orgExact'); next.delete('page'); setParams(next); }}>上一级组织</Button></>}</Space>
-    <Row gutter={12} style={{ marginBottom: 16 }}>{[['去重项目数', String(total.count)], ['预计项目收入', <MoneyText value={total.income} />], ['已签合同总额', <MoneyText value={total.receipts.signed} />], ['加权预测毛利率', showMargin ? formatPercent(total.rate) : '已隐藏']].map(([label, value]) => <Col span={6} key={String(label)}><Card size="small" title={label}><div style={{ fontSize: 22 }}>{value}</div></Card></Col>)}</Row>
+    <Row gutter={12} style={{ marginBottom: 16 }}>{[
+      { label: '去重项目数', value: String(total.count), unit: '个', icon: <AppstoreOutlined /> },
+      { label: '预计项目收入', value: total.income, icon: <DollarOutlined /> },
+      { label: '已签合同总额', value: total.receipts.signed, icon: <SafetyCertificateOutlined /> },
+      { label: '加权预测毛利率', value: showMargin ? formatPercent(total.rate) : '已隐藏', unit: '', icon: <FundOutlined /> },
+    ].map((m) => (
+      <Col span={6} key={m.label}>
+        <MetricStatCard
+          title={m.label}
+          value={m.value}
+          unit={m.unit ?? '万元'}
+          icon={m.icon}
+        />
+      </Col>
+    ))}</Row>
     <p>各分组互斥，数量与金额可加总。毛利率 = 汇总预测毛利 ÷ 汇总预计收入；未签收入包含拟签收入，合同金额排除未签。回款按到期计划计算。</p>
     <Table rowKey="key" size="small" dataSource={rows} scroll={{ x: 1700 }} pagination={{ pageSize: 8, current: Number(params.get('page')) || 1, showSizeChanger: false, showTotal: (n) => `共 ${n} 组`, onChange: (page) => { const next = new URLSearchParams(params); next.set('page', String(page)); setParams(next); } }} columns={[
       { title: '组合分组', width: 220, fixed: 'left', render: (_, r) => <Button type="link" style={{ whiteSpace: 'normal', textAlign: 'left' }} onClick={() => drill(r)}>{r.label}</Button> },
