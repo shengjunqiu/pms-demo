@@ -1,3 +1,4 @@
+import { ProjectManagerWorkbenchPage } from '@/pages/workbench/ProjectManagerWorkbenchPage';
 import { LaborCostPage } from '@/pages/execution/LaborCostPage';
 import { ReportsPage } from '@/pages/execution/ReportsPage';
 import { DeliverablesPage } from '@/pages/execution/DeliverablesPage';
@@ -61,6 +62,7 @@ export const AppRouter: React.FC = () => {
         <Route path="requirements-bugs/:id" element={<TicketDetailPage family="quality" />} />
         <Route path="issues-risks" element={<TicketsPage family="risk" />} />
         <Route path="issues-risks/:id" element={<TicketDetailPage family="risk" />} />
+        <Route path="workbench/project-manager" element={<ProjectManagerWorkbenchPage />} />
         <Route path="workbench/todos" element={<TodosPage />} />
         <Route path="projects/:id/progress" element={<ProjectProgressPage />} />
         <Route path="projects/:id/plan-requests/:requestId" element={<PlanRequestPage />} />
@@ -70,7 +72,7 @@ export const AppRouter: React.FC = () => {
         {PAGE_MANIFEST.map((item) => {
           const relativeRoute = item.route.startsWith('/') ? item.route.slice(1) : item.route;
           // 跳过已实现的页面
-          if (['projects/:id/daily-reports', 'projects/:id/weekly-reports', 'projects/:id/deliverables', 'projects/:id/procurement', 'projects/:id/outsourcing', 'projects/:id/expenses', 'requirements-bugs', 'requirements-bugs/:id', 'issues-risks', 'issues-risks/:id', 'workbench/todos', 'projects/:id/progress', 'projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/four-calculations', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions', 'executive/decisions'].includes(relativeRoute)) {
+          if (['workbench/project-manager', 'projects/:id/stage-switch', 'projects/:id/labor-cost', 'projects/:id/daily-reports', 'projects/:id/weekly-reports', 'projects/:id/deliverables', 'projects/:id/procurement', 'projects/:id/outsourcing', 'projects/:id/expenses', 'requirements-bugs', 'requirements-bugs/:id', 'issues-risks', 'issues-risks/:id', 'workbench/todos', 'projects/:id/progress', 'projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/four-calculations', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions', 'executive/decisions'].includes(relativeRoute)) {
             return null;
           }
           return (
