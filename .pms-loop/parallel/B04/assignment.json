@@ -12,7 +12,7 @@
   "branch": "pms/budget",
   "base_commit": "3e30506",
   "contract_commit": "1d2c49e",
-  "status": "developing",
+  "status": "integrated",
   "writer": "/root/develop_ys",
   "last_confirmed_at": "2026-09-10",
   "owned_paths": "按docs/PARALLEL_DEVELOPMENT.md对应业务域",
@@ -25,7 +25,13 @@
   ],
   "scenarios": "catalog对应页面的全部条件及正常/阻断/角色/版本同步场景",
   "fixtures": "现有固定故事；B01另建合法规划期对象",
-  "next_action": "按本轮已确认接口完成业务与共享提交，暂不操作正式Loop",
-  "delivery_commits": [],
-  "integration_commits": []
+  "next_action": "逐页正式浏览器验收；尚未计入完成页面",
+  "delivery_commits": [
+    "497194f",
+    "8b46a3f"
+  ],
+  "integration_commits": [
+    "b5f46b0",
+    "0d85676"
+  ]
 }

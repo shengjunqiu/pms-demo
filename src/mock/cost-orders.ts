@@ -1,3 +1,4 @@
+import {assertNewProjectCommitment} from './unsigned';
 import { assertConstructionWritable } from '@/mock/construction-lock';
 import { AS_OF_DATE } from '@/mock';
 import type { Actor, BusinessState } from '@/mock/business';
@@ -29,9 +30,10 @@ export function applyCostOrderAction(state: BusinessState, action: CostOrderActi
   if (state.lockedProjects.includes(p.id) || ['已关闭', '运维'].includes(p.phase) || ['已终止', '已关闭'].includes(p.status)) throw new Error('建设期已结束或锁定，请使用运维周期费用');
   const pm = actor.role === 'project-manager' && actor.id === p.pmId;
   const checkLimit = (amount: number, subjectId: string, excludeId?: string) => {
+    assertNewProjectCommitment(state,p);
     if (amount > costAvailability(state, p.id, subjectId, excludeId).available) throw new Error('科目预算不足，请先完成预算变更审批');
     const pending = sumMoney(state.costOrders.filter((o) => o.projectId === p.id && o.status === '待审批' && o.id !== excludeId).map((o) => o.amount));
-    if (p.isUnsigned && p.actualCost + p.committedCost + pending + amount > (p.unsignedLimitQuota ?? 0)) throw new Error('未签投入额度不足，须先追加审批');
+    if (p.isUnsigned && p.actualCost + p.committedCost + pending + Math.max(0, sumMoney(state.laborEntries.filter(e=>e.projectId===p.id&&e.status==='待审核').map(e=>e.amount))-(p.commitmentBySubject?.['SUB-01']??0)) + amount > (p.unsignedLimitQuota ?? 0)) throw new Error('未签投入额度不足，须先追加审批');
   };
   const adjustCommitment = (subjectId: string, delta: number) => {
     p.commitmentBySubject ??= Object.fromEntries(selectFourCalculations(p, state).subjects.map((s) => [s.subjectId, s.committed]));

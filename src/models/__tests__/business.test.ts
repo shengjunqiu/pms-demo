@@ -104,7 +104,7 @@ describe('审批、权限及成本锁定', () => {
     milestone.status = '已达成';
     expect(transition(state, { type: 'stage-gate', projectId: 'P-001' }, pmo).projects[0].phase).toBe('收尾');
   });
-  it('承诺结转实际不增加滚动成本，前期来源防重复，未签超额度阻断', () => {
+  it('承诺结转实际不增加滚动成本，前期来源防重复，已发生未签成本真实入账', () => {
     const original = createBusinessState();
     const cost = { ...original.costs[0], id: 'NEW-COST', sourceId: 'EARLY-001', amount: 50 };
     const state = transition(original, { type: 'confirm-cost', cost, fromCommitment: true }, finance);
@@ -112,7 +112,9 @@ describe('审批、权限及成本锁定', () => {
     expect(state.projects[0].actualCost).toBe(1700);
     expect(state.projects[0].committedCost).toBe(786.2);
     expect(() => transition(state, { type: 'confirm-cost', cost: { ...cost, id: 'ANOTHER' } }, finance)).toThrow('重复');
-    expect(() => transition(state, { type: 'confirm-cost', cost: { ...cost, id: 'UNSIGNED-COST', projectId: 'P-004', sourceId: 'NEW', amount: 100 } }, finance)).toThrow('额度');
+    const booked = transition(state, { type: 'confirm-cost', cost: { ...cost, id: 'UNSIGNED-COST', projectId: 'P-004', sourceId: 'NEW', amount: 100 } }, finance);
+    expect(booked.projects.find(p=>p.id==='P-004')!.actualCost).toBe(state.projects.find(p=>p.id==='P-004')!.actualCost+100);
+    expect(booked.costs.filter(c=>c.sourceId==='NEW')).toHaveLength(1);
   });
   it('旧直接结算入口不可绕过客户确认与正式评审', () => {
     const original = createBusinessState();

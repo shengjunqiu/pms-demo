@@ -1,3 +1,4 @@
+import {assertNewProjectCommitment} from './unsigned';
 import { AS_OF_DATE, mockTimesheets } from '@/mock';
 import type { Actor, BusinessState } from '@/mock/business';
 import { selectFourCalculations } from '@/mock/selectors';
@@ -29,14 +30,15 @@ export function applyLaborAction(state: BusinessState, action: LaborAction, acto
   if (!p) throw new Error('项目或工时记录不存在');
   if (p.phase !== '执行' || ['已终止', '已关闭'].includes(p.status) || state.lockedProjects.includes(p.id)) throw new Error('仅执行中且未锁定项目可办理建设工时');
   assertConstructionWritable(state, p.id);
-  const limit = (amount: number, excludeId?: string) => {
+  const limit = (amount: number, excludeId?: string, checkUnsigned = true) => {
     const a = laborAvailability(state, p.id, excludeId);
     if (amount > a.available) throw new Error('当前阶段释放人力预算不足，请先完成阶段或预算审批');
     const pending = sumMoney(state.laborEntries.filter((e) => e.projectId === p.id && e.status === '待审核' && e.id !== excludeId).map((e) => e.amount));
     const otherPending = sumMoney(state.costOrders.filter((o) => o.projectId === p.id && o.status === '待审批').map((o) => o.amount));
-    if (p.isUnsigned && p.actualCost + p.committedCost + Math.max(0, pending + amount - a.committed) + otherPending > (p.unsignedLimitQuota ?? 0)) throw new Error('未签投入额度不足');
+    if (checkUnsigned && p.isUnsigned && p.actualCost + p.committedCost + Math.max(0, pending + amount - a.committed) + otherPending > (p.unsignedLimitQuota ?? 0)) throw new Error('未签投入额度不足');
   };
   if (action.type === 'submit-labor') {
+    assertNewProjectCommitment(state,p);
     if (!['project-manager', 'solution-tech'].includes(actor.role) || !(p.pmId === actor.id || p.memberIds?.includes(actor.id))) throw new Error('仅参与项目的成员可填报本人工时');
     if (!state.tasks.some((t) => t.id === action.taskId && t.projectId === p.id)) throw new Error('任务必须属于当前项目');
     const date = new Date(action.date);
@@ -55,7 +57,7 @@ export function applyLaborAction(state: BusinessState, action: LaborAction, acto
     if (!action.opinion.trim()) throw new Error('审核意见必填');
     const e = entry!;
     if (action.approve) {
-      limit(e.amount, e.id);
+      limit(e.amount, e.id, false);
       if (state.costs.some((c) => c.sourceId === e.id)) throw new Error('工时已计费，不可重复归集');
       p.commitmentBySubject ??= Object.fromEntries(selectFourCalculations(p,state).subjects.map((s) => [s.subjectId,s.committed]));
       const consumed = Math.min(e.amount, p.commitmentBySubject['SUB-01'] ?? 0);

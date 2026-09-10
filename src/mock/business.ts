@@ -1,3 +1,5 @@
+import {applyUnsignedAction,approveUnsignedInvestment,type UnsignedAction} from './unsigned';
+import type {UnsignedProjectControl,UnsignedInvestmentRequest,StartConfirmation} from '@/models/unsigned';
 import {applyInitiationAction,type InitiationAction} from './initiation';
 import type {InitiationApplication} from '@/models/initiation';
 import { applyConfigurationAction, createConfigurationState, type ConfigurationAction } from '@/mock/configuration';
@@ -60,6 +62,7 @@ export interface PlanRequest {
 }
 export interface Material extends DocumentDetails { archiveCategory?: ArchiveCategory; sourceId?: string; id: string; projectId: string; name: string; required: boolean; status: '缺失' | '待提交' | '待审核' | '通过' | '驳回' }
 export interface BusinessState {
+  unsignedProjects:Record<string,UnsignedProjectControl>; unsignedInvestmentRequests:UnsignedInvestmentRequest[]; startConfirmations:Record<string,StartConfirmation>;
   initiations: InitiationApplication[];
   configuration: ConfigurationState; templateApplications: Record<string,{templateVersionId:string;generatedAt:string}>;
   changeRequests: ChangeRequest[];
@@ -84,7 +87,7 @@ export interface BusinessState {
   audit: { id: string; actor: string; action: string; target: string; date: string }[];
 }
 export function createBusinessState(): BusinessState {
-  const state: BusinessState = structuredClone({ operationCostSources:[], operationHandovers:{}, operationCycles:[], operationEvents:[], projectClosures:{}, configuration: createConfigurationState(), templateApplications: {}, initiations: [], postEvaluations: {}, projectArchives: {}, changeRequests: [], earlyInvestmentRequests: [], earlyCosts: [], settlementRequests: [], settlementCostReviews: [], settlementCostDispositions: [], settlementAnalyses: {}, settlementForecastSnapshots: {}, estimateDrafts: {}, estimateMeta: {}, projectTeams: {}, budgetDrafts: {}, presales: {}, planningDrafts: {}, planningReviews: [], acceptanceDetails: {}, acceptanceReports: [], opportunities: mockOpportunities, opportunityMeta: {}, contracts: mockContracts, receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
+  const state: BusinessState = structuredClone({ unsignedProjects:{}, unsignedInvestmentRequests:[], startConfirmations:{}, operationCostSources:[], operationHandovers:{}, operationCycles:[], operationEvents:[], projectClosures:{}, configuration: createConfigurationState(), templateApplications: {}, initiations: [], postEvaluations: {}, projectArchives: {}, changeRequests: [], earlyInvestmentRequests: [], earlyCosts: [], settlementRequests: [], settlementCostReviews: [], settlementCostDispositions: [], settlementAnalyses: {}, settlementForecastSnapshots: {}, estimateDrafts: {}, estimateMeta: {}, projectTeams: {}, budgetDrafts: {}, presales: {}, planningDrafts: {}, planningReviews: [], acceptanceDetails: {}, acceptanceReports: [], opportunities: mockOpportunities, opportunityMeta: {}, contracts: mockContracts, receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
     estimates: mockEstimateVersions, milestones: mockMilestones, settlements: mockSettlements,
     issues: mockIssues, risks: mockRisks, bugs: mockBugs, costs: mockCostItems, approvals: [], changes: mockChanges, managementApprovals: [],
     decisions: mockDecisions, acceptances: mockAcceptances, lockedProjects: ['P-008'], maintenanceCosts: [], audit: [],
@@ -104,7 +107,7 @@ export function createBusinessState(): BusinessState {
   initOperationsFixture(state);
   return state;
 }
-export type BusinessAction = OperationsAction | ConfigurationAction | InitiationAction | CloseoutAction | ProjectChangeAction | EarlyInvestmentAction | SettlementAction | EstimateAction | TeamAction | BudgetDraftAction | PresalesAction | BudgetPlanningAction | AcceptanceAction | OpportunityAction | LaborAction | DeliverableAction | ReportAction | CostOrderAction | TicketAction
+export type BusinessAction = UnsignedAction | OperationsAction | ConfigurationAction | InitiationAction | CloseoutAction | ProjectChangeAction | EarlyInvestmentAction | SettlementAction | EstimateAction | TeamAction | BudgetDraftAction | PresalesAction | BudgetPlanningAction | AcceptanceAction | OpportunityAction | LaborAction | DeliverableAction | ReportAction | CostOrderAction | TicketAction
   | { type: 'submit-budget'; projectId: string; budget: BudgetVersion; reason: string }
   | { type: 'review'; approvalId: string; approve: boolean; opinion: string }
   | { type: 'review-management'; id: string; approve: boolean; opinion: string }
@@ -129,7 +132,9 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     return value;
   };
   let target = '';
-  if (operationsActions.has(action.type)) {
+  if (action.type==='follow-unsigned'||action.type==='request-unsigned-investment'||action.type==='confirm-project-contract'||action.type==='exit-unsigned'||action.type==='confirm-project-start') {
+    target=applyUnsignedAction(state,action,actor);
+  } else if (operationsActions.has(action.type)) {
     target = applyOperationsAction(state, action as OperationsAction, actor);
   } else if (action.type === 'start-post-evaluation' || action.type === 'save-post-evaluation' || action.type === 'score-post-evaluation' || action.type === 'confirm-post-evaluation' || action.type === 'submit-archive-file' || action.type === 'review-archive-file' || action.type === 'confirm-project-archive') {
     target = applyCloseoutAction(state, action, actor);
@@ -222,6 +227,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     const p = project(approval.projectId); target = approval.id;
     if (action.approve && approval.type === '未签额外投入') {
       if (!p.isUnsigned || p.unsignedLimitQuota !== approval.originalQuota || !approval.proposedQuota || approval.proposedQuota <= (p.unsignedLimitQuota ?? 0)) throw new Error('额度或未签状态已变化，请重新申报');
+      approveUnsignedInvestment(state,approval);
       p.unsignedLimitQuota = approval.proposedQuota;
     }
     // Coordination decisions retain the source risk, acceptance and locked settlement state.
@@ -329,7 +335,6 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
       assertConstructionWritable(state, p.id);
       if (action.fromCommitment && action.cost.amount > p.committedCost) throw new Error('结转金额超过未发生承诺');
       const nextCommitted = action.fromCommitment ? money(p.committedCost - action.cost.amount) : p.committedCost;
-      if (p.isUnsigned && p.actualCost + action.cost.amount + nextCommitted > (p.unsignedLimitQuota ?? 0)) throw new Error('未签额度不足，须追加审批');
       if (action.fromCommitment && p.commitmentBySubject) {
         if ((p.commitmentBySubject[action.cost.subjectId] ?? 0) < action.cost.amount) throw new Error('科目承诺余额不足');
         p.commitmentBySubject[action.cost.subjectId] = money(p.commitmentBySubject[action.cost.subjectId] - action.cost.amount);
