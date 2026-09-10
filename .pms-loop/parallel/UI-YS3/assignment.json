@@ -24,9 +24,9 @@
   "shared_changes": [],
   "development_dependencies": [],
   "acceptance_dependencies": [],
-  "acceptance_ready": false,
+  "acceptance_ready": true,
   "acceptance_group": "UI-YS3",
-  "status": "submitted",
+  "status": "integrated",
   "last_confirmed_at": "2026-09-11",
   "acceptance_checklist": [
     "工程检查",
@@ -36,6 +36,7 @@
   ],
   "scenarios": "按/tmp/pms-ui-initiation-preparation.md，真实上游准备，主要对象操作用UI",
   "fixtures": "真实新商机→六维→售前通过→冻结概算，默认立项为空",
-  "next_action": "当前预算五页验收完成后排队集成立项四页",
-  "delivery_commit": "799b5cd"
+  "next_action": "静态复核与范围检查通过，准备当前源码真实立项验收",
+  "delivery_commit": "799b5cd",
+  "integration_commit": "bcc03b2"
 }
