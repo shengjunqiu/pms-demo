@@ -1,0 +1,16 @@
+{
+  "package_id": "UI-YS4-PREP",
+  "package_kind": "acceptance-preparation",
+  "items": [],
+  "owner": "/root/ui_planning",
+  "writer": "",
+  "workdir": "/tmp/pms-ui-budget-workspace",
+  "branch": "pms/ui-budget-workspace",
+  "base_commit": "75625c7",
+  "contract_commit": "aecafcb",
+  "owned_paths": [
+    "/tmp/pms-ui-unsigned-preparation.md"
+  ],
+  "status": "archived",
+  "next_action": "只读准备完成：/tmp/pms-ui-unsigned-preparation.md"
+}

@@ -130,6 +130,17 @@ test('UI GL06 待决策摘要、历史切换与原审批', async ({ page }) => {
   await expect(page).toHaveURL(/approvals\/APR-1\?/);
   await expect(page.getByRole('heading', { name: '预算调整原审批', exact: true })).toBeVisible();
   await expect(page.locator('.pms-page-header')).toContainText('APR-1');
+  await page.getByLabel('审批意见', { exact: true }).fill('核对提交快照与概算偏差，批准本次预算调整');
+  await page.getByRole('button', { name: '通过，待基线确认', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: /^确\s*定$/ }).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.getByRole('button', { name: '确认基线生效', exact: true })).toBeDisabled();
+  await page.goBack();
+  await expect(page.getByRole('heading', { name: '决策处理概览' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'APR-1', exact: true })).toHaveCount(0);
+  await page.getByRole('tab', { name: /历史决策/ }).click();
+  await expect(page.getByRole('button', { name: 'APR-1', exact: true })).toBeVisible();
+  await expect(page.locator('.ant-table-tbody').getByText('已通过', { exact: true }).first()).toBeVisible();
 });
 
 

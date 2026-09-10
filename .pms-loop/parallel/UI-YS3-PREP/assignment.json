@@ -1,0 +1,16 @@
+{
+  "package_id": "UI-YS3-PREP",
+  "package_kind": "acceptance-preparation",
+  "items": [],
+  "owner": "/root/ui_executive",
+  "writer": "",
+  "workdir": "/tmp/pms-ui-executive",
+  "branch": "pms/ui-executive",
+  "base_commit": "3021706",
+  "contract_commit": "aecafcb",
+  "owned_paths": [
+    "/tmp/pms-ui-initiation-preparation.md"
+  ],
+  "status": "archived",
+  "next_action": "只读准备完成：/tmp/pms-ui-initiation-preparation.md"
+}
