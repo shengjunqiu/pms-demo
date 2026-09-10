@@ -1,0 +1,32 @@
+{
+  "package_id": "F02",
+  "owner": "develop_ys",
+  "workdir": "/private/tmp/pms-parallel-ys",
+  "branch": "pms/action-budget",
+  "base_commit": "44acc08",
+  "owned_paths": [
+    "src/pages/initiation/InitiationApplyPage.tsx",
+    "src/pages/initiation/InitiationRiskPage.tsx",
+    "src/pages/initiation/InitiationDecisionPage.tsx",
+    "src/pages/budget/TeamPage.tsx",
+    "src/pages/budget/WbsPlanningPage.tsx",
+    "src/pages/budget/MilestonePlanningPage.tsx",
+    "src/pages/budget/PlanReviewPage.tsx",
+    "src/pages/budget/BudgetEditorPage.tsx",
+    "src/pages/approvals/BudgetApprovalPage.tsx",
+    "src/pages/budget/BaselinePage.tsx",
+    "src/pages/unsigned/UnsignedProjectPage.tsx",
+    "src/pages/unsigned/StartConfirmationPage.tsx"
+  ],
+  "status": "integrated",
+  "contract": "src/hooks/useActionAccess.ts: canDo(actionType,targetId), canEditField(field); retain domain checks",
+  "scenarios": [
+    "disabled action cannot open/edit/confirm business forms",
+    "save-and-submit checks both permissions before first write",
+    "read-only navigation remains available",
+    "existing default-role happy paths unchanged"
+  ],
+  "formal_acceptance": false,
+  "delivery_commit": "bf4c48c",
+  "integration_commit": "de83bf8"
+}

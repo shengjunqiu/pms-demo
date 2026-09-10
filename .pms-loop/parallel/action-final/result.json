@@ -1,0 +1,8 @@
+{
+  "source_commit": "61d215f",
+  "domain_tests": 219,
+  "browser_passed": 15,
+  "browser_failed": 1,
+  "formal_acceptance": false,
+  "failure": "first-batch 商机评估场景未配置技术协同人，403；保留失败证据，后续通过真实表单指定协同人。"
+}

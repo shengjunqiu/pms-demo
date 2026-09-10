@@ -1,0 +1,19 @@
+{
+  "package_id": "F07",
+  "owner": "develop_ys",
+  "workdir": "/private/tmp/pms-parallel-ys",
+  "branch": "pms/action-tickets",
+  "base_commit": "32f6d93",
+  "owned_paths": [
+    "src/pages/tickets/TicketsPage.tsx",
+    "src/pages/tickets/TicketDetailPage.tsx"
+  ],
+  "status": "integrated",
+  "scenarios": [
+    "create and each update operation disabled by policy",
+    "modal edit and confirmation policy controls"
+  ],
+  "formal_acceptance": false,
+  "delivery_commit": "30ab8d0",
+  "integration_commit": "1b3a9f3e17cebe793be8ed67b02e3acf254b57bd"
+}

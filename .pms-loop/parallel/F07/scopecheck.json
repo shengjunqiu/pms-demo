@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "base": "32f6d93652268fcda0bc4624f0bf49499335bfb1",
+  "head": "30ab8d00f7f6b8bc407d9d3e91ceea36a0406d30",
+  "paths": [
+    "src/pages/tickets/TicketDetailPage.tsx",
+    "src/pages/tickets/TicketsPage.tsx"
+  ],
+  "shared_paths": [],
+  "outside_owned_paths": [],
+  "merge_commits": [],
+  "unresolved_conflicts": []
+}

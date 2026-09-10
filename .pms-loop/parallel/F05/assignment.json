@@ -1,0 +1,21 @@
+{
+  "package_id": "F05",
+  "owner": "develop_ys",
+  "workdir": "/private/tmp/pms-parallel-ys",
+  "branch": "pms/action-delivery",
+  "base_commit": "32f6d93",
+  "owned_paths": [
+    "src/pages/execution/CostSourcesPage.tsx",
+    "src/pages/execution/DeliverablesPage.tsx"
+  ],
+  "status": "integrated",
+  "contract": "useActionAccess canDo(type, actual target); retain domain guards; latest getState at call",
+  "scenarios": [
+    "disabled controls and forms and modal confirmations",
+    "save and submit independent; check both before first mutation",
+    "retain read-only navigation and domain guards"
+  ],
+  "formal_acceptance": false,
+  "delivery_commit": "786a97c",
+  "integration_commit": "4b795494da4a70ef2b0703ad50c1eb634e733a6a"
+}

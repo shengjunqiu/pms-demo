@@ -1,0 +1,20 @@
+
+> pms-demo@1.0.0 test:e2e /Users/shengjunqiu/Documents/Code/pms-demo
+> playwright test e2e/action-access.spec.ts e2e/access.spec.ts e2e/receipts.spec.ts
+
+[WebServer] (node:4353) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:4376) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:4392) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/access.spec.ts:106:1 › CF07发布财务页面与人员单价限制，CF08保留发布差异及访问拒绝 (36.7s)
+  ✓  2 e2e/access.spec.ts:197:1 › 默认PM仍可审核真实团队成员工时，个人单价和金额保持隐藏 (33.3s)
+  ✓  3 e2e/action-access.spec.ts:30:1 › 禁用工时审核仍可填报；费率可见和编辑独立，恢复后原值保留 (29.4s)
+  ✓  4 e2e/receipts.spec.ts:76:1 › P006财务收清1023万元后应收门禁解除，其他关闭条件仍待办理 (15.6s)
+  ✓  5 e2e/receipts.spec.ts:125:1 › P006部分收款后重复流水被拒，合同余额及原流水条数保持不变 (11.2s)
+
+  5 passed (2.2m)

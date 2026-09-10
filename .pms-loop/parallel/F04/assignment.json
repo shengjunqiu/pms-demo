@@ -1,0 +1,22 @@
+{
+  "package_id": "F04",
+  "owner": "develop_gs",
+  "workdir": "/private/tmp/pms-parallel-gs",
+  "branch": "pms/action-execution",
+  "base_commit": "32f6d93",
+  "owned_paths": [
+    "src/pages/execution/ProjectProgressPage.tsx",
+    "src/pages/approvals/PlanRequestPage.tsx",
+    "src/pages/execution/ReportsPage.tsx"
+  ],
+  "status": "integrated",
+  "contract": "useActionAccess canDo(type, actual target); retain domain guards; latest getState at call",
+  "scenarios": [
+    "disabled controls and forms and modal confirmations",
+    "save and submit independent; check both before first mutation",
+    "retain read-only navigation and domain guards"
+  ],
+  "formal_acceptance": false,
+  "delivery_commit": "1e1f284",
+  "integration_commit": "a205763dc11acf125da2d46f1fc460bcd21e6000"
+}

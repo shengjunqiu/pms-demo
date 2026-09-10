@@ -1,0 +1,29 @@
+{
+  "package_id": "F03",
+  "owner": "develop_js",
+  "workdir": "/private/tmp/pms-parallel-js",
+  "branch": "pms/action-settlement",
+  "base_commit": "44acc08",
+  "owned_paths": [
+    "src/pages/settlement/AcceptancePage.tsx",
+    "src/pages/settlement/ReportAcceptancePage.tsx",
+    "src/pages/settlement/SettlementPage.tsx",
+    "src/pages/settlement/SettlementAnalysisPage.tsx",
+    "src/pages/settlement/PostEvaluationPage.tsx",
+    "src/pages/settlement/ArchivePage.tsx",
+    "src/pages/settlement/OperationHandoverPage.tsx",
+    "src/pages/settlement/OperationsPage.tsx",
+    "src/pages/settlement/ProjectClosePage.tsx"
+  ],
+  "status": "integrated",
+  "contract": "src/hooks/useActionAccess.ts: canDo(actionType,targetId), canEditField(field); retain domain checks",
+  "scenarios": [
+    "disabled action cannot open/edit/confirm business forms",
+    "save-and-submit checks both permissions before first write",
+    "read-only navigation remains available",
+    "existing default-role happy paths unchanged"
+  ],
+  "formal_acceptance": false,
+  "delivery_commit": "8f72a2b",
+  "integration_commit": "32f6d93652268fcda0bc4624f0bf49499335bfb1"
+}

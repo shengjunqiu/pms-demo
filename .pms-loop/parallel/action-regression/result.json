@@ -1,0 +1,10 @@
+{
+  "source_commit": "32f6d93",
+  "domain_tests": 219,
+  "browser_tests": 5,
+  "formal_acceptance": false,
+  "screenshots_reviewed": [
+    "CF07-rate-readonly-1280.png"
+  ],
+  "note": "Initial F01-F03 integration regression; later F04-F07 require their own current-source checks."
+}

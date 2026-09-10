@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "base": "32f6d93652268fcda0bc4624f0bf49499335bfb1",
+  "head": "1e1f284ec1e61b0da552f4d8e5e4f9f7219057b2",
+  "paths": [
+    "src/pages/approvals/PlanRequestPage.tsx",
+    "src/pages/execution/ProjectProgressPage.tsx",
+    "src/pages/execution/ReportsPage.tsx"
+  ],
+  "shared_paths": [],
+  "outside_owned_paths": [],
+  "merge_commits": [],
+  "unresolved_conflicts": []
+}
