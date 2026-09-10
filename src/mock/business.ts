@@ -2,6 +2,9 @@ import { applyProjectChangeAction, initializePendingChanges, type ProjectChangeA
 import type { ChangeRequest } from '@/models/changes';
 import { applyEarlyInvestmentAction, type EarlyInvestmentAction } from '@/mock/early-investments';
 import type { EarlyInvestmentRequest, EarlyCostRecord } from '@/models/early-investments';
+import { assertArchiveActionWritable } from '@/mock/archive-lock';
+import { applyCloseoutAction, type CloseoutAction } from '@/mock/closeout';
+import type { PostEvaluation, ProjectArchive, ArchiveCategory } from '@/models/closeout';
 import { applySettlementAction, type SettlementAction } from '@/mock/settlement';
 import type { SettlementRequest, SettlementCostReview, SettlementCostDisposition, SettlementAnalysis } from '@/models/settlement';
 import { applyEstimateAction, type EstimateAction } from '@/mock/estimates';
@@ -49,10 +52,11 @@ export interface PlanRequest {
   id: string; projectId: string; kind: 'schedule' | 'stage'; reason: string; status: '待审批' | '通过' | '驳回';
   requiredRoles: ('pmo' | 'finance')[]; reviews: { role: UserRole; approve: boolean; opinion: string }[]; sourceRequirementId?: string; submittedBy: string; submittedAt: string; baselineId: string; tasks: WbsTask[]; shiftDays: number; opinion?: string;
 }
-export interface Material extends DocumentDetails { id: string; projectId: string; name: string; required: boolean; status: '缺失' | '待提交' | '待审核' | '通过' | '驳回' }
+export interface Material extends DocumentDetails { archiveCategory?: ArchiveCategory; sourceId?: string; id: string; projectId: string; name: string; required: boolean; status: '缺失' | '待提交' | '待审核' | '通过' | '驳回' }
 export interface BusinessState {
   changeRequests: ChangeRequest[];
   earlyInvestmentRequests: EarlyInvestmentRequest[]; earlyCosts: EarlyCostRecord[];
+  postEvaluations: Record<string, PostEvaluation>; projectArchives: Record<string, ProjectArchive>;
   settlementRequests: SettlementRequest[]; settlementCostReviews: SettlementCostReview[]; settlementCostDispositions: SettlementCostDisposition[]; settlementAnalyses: Record<string, SettlementAnalysis[]>;
   settlementForecastSnapshots: Record<string, {date:string;total:number;subjects:Record<string,number>}>;
   estimateDrafts: Record<string, EstimateDraft>; estimateMeta: Record<string, EstimateMetadata>;
@@ -71,7 +75,7 @@ export interface BusinessState {
   audit: { id: string; actor: string; action: string; target: string; date: string }[];
 }
 export function createBusinessState(): BusinessState {
-  const state: BusinessState = structuredClone({ changeRequests: [], earlyInvestmentRequests: [], earlyCosts: [], settlementRequests: [], settlementCostReviews: [], settlementCostDispositions: [], settlementAnalyses: {}, settlementForecastSnapshots: {}, estimateDrafts: {}, estimateMeta: {}, projectTeams: {}, budgetDrafts: {}, presales: {}, planningDrafts: {}, planningReviews: [], acceptanceDetails: {}, acceptanceReports: [], opportunities: mockOpportunities, opportunityMeta: {}, contracts: mockContracts, receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
+  const state: BusinessState = structuredClone({ postEvaluations: {}, projectArchives: {}, changeRequests: [], earlyInvestmentRequests: [], earlyCosts: [], settlementRequests: [], settlementCostReviews: [], settlementCostDispositions: [], settlementAnalyses: {}, settlementForecastSnapshots: {}, estimateDrafts: {}, estimateMeta: {}, projectTeams: {}, budgetDrafts: {}, presales: {}, planningDrafts: {}, planningReviews: [], acceptanceDetails: {}, acceptanceReports: [], opportunities: mockOpportunities, opportunityMeta: {}, contracts: mockContracts, receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
     estimates: mockEstimateVersions, milestones: mockMilestones, settlements: mockSettlements,
     issues: mockIssues, risks: mockRisks, bugs: mockBugs, costs: mockCostItems, approvals: [], changes: mockChanges, managementApprovals: [],
     decisions: mockDecisions, acceptances: mockAcceptances, lockedProjects: ['P-008'], maintenanceCosts: [], audit: [],
@@ -90,7 +94,7 @@ export function createBusinessState(): BusinessState {
   initAcceptanceFixture(state);
   return state;
 }
-export type BusinessAction = ProjectChangeAction | EarlyInvestmentAction | SettlementAction | EstimateAction | TeamAction | BudgetDraftAction | PresalesAction | BudgetPlanningAction | AcceptanceAction | OpportunityAction | LaborAction | DeliverableAction | ReportAction | CostOrderAction | TicketAction
+export type BusinessAction = CloseoutAction | ProjectChangeAction | EarlyInvestmentAction | SettlementAction | EstimateAction | TeamAction | BudgetDraftAction | PresalesAction | BudgetPlanningAction | AcceptanceAction | OpportunityAction | LaborAction | DeliverableAction | ReportAction | CostOrderAction | TicketAction
   | { type: 'submit-budget'; projectId: string; budget: BudgetVersion; reason: string }
   | { type: 'review'; approvalId: string; approve: boolean; opinion: string }
   | { type: 'review-management'; id: string; approve: boolean; opinion: string }
@@ -106,6 +110,7 @@ export type BusinessAction = ProjectChangeAction | EarlyInvestmentAction | Settl
 
 /** Pure transition: validate first and clone, so failed actions never partially update the shared store. */
 export function transition(previous: BusinessState, action: BusinessAction, actor: Actor): BusinessState {
+  assertArchiveActionWritable(previous, action);
   const state = structuredClone(previous);
   const requireRole = (...roles: UserRole[]) => { if (!roles.includes(actor.role)) throw new Error('当前角色无权执行此操作'); };
   const project = (id: string) => {
@@ -114,7 +119,9 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     return value;
   };
   let target = '';
-  if (action.type === 'save-early-investment' || action.type === 'review-early-investment' || action.type === 'record-early-cost') {
+  if (action.type === 'start-post-evaluation' || action.type === 'save-post-evaluation' || action.type === 'score-post-evaluation' || action.type === 'confirm-post-evaluation' || action.type === 'submit-archive-file' || action.type === 'review-archive-file' || action.type === 'confirm-project-archive') {
+    target = applyCloseoutAction(state, action, actor);
+  } else if (action.type === 'save-early-investment' || action.type === 'review-early-investment' || action.type === 'record-early-cost') {
     target = applyEarlyInvestmentAction(state, action, actor);
   } else if (action.type === 'estimate-create-draft' || action.type === 'estimate-save-draft' || action.type === 'estimate-publish' || action.type === 'estimate-freeze') {
     target = applyEstimateAction(state, action, actor);
