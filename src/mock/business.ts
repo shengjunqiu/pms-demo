@@ -61,6 +61,10 @@ export function createBusinessState(): BusinessState {
       status: p.status === '已结算' || name === '实施计划' && mockMilestones.some((m) => m.projectId === p.id && m.type === '启动' && m.status === '已达成') ? '通过' as const : '缺失' as const,
     }))),
   });
+  for (const opportunity of state.opportunities) {
+    const candidates = state.estimates.filter((e) => e.opportunityId === opportunity.id && e.isFrozen);
+    if (!opportunity.currentEstimateVersionId && candidates.length === 1) opportunity.currentEstimateVersionId = candidates[0].id;
+  }
   initializePlanning(state);
   initAcceptanceFixture(state);
   return state;
