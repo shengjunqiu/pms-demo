@@ -3,14 +3,14 @@
 <!-- pms-loop:begin -->
 ## Loop 当前进度
 
-已验收：**36 / 72 页面**
+已验收：**38 / 72 页面**
 
-状态：`in_progress`；更新时间：2026-09-10T12:14:09+00:00
+状态：`in_progress`；更新时间：2026-09-10T12:29:55+00:00
 
 | 模块 | 已验收 | 待办/活动/阻塞 |
 |---|---:|---|
 | WK | 1/2 | WK-01(pending) |
-| GS | 5/11 | GS-01(pending)、GS-03(pending)、GS-08(pending)、GS-09(pending)、GS-10(pending)、GS-11(pending) |
+| GS | 7/11 | GS-08(pending)、GS-09(pending)、GS-10(pending)、GS-11(pending) |
 | YS | 6/15 | YS-01(pending)、YS-02(pending)、YS-03(pending)、YS-04(pending)、YS-05(pending)、YS-09(pending)、YS-10(pending)、YS-11(pending)、YS-12(pending) |
 | HS | 15/17 | HS-14(pending)、HS-15(pending) |
 | JS | 2/13 | JS-01(pending)、JS-02(pending)、JS-05(pending)、JS-06(pending)、JS-07(pending)、JS-08(pending)、JS-09(pending)、JS-10(pending)、JS-11(pending)、JS-12(pending)、JS-13(pending) |
@@ -23,8 +23,6 @@
 
 ### 最近轮次与验证
 
-- R0021：YS-06, YS-07, YS-08；accepted；证据目录 `.pms-loop/runs/R0021/`
-  验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
 - R0022：JS-03, JS-04；accepted；证据目录 `.pms-loop/runs/R0022/`
   验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
 - R0023：CF-08；accepted；证据目录 `.pms-loop/runs/R0023/`
@@ -33,11 +31,11 @@
   验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
 - R0025：GS-05, GS-06, GS-07；accepted；证据目录 `.pms-loop/runs/R0025/`
   验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
+- R0026：GS-01, GS-03；accepted；证据目录 `.pms-loop/runs/R0026/`
+  验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
 
 ### 假设、已知问题与恢复说明
 
-- 2026-09-09T18:24:17+00:00：R0017（HS-03/HS-04/HS-17）已实现日报草稿/提交/独立问题关联、周报快照与模拟上报、交付物版本/质量整改/PMO审核/归档、里程碑材料日期校验及WK02联动。39领域测试已通过；新增实施计划导入目录后正在重跑最终check。浏览器曾成功打开日报初态，但CUA随后超时并重置，getState连续返回apps=[]/browsers=[]，createBrowserTab返回Browser is not available: iab；open_in_codex预览未响应已终止等待。evidence保持未验收；恢复浏览器后继续当前轮次，不重复begin。待验证：日报无进展草稿→提交/待办、周报生成补充上报/来源快照、文档质量失败→独立整改→复查、文件v1退回→v2通过、材料通过后里程碑实际达成，三页1440/1280截图及控制台。R0015已提交02a7041，累计17/72页；所有R0017源码尚未提交。
-- 2026-09-09T18:24:37+00:00：R0017最终check已通过：revision=9d79d16b0a83735864a516b54d11fa73318e298902307882d85b389b792ba168，typecheck/lint/build/test:domain全通过（39测试）。仅剩实际浏览器业务回归、三页双宽截图和证据验收；浏览器连接未恢复，不能accept或按完成提交。继续时先恢复CUA可用浏览器，再沿R0017验证。
 - 2026-09-10T00:20:20+00:00：用户指出此前验证标签页过多。2026-09-10复查CUA：内置浏览器连接已恢复，当前tabs=[]，无遗留页可关闭。后续浏览器验收只复用一个测试标签页，通过站内导航切换页面和角色；完成证据保存后及时关闭，不再逐轮新建并累积标签页。标签过多可能增加负载，但尚无证据证明是上次断连的直接原因。R0017仍待浏览器验收。
 - 2026-09-10T02:29:26+00:00：并发开发进行中：A01 GS01-04、B01 YS06-08、C01 JS01-04已合入main，另实现WK01与统一待办/PMO基线确认；正式仍22/72无活动轮次，待下游依赖打通后分批验收。三个worktree继续A02/B02/C02，指派见.pms-loop/parallel。75领域测试通过（--maxWorkers=1），build通过；真实Playwright test:e2e已建立，工作台双宽通过，首批11页截图/商机提交正在调试选择器。单测试操作者、自动关闭无可见标签累积。不要把集成或分支测试计为验收。
 - 2026-09-10T05:20:32+00:00：本次恢复已合入 access e2e 4be6ffc→a650360、D09 d978009→fb5c20c；主集成6408766保存字段展示权限、团队总览真实成员、JS13按检查项名定位补办路由及回归证据。typecheck/lint/build通过，access.spec.ts 2条及receipts.spec.ts 2条真实浏览器共4通过，无控制台error；1440/1280截图已保存parallel/access-e2e并抽查。修复helpers只匹配可见下拉；团队场景先由领导驳回APR-1再修改成员，遵守原业务门禁。仍29/72、无活动轮次；CF07/08不得直接accept：尚须补齐商机/审计组织范围、按钮级策略展示、完整审批轨迹及对应浏览器场景。D09五页只完成工程检查，字段隐藏后的保存及跨页链仍需专项浏览器观察；bundle约2.257MB分包待办。当前无运行服务和浏览器测试。后续先补访问范围再开始CF07/08正式轮次，禁止复用旧截图修改hash验收。
@@ -46,6 +44,8 @@
 - 2026-09-10T11:24:43+00:00：R0024已正式验收YS-13/14/15，累计33/72，无活动轮次。demo初始快照惰性构建并独立深拷贝，修复重复构建导致测试超时，未放宽时限；期望业务拒绝不再泄漏Promise控制台错误，统一前六个演示人员角色，启动页移除实现名。最终revision=d20df29c63407668d1bc927a43a9516a732e76c21a14f300144ccef463dccbd2，typecheck/lint/build及233领域测试通过；R24两份真实浏览器测试7/7通过，合同缺附件/回款不守恒、未签/缺基线/非法日期阻断，追加批准驳回、退出成本保留和启动执行链均核验。六张正式双宽截图已查看，通知角色正确，无console error；前置上游状态由统一transition准备，不冒充上游页面UI验收。旧失败日志与前版本截图保留attempts。R24-QA独占测试d394351范围检查后单向回收e20ab56，无冲突，支持任务已归档；B05已accepted。下一步继续验收已集成库存，按pipeline确认具体包依赖和acceptance_ready，不继续堆新页面。CF07收入/成本粒度及组织上下文仍待补齐；最终全量e2e与72页尚未完成。
 - 2026-09-10T12:01:03+00:00：恢复开发：优化已提交eef434f；当前R0025验收GS05/06/07。主目录修复对象key隔离、预期业务拒绝处理、方案modifiedBy/At真实修改人；定向领域8测试与typecheck通过。PRESALES-QA首交付26007ab→57c2725，首轮浏览器只读/404通过，主链在成本科目Select定位器被显示值覆盖而超时（非业务断言失败）；子agent补真实403/不通过分支及Select定位器，等待增量交付。正式check尚未开始，evidence全部保持未通过。A01修复在/tmp/pms-opportunity-fix独立进行，范围仅三页及其e2e，合入前范围检查。系统Chromium通过PMS_BROWSER_EXECUTABLE=/usr/bin/chromium使用，重型测试由主线程串行。
 - 2026-09-10T12:14:09+00:00：R0025已正式验收GS05/06/07，36/72；工程四项通过、3条浏览器场景通过，已查看两尺寸截图。接下来接入A01 0f1b49d与d8e92f1，验证GS01/03。
+- 2026-09-10T12:22:56+00:00：R0026 GS01/03已集成26c7c31/f91d070。预检修正AntD按钮空格、排序保留页码、筛选完成等待、HS01实际标题及fixture：OPP002已转立项不能跟进/暂缓，新建商机不能补录建档前日期。改用真实新建商机暂缓与历史未锁商机倒序跟进；不修改业务门禁。precheck3其余5条通过（含GS02/04回归），precheck4验证跟进。正式check尚未开始。
+- 2026-09-10T12:29:55+00:00：R0025/R0026两轮已验收GS05/06/07及GS01/03，累计38/72，无活动轮次。R26最终revision=442d69c296f96bb22ab31a460f8a981b1c5fa1e99dd06fb3007e65fb19f42ad6，typecheck/lint/build与233领域测试通过（91.98秒）；9个正式浏览器场景通过、控制台error空，4张主页面双宽截图已查看，补充版本不匹配/暂缓截图已查看。修复立项版本门禁一致、日期视图恢复、最后跟进取业务日期、PM成本隐藏一致、详情金额日期；测试用真实生命周期fixture，不绕过已转立项/建档日期限制。A01/A02已accepted，子agent已停写，外部worktree保留；下一步先审A03 GS08/09真实依赖、补验收准备，继续消化库存。CF07收入/成本粒度及组织上下文、剩余34页和FINAL仍未完成。浏览器测试及所启服务已退出；本地提交未推送。
 
 完整任务状态、历史和证据索引见 `.pms-loop/state.json`。
 <!-- pms-loop:end -->

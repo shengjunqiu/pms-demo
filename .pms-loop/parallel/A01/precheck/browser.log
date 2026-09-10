@@ -1,0 +1,177 @@
+[WebServer] (node:2620995) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2621027) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 7 tests using 1 worker
+
+(node:2621056) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 e2e/opportunity-ledger.spec.ts:87:1 › 台账日期方案恢复、列设置导出与补录跟进日期 (23.6s)
+(node:2621490) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 e2e/opportunity-ledger.spec.ts:142:1 › 真实完整版本链可发起立项，九个页签及下钻保持同一商机 (17.1s)
+  ✘  3 e2e/opportunity-ledger.spec.ts:174:1 › 新评审与旧冻结概算不一致时两页共同阻断，项目经理成本显示一致 (20.4s)
+(node:2622233) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  4 e2e/opportunity-ledger.spec.ts:198:1 › 台账分页和金额排序使用完整可见集合 (15.4s)
+(node:2622627) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  5 e2e/opportunity-ledger.spec.ts:228:1 › 暂缓必须安排复评，详情与台账提醒同步并能发起复评 (19.1s)
+(node:2622942) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  6 e2e/opportunity-ledger.spec.ts:264:1 › 真实前期投入终止时强制处置说明，保留来源成本与只读历史 (20.9s)
+(node:2623308) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  7 e2e/opportunity-ledger.spec.ts:320:1 › 未知商机、组织拒绝和已立项商机的真实项目下钻 (14.5s)
+
+
+  1) e2e/opportunity-ledger.spec.ts:87:1 › 台账日期方案恢复、列设置导出与补录跟进日期 ───────────────────────────────────
+
+    TimeoutError: locator.click: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: '重置', exact: true })
+
+
+       95 |   await page.getByLabel('视图名称', { exact: true }).fill('十月签约');
+       96 |   await page.getByRole('dialog').getByRole('button', { name: /确\s*定/ }).click();
+    >  97 |   await page.getByRole('button', { name: '重置', exact: true }).click();
+          |                                                               ^
+       98 |   await expect(dates.nth(0)).toHaveValue('');
+       99 |   await dates.nth(0).fill('2026-11-01');
+      100 |   await dates.nth(0).press('Enter');
+        at /home/shengjunqiu/code/pms-demo/e2e/opportunity-ledger.spec.ts:97:63
+
+    Error Context: test-results/opportunity-ledger-台账日期方案恢复、列设置导出与补录跟进日期/error-context.md
+
+  2) e2e/opportunity-ledger.spec.ts:174:1 › 新评审与旧冻结概算不一致时两页共同阻断，项目经理成本显示一致 ─────────────────────────
+
+    TimeoutError: locator.click: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: '查询', exact: true })
+
+
+      178 |   // Search accepts business code rather than internal id; use the unique business name.
+      179 |   await page.getByLabel('编号 / 商机名称', { exact: true }).fill('台账验收数据共享项目');
+    > 180 |   await page.getByRole('button', { name: '查询', exact: true }).click();
+          |                                                               ^
+      181 |   await expect(page.getByRole('button', { name: '发起立项', exact: true })).toBeDisabled();
+      182 |   await navigate(page, `/opportunities/${id}`);
+      183 |   await expect(page.getByRole('button', { name: '发起立项', exact: true })).toBeDisabled();
+        at /home/shengjunqiu/code/pms-demo/e2e/opportunity-ledger.spec.ts:180:63
+
+    Error Context: test-results/opportunity-ledger-新评审与旧冻结概算不一致时两页共同阻断，项目经理成本显示一致/error-context.md
+
+  3) e2e/opportunity-ledger.spec.ts:198:1 › 台账分页和金额排序使用完整可见集合 ──────────────────────────────────────
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 10
+    + Received  + 10
+
+      Array [
+    -   "OPP-007",
+    -   "OPP-002",
+    -   "OPP-009",
+    -   "OPP-PLAN-001",
+    -   "OPP-010",
+    -   "OPP-011",
+    -   "OPP-012",
+    -   "OPP-013",
+    -   "OPP-014",
+    -   "OPP-015",
+    +   "OPP-016",
+    +   "OPP-017",
+    +   "OPP-018",
+    +   "OPP-006",
+    +   "OPP-019",
+    +   "OPP-020",
+    +   "OPP-021",
+    +   "OPP-022",
+    +   "OPP-023",
+    +   "OPP-024",
+      ]
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      212 |       .sort((a, b) => a.estimatedAmount - b.estimatedAmount).slice(0, 10).map(o => o.id);
+      213 |   });
+    > 214 |   await expect.poll(async () => rows.evaluateAll(nodes => nodes.map(node => node.getAttribute('data-row-key')))).toEqual(expectedIds);
+          |                                                                                                                  ^
+      215 |   await page.getByRole('button', { name: '更多筛选', exact: true }).click();
+      216 |   await page.getByLabel('最低金额（万元）', { exact: true }).fill('8000');
+      217 |   await page.getByRole('button', { name: '查询', exact: true }).click();
+        at /home/shengjunqiu/code/pms-demo/e2e/opportunity-ledger.spec.ts:214:114
+
+    Error Context: test-results/opportunity-ledger-台账分页和金额排序使用完整可见集合/error-context.md
+
+  4) e2e/opportunity-ledger.spec.ts:228:1 › 暂缓必须安排复评，详情与台账提醒同步并能发起复评 ───────────────────────────────
+
+    TimeoutError: locator.click: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: '暂缓', exact: true })
+
+
+      230 |   const id = await seed(page);
+      231 |   await navigate(page, `/opportunities/${id}`);
+    > 232 |   await page.getByRole('button', { name: '暂缓', exact: true }).click();
+          |                                                               ^
+      233 |   const dialog = page.getByRole('dialog');
+      234 |   await dialog.getByRole('button', { name: '确认并记录', exact: true }).click();
+      235 |   await expect(dialog.locator('.ant-form-item-explain-error')).toHaveCount(3);
+        at /home/shengjunqiu/code/pms-demo/e2e/opportunity-ledger.spec.ts:232:63
+
+    Error Context: test-results/opportunity-ledger-暂缓必须安排复评，详情与台账提醒同步并能发起复评/error-context.md
+
+  5) e2e/opportunity-ledger.spec.ts:264:1 › 真实前期投入终止时强制处置说明，保留来源成本与只读历史 ────────────────────────────
+
+    TimeoutError: locator.click: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: '终止', exact: true })
+
+
+      285 |   }, id);
+      286 |   await navigate(page, `/opportunities/${id}`);
+    > 287 |   await page.getByRole('button', { name: '终止', exact: true }).click();
+          |                                                               ^
+      288 |   const dialog = page.getByRole('dialog');
+      289 |   await expect(dialog).toContainText('已发生提前投入：12.00 万元');
+      290 |   await dialog.getByLabel('决策原因', { exact: true }).fill('客户取消采购');
+        at /home/shengjunqiu/code/pms-demo/e2e/opportunity-ledger.spec.ts:287:63
+
+    Error Context: test-results/opportunity-ledger-真实前期投入终止时强制处置说明，保留来源成本与只读历史/error-context.md
+
+  6) e2e/opportunity-ledger.spec.ts:320:1 › 未知商机、组织拒绝和已立项商机的真实项目下钻 ─────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('heading', { name: '福建省晋江市岸海防综合治理平台', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('heading', { name: '福建省晋江市岸海防综合治理平台', exact: true }) with timeout 5000ms
+      - waiting for getByRole('heading', { name: '福建省晋江市岸海防综合治理平台', exact: true })
+
+
+      326 |   await page.getByRole('link', { name: '已转入项目：福建省晋江市岸海防综合治理平台', exact: true }).click();
+      327 |   await expect(page).toHaveURL('/projects/P-001');
+    > 328 |   await expect(page.getByRole('heading', { name: '福建省晋江市岸海防综合治理平台', exact: true })).toBeVisible();
+          |                                                                                     ^
+      329 |   await role(page, '财务专员');
+      330 |   await page.evaluate(async () => {
+      331 |     const path = '/src/mock/business.ts';
+        at /home/shengjunqiu/code/pms-demo/e2e/opportunity-ledger.spec.ts:328:85
+
+    Error Context: test-results/opportunity-ledger-未知商机、组织拒绝和已立项商机的真实项目下钻/error-context.md
+
+  6 failed
+    e2e/opportunity-ledger.spec.ts:87:1 › 台账日期方案恢复、列设置导出与补录跟进日期 ────────────────────────────────────
+    e2e/opportunity-ledger.spec.ts:174:1 › 新评审与旧冻结概算不一致时两页共同阻断，项目经理成本显示一致 ──────────────────────────
+    e2e/opportunity-ledger.spec.ts:198:1 › 台账分页和金额排序使用完整可见集合 ───────────────────────────────────────
+    e2e/opportunity-ledger.spec.ts:228:1 › 暂缓必须安排复评，详情与台账提醒同步并能发起复评 ────────────────────────────────
+    e2e/opportunity-ledger.spec.ts:264:1 › 真实前期投入终止时强制处置说明，保留来源成本与只读历史 ─────────────────────────────
+    e2e/opportunity-ledger.spec.ts:320:1 › 未知商机、组织拒绝和已立项商机的真实项目下钻 ──────────────────────────────────
+  1 passed (2.3m)

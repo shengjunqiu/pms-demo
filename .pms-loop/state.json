@@ -23,16 +23,16 @@
       "round": "R0013"
     },
     "GS-01": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0026"
     },
     "GS-02": {
       "status": "done",
       "round": "R0020"
     },
     "GS-03": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0026"
     },
     "GS-04": {
       "status": "done",
@@ -1007,6 +1007,45 @@
         ".pms-loop/runs/R0025/checks.json": "86d769a4de22aa4b57d327148b1cf1f1356be47af1c99898fd0dce50b4f31cb4",
         ".pms-loop/runs/R0025/evidence.json": "a6b1193538af353775d872ee9781dd2ad2ade9331b8f71b87d237adccd01b7b7"
       }
+    },
+    {
+      "id": "R0026",
+      "items": [
+        "GS-01",
+        "GS-03"
+      ],
+      "started_at": "2026-09-10T12:14:54+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-10T12:29:34+00:00",
+      "revision": "442d69c296f96bb22ab31a460f8a981b1c5fa1e99dd06fb3007e65fb19f42ad6",
+      "proof": {
+        ".pms-loop/runs/R0026/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0026/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0026/build.log": "b4fdf6e260a3f22fbd742edad5d06ecdb2f3ab5dc80531198da9f926d8b4f85a",
+        ".pms-loop/runs/R0026/test-domain.log": "ca3e2a9c8feb8e8c654ff3879cbe90bdf25dd933db6e80ae5daab3cfbf60f607",
+        ".pms-loop/runs/R0026/artifacts/browser-501aaaeb656e8ee17bbca1640fc49da46509904f.json": "199d66a42953d958ef77931dafb33fc974e1cdb4b63b22f250d47b87c507466a",
+        ".pms-loop/runs/R0026/artifacts/browser-501aaaeb656e8ee17bbcce9c21aac19538a9e0e2.json": "a7a3816db0b0cc7ede3930276a74bbe86aca50de82f6b0dc8cd7152f09b28b79",
+        ".pms-loop/runs/R0026/artifacts/r0024-ef3a7c770820419a41de16540492a734ca562220.json": "4affdce2221710ea384eea90cc685ceaca471960bd3fea0fa837e177a4cfddbf",
+        ".pms-loop/runs/R0026/artifacts/r0024-ef3a7c770820419a41de48eb32a0b85f3c532270.json": "923bc75113e5db22a01bd596f36f010cb19627e86b223033597b6e74f65a0c1b",
+        ".pms-loop/runs/R0026/artifacts/r0024-ef3a7c770820419a41de70cb8323015c54be4ec5.json": "bdc0ce52da28d6ded13508a717d280615d39e989ec92563e0baa1296119054fb",
+        ".pms-loop/runs/R0026/artifacts/r0024-ef3a7c770820419a41de76ca7ce3a69318ce729c.json": "5e2639d17994c747ebb6479da880d3381db9fa8bdd5f8877bc98f9f0dc292e7a",
+        ".pms-loop/runs/R0026/artifacts/r0024-ef3a7c770820419a41de786820ff8bf4c3438c93.json": "841dae30347b49c6962b8a50453fa568aa36aea43ba0843c46b45806a74699ec",
+        ".pms-loop/runs/R0026/artifacts/r0024-ef3a7c770820419a41deb2e8055131b62ba547e8.json": "4ffbc9082502271532ac82fca19ce0c3b9480d97e5bdd300826d3e66c3caae30",
+        ".pms-loop/runs/R0026/artifacts/r0024-ef3a7c770820419a41defac9cfd6cfaef86186d4.json": "001dee91c5a6fabfd1288323699b128bf6956efcda9969574ce5fd8a18932857",
+        ".pms-loop/runs/R0026/artifacts/browser.log": "717a8fdb546e7dbc4fb616b449a4b3a70aa3dbcadb6e74668db0459d16d8182f",
+        ".pms-loop/runs/R0026/artifacts/GS01-ledger-1440.png": "e231c55779e4bd3275cc3443f604df041ac072c76c7bb205e843904f5208ecd9",
+        ".pms-loop/runs/R0026/artifacts/GS01-ledger-1280.png": "699a8bb6355d949327eb9bc65c3fd7ca06bec5d4b37d7a11f43e732666e4cc53",
+        ".pms-loop/runs/R0026/artifacts/GS03-ready-1440.png": "f57673227e15256c5c36bed6ee13ba0a92752b067d1b87cfb171dfea74b603b4",
+        ".pms-loop/runs/R0026/artifacts/GS03-ready-1280.png": "7618a655bdf3f10b6e62e55177549978b21439317da69645651fd815f2032cf2",
+        ".pms-loop/runs/R0026/checks.json": "d84f51a2a87264055ab2439855a50fb28b21ae370aa6e96d06d2415c5acd2c02",
+        ".pms-loop/runs/R0026/evidence.json": "8c8ec37f753bcac3357155667b53f37c56edaa2aaf44f8b856a0dd393e21c1e4"
+      }
     }
   ],
   "notes": [
@@ -1101,6 +1140,14 @@
     {
       "at": "2026-09-10T12:14:09+00:00",
       "text": "R0025已正式验收GS05/06/07，36/72；工程四项通过、3条浏览器场景通过，已查看两尺寸截图。接下来接入A01 0f1b49d与d8e92f1，验证GS01/03。"
+    },
+    {
+      "at": "2026-09-10T12:22:56+00:00",
+      "text": "R0026 GS01/03已集成26c7c31/f91d070。预检修正AntD按钮空格、排序保留页码、筛选完成等待、HS01实际标题及fixture：OPP002已转立项不能跟进/暂缓，新建商机不能补录建档前日期。改用真实新建商机暂缓与历史未锁商机倒序跟进；不修改业务门禁。precheck3其余5条通过（含GS02/04回归），precheck4验证跟进。正式check尚未开始。"
+    },
+    {
+      "at": "2026-09-10T12:29:55+00:00",
+      "text": "R0025/R0026两轮已验收GS05/06/07及GS01/03，累计38/72，无活动轮次。R26最终revision=442d69c296f96bb22ab31a460f8a981b1c5fa1e99dd06fb3007e65fb19f42ad6，typecheck/lint/build与233领域测试通过（91.98秒）；9个正式浏览器场景通过、控制台error空，4张主页面双宽截图已查看，补充版本不匹配/暂缓截图已查看。修复立项版本门禁一致、日期视图恢复、最后跟进取业务日期、PM成本隐藏一致、详情金额日期；测试用真实生命周期fixture，不绕过已转立项/建档日期限制。A01/A02已accepted，子agent已停写，外部worktree保留；下一步先审A03 GS08/09真实依赖、补验收准备，继续消化库存。CF07收入/成本粒度及组织上下文、剩余34页和FINAL仍未完成。浏览器测试及所启服务已退出；本地提交未推送。"
     }
   ]
 }

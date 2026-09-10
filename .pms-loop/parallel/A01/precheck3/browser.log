@@ -1,0 +1,49 @@
+[WebServer] (node:2626117) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2626140) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 6 tests using 1 worker
+
+(node:2626169) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/first-batch.spec.ts:37:1 › 商机提交和重新打开保留同一份业务记录 (34.7s)
+  ✓  2 e2e/first-batch.spec.ts:162:1 › 商机必填、草稿、取消及冻结编辑限制 (15.7s)
+  ✘  3 e2e/opportunity-ledger.spec.ts:87:1 › 台账日期方案恢复、列设置导出与补录跟进日期 (24.4s)
+(node:2627066) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  4 e2e/opportunity-ledger.spec.ts:177:1 › 新评审与旧冻结概算不一致时两页共同阻断，项目经理成本显示一致 (14.2s)
+  ✓  5 e2e/opportunity-ledger.spec.ts:233:1 › 暂缓必须安排复评，详情与台账提醒同步并能发起复评 (16.2s)
+  ✓  6 e2e/opportunity-ledger.spec.ts:325:1 › 未知商机、组织拒绝和已立项商机的真实项目下钻 (12.7s)
+
+
+  1) e2e/opportunity-ledger.spec.ts:87:1 › 台账日期方案恢复、列设置导出与补录跟进日期 ───────────────────────────────────
+
+    Error: expect(locator).toBeHidden() failed
+
+    Locator:  getByRole('dialog')
+    Expected: hidden
+    Received: visible
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeHidden" getByRole('dialog') with timeout 5000ms
+      - waiting for getByRole('dialog')
+        14 × locator resolved to <div role="dialog" aria-modal="true" aria-labelledby=":rpt:" class="ant-modal css-dev-only-do-not-override-vgqema">…</div>
+           - unexpected value "visible"
+
+
+      133 |     await dialog.getByLabel('下一步计划', { exact: true }).fill('核对采购计划');
+      134 |     await dialog.getByRole('button', { name: '保存跟进', exact: true }).click();
+    > 135 |     await expect(dialog).toBeHidden();
+          |                          ^
+      136 |   }
+      137 |   await expect(page.getByText('客户沟通：2026-09-09客户会议', { exact: true })).toBeVisible();
+      138 |   await expect(page.getByText('客户沟通：2026-09-08客户会议', { exact: true })).toBeVisible();
+        at /home/shengjunqiu/code/pms-demo/e2e/opportunity-ledger.spec.ts:135:26
+
+    Error Context: test-results/opportunity-ledger-台账日期方案恢复、列设置导出与补录跟进日期/error-context.md
+
+  1 failed
+    e2e/opportunity-ledger.spec.ts:87:1 › 台账日期方案恢复、列设置导出与补录跟进日期 ────────────────────────────────────
+  5 passed (2.0m)

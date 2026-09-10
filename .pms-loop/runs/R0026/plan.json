@@ -1,0 +1,108 @@
+{
+  "round": "R0026",
+  "items": [
+    {
+      "id": "GS-01",
+      "title": "商机台账",
+      "route": "/opportunities",
+      "kind": "台账列表",
+      "roles": "市场/项目主办部门",
+      "phase": 4,
+      "feature_ids": [
+        "GS-001",
+        "GS-002",
+        "GS-003",
+        "GS-004",
+        "GS-005",
+        "GS-006",
+        "GS-007",
+        "GS-008"
+      ],
+      "upstream_feature_scope": "GS-001~008",
+      "source_lines": {
+        "pages": 105,
+        "brief": 394
+      },
+      "criteria": [
+        "完整商机筛选、跟进、评估、暂缓/终止/立项入口",
+        "转立项条件不满足显示原因；有投入终止保留成本并要求处置"
+      ]
+    },
+    {
+      "id": "GS-03",
+      "title": "商机详情",
+      "route": "/opportunities/:id",
+      "kind": "详情全景",
+      "roles": "商机相关角色",
+      "phase": 4,
+      "feature_ids": [
+        "GS-004",
+        "GS-005",
+        "GS-006",
+        "GS-007",
+        "GS-008"
+      ],
+      "upstream_feature_scope": "GS-004~008",
+      "source_lines": {
+        "pages": 107,
+        "brief": 396
+      },
+      "criteria": [
+        "九类页签整合跟进、方案、评审、概算、提前投入、历史",
+        "立项按钮根据条件启停并列缺失项；上游关联与版本可追溯"
+      ]
+    }
+  ],
+  "sources": {
+    "prd": {
+      "path": "docs/项目管理平台PRD_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "6dac675ca22237b7fa59129eccc466a9e242d20f948c0b68e958a7227bb2bd1b"
+    },
+    "features": {
+      "path": "docs/项目管理平台详细功能清单_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "fabfac73b480ccaf01aa831ae3c5d0a6485e33fff80f517468b2b6c52829ddfb"
+    },
+    "pages": {
+      "path": "docs/项目管理平台页面清单与原型设计说明_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "db1c548b5f5ef025eb90fef06422e132f003665fc7e6156dd706b7f095c994dc"
+    },
+    "brief": {
+      "path": "docs/项目管理平台高保真原型_AgentLoop开发任务书_V1.0.md",
+      "sha256": "286f917d5edc99a4a0c7da97515a3d6308cae7395fb287bbcd1846de60045b43"
+    }
+  },
+  "feature_references": {
+    "GS-001": {
+      "title": "商机列表",
+      "line": 40
+    },
+    "GS-002": {
+      "title": "商机新建",
+      "line": 41
+    },
+    "GS-003": {
+      "title": "商机编辑",
+      "line": 42
+    },
+    "GS-004": {
+      "title": "商机详情",
+      "line": 43
+    },
+    "GS-005": {
+      "title": "商机状态维护",
+      "line": 44
+    },
+    "GS-006": {
+      "title": "跟进记录",
+      "line": 45
+    },
+    "GS-007": {
+      "title": "暂缓与复评",
+      "line": 46
+    },
+    "GS-008": {
+      "title": "商机终止",
+      "line": 47
+    }
+  }
+}

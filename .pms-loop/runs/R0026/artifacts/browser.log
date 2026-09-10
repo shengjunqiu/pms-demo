@@ -1,0 +1,20 @@
+[WebServer] (node:2631628) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2631653) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 9 tests using 1 worker
+
+(node:2631678) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/first-batch.spec.ts:37:1 › 商机提交和重新打开保留同一份业务记录 (35.7s)
+  ✓  2 e2e/first-batch.spec.ts:162:1 › 商机必填、草稿、取消及冻结编辑限制 (15.5s)
+  ✓  3 e2e/opportunity-ledger.spec.ts:87:1 › 台账日期方案恢复、列设置导出与补录跟进日期 (24.0s)
+  ✓  4 e2e/opportunity-ledger.spec.ts:155:1 › 真实完整版本链可发起立项，九个页签及下钻保持同一商机 (15.8s)
+  ✓  5 e2e/opportunity-ledger.spec.ts:187:1 › 新评审与旧冻结概算不一致时两页共同阻断，项目经理成本显示一致 (13.2s)
+  ✓  6 e2e/opportunity-ledger.spec.ts:212:1 › 台账分页和金额排序使用完整可见集合 (12.5s)
+  ✓  7 e2e/opportunity-ledger.spec.ts:243:1 › 暂缓必须安排复评，详情与台账提醒同步并能发起复评 (16.8s)
+  ✓  8 e2e/opportunity-ledger.spec.ts:279:1 › 真实前期投入终止时强制处置说明，保留来源成本与只读历史 (15.2s)
+  ✓  9 e2e/opportunity-ledger.spec.ts:335:1 › 未知商机、组织拒绝和已立项商机的真实项目下钻 (13.1s)
+
+  9 passed (2.7m)
