@@ -1,3 +1,4 @@
+import { canViewSensitiveField } from '@/mock/configuration-access';
 import { useState } from 'react';
 import { Alert, Button, Card, Col, Descriptions, Drawer, Empty, Row, Space, Statistic, Table, Tabs, Tag, Typography } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
@@ -18,6 +19,8 @@ const colors = { green: 'success', yellow: 'gold', orange: 'orange', red: 'error
 export function GL03ProjectDrilldownPage() {
   const [params, setParams] = useSearchParams(); const navigate = useNavigate(); const location = useLocation();
   const data = useBusinessStore((s) => s.data); const role = useAppStore((s) => s.currentRole);
+  const showMargin = canViewSensitiveField(data, { role }, 'margin');
+  const healthReason = (reason: string) => showMargin ? reason : reason.replace(/毛利[^，。；]*/g, '毛利信息已隐藏');
   const [detail, setDetail] = useState<{ title: string; fields: [string, string][] }>();
   const scope = selectProjects(readProjectFilter(params), role, data.projects, data).filter((p) =>
     (!params.get('stage') || fourStage(p) === params.get('stage')) &&
@@ -47,7 +50,7 @@ export function GL03ProjectDrilldownPage() {
       { title: '责任部门 / PM', width: 160, render: (_, p) => <>{p.departmentName}<div>{p.pmName}</div></> },
       { title: '阶段', width: 100, render: (_, p) => fourStage(p) },
       ...(['contractAmount', 'budgetAmount', 'rollingCost', 'costVariance'] as const).map((key, i) => ({ title: ['已签合同', '预算', '滚动预测', '预测偏差'][i], dataIndex: key, key, width: 120, sortOrder: params.get('sort') === key ? (params.get('order') === 'ascend' ? 'ascend' as const : 'descend' as const) : null, sorter: (a: typeof scope[number], b: typeof scope[number]) => a[key] - b[key], render: (v: number) => <MoneyText value={v} signed={key === 'costVariance'} /> })),
-      { title: '健康度与原因', width: 250, render: (_, p) => <><Tag color={colors[p.health]}>{names[p.health]}</Tag><div>{p.healthReason}</div></> },
+      { title: '健康度与原因', width: 250, render: (_, p) => <><Tag color={colors[p.health]}>{names[p.health]}</Tag><div>{healthReason(p.healthReason)}</div></> },
     ]} />
   </>;
   if (!project) return list;
@@ -59,9 +62,9 @@ export function GL03ProjectDrilldownPage() {
       { key: 'customer', label: '客户', children: p.customerName }, { key: 'pm', label: '项目经理', children: p.pmName }, { key: 'dept', label: '责任部门', children: p.departmentName },
       { key: 'director', label: '项目总监（演示任命）', children: mockDepartments.find((d) => d.id === mockDepartments.find((d) => d.id === p.departmentId)?.parentId)?.leader ?? '王总' },
       { key: 'phase', label: '生命周期', children: `${fourStage(p)} · ${p.subPhase}` }, { key: 'health', label: '健康度', children: <Tag color={colors[p.health]}>{names[p.health]}</Tag> },
-    ]} /><Alert showIcon type={p.health === 'red' ? 'error' : p.health === 'green' ? 'success' : 'warning'} message={p.healthReason} /></Card>
+    ]} /><Alert showIcon type={p.health === 'red' ? 'error' : p.health === 'green' ? 'success' : 'warning'} message={healthReason(p.healthReason)} /></Card>
     <Row gutter={16} style={{ marginBottom: 16 }}>{[['冻结概算', calc.estimate?.totalCost], ['有效预算', calc.budget?.totalAmount], ['动态核算', calc.rolling], ['冻结结算', calc.settlement?.finalCost]].map(([label, value]) => <Col span={6} key={String(label)}><Card size="small"><Statistic title={label} value={Number(value)} formatter={() => <MoneyText value={typeof value === 'number' ? value : null} />} /></Card></Col>)}</Row>
-    <Typography.Paragraph>项目收入 <MoneyText value={calc.income} />；滚动偏差 <MoneyText value={calc.variance} signed />（{formatPercent(percentage(calc.variance, calc.budget?.totalAmount ?? 0))}）；预测毛利 <MoneyText value={calc.grossMargin} />（{formatPercent(calc.grossMarginRate)}）。未结算显示 —，未签预计收入不计入已签合同。</Typography.Paragraph>
+    <Typography.Paragraph>项目收入 <MoneyText value={calc.income} />；滚动偏差 <MoneyText value={calc.variance} signed />（{formatPercent(percentage(calc.variance, calc.budget?.totalAmount ?? 0))}）；预测毛利 {showMargin ? <><MoneyText value={calc.grossMargin} />（{formatPercent(calc.grossMarginRate)}）</> : '已隐藏'}。未结算显示 —，未签预计收入不计入已签合同。</Typography.Paragraph>
     <Tabs activeKey={params.get('tab') ?? 'cost'} onChange={(tab) => view({ tab })} items={[
       { key: 'cost', label: '成本异常原因', children: <Table rowKey="subjectId" size="small" pagination={false} dataSource={calc.subjects} columns={[
         { title: '科目 / 来源', render: (_, r) => <Button type="link" onClick={() => projectLink(undefined, true, r.subjectId)}>{r.subjectName}</Button> },

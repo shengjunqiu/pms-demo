@@ -1,3 +1,4 @@
+import { canViewSensitiveField } from '@/mock/configuration-access';
 import { Button, Card, Col, Row, Select, Space, Table, Tag } from 'antd';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AS_OF_DATE, mockCustomers, mockDepartments } from '@/mock';
@@ -17,6 +18,7 @@ const dimensions = [{ value: 'org', label: '组织层级' }, { value: 'region', 
 const healthNames: Record<string, string> = { green: '健康', yellow: '关注', orange: '预警', red: '高风险' };
 export function GL04PortfolioPage() {
   const data = useBusinessStore((s) => s.data); const role = useAppStore((s) => s.currentRole);
+  const showMargin = canViewSensitiveField(data, { role }, 'margin');
   const [params, setParams] = useSearchParams(); const navigate = useNavigate();
   if (!['executive', 'pmo', 'admin'].includes(role)) return <StateView type="403" />;
   const scope = selectProjects(readProjectFilter(params), role, data.projects, data);
@@ -52,16 +54,16 @@ export function GL04PortfolioPage() {
   };
   return <><PageHeader title="GL-04 项目组合分析" description={`集团 → 业务群 → 部门 → 项目 · ${AS_OF_DATE} · 万元`} breadcrumbs={[{ title: '首页', href: '/' }, { title: '组合分析' }]} extra={<Button onClick={() => navigate(-1)}>返回上一级</Button>} />
     <ProjectFilters params={params} onChange={setParams} /><AnalysisTools storageKey="pms-portfolio-views" params={params} onChange={setParams} exportRows={[
-      ['分组', '项目数', '预计收入', '签约金额', '滚动成本', '预测毛利', '加权毛利率'], ...rows.map((r) => [r.label, String(r.count), r.income.toFixed(2), r.receipts.signed.toFixed(2), r.rolling.toFixed(2), r.gross.toFixed(2), formatPercent(r.rate)]),
+      ['分组', '项目数', '预计收入', '签约金额', '滚动成本', '预测毛利', '加权毛利率'], ...rows.map((r) => [r.label, String(r.count), r.income.toFixed(2), r.receipts.signed.toFixed(2), r.rolling.toFixed(2), showMargin ? r.gross.toFixed(2) : '已隐藏', showMargin ? formatPercent(r.rate) : '已隐藏']),
     ]} />
     <Space wrap style={{ margin: '16px 0' }}><Select aria-label="组合维度" style={{ width: 180 }} options={dimensions} value={dimension} onChange={(value) => { const next = new URLSearchParams(params); next.set('dimension', value); next.delete('page'); setParams(next); }} />{dimension === 'org' && <><Tag>当前层级：{mockDepartments.find((d) => d.id === root)?.name}</Tag><Button disabled={root === 'D-001'} onClick={() => { const next = new URLSearchParams(params); next.set('org', mockDepartments.find((d) => d.id === root)?.parentId ?? 'D-001'); next.delete('orgExact'); next.delete('page'); setParams(next); }}>上一级组织</Button></>}</Space>
-    <Row gutter={12} style={{ marginBottom: 16 }}>{[['去重项目数', String(total.count)], ['预计项目收入', <MoneyText value={total.income} />], ['已签合同总额', <MoneyText value={total.receipts.signed} />], ['加权预测毛利率', formatPercent(total.rate)]].map(([label, value]) => <Col span={6} key={String(label)}><Card size="small" title={label}><div style={{ fontSize: 22 }}>{value}</div></Card></Col>)}</Row>
+    <Row gutter={12} style={{ marginBottom: 16 }}>{[['去重项目数', String(total.count)], ['预计项目收入', <MoneyText value={total.income} />], ['已签合同总额', <MoneyText value={total.receipts.signed} />], ['加权预测毛利率', showMargin ? formatPercent(total.rate) : '已隐藏']].map(([label, value]) => <Col span={6} key={String(label)}><Card size="small" title={label}><div style={{ fontSize: 22 }}>{value}</div></Card></Col>)}</Row>
     <p>各分组互斥，数量与金额可加总。毛利率 = 汇总预测毛利 ÷ 汇总预计收入；未签收入包含拟签收入，合同金额排除未签。回款按到期计划计算。</p>
     <Table rowKey="key" size="small" dataSource={rows} scroll={{ x: 1700 }} pagination={{ pageSize: 8, current: Number(params.get('page')) || 1, showSizeChanger: false, showTotal: (n) => `共 ${n} 组`, onChange: (page) => { const next = new URLSearchParams(params); next.set('page', String(page)); setParams(next); } }} columns={[
       { title: '组合分组', width: 220, fixed: 'left', render: (_, r) => <Button type="link" style={{ whiteSpace: 'normal', textAlign: 'left' }} onClick={() => drill(r)}>{r.label}</Button> },
       { title: '项目数', width: 85, dataIndex: 'count' }, { title: '预计收入 / 占比', width: 150, render: (_, r) => <><MoneyText value={r.income} /><div>{formatPercent(percentage(r.income, total.income))}</div></> },
       { title: '已签合同', width: 125, render: (_, r) => <MoneyText value={r.receipts.signed} /> }, { title: '滚动成本', width: 125, render: (_, r) => <MoneyText value={r.rolling} /> },
-      { title: '预测毛利 / 比率', width: 150, render: (_, r) => <><MoneyText value={r.gross} /><div>{formatPercent(r.rate)}</div></> },
+      { title: '预测毛利 / 比率', width: 150, render: (_, r) => showMargin ? <><MoneyText value={r.gross} /><div>{formatPercent(r.rate)}</div></> : '已隐藏' },
       { title: '健康 / 关注 / 预警 / 高风险', width: 210, render: (_, r) => `${r.green} / ${r.yellow} / ${r.orange} / ${r.red}` },
       { title: '到期应收 / 实收率', width: 150, render: (_, r) => <><MoneyText value={r.receipts.due} /><div>{formatPercent(r.receipts.dueCompletion)}</div></> },
       { title: '已收 / 逾期', width: 150, render: (_, r) => <><MoneyText value={r.receipts.paid} /><div><MoneyText value={r.receipts.overdue} /></div></> },

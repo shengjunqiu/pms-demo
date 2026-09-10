@@ -1,3 +1,4 @@
+import { canViewSensitiveField } from '@/mock/configuration-access';
 import { useState } from "react";
 import {
   Alert,
@@ -54,6 +55,7 @@ export function SettlementAnalysisPage({
   const navigate = useNavigate();
   const { data, dispatch } = useBusinessStore();
   const { currentRole, currentUser } = useAppStore();
+  const showMargin = canViewSensitiveField(data, { role: currentRole }, 'margin');
   const { message } = App.useApp();
   const [editing, setEditing] = useState(false);
   const [rows, setRows] = useState<SettlementAnalysis[]>([]);
@@ -183,9 +185,9 @@ export function SettlementAnalysisPage({
           <Card size="small">
             <Statistic
               title={final ? "结算毛利（万元）" : "当前测算毛利（万元）"}
-              value={income - cost}
+              value={showMargin ? income - cost : "已隐藏"}
               precision={2}
-              valueStyle={{ color: income - cost < 0 ? "#cf1322" : "#1677ff" }}
+              valueStyle={{ color: showMargin && income - cost < 0 ? "#cf1322" : "#1677ff" }}
             />
           </Card>
         </Col>
@@ -193,9 +195,9 @@ export function SettlementAnalysisPage({
           <Card size="small">
             <Statistic
               title="毛利率"
-              value={rate ?? "—"}
+              value={showMargin ? rate ?? "—" : "已隐藏"}
               precision={1}
-              suffix={rate === null ? "" : "%"}
+              suffix={!showMargin || rate === null ? "" : "%"}
             />
           </Card>
         </Col>
@@ -240,7 +242,7 @@ export function SettlementAnalysisPage({
                 {
                   title: `概算 ${snapshot.estimateVersion}`,
                   render: (_, r) =>
-                    r.estimate === undefined ? (
+                    !showMargin && r.name === "毛利（万元）" ? "已隐藏" : r.estimate === undefined ? (
                       "—"
                     ) : (
                       <MoneyText value={r.estimate} />
@@ -248,16 +250,16 @@ export function SettlementAnalysisPage({
                 },
                 {
                   title: `预算 ${snapshot.budgetVersion}`,
-                  render: (_, r) => <MoneyText value={r.budget} />,
+                  render: (_, r) => !showMargin && r.name === "毛利（万元）" ? "已隐藏" : <MoneyText value={r.budget} />,
                 },
                 {
                   title: `最后滚动 ${snapshot.lastRollingDate}`,
-                  render: (_, r) => <MoneyText value={r.rolling} />,
+                  render: (_, r) => !showMargin && r.name === "毛利（万元）" ? "已隐藏" : <MoneyText value={r.rolling} />,
                 },
                 {
                   title: "冻结结算",
                   render: (_, r) =>
-                    r.settlement === undefined ? (
+                    !showMargin && r.name === "毛利（万元）" ? "已隐藏" : r.settlement === undefined ? (
                       "—"
                     ) : (
                       <MoneyText value={r.settlement} />

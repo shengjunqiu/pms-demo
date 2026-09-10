@@ -1,3 +1,4 @@
+import { canViewSensitiveField } from '@/mock/configuration-access';
 import { useState } from 'react';
 import { Alert, Button, Card, Col, Descriptions, Drawer, Empty, Input, Row, Select, Space, Statistic, Table, Tabs, Tag, Typography } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
@@ -24,6 +25,8 @@ export function DynamicAccountingPage() {
   const [params, setParams] = useSearchParams();
   const data = useBusinessStore((s) => s.data);
   const role = useAppStore((s) => s.currentRole);
+  const showMargin = canViewSensitiveField(data, { role }, 'margin');
+  const healthReason = (reason: string) => showMargin ? reason : reason.replace(/毛利[^，。；]*/g, '毛利信息已隐藏');
   const [source, setSource] = useState<CostItem>();
   const [query, setQuery] = useState('');
   const p = data.projects.find((project) => project.id === id);
@@ -59,9 +62,9 @@ export function DynamicAccountingPage() {
       <Space wrap size={16}><Text strong>{p.departmentName}</Text><span>项目经理：{p.pmName}</span><Tag color={healthColors[p.health]}>{healthNames[p.health]}</Tag><Tag>预算 {calc.budget.version}</Tag><Tag>科目映射 DEMO-1</Tag><Tag>{p.isUnsigned ? '未签立项' : '合同已签'}</Tag></Space>
       <div style={{ marginTop: 8, color: '#666' }}>滚动 = 已发生 + 未发生承诺 + 剩余预测；实际取已确认凭证，历史基线不回写。单位：万元。</div>
     </Card>
-    <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>{metrics.map(([name, value]) => <Col span={6} key={name}><Card size="small"><Statistic title={name} value={value} formatter={() => <MoneyText value={value} signed={name === '预测成本偏差'} />} valueStyle={{ fontSize: 21, color: name === '预测成本偏差' && value > 0 ? '#cf1322' : undefined }} /></Card></Col>)}</Row>
-    <Space wrap size={24} style={{ marginBottom: 16 }}><span>预算执行率：<b>{formatPercent(percentage(calc.actual, calc.budget.totalAmount))}</b></span><span>滚动偏差率：<b>{formatPercent(percentage(calc.variance, calc.budget.totalAmount))}</b></span><span>预测毛利率：<b>{formatPercent(calc.grossMarginRate)}</b></span><span>拟签/预计收入：<MoneyText value={calc.income} /> 万元</span></Space>
-    <Alert showIcon type={calc.variance > 0 ? 'warning' : 'success'} message={p.healthReason} description={`演示规则 ${selectAlertRules(data,p).get('cost')?.id??'成本预警已停用'}：滚动偏差达到 ${selectAlertRules(data,p).get('cost')?.warningThreshold??'—'}% 为预警、${selectAlertRules(data,p).get('cost')?.highThreshold??'—'}% 为高风险；点击科目查看构成，判断原因需结合原始凭证。`} style={{ marginBottom: 16 }} />
+    <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>{metrics.map(([name, value]) => <Col span={6} key={name}><Card size="small"><Statistic title={name} value={value} formatter={() => !showMargin && name === '预测毛利' ? '已隐藏' : <MoneyText value={value} signed={name === '预测成本偏差'} />} valueStyle={{ fontSize: 21, color: name === '预测成本偏差' && value > 0 ? '#cf1322' : undefined }} /></Card></Col>)}</Row>
+    <Space wrap size={24} style={{ marginBottom: 16 }}><span>预算执行率：<b>{formatPercent(percentage(calc.actual, calc.budget.totalAmount))}</b></span><span>滚动偏差率：<b>{formatPercent(percentage(calc.variance, calc.budget.totalAmount))}</b></span><span>预测毛利率：<b>{showMargin ? formatPercent(calc.grossMarginRate) : '已隐藏'}</b></span><span>拟签/预计收入：<MoneyText value={calc.income} /> 万元</span></Space>
+    <Alert showIcon type={calc.variance > 0 ? 'warning' : 'success'} message={healthReason(p.healthReason)} description={`演示规则 ${selectAlertRules(data,p).get('cost')?.id??'成本预警已停用'}：滚动偏差达到 ${selectAlertRules(data,p).get('cost')?.warningThreshold??'—'}% 为预警、${selectAlertRules(data,p).get('cost')?.highThreshold??'—'}% 为高风险；点击科目查看构成，判断原因需结合原始凭证。`} style={{ marginBottom: 16 }} />
     <Card size="small"><Tabs activeKey={tab} onChange={(key) => update('tab', key)} items={[
       { key: 'subjects', label: '成本科目与偏差', children: <>
         <Table rowKey="subjectId" size="small" dataSource={calc.subjects} pagination={false} scroll={{ x: 900 }} columns={[
