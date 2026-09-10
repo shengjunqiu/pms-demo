@@ -45,6 +45,7 @@ test('UI GL02 同样本四阶段金额、科目归因与凭证', async ({ page }
   await expect(page.getByRole('dialog')).toContainText(project);
   await page.getByRole('dialog').getByRole('button', { name: '查看原科目' }).click();
   await expect(page).toHaveURL(/projects\/P-001\/dynamic-accounting\?.*subject=/);
+  await expect(page.getByRole('heading', { name: '动态核算', exact: true })).toBeVisible();
   await page.goBack();
   await expect(page.getByRole('heading', { name: '四算经营专题', exact: true })).toBeVisible();
   await page.getByRole('tab', { name: /已结算同样本/ }).click();
@@ -60,9 +61,10 @@ test('UI GL03 穿透摘要、责任记录及原业务返回', async ({ page }) =
   await expect(page.locator('.ant-descriptions')).toContainText('P-001');
   await capture(page, 'GL03');
   await page.getByRole('tab', { name: /里程碑/ }).click();
+  await expect(page.getByRole('tab', { name: /里程碑/ })).toHaveAttribute('aria-selected', 'true');
   await page.locator('.ant-tabs-tabpane-active .ant-table-tbody button').first().click();
   await expect(page.getByRole('dialog')).toContainText('责任人');
-  await page.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).click();
+  await page.getByRole('dialog').locator('.ant-drawer-close').click();
   await page.getByRole('button', { name: '进入项目总览', exact: true }).click();
   await expect(page.getByRole('heading', { name: project, exact: true })).toBeVisible();
   await page.goBack();
@@ -80,6 +82,7 @@ test('UI GL04 组合维度、收入占比与上下级穿透', async ({ page }) =
   await expect(page).toHaveURL(/org=D-/);
   await expect(page.getByRole('button', { name: '上一级组织' })).toBeEnabled();
   await page.getByRole('button', { name: '上一级组织' }).click();
+  await expect(page.getByRole('button', { name: '上一级组织', exact: true })).toBeDisabled();
   await select(page, '组合维度', '健康度');
   await expect(page).toHaveURL(/dimension=health/);
   await page.locator('.ant-table-tbody').getByRole('button', { name: '高风险', exact: true }).click();
@@ -95,16 +98,18 @@ test('UI GL05 异常分类、收纳列与责任链原记录', async ({ page }) =
   await expect(page.getByRole('heading', { name: '异常关注概览' })).toBeVisible();
   await capture(page, 'GL05');
   await page.getByRole('tab', { name: /高风险/ }).click();
-  await expect(page).toHaveURL(/exception=/);
+  await expect(page).toHaveURL(/exception=red/);
+  await expect(page.getByRole('tab', { name: /高风险/ })).toHaveAttribute('aria-selected', 'true');
   await page.getByText('常用视图、列设置与导出', { exact: true }).click();
   await page.getByRole('button', { name: '列设置', exact: true }).click();
-  await page.getByRole('dialog').getByLabel('责任组织').check();
-  await page.getByRole('dialog').getByRole('button', { name: '完成', exact: true }).click();
+  await page.getByRole('dialog').getByLabel('责任组织', { exact: true }).check();
+  await page.getByRole('dialog').getByRole('button', { name: /^完\s*成$/ }).click();
   await expect(page.getByRole('columnheader', { name: '责任组织', exact: true })).toBeVisible();
   await page.getByRole('button', { name: '原因与责任链', exact: true }).first().click();
   await expect(page.getByRole('dialog')).toContainText('责任链');
   await page.getByRole('dialog').getByRole('button', { name: '成本来源明细' }).click();
   await expect(page).toHaveURL(/dynamic-accounting\?.*exception=/);
+  await expect(page.getByRole('heading', { name: '动态核算', exact: true })).toBeVisible();
 });
 
 test('UI GL06 待决策摘要、历史切换与原审批', async ({ page }) => {
@@ -113,13 +118,18 @@ test('UI GL06 待决策摘要、历史切换与原审批', async ({ page }) => {
   await capture(page, 'GL06');
   await page.getByRole('tab', { name: /历史决策/ }).click();
   await expect(page).toHaveURL(/decisionStatus=history/);
+  await expect(page.getByRole('tab', { name: /历史决策/ })).toHaveAttribute('aria-selected', 'true');
   await page.getByRole('tab', { name: /^待决策/ }).click();
+  await expect(page.getByRole('tab', { name: /^待决策/ })).toHaveAttribute('aria-selected', 'true');
   await select(page, '决策事项类型', '超概算审批');
   await expect(page).toHaveURL(/decisionType=/);
+  await expect(page.locator('.ant-select[aria-label="决策事项类型"]')).toContainText('超概算审批');
   await page.getByRole('button', { name: 'APR-1', exact: true }).click();
   await expect(page.getByRole('dialog')).toContainText('引用版本');
   await page.getByRole('dialog').getByRole('button', { name: '进入原审批' }).click();
   await expect(page).toHaveURL(/approvals\/APR-1\?/);
+  await expect(page.getByRole('heading', { name: '预算调整原审批', exact: true })).toBeVisible();
+  await expect(page.locator('.pms-page-header')).toContainText('APR-1');
 });
 
 
@@ -131,6 +141,8 @@ test('UI GL 空范围与项目经理访问边界', async ({ page }) => {
   await expect(page.getByText('项目不存在', { exact: true })).toBeVisible();
   await role(page, '项目经理');
   for (const path of ['four-calculations', 'project-drilldown', 'portfolio', 'exceptions', 'decisions']) {
+    await navigate(page, '/workbench/project-manager');
+    await expect(page.getByRole('heading', { name: '项目经理工作台', exact: true })).toBeVisible();
     await navigate(page, `/executive/${path}`);
     await expect(page.getByText('403 无访问权限', { exact: true })).toBeVisible();
   }
