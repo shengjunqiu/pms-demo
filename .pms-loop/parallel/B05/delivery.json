@@ -1,0 +1,51 @@
+{
+  "package_id": "B05",
+  "base_commit": "ea6903fdb378c5c6dceb1dbb62bccb2d786461d0",
+  "delivery_commit": "c9f0f2eb141c3396a9044aa78fd5f70e07ea6008",
+  "depends_on_deliveries": [],
+  "shared_changes": [
+    {
+      "status": "integrated",
+      "integration_commit": "2ded27b",
+      "summary": "Coordinator hides execution-task todos and rejects update-task before the project formally enters execution."
+    }
+  ],
+  "checks": [
+    {
+      "command": "check_delivery.py ea6903f..c9f0f2e",
+      "exit_code": 0,
+      "summary": "six B05-owned paths only; no shared paths, merge commits, or conflicts"
+    },
+    {
+      "command": "pnpm exec vitest run src/models/__tests__/unsigned.test.ts src/models/__tests__/progress.test.ts src/models/__tests__/todos.test.ts --maxWorkers=1",
+      "exit_code": 0,
+      "summary": "3 files and 18 tests passed on integration HEAD"
+    },
+    {
+      "command": "pnpm typecheck && pnpm lint && pnpm build",
+      "exit_code": 0
+    },
+    {
+      "command": "pnpm test:domain",
+      "exit_code": 0,
+      "summary": "32 files and 232 tests passed on integration HEAD"
+    }
+  ],
+  "artifacts": [
+    "subagent workflow a8c75c15-bf7f-4cd6-be39-eef2f3480c7c deliveries/b05-worker.md",
+    "subagent follow-up review for B05: Merge verdict OK with notes"
+  ],
+  "remaining_dependencies": [
+    "current integration browser verification for YS-13/14/15",
+    "formal 1440x900/1280x900 screenshots",
+    "formal Loop acceptance"
+  ],
+  "integration_commit": "dc7aa7b",
+  "integration_commits": [
+    "2ded27b",
+    "e7deba3",
+    "dc7aa7b"
+  ],
+  "formal_rounds": [],
+  "status": "integrated_pending_acceptance"
+}

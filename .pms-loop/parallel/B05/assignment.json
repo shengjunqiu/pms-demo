@@ -12,7 +12,7 @@
   "branch": "pms/b05-unsigned-r2",
   "base_commit": "ea6903f",
   "contract_commit": "ea6903f",
-  "status": "assigned",
+  "status": "integrated_pending_acceptance",
   "writer": "subagent:b05-worker",
   "last_confirmed_at": "2026-09-10",
   "owned_paths": [
@@ -22,7 +22,7 @@
     "src/models/__tests__/unsigned.test.ts",
     "src/routes/modules/unsigned.tsx"
   ],
-  "shared_changes": "root only; report interface needs without editing business.ts, selectors, shared types, route aggregation, navigation, project configuration, Loop state, or managed progress",
+  "shared_changes": "integrated by coordinator in 2ded27b: WBS execution-task todos and update-task mutations require project phase 执行",
   "development_dependencies": [
     "current integrated initiation, budget, contract, action-policy and execution-start contracts at ea6903f"
   ],
@@ -37,9 +37,15 @@
     "角色和动作策略限制与不可变历史"
   ],
   "fixtures": "现有固定故事与合法规划期对象，沿用统一BusinessState",
-  "next_action": "在新同步点完成YS-13/14/15独占实现与领域测试；check_delivery.py通过后交付",
+  "next_action": "在当前集成版本完成YS-13/14/15浏览器场景、双宽度截图和正式Loop验收",
   "delivery_commits": [
-    "f54928e"
+    "f54928e",
+    "a1dc85a",
+    "c9f0f2e"
   ],
-  "integration_commits": []
+  "integration_commits": [
+    "2ded27b",
+    "e7deba3",
+    "dc7aa7b"
+  ]
 }
