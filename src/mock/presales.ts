@@ -8,10 +8,14 @@ import { hourlyRate } from '@/mock/labor';
 import { money, sumMoney } from '@/utils/money';
 export function presalesWorkspace(state: BusinessState,id: string): PresalesWorkspace { return state.presales[id]??{solutionVersions:[],costVersions:[],reviews:[],research:[]}; }
 export function solutionFingerprint(draft:SolutionDraft) {
-  const {customerSituation,goals,scope,boundaries,architecture,implementation,deliverables,dependencies,assumptions,ownerId,participants,startDate,endDate,attachments}=draft;
+  const {customerSituation,goals,scope,boundaries,architecture,implementation,deliverables,dependencies,assumptions,ownerId,startDate,endDate}=draft;
+  const participants=[...draft.participants].sort();const attachments=[...draft.attachments].sort();
   return JSON.stringify({customerSituation,goals,scope,boundaries,architecture,implementation,deliverables,dependencies,assumptions,ownerId,participants,startDate,endDate,attachments});
 }
-export function costFingerprint(draft:CostDraft) { const {financeCheck: _check,...content}=draft; void _check; return JSON.stringify(content); }
+export function costFingerprint(draft:CostDraft) {
+  const {solutionFingerprint,feasibility,architecture,reuse,customization,environment,security,dependencies,risk,lines}=draft;const attachments=[...draft.attachments].sort();
+  return JSON.stringify({solutionFingerprint,feasibility,architecture,reuse,customization,environment,security,dependencies,risk,lines,attachments});
+}
 export const costLineAmount=(line:PresalesCostLine)=>money(line.quantity*line.unitPrice*(line.taxBasis==='不含税'?1+line.taxRate/100:1));
 export const costTotal=(draft?:CostDraft)=>sumMoney((draft?.lines??[]).map(costLineAmount));
 export const laborDayRate=(userId:string)=>money(hourlyRate(userId)*8/10000);
@@ -21,7 +25,7 @@ export function presalesReady(state:BusinessState,id:string) {
   if(!s)missing.push('缺少已保存方案');else {for(const [key,label] of [['customerSituation','客户现状'],['goals','建设目标'],['scope','范围'],['boundaries','交付边界'],['architecture','总体架构'],['implementation','实施思路'],['deliverables','交付物'],['dependencies','外部依赖'],['assumptions','关键假设']] as const)if(!s[key].trim())missing.push(`方案${label}未填写`);if(!s.attachments.length)missing.push('缺少正式方案附件');}
   if(!c)missing.push('缺少技术成本评估');else {if(!c.lines.length)missing.push('成本测算无科目明细');if(c.feasibility==='不可行')missing.push('技术结论不可行');if(!c.architecture.trim()||!c.reuse.trim()||!c.customization.trim()||!c.environment.trim()||!c.security.trim()||!c.dependencies.trim())missing.push('技术评估说明不完整');if(s&&c.solutionFingerprint!==solutionFingerprint(s))missing.push('方案已变更，需重新确认成本测算');if(!c.financeCheck||c.financeCheck.fingerprint!==costFingerprint(c))missing.push('财务尚未确认当前成本测算');if(c.lines.some(l=>l.subjectId==='SUB-03'&&(!l.quotationExpiry||l.quotationExpiry<AS_OF_DATE)))missing.push('采购询价缺失或过期');}
   const last=w.reviews.at(-1);if(last?.status==='评审中')missing.push('已有评审正在处理');if(last?.status==='整改后复审'&&last.corrections.some(c=>!c.replies.length))missing.push('上轮整改事项尚未逐条回复');
-  const lastSolution=last&&w.solutionVersions.find(v=>v.id===last.solutionVersionId);if(last&&last.status!=='评审中'&&s&&lastSolution&&solutionFingerprint(s)===solutionFingerprint(lastSolution))missing.push(last.status==='整改后复审'?'整改后方案内容尚未变更':'方案内容未变更，无需发起新评审');return missing;
+  const lastSolution=last&&w.solutionVersions.find(v=>v.id===last.solutionVersionId);const lastCost=last&&w.costVersions.find(v=>v.id===last.costVersionId);if(last&&last.status!=='评审中'&&s&&c&&lastSolution&&lastCost&&solutionFingerprint(s)===solutionFingerprint(lastSolution)&&costFingerprint(c)===costFingerprint(lastCost))missing.push(last.status==='整改后复审'?'整改后方案与成本内容均未变更':'方案与成本内容均未变更，无需发起新评审');return missing;
 }
 export type PresalesAction =
  | {type:'presales-research';id:string;findings:string;scopeChange:string;attachment:string}
