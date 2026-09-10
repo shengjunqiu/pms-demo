@@ -1,8 +1,12 @@
+import { PostEvaluationPage } from '@/pages/settlement/PostEvaluationPage';
+import { ArchivePage } from '@/pages/settlement/ArchivePage';
 import { SettlementPage } from '@/pages/settlement/SettlementPage';
 import { SettlementAnalysisPage } from '@/pages/settlement/SettlementAnalysisPage';
 import { AcceptancePage } from '@/pages/settlement/AcceptancePage';
 import { ReportAcceptancePage } from '@/pages/settlement/ReportAcceptancePage';
 export const settlementRoutes = [
+ {path:'projects/:id/post-evaluation',element:<PostEvaluationPage/>},
+ {path:'projects/:id/archive',element:<ArchivePage/>},
  { path:'projects/:id/settlement/apply',element:<SettlementPage key="apply" apply/> },
  { path:'projects/:id/settlement',element:<SettlementPage key="detail"/> },
  { path:'projects/:id/four-calculations',element:<SettlementAnalysisPage key="four"/> },
