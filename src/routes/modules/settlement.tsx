@@ -1,3 +1,6 @@
+import {OperationHandoverPage} from '@/pages/settlement/OperationHandoverPage';
+import {OperationsPage} from '@/pages/settlement/OperationsPage';
+import {ProjectClosePage} from '@/pages/settlement/ProjectClosePage';
 import { PostEvaluationPage } from '@/pages/settlement/PostEvaluationPage';
 import { ArchivePage } from '@/pages/settlement/ArchivePage';
 import { SettlementPage } from '@/pages/settlement/SettlementPage';
@@ -5,6 +8,9 @@ import { SettlementAnalysisPage } from '@/pages/settlement/SettlementAnalysisPag
 import { AcceptancePage } from '@/pages/settlement/AcceptancePage';
 import { ReportAcceptancePage } from '@/pages/settlement/ReportAcceptancePage';
 export const settlementRoutes = [
+ {path:'projects/:id/operation-handover',element:<OperationHandoverPage/>},
+ {path:'operations/:id',element:<OperationsPage/>},
+ {path:'projects/:id/close',element:<ProjectClosePage/>},
  {path:'projects/:id/post-evaluation',element:<PostEvaluationPage/>},
  {path:'projects/:id/archive',element:<ArchivePage/>},
  { path:'projects/:id/settlement/apply',element:<SettlementPage key="apply" apply/> },
