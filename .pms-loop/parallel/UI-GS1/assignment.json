@@ -1,0 +1,40 @@
+{
+  "package_id": "UI-GS1",
+  "items": [
+    "GS-01",
+    "GS-02",
+    "GS-03",
+    "GS-04"
+  ],
+  "owner": "UI-GS1",
+  "integration_root": "/home/shengjunqiu/code/pms-demo",
+  "workdir": "/tmp/pms-ui-opportunities",
+  "branch": "pms/ui-opportunities",
+  "base_commit": "5639039",
+  "contract_commit": "5639039",
+  "owned_paths": [
+    "src/pages/opportunities/OpportunitiesPage.tsx",
+    "src/pages/opportunities/OpportunityFormPage.tsx",
+    "src/pages/opportunities/OpportunityDetailPage.tsx",
+    "src/pages/opportunities/OpportunityAssessmentPage.tsx",
+    "src/pages/opportunities/OpportunityActions.tsx",
+    "e2e/ui-opportunities.spec.ts"
+  ],
+  "shared_changes": [],
+  "development_dependencies": [],
+  "acceptance_dependencies": [],
+  "acceptance_ready": true,
+  "acceptance_group": "UI-GS1",
+  "status": "integrated_pending_acceptance",
+  "writer": "",
+  "last_confirmed_at": "2026-09-11",
+  "acceptance_checklist": [
+    "typecheck/lint/build/domain",
+    "真实UI操作与跨页返回",
+    "1440/1280截图查看及控制台",
+    "正式accept"
+  ],
+  "scenarios": "原页面功能保持，优化信息层次、筛选与动作分区；正常、空态、只读、旧深链",
+  "fixtures": "统一现有演示数据；P-001、P-PLAN-001及商机OPP-2026-001",
+  "next_action": "当前R0038完成后GS01-04正式验收"
+}

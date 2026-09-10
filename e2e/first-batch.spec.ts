@@ -102,6 +102,7 @@ test('策划计划经PMO评审、预算审批与独立基线确认', async ({ pa
   await expect(page.getByRole('dialog')).toBeHidden();
   await expect(page.getByText('1 平台交付', { exact: true })).toBeVisible();
   await navigate(page, '/projects/P-PLAN-001/milestones');
+  await expect(page.getByRole('heading', { name: '里程碑计划', exact: true })).toBeVisible();
   await page.getByRole('button', { name: /^编\s*辑$/ }).first().click();
   await page.getByLabel('达成条件', { exact: true }).fill('启动会议纪要与责任分工确认');
   await page.getByRole('dialog').getByRole('button', { name: /确\s*定/ }).click();

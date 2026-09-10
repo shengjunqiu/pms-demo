@@ -60,7 +60,12 @@ export const MainLayout: React.FC = () => {
   const routeProject = projectForTarget(data, targetId);
   const allowed = (!currentPage || canAccessPage(data, currentUser, currentPage.id)) && (!routeProject || canAccessProject(data, currentUser, routeProject));
   const activeGroup = currentPage?.id.split('-')[0];
-  const isWorkspace = ['WK-01', 'GL-01', 'HS-01'].includes(currentPage?.id ?? '');
+  const isWorkspace = [
+    'WK-01', 'GL-01', 'HS-01',
+    'GS-01', 'GS-02', 'GS-03', 'GS-04',
+    'GL-02', 'GL-03', 'GL-04', 'GL-05', 'GL-06',
+    'YS-06', 'YS-07', 'YS-08',
+  ].includes(currentPage?.id ?? '');
   useEffect(() => {
     if (activeGroup) setOpenGroups((keys) => keys.includes(activeGroup) ? keys : [...keys, activeGroup]);
   }, [activeGroup]);
@@ -224,7 +229,7 @@ export const MainLayout: React.FC = () => {
             borderRadius: 12,
             border: isWorkspace ? undefined : '1px solid #e2e8f0',
             minHeight: 'calc(100vh - 96px)',
-            overflowX: 'auto',
+            overflowX: isWorkspace ? 'visible' : 'auto',
           }}
         >
           {allowed ? <Outlet /> : <StateView type="403" />}

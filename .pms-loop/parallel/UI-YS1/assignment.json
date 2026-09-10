@@ -1,0 +1,41 @@
+{
+  "package_id": "UI-YS1",
+  "items": [
+    "YS-06",
+    "YS-07",
+    "YS-08"
+  ],
+  "owner": "UI-YS1",
+  "integration_root": "/home/shengjunqiu/code/pms-demo",
+  "workdir": "/tmp/pms-ui-planning",
+  "branch": "pms/ui-planning",
+  "base_commit": "5639039",
+  "contract_commit": "5639039",
+  "owned_paths": [
+    "src/pages/budget/WbsPlanningPage.tsx",
+    "src/pages/budget/MilestonePlanningPage.tsx",
+    "src/pages/budget/PlanReviewPage.tsx",
+    "src/pages/budget/PlanningLayout.tsx",
+    "e2e/ui-planning.spec.ts"
+  ],
+  "shared_changes": [],
+  "development_dependencies": [],
+  "acceptance_dependencies": [],
+  "acceptance_ready": true,
+  "acceptance_group": "UI-YS1",
+  "status": "accepted",
+  "writer": "",
+  "last_confirmed_at": "2026-09-11",
+  "acceptance_checklist": [
+    "typecheck/lint/build/domain",
+    "真实UI操作与跨页返回",
+    "1440/1280截图查看及控制台",
+    "正式accept"
+  ],
+  "scenarios": "原页面功能保持，优化信息层次、筛选与动作分区；正常、空态、只读、旧深链",
+  "fixtures": "统一现有演示数据；P-001、P-PLAN-001及商机OPP-2026-001",
+  "next_action": "R0038三页正式UI验收通过；不合入6cf8bee局部补丁。",
+  "formal_rounds": [
+    "R0038"
+  ]
+}

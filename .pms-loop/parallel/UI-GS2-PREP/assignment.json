@@ -1,0 +1,22 @@
+{
+  "package_id": "UI-GS2-PREP",
+  "package_kind": "acceptance-preparation",
+  "items": [],
+  "owner": "/root/ui_opportunities",
+  "writer": "",
+  "workdir": "/tmp/pms-ui-opportunities",
+  "branch": "pms/ui-opportunities",
+  "base_commit": "057949b",
+  "contract_commit": "5639039",
+  "integration_root": "/home/shengjunqiu/code/pms-demo",
+  "owned_paths": [
+    "/tmp/pms-ui-gs2-preparation.md"
+  ],
+  "status": "archived",
+  "development_dependencies": [],
+  "acceptance_dependencies": [],
+  "acceptance_ready": false,
+  "shared_changes": [],
+  "last_confirmed_at": "2026-09-11",
+  "next_action": "只读准备完成，报告/tmp/pms-ui-gs2-preparation.md；库存下降后建立普通开发包"
+}

@@ -1,0 +1,25 @@
+{
+  "base_commit": "5639039",
+  "delivery_commit": "8bd3c06",
+  "integration_commit": "03dbf5c",
+  "depends_on_deliveries": [],
+  "shared_changes": [],
+  "checks": {
+    "typecheck": "passed",
+    "target_eslint": "passed",
+    "range_check": "passed"
+  },
+  "artifacts": [],
+  "remaining_dependencies": [],
+  "delivery_commits": [
+    "5f98d9a",
+    "8bd3c06"
+  ],
+  "integration_commits": [
+    "03dbf5c",
+    "52000d4"
+  ],
+  "excluded_commits": [
+    "6cf8bee（局部Row补丁已由共享修复替代，未合入）"
+  ]
+}

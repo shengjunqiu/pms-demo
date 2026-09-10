@@ -147,6 +147,9 @@ test('台账日期方案恢复、列设置导出与补录跟进日期', async ({
   await expect(page.getByText('客户沟通：2026-09-08客户会议', { exact: true })).toBeVisible();
   await navigate(page, '/opportunities?keyword=' + encodeURIComponent(code));
   await expect(page.locator('.ant-table-tbody tr.ant-table-row')).toHaveCount(1);
+  await page.getByRole('button', { name: '列设置', exact: true }).click();
+  await page.getByRole('dialog').getByLabel('最后跟进', { exact: true }).check();
+  await page.getByRole('dialog').getByRole('button', { name: /^完\s*成$/ }).click();
   await expect(page.locator('.ant-table-tbody tr.ant-table-row')).toContainText('2026-09-09');
   await capturePageEvidence(page, 'GS01-ledger');
   expect(errors).toEqual([]);
@@ -157,7 +160,8 @@ test('真实完整版本链可发起立项，九个页签及下钻保持同一�
   const id = await seed(page, 'ready');
   const detail = `/opportunities/${id}`;
   await navigate(page, detail);
-  await expect(page.getByText(/预计金额 1,000.00 万元 · 预计签约 2026-11-30/)).toBeVisible();
+  await expect(page.locator('.pms-record-summary')).toContainText('1,000.00');
+  await expect(page.locator('.pms-record-summary')).toContainText('2026-11-30');
   await expect(page.getByText('全部条件已满足', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: '发起立项', exact: true })).toBeEnabled();
   await capturePageEvidence(page, 'GS03-ready');
@@ -192,7 +196,8 @@ test('新评审与旧冻结概算不一致时两页共同阻断，项目经理�
   await page.getByLabel('编号 / 商机名称', { exact: true }).fill('台账验收数据共享项目');
   await page.getByRole('button', { name: /^查\s*询$/ }).click();
   await expect(page.locator('.ant-table-tbody tr.ant-table-row')).toHaveCount(1);
-  await expect(page.locator(`tr[data-row-key="${id}"]`).getByRole('button', { name: '发起立项', exact: true })).toBeDisabled();
+  await page.locator(`tr[data-row-key="${id}"]`).getByRole('button', { name: /^办理/ }).click();
+  await expect(page.locator('.ant-dropdown:visible').getByRole('menuitem', { name: '发起立项', exact: true })).toHaveAttribute('aria-disabled', 'true');
   await navigate(page, `/opportunities/${id}`);
   await expect(page.getByRole('button', { name: '发起立项', exact: true })).toBeDisabled();
   await expect(page.getByText(/冻结概算与当前通过的方案\/专家评审版本链不一致/)).toBeVisible();
@@ -201,6 +206,9 @@ test('新评审与旧冻结概算不一致时两页共同阻断，项目经理�
   await navigate(page, '/opportunities?keyword=OPP-2026-001');
   const row = page.locator('.ant-table-tbody tr.ant-table-row');
   await expect(row).toHaveCount(1);
+  await page.getByRole('button', { name: '列设置', exact: true }).click();
+  await page.getByRole('dialog').getByLabel('概算（万元）', { exact: true }).check();
+  await page.getByRole('dialog').getByRole('button', { name: /^完\s*成$/ }).click();
   await expect(row).toContainText('已隐藏');
   await navigate(page, '/opportunities/OPP-001');
   await expect(page.getByText('无敏感字段权限', { exact: true })).toBeVisible();
@@ -263,7 +271,8 @@ test('暂缓必须安排复评，详情与台账提醒同步并能发起复评',
   await navigate(page, '/opportunities?keyword=' + encodeURIComponent('台账验收数据共享项目'));
   await expect(page.getByText('未来7日需复评 1 个商机', { exact: true })).toBeVisible();
   await expect(page.locator('.ant-table-tbody tr.ant-table-row')).toContainText('暂缓');
-  await page.locator('.ant-table-tbody tr.ant-table-row').getByRole('button', { name: '发起评估', exact: true }).click();
+  await page.locator('.ant-table-tbody tr.ant-table-row').getByRole('button', { name: /^办理/ }).click();
+  await page.locator('.ant-dropdown:visible').getByRole('menuitem', { name: '发起评估', exact: true }).click();
   await expect(page).toHaveURL(`/opportunities/${id}/evaluation`);
   const result = await page.evaluate(async (opportunityId) => {
     const path = '/src/mock/business.ts';
