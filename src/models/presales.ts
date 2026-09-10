@@ -8,7 +8,7 @@ export interface CostDraft { solutionFingerprint: string; feasibility: '可行' 
 export interface SolutionVersion extends SolutionDraft { id: string; version: number; submittedAt: string; submittedBy: string }
 export interface CostVersion extends CostDraft { id: string; version: number; solutionVersionId: string; total: number; submittedAt: string; submittedBy: string }
 export interface ExpertOpinion { userId: string; by: string; role: UserRole; dimension: string; conclusion: '通过' | '整改' | '不通过'; opinion: string; attachment: string; date: string }
-export interface PresalesReview {
+export interface PresalesReview { templateSnapshot?:import('./configuration').TemplateVersion;
   id: string; round: number; solutionVersionId: string; costVersionId: string; status: '评审中' | '通过' | '整改后复审' | '不通过'; method: string; plannedDate: string; experts: { userId: string; name: string; role: UserRole; dimension: string }[]; opinions: ExpertOpinion[];
   createdAt: string; createdBy: string; conclusionReason?: string; decidedAt?: string; corrections: { id: string; item: string; ownerId: string; ownerName: string; dueDate: string; replies: { response: string; attachment: string; date: string; by: string }[] }[];
 }

@@ -1,3 +1,4 @@
+import { selectGradingRule } from '@/mock/configuration';
 import type { BusinessState } from '@/mock/business';
 import { AS_OF_DATE } from '@/mock';
 export const STAGE_RULE = { version: 'STAGE-1', targetPhase: '收尾' as const, targetSubPhase: '客户终验' as const, releasePercent: 90 };
@@ -16,8 +17,9 @@ export function stageChecks(state: BusinessState, projectId: string) {
   {key:'quality',name:'质量与重大异常',passed:(!quality?.checks.length||quality.checks.at(-1)!.passed)&&issues.length===0&&risks.length===0,detail:`未关闭重大问题${issues.length}项，重大监控风险${risks.length}项；质量${quality?.checks.length?(quality.checks.at(-1)!.passed?'通过':'未通过'):'未登记新检查，材料审核独立校验'}`},
  ];
 }
-export function stageSnapshot(state:BusinessState,projectId:string) {
+export function stageSnapshot(state:BusinessState,projectId:string,submitted?:{rule:string;releasePercent:number}) {
  const p=state.projects.find((p)=>p.id===projectId)!; const milestone=state.milestones.find((m)=>m.projectId===p.id&&m.type==='开发完成');
- return {rule:STAGE_RULE.version,fromPhase:p.phase,fromSubPhase:p.subPhase,targetPhase:STAGE_RULE.targetPhase,targetSubPhase:STAGE_RULE.targetSubPhase,milestoneId:milestone?.id,plannedDate:milestone?.plannedDate,actualDate:milestone?.actualDate,releasePercent:STAGE_RULE.releasePercent,checks:stageChecks(state,p.id)};
+ const grading=submitted?{id:submitted.rule,stageReleasePercent:submitted.releasePercent}:selectGradingRule(state,p.departmentId,p.type);
+ return {rule:submitted?.rule??grading.id,fromPhase:p.phase,fromSubPhase:p.subPhase,targetPhase:STAGE_RULE.targetPhase,targetSubPhase:STAGE_RULE.targetSubPhase,milestoneId:milestone?.id,plannedDate:milestone?.plannedDate,actualDate:milestone?.actualDate,releasePercent:submitted?.releasePercent??grading.stageReleasePercent,checks:stageChecks(state,p.id)};
 }
 export type StageSnapshot=ReturnType<typeof stageSnapshot>;

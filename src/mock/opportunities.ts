@@ -1,3 +1,4 @@
+import { selectGradingRule, selectTemplate } from '@/mock/configuration';
 import { AS_OF_DATE, mockCustomers, mockDepartments, mockUsers } from '@/mock';
 import type { Actor, BusinessState } from '@/mock/business';
 import type { AssessmentDimension, DimensionOpinion, OpportunityInput, OpportunityMeta } from '@/models/opportunities';
@@ -26,16 +27,16 @@ export function canManageOpportunity(state: BusinessState, o: Opportunity, actor
 export function opportunityLocked(state: BusinessState, o: Opportunity) { return ['拟立项', '方案评审中', '已转立项', '已终止'].includes(o.status) || state.estimates.some(e => e.opportunityId === o.id && e.isFrozen); }
 export function basicMissing(o: Opportunity, m: OpportunityMeta) { return [!o.name.trim() && '商机名称', !o.customerId && '客户', !o.departmentId && '主办部门', !o.ownerId && '负责人', !(o.estimatedAmount > 0) && '预计金额', !m.source.trim() && '商机来源', !m.projectType.trim() && '项目类型', !m.description.trim() && '业务背景与需求'].filter(Boolean) as string[]; }
 export function assessmentSummary(o: Opportunity, m: OpportunityMeta) {
-  const round = m.assessments.at(-1); const opinions = round?.opinions ?? {};
+  const round = m.assessments.at(-1); const rule=round?.ruleSnapshot??OPPORTUNITY_RULE; const opinions = round?.opinions ?? {};
   const complete = DIMENSIONS.filter(d => opinions[d.key]);
-  const score = complete.length ? money(complete.reduce((n,d) => n + opinions[d.key]!.score, 0) / complete.length) : null;
+  const weight=(key:AssessmentDimension)=>round?.templateSnapshot?.rows.find(r=>r.id===`item-${DIMENSIONS.findIndex(d=>d.key===key)+1}`)?.weight??1;const totalWeight=complete.reduce((n,d)=>n+weight(d.key),0);const score = complete.length&&totalWeight>0 ? money(complete.reduce((n,d) => n + opinions[d.key]!.score*weight(d.key), 0) / totalWeight) : null;
   const cost = opinions.margin?.preliminaryCost; const margin = cost === undefined ? null : money(o.estimatedAmount - cost); const marginRate = percentage(margin ?? 0, o.estimatedAmount);
   const missing = [...basicMissing(o,m), ...DIMENSIONS.filter(d => !opinions[d.key]).map(d => `${d.name}意见未提交`)];
   if (Object.values(opinions).some(v => v.conclusion === '不可行')) missing.push('存在专业不可行项');
-  if (score !== null && score < OPPORTUNITY_RULE.minimumScore) missing.push(`综合评分低于${OPPORTUNITY_RULE.minimumScore}分`);
-  if (cost !== undefined && (marginRate === null || marginRate < OPPORTUNITY_RULE.minimumMargin)) missing.push(`预估毛利率低于${OPPORTUNITY_RULE.minimumMargin}%`);
+  if (score !== null && score < rule.minimumScore) missing.push(`综合评分低于${rule.minimumScore}分`);
+  if (cost !== undefined && (marginRate === null || marginRate < rule.minimumMargin)) missing.push(`预估毛利率低于${rule.minimumMargin}%`);
   const riskLevel = Object.values(opinions).some(v => v.conclusion === '不可行' || v.score < OPPORTUNITY_RULE.lowScore) ? '高风险' : missing.length || Object.values(opinions).some(v => v.conclusion === '有条件可行') ? '关注' : '正常';
-  return { round, score, cost, margin, marginRate: cost === undefined ? null : marginRate, missing, riskLevel, suggestion: missing.length ? '暂缓' : '拟立项', complete: complete.length };
+  return { rule, round, score, cost, margin, marginRate: cost === undefined ? null : marginRate, missing, riskLevel, suggestion: missing.length ? '暂缓' : '拟立项', complete: complete.length };
 }
 export function initiationMissing(state: BusinessState, o: Opportunity) {
   const m = opportunityMeta(state,o);
@@ -91,7 +92,8 @@ export function applyOpportunityAction(state: BusinessState, action: Opportunity
     if (o.status === '拟立项' || o.status === '方案评审中') throw new Error('已进入方案流程，请在方案评审中处理');
     if (basicMissing(o,m).length) throw new Error(`必要信息不完整：${basicMissing(o,m).join('、')}`);
     if (m.assessments.at(-1)?.status === '评估中') throw new Error('已有进行中的评估');
-    m.assessments.push({ id: `ASSESS-${o.id}-${m.assessments.length + 1}`, version: m.assessments.length + 1, status: '评估中', opinions: {}, startedAt: AS_OF_DATE }); o.status = '待评估'; return o.id;
+    const grading=selectGradingRule(state,o.departmentId,m.projectType);
+    const template=selectTemplate(state,'assessment',o.departmentId,m.projectType);if(!template)throw new Error('无适用商机评估模板');m.assessments.push({ templateSnapshot:structuredClone(template), ruleSnapshot:{version:grading.id,minimumScore:grading.minimumAssessmentScore,minimumMargin:grading.minimumMargin}, id: `ASSESS-${o.id}-${m.assessments.length + 1}`, version: m.assessments.length + 1, status: '评估中', opinions: {}, startedAt: AS_OF_DATE }); o.status = '待评估'; return o.id;
   }
   if (!action.reason.trim()) throw new Error('决策原因必填');
   if (action.conclusion === '暂缓') {
@@ -108,6 +110,6 @@ export function applyOpportunityAction(state: BusinessState, action: Opportunity
     if (action.conclusion === '拟立项') m.solutionTask ??= { id: `SOL-TASK-${o.id}`, opportunityId: o.id, assessmentId: s.round.id, ownerId: 'U-005', ownerName: mockUsers.find(u => u.id === 'U-005')!.name, status: '待开始', createdAt: AS_OF_DATE, dueDate: '2026-09-20' };
   }
   const round = m.assessments.at(-1); const summary = assessmentSummary(o,m);
-  if (round?.status === '评估中') Object.assign(round,{ status:'已确认', conclusion: action.conclusion, reason: action.reason, confirmedAt: AS_OF_DATE, ruleVersion: OPPORTUNITY_RULE.version, score: summary.score ?? undefined, riskLevel: summary.riskLevel });
+  if (round?.status === '评估中') Object.assign(round,{ status:'已确认', conclusion: action.conclusion, reason: action.reason, confirmedAt: AS_OF_DATE, ruleVersion: summary.rule.version, score: summary.score ?? undefined, riskLevel: summary.riskLevel });
   o.status = action.conclusion; return o.id;
 }
