@@ -23,9 +23,9 @@
   "shared_changes": [],
   "development_dependencies": [],
   "acceptance_dependencies": [],
-  "acceptance_ready": false,
+  "acceptance_ready": true,
   "acceptance_group": "UI-YS4",
-  "status": "submitted",
+  "status": "integrated_pending_acceptance",
   "last_confirmed_at": "2026-09-11",
   "acceptance_checklist": [
     "工程检查",
@@ -35,6 +35,7 @@
   ],
   "scenarios": "按/tmp/pms-ui-unsigned-preparation.md，不改额度与成本或启动门禁",
   "fixtures": "已有r0024合法transition前置和真实UI动作",
-  "next_action": "范围检查通过，等待当前GS3及YS3后集成验收",
-  "delivery_commit": "6f16e59927edbb2c8e62186d1153cca9d49748ce"
+  "next_action": "R0045当前集成版工程及浏览器验收",
+  "delivery_commit": "6f16e59927edbb2c8e62186d1153cca9d49748ce",
+  "integration_commit": "6c767ae"
 }

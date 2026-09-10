@@ -64,7 +64,7 @@ export const MainLayout: React.FC = () => {
     'WK-01', 'GL-01', 'HS-01',
     'GS-01', 'GS-02', 'GS-03', 'GS-04', 'GS-05', 'GS-06', 'GS-07', 'GS-08', 'GS-09', 'GS-10', 'GS-11',
     'GL-02', 'GL-03', 'GL-04', 'GL-05', 'GL-06',
-    'YS-01', 'YS-02', 'YS-03', 'YS-04', 'YS-05', 'YS-06', 'YS-07', 'YS-08', 'YS-09', 'YS-10', 'YS-11', 'YS-12',
+    'YS-01', 'YS-02', 'YS-03', 'YS-04', 'YS-05', 'YS-06', 'YS-07', 'YS-08', 'YS-09', 'YS-10', 'YS-11', 'YS-12', 'YS-13', 'YS-14', 'YS-15',
   ].includes(currentPage?.id ?? '');
   useEffect(() => {
     if (activeGroup) setOpenGroups((keys) => keys.includes(activeGroup) ? keys : [...keys, activeGroup]);
