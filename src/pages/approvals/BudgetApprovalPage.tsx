@@ -8,15 +8,15 @@ import { StateView } from '@/components/common/StateView';
 import { MoneyText } from '@/components/common/MoneyText';
 import { visibleProjects } from '@/mock/selectors';
 
-export function BudgetApprovalPage() {
+export function BudgetApprovalPage({ approvalId }: { approvalId?: string } = {}) {
   const { message } = App.useApp();
   const { id } = useParams(); const navigate = useNavigate();
   const { data, dispatch } = useBusinessStore(); const { currentRole, currentUser } = useAppStore();
   const [opinion, setOpinion] = useState(''); const [decision, setDecision] = useState<boolean>();
-  const approval = data.approvals.find((a) => a.id === id);
+  const approval = data.approvals.find((a) => a.id === (approvalId ?? id));
   if (!approval) return <StateView type="404" title="审批不存在" />;
   const project = data.projects.find((p) => p.id === approval.projectId)!;
-  if (!visibleProjects(currentRole, data.projects).some((p) => p.id === project.id)) return <StateView type="403" />;
+  if (!['project-manager','pmo','finance','executive','admin'].includes(currentRole) || !visibleProjects(currentRole, data.projects).some((p) => p.id === project.id)) return <StateView type="403" />;
   const original = data.decisions.find((d) => d.id === approval.id);
   const permitted = approval.status === '待审批' && currentRole === approval.requiredRole;
   return <><PageHeader title={approval.kind === 'change' ? '重大成本变更原审批' : '预算调整原审批'} description={`${approval.id} · ${project.name} · 审批引用提交时快照`} breadcrumbs={[{ title: '首页', href: '/' }, { title: '预算调整原审批' }]} extra={<Button onClick={() => navigate(-1)}>返回来源</Button>} />
@@ -29,7 +29,7 @@ export function BudgetApprovalPage() {
       { key: 'change', label: '原变更单', span: 3, children: approval.sourceChangeId ?? '预算调整' },
       { key: 'reason', label: '申请说明', span: 3, children: approval.reason },
     ]} />
-    <Alert style={{ margin: '16px 0' }} showIcon type="warning" message={approval.budget.isOverEstimate ? '申请预算超过引用概算，须集团领导审批' : '申请预算在引用概算内，进入PMO审批'} description="预算通过后待PMO确认基线；项目变更审批通过直接追加基线。驳回保留当前生效版本。历史概算、已发生与滚动成本不会因预算审批被改写。" />
+    <Alert style={{ margin: '16px 0' }} showIcon type="warning" message={approval.budget.isOverEstimate ? `申请预算命中超概算规则，须集团领导审批：${approval.budget.overEstimateReasons?.join('；')??'超总成本'}` : '申请预算在引用概算内，进入PMO审批'} description="预算通过后待PMO确认基线；项目变更审批通过直接追加基线。驳回保留当前生效版本。历史概算、已发生与滚动成本不会因预算审批被改写。" />
     <Table rowKey="subjectId" size="small" pagination={false} dataSource={approval.budget.items} columns={[
       { title: '成本科目', dataIndex: 'subjectName' }, { title: '引用概算（万元）', render: (_, r) => <MoneyText value={approval.estimate.items.find((i) => i.subjectId === r.subjectId)?.amount} /> },
       { title: '原预算（万元）', render: (_, r) => <MoneyText value={data.budgets.find((b) => b.projectId === project.id && b.version === approval.baseline.version)?.items.find((i) => i.subjectId === r.subjectId)?.amount} /> },

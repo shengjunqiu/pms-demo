@@ -9,6 +9,7 @@ export const planningOpportunity: Opportunity = { id:'OPP-PLAN-001',code:'OPP-20
 export const validPlanDate = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s) && Number.isFinite(Date.parse(s)) && new Date(s).toISOString().slice(0,10) === s;
 export const teamResources = (state: BusinessState, id: string): TeamResource[] => {
   const p = state.projects.find(p=>p.id===id)!;
+  if(state.projectTeams?.[id])return structuredClone(state.projectTeams[id].members);
   return [...new Set([p.pmId,...(p.memberIds??[])])].map(userId=> {const u=mockUsers.find(u=>u.id===userId); return {userId,name:u?.name??p.pmName,role:userId===p.pmId?'项目经理':'交付成员',departmentId:u?.departmentId??p.departmentId,active:true,startDate:p.plannedStartDate,endDate:p.plannedEndDate,allocation:100,plannedHours:160,keyPosition:userId===p.pmId};});
 };
 export function planningSnapshot(state: BusinessState,id: string): PlanningSnapshot {
@@ -66,7 +67,7 @@ export function confirmBudgetBaseline(state:BusinessState,approval:Approval,acto
  const snapshot=approval.baseline.snapshot;if(!snapshot)throw new Error('缺少完整基线快照');
  const draft=state.planningDrafts[p.id];if(!baseline&&(!draft||draft.status!=='已通过'||draft.reviewId!==snapshot.planningReviewId))throw new Error('计划评审版本已变化');
  const version=`V${Math.max(0,...state.baselines.filter(b=>b.projectId===p.id).map(b=>Number(/^V(\d+)/.exec(b.version)?.[1]??0)))+1}.0`;
- state.budgets.filter(b=>b.projectId===p.id&&b.status==='已生效').forEach(b=>{b.status='已废弃';});if(baseline)baseline.status='历史';
+ state.budgets.filter(b=>b.projectId===p.id&&(b.status==='已生效'||b.id===`BUD-PENDING-${approval.id}`)).forEach(b=>{b.status='已废弃';});if(baseline)baseline.status='历史';
  const budget={...structuredClone(approval.budget),id:`BUD-${approval.id}`,version,status:'已生效' as const,createdAt:AS_OF_DATE,createdBy:actor.id};
  state.budgets.push(budget);const full={...structuredClone(snapshot),budget};
  state.baselines.push({...structuredClone(approval.baseline),id:`BASE-${approval.id}`,version,status:'已生效',budgetAmount:budget.totalAmount,createdAt:AS_OF_DATE,snapshot:full});
@@ -100,7 +101,7 @@ export function applyBudgetPlanningAction(state:BusinessState,action:BudgetPlann
   const errors=validatePlanning(action.plan,p.id);if(errors.length)throw new Error(errors.join('；'));
   state.planningDrafts[p.id]={...structuredClone(action.plan),projectId:p.id,revision:draft.revision+1,status:draft.status==='整改中'?'整改中':'草稿',reviewId:draft.reviewId,updatedAt:AS_OF_DATE};
  }else if(action.type==='submit-planning'){
-  requirePm();if(!['草稿','整改中'].includes(draft.status))throw new Error('当前计划不可重复提交');const errors=validatePlanning(draft,p.id);if(errors.length)throw new Error(errors.join('；'));
+  requirePm();if(state.projectTeams[p.id]?.appointments.some(a=>a.status==='待接受'))throw new Error('主PM任命待接受，暂不能提交计划');if(!['草稿','整改中'].includes(draft.status))throw new Error('当前计划不可重复提交');const errors=validatePlanning(draft,p.id);if(errors.length)throw new Error(errors.join('；'));
   const previous=state.planningReviews.find(r=>r.id===draft.reviewId);if(previous?.rectifications.some(r=>!r.reply?.trim()))throw new Error('请先回复全部整改项');
   const id=`PREVIEW-${state.planningReviews.length+1}`;state.planningReviews.push({id,projectId:p.id,round:state.planningReviews.filter(r=>r.projectId===p.id).length+1,revision:draft.revision,snapshot:planningSnapshot(state,p.id),status:'待评审',submittedBy:actor.name,submittedAt:AS_OF_DATE,rectifications:[]});draft.status='评审中';draft.reviewId=id;
  }else if(action.type==='review-planning'){

@@ -69,7 +69,8 @@ describe('审批、权限及成本锁定', () => {
   it('驳回不改变生效基线，失败动作不产生部分写入', () => {
     const original = createBusinessState();
     const pending = transition(original, { type: 'submit-budget', projectId: 'P-001', budget: original.budgets[0], reason: '计划调整' }, pm);
-    const result = transition(pending, { type: 'review', approvalId: 'APR-1', approve: false, opinion: '补充交付范围' }, pmo);
+    expect(pending.approvals[0].budget.overEstimateReasons?.length).toBeGreaterThan(0);
+    const result = transition(pending, { type: 'review', approvalId: 'APR-1', approve: false, opinion: '补充交付范围' }, leader);
     expect(result.baselines).toEqual(original.baselines);
     expect(result.projects[0].budgetAmount).toBe(original.projects[0].budgetAmount);
     expect(original.approvals).toHaveLength(0);

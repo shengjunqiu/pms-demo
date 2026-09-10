@@ -1,4 +1,4 @@
-import type { FullBaselineSnapshot } from './budget';
+import type { FullBaselineSnapshot, BudgetLine } from './budget';
 import type { ReportSnapshot } from '@/mock/reports';
 // 组织架构
 export interface Department {
@@ -143,6 +143,7 @@ export interface ReceiptPlan {
 
 // 预算版本
 export interface BudgetVersion {
+  details?: BudgetLine[]; ruleVersion?: string; overEstimateReasons?: string[];
   id: string;
   projectId: string;
   version: string;

@@ -20,3 +20,17 @@ export interface PlanningReview {
   reviewer?: string; reviewedAt?: string; opinion?: string;
   rectifications: { id: string; content: string; ownerId: string; deadline: string; reply?: string }[];
 }
+export interface ProjectTeam {
+ members:TeamResource[];
+ appointments:{id:string;userId:string;name:string;status:'待接受'|'已接受'|'已拒绝';nominatedAt:string;nominatedBy:string;opinion?:string;respondedAt?:string}[];
+ history:{date:string;actor:string;description:string}[];
+}
+export interface BudgetLine {
+ id:string;name:string;kind:'labor'|'procurement'|'outsource'|'expense'|'third-party'|'reserve';subjectId:string;
+ amount:number;userId?:string;grade?:string;plannedDays:number;travelDays:number;taskId?:string;stage:string;
+ sourceEstimateItemId?:string;justification:string;department:string;supplyMode:string;
+}
+export interface BudgetDraft {
+ projectId:string;revision:number;estimateVersionId:string;lines:BudgetLine[];reason:string;mitigation:string;responsibility:string;
+ updatedAt:string;submittedApprovalId?:string;
+}
