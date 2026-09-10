@@ -1,3 +1,4 @@
+import type {ConfigurationState,ApprovalProgress} from './configuration';
 import type { EstimateVersion,Opportunity,Project } from './types';
 import type { UserRole } from '@/store/useAppStore';
 export type InitiationRiskDomain='商务'|'技术'|'交付'|'财务'|'法务';
@@ -17,6 +18,7 @@ export interface InitiationSource {
  risks:InitiationRisk[];earlyCostTotal:number;earlyCostSources:{id:string;sourceId:string;amount:number}[];
 }
 export interface InitiationRound {
+ configurationSnapshot?:ConfigurationState;approvalProgress?:ApprovalProgress;
  revision:number;input:InitiationInput;source:InitiationSource;submittedAt:string;submittedBy:string;
  status:'待风险评估'|'待分级'|'会签中'|'待决策'|'通过'|'整改'|'否决'|'暂缓';
  risks:InitiationRisk[];riskLevel?:'低'|'中'|'高';riskExplanation?:string;assessedBy?:string;
