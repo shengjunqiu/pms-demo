@@ -1,9 +1,10 @@
-import { Button, Card, Col, Empty, Progress, Row, Select, Space, Table, Tabs, Tag, Typography } from 'antd';
+import { Button, Card, Col, Dropdown, Empty, Progress, Row, Select, Table, Tabs, Tag, Typography } from 'antd';
 import {
   ProjectOutlined,
   CarryOutOutlined,
   ClockCircleOutlined,
   AlertOutlined,
+  DownOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { PageHeader } from '@/components/common/PageHeader';
@@ -50,7 +51,7 @@ export function ProjectManagerWorkbenchPage() {
       { title: '当前项目', value: String(mine.length), unit: '个', icon: <ProjectOutlined />, statusText: '在管', statusType: 'healthy' as const },
       { title: '待处理事项', value: String(todos.length), unit: '项', icon: <CarryOutOutlined />, statusText: '待办', statusType: todos.length > 0 ? ('warning' as const) : ('healthy' as const) },
       { title: '超期待办', value: String(todos.filter((t) => t.due < AS_OF_DATE).length), unit: '项', icon: <ClockCircleOutlined />, statusText: todos.filter((t) => t.due < AS_OF_DATE).length > 0 ? '需紧急处理' : '无逾期', statusType: todos.filter((t) => t.due < AS_OF_DATE).length > 0 ? ('danger' as const) : ('healthy' as const) },
-      { title: '预警与高风险项目', value: String(mine.filter((p) => ['orange', 'red'].includes(p.health)).length), unit: '个', icon: <AlertOutlined />, statusText: mine.filter((p) => ['orange', 'red'].includes(p.health)).length > 0 ? '重点跟踪' : '全部健康', statusType: mine.filter((p) => ['orange', 'red'].includes(p.health)).length > 0 ? ('danger' as const) : ('healthy' as const) },
+      { title: '预警与高风险项目', value: String(mine.filter((p) => ['orange', 'red'].includes(p.health)).length), unit: '个', icon: <AlertOutlined />, statusText: mine.filter((p) => ['orange', 'red'].includes(p.health)).length > 0 ? '重点跟踪' : '暂无预警或高风险', statusType: mine.filter((p) => ['orange', 'red'].includes(p.health)).length > 0 ? ('danger' as const) : ('healthy' as const) },
     ].map((m) => (
       <Col span={6} key={m.title}>
         <MetricStatCard
@@ -63,23 +64,32 @@ export function ProjectManagerWorkbenchPage() {
         />
       </Col>
     ))}</Row>
-    <Card title="快捷发起" size="small" style={{ marginBottom: 16 }} extra={<Select aria-label="快捷操作项目" value={selected?.id} placeholder="选择项目" style={{ width: 300 }} options={mine.map((p) => ({ value: p.id, label: `${p.id} ${p.name}` }))} onChange={(project) => { const next = new URLSearchParams(params); next.set('project', project); setParams(next); }} />}><Space wrap>{actions.map(([label, path]) => <Button key={label} disabled={!selected} onClick={() => goAction(path)}>{label}</Button>)}</Space><Typography.Paragraph type="secondary" style={{ margin: '12px 0 0' }}>选择项目后进入对应业务页填写与提交；权限、阶段条件和冻结规则由原业务校验。</Typography.Paragraph></Card>
+    <Row gutter={[16, 16]} className="pms-focus-row"><Col span={14}><Card size="small" title="异常与待处理事项" extra={<Button type="link" onClick={() => navigate('/workbench/todos')}>全部待办</Button>}><Table rowKey="id" size="small" dataSource={todos} pagination={{ pageSize: 4, showSizeChanger: false }} columns={[
+      { title: '事项', render: (_, t) => <>{t.title}<div><Typography.Text type="secondary">{t.projectId ?? t.sourceName} · {t.node}</Typography.Text></div></> },
+      { title: '到期', width: 115, render: (_, t) => <Typography.Text type={t.due < AS_OF_DATE ? 'danger' : undefined}>{t.due}</Typography.Text> },
+      { title: '操作', width: 100, render: (_, t) => <Button size="small" onClick={() => navigate(t.route)}>去办理</Button> },
+    ]} /></Card></Col><Col span={10} className="pms-stacked-cards"><Card size="small" title="7天内到期与超期里程碑" extra={<Button type="link" size="small" disabled={!selected} onClick={() => goAction('progress')}>项目进度</Button>}>{milestones.length ? milestones.slice(0, 6).map((m) => <div key={m.id} style={{ marginBottom: 12 }}><Tag color={m.plannedDate < AS_OF_DATE ? 'error' : 'warning'}>{m.plannedDate < AS_OF_DATE ? '已超期' : '即将到期'}</Tag>{m.plannedDate}<div><Button type="link" size="small" onClick={() => navigate(`/projects/${m.projectId}/progress`)}>{m.projectId} · {m.name}</Button></div></div>) : <Empty description="近期无待达成里程碑" />}</Card>
+      <Card title="快捷发起" size="small" style={{ marginTop: 16 }}>
+        <Select aria-label="快捷操作项目" value={selected?.id} placeholder="选择项目" style={{ width: '100%' }} options={mine.map((p) => ({ value: p.id, label: `${p.id} ${p.name}` }))} onChange={(project) => { const next = new URLSearchParams(params); next.set('project', project); setParams(next); }} />
+        <div className="pms-action-list">{actions.slice(0, 3).map(([label, path]) => <Button key={label} disabled={!selected} onClick={() => goAction(path)}>{label}</Button>)}
+          <Dropdown trigger={['click']} menu={{ items: actions.slice(3).map(([label, path]) => ({ key: path, label, onClick: () => goAction(path) })) }}>
+            <Button disabled={!selected}>更多发起 <DownOutlined /></Button>
+          </Dropdown>
+        </div>
+      </Card>
+    </Col></Row>
     <Card title="我的项目 · 进度、成本与待处理事项" size="small" style={{ marginBottom: 16 }}><Table rowKey="id" size="small" dataSource={rows} scroll={{ x: 2100 }} pagination={{ pageSize: 5, showSizeChanger: false }} columns={[
-      { title: '项目编号 / 名称', fixed: 'left', width: 240, render: (_, p) => <><Button type="link" style={{ padding: 0 }} onClick={() => navigate(`/projects/${p.id}`)}>{p.code}</Button><div>{p.name}</div></> },
-      { title: '项目金额', width: 120, render: (_, p) => <MoneyText value={p.revenueAmount ?? p.contractAmount} /> },
+      { title: '项目编号 / 名称', fixed: 'left', width: 240, render: (_, p) => <><Button type="link" style={{ padding: 0 }} onClick={() => navigate(`/projects/${p.id}`)}>{p.code}</Button><div><Button type="link" className="pms-project-name" onClick={() => navigate(`/projects/${p.id}`)}>{p.name}</Button></div></> },
+      { title: '项目金额', align: 'right', width: 120, render: (_, p) => <MoneyText value={p.revenueAmount ?? p.contractAmount} /> },
       { title: '合同 / 计划验收', width: 190, render: (_, p) => <>{p.contractDate ?? '尚未签约'}<div>{p.plannedEndDate}</div></> },
       { title: '阶段 / 健康度', width: 160, render: (_, p) => <>{p.phase} · {p.subPhase}<div><Tag color={p.health === 'red' ? 'error' : p.health === 'green' ? 'success' : 'warning'}>{p.status}</Tag></div></> },
       { title: '整体完成率', width: 160, render: (_, p) => <Progress percent={p.progressRate} size="small" /> },
       ...(['issue', 'risk', 'bug', 'requirement'] as const).map((kind, i) => ({ title: ['问题', '风险', 'BUG', '需求'][i], width: 75, render: (_: unknown, p: typeof rows[number]) => quality(p.id, kind) })),
       { title: '预算 / 已用成本', width: 170, render: (_, p) => <><MoneyText value={p.calc.budget?.totalAmount} /><div><MoneyText value={p.calc.actual} /></div></> },
-      { title: '预算 - 滚动成本', width: 175, render: (_, p) => <><MoneyText value={p.calc.budget ? -p.calc.variance : null} signed /><div><Button size="small" type="link" onClick={() => navigate(`/projects/${p.id}/dynamic-accounting`)}>查看动态核算</Button></div></> },
+      { title: '预计预算结余', width: 175, render: (_, p) => <><MoneyText value={p.calc.budget ? -p.calc.variance : null} signed /><div><Button size="small" type="link" onClick={() => navigate(`/projects/${p.id}/dynamic-accounting`)}>查看动态核算</Button></div></> },
       { title: '人力预算 / 已用', width: 160, render: (_, p) => <><MoneyText value={p.calc.subjects.find((s) => s.subjectId === 'SUB-01')?.budget} /><div><MoneyText value={p.calc.subjects.find((s) => s.subjectId === 'SUB-01')?.actual} /></div></> },
     ]} /></Card>
-    <Row gutter={[16, 16]}><Col span={14}><Card size="small" title="异常与待处理事项" extra={<Button type="link" onClick={() => navigate('/workbench/todos')}>全部待办</Button>}><Table rowKey="id" size="small" dataSource={todos} pagination={{ pageSize: 5, showSizeChanger: false }} columns={[
-      { title: '事项', render: (_, t) => <>{t.title}<div><Typography.Text type="secondary">{t.projectId ?? t.sourceName} · {t.node}</Typography.Text></div></> },
-      { title: '到期', width: 115, render: (_, t) => <Typography.Text type={t.due < AS_OF_DATE ? 'danger' : undefined}>{t.due}</Typography.Text> },
-      { title: '操作', width: 100, render: (_, t) => <Button size="small" onClick={() => navigate(t.route)}>去办理</Button> },
-    ]} /></Card></Col><Col span={10}><Card size="small" title="7天内到期与超期里程碑">{milestones.length ? milestones.slice(0, 6).map((m) => <div key={m.id} style={{ marginBottom: 12 }}><Tag color={m.plannedDate < AS_OF_DATE ? 'error' : 'warning'}>{m.plannedDate < AS_OF_DATE ? '已超期' : '即将到期'}</Tag>{m.plannedDate}<div><Button type="link" size="small" onClick={() => navigate(`/projects/${m.projectId}/progress`)}>{m.projectId} · {m.name}</Button></div></div>) : <Empty description="近期无待达成里程碑" />}</Card></Col>
+    <Row gutter={[16, 16]}>
     <Col span={12}><Card size="small" title="待验收与整改">{acceptances.length ? acceptances.slice(0, 5).map((a) => <p key={a.id}><Tag color={a.status === '整改中' ? 'warning' : 'blue'}>{a.status}</Tag><Button type="link" onClick={() => navigate(`/projects/${a.projectId}/${a.type === '内部初验' ? 'internal-acceptance' : a.type === '供应商验收' ? 'supplier-acceptance' : 'customer-acceptance'}`)}>{a.projectId} · {a.type} · 第{a.round}轮</Button></p>) : <Empty description="暂无待处理验收" />}</Card></Col>
     <Col span={12}><Card size="small" title="近期回款与逾期款项">{receipts.length ? receipts.slice(0, 5).map((r) => <p key={r.id}><Tag color={r.dueDate < AS_OF_DATE ? 'error' : 'blue'}>{r.dueDate}</Tag><Button type="link" onClick={() => navigate(`/projects/${r.projectId}?tab=receipts`)}>{r.projectId} · {r.title}</Button><MoneyText value={r.amount - r.paidAmount} /></p>) : <Empty description="近期无待回款事项" />}</Card></Col></Row>
   </>;

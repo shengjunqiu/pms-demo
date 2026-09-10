@@ -7,7 +7,7 @@ for (const width of [1440, 1280]) {
     page.on('pageerror', (error) => errors.push(error.message));
     page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
     await page.goto('/workbench/project-manager');
-    await expect(page.getByRole('heading', { name: 'WK-01 项目经理工作台' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '项目经理工作台' })).toBeVisible();
     // A concrete shared fixture must exist, and detail navigation must retain that project.
     const firstProject = page.locator('.ant-table-tbody tr').filter({ has: page.getByRole('button', { name: /^PRJ-/ }) }).first();
     await expect(firstProject).toBeVisible();
@@ -18,7 +18,7 @@ for (const width of [1440, 1280]) {
     await page.goto('/workbench/project-manager');
     await page.getByRole('button', { name: '全部待办', exact: true }).click();
     await expect(page).toHaveURL('/workbench/todos');
-    await expect(page.getByRole('heading', { name: 'WK-02 我的待办中心' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '我的待办中心' })).toBeVisible();
     expect(errors).toEqual([]);
   });
 }

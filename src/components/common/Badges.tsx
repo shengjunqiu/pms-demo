@@ -56,7 +56,7 @@ export const HealthBadge: React.FC<{ status?: HealthStatus; label?: string; clas
   className = '',
 }) => {
   const text = label || status;
-  if (status.includes('重大') || status.includes('严重') || status.includes('红') || status.includes('超支')) {
+  if (status.includes('高风险') || status.includes('重大') || status.includes('严重') || status.includes('红') || status.includes('超支')) {
     return (
       <span
         className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200 ${className}`}
@@ -96,7 +96,7 @@ export const RiskBadge: React.FC<{ level?: RiskLevel; className?: string }> = ({
   if (level.includes('特大')) {
     return (
       <span
-        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-300 animate-pulse ${className}`}
+        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-300 ${className}`}
       >
         {level}
       </span>

@@ -15,6 +15,8 @@ export interface MetricStatCardProps {
   statusType?: 'healthy' | 'warning' | 'danger' | 'info';
   onClick?: () => void;
   className?: string;
+  variant?: 'card' | 'flat';
+  signed?: boolean;
 }
 
 export const MetricStatCard: React.FC<MetricStatCardProps> = ({
@@ -28,6 +30,8 @@ export const MetricStatCard: React.FC<MetricStatCardProps> = ({
   statusType = 'healthy',
   onClick,
   className = '',
+  variant = 'card',
+  signed = false,
 }) => {
   const statusColorMap = {
     healthy: 'text-emerald-600',
@@ -39,15 +43,21 @@ export const MetricStatCard: React.FC<MetricStatCardProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`rounded-xl border border-slate-200 bg-white p-4 shadow-xs hover:border-blue-400 hover:shadow-md transition-all group ${
-        onClick ? 'cursor-pointer' : ''
-      } ${className}`}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick();
+        }
+      } : undefined}
+      className={`pms-metric pms-metric--${variant} ${onClick ? 'pms-metric--interactive' : ''} ${className}`}
     >
       {/* 1. 卡片顶行：标签 + 语义图标 */}
       <div className="flex items-center justify-between text-slate-500 mb-2">
         <span className="text-xs font-medium text-slate-600">{title}</span>
         {icon && (
-          <div className="text-blue-500 group-hover:scale-110 transition-transform flex items-center">
+          <div className="text-blue-500  flex items-center">
             {icon}
           </div>
         )}
@@ -55,15 +65,15 @@ export const MetricStatCard: React.FC<MetricStatCardProps> = ({
 
       {/* 2. 卡片核心行：大数值 + 等宽字体 + 单位 */}
       <div className="flex items-baseline space-x-1.5 my-1">
-        <span className="text-2xl font-bold text-slate-900 font-mono tracking-tight">
-          {typeof value === 'number' ? value.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : value}
+        <span className="pms-metric-value">
+          {typeof value === 'number' ? `${signed && value > 0 ? '+' : ''}${value.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : value}
         </span>
         {unit && <span className="text-xs text-slate-500 font-medium">{unit}</span>}
       </div>
 
       {/* 3. 卡片底行：辅助指标 / 同比环比 / 细分健康度占比 */}
       {(subtitle || trend || statusText) && (
-        <div className="mt-2.5 flex items-center justify-between text-[11px] text-slate-500 border-t border-slate-100 pt-2">
+        <div className="pms-metric-caption flex items-center justify-between text-xs text-slate-500">
           {subtitle && <span>{subtitle}</span>}
           {trend && (
             <span className={`font-mono font-medium ${trend.isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>

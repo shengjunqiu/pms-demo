@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "catalog_sha256": "afabe9c27b289a2aa00a72d116be344fdbb01683443388e367536a99feb1f05e",
-  "status": "complete",
+  "status": "in_progress",
   "active": null,
   "completion_revision": null,
   "created_at": "2026-09-09T14:33:07+00:00",
@@ -16,8 +16,7 @@
     },
     "WK-01": {
       "status": "done",
-      "reason": "按真实依赖拆分验收轮次，先验收进度与待办；工作台待原业务入口完成后继续。",
-      "round": "R0035"
+      "round": "R0037"
     },
     "WK-02": {
       "status": "done",
@@ -138,7 +137,7 @@
     },
     "HS-01": {
       "status": "done",
-      "round": "R0007"
+      "round": "R0037"
     },
     "HS-02": {
       "status": "done",
@@ -269,7 +268,7 @@
     },
     "GL-01": {
       "status": "done",
-      "round": "R0010"
+      "round": "R0037"
     },
     "GL-02": {
       "status": "done",
@@ -331,9 +330,8 @@
       "round": "R0023"
     },
     "FINAL": {
-      "status": "done",
-      "reason": "合并交付物依赖后继续同一业务闭环",
-      "round": "R0036"
+      "status": "pending",
+      "reason": "用户授权UI优化：重排工作台和驾驶舱首屏、项目详情分组导航及统一视觉，重新验证三页与公共组件回归。"
     }
   },
   "runs": [
@@ -1158,6 +1156,47 @@
         "build": "pass",
         "test:domain": "pass"
       }
+    },
+    {
+      "id": "R0037",
+      "items": [
+        "WK-01",
+        "GL-01",
+        "HS-01"
+      ],
+      "started_at": "2026-09-10T17:21:22+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-10T18:25:03+00:00",
+      "revision": "e78ea96fca3a2df5bf023535e5ce60c67661715fd5eeb8a33357e1df1ebc71cd",
+      "proof": {
+        ".pms-loop/runs/R0037/build.log": "1b21cdd33785c258c7060444722b105790f1bee425784e19982f6fd50f883115",
+        ".pms-loop/runs/R0037/test-domain.log": "254aba0817200cc5725a828c3b7e0a8ed54b248a1ad1f972e4333cf281956beb",
+        ".pms-loop/runs/R0037/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0037/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0037/browser-ui-final.log": "aafedcea920bf3f5faa25f4edda48f190a1d59687d67c14fb163e11b3afe9faa",
+        ".pms-loop/runs/R0037/artifacts/ui-chain.json": "38793900fcac216cafba5500d5b42981ddacc469f811a3aca82e4a058e924b0c",
+        ".pms-loop/runs/R0037/artifacts/UI_REVIEW.md": "3b2185e9158de27c1af4aea693c0600a3eb5896a5bf91e2af57a53bd00297687",
+        ".pms-loop/runs/R0037/artifacts/ui-0dedc0c9b9177bfdcd7210fab5d9d03553da3f57.json": "7404e948275f846a5262ca26821dc5054e081f5239cd6eccf38e2dc3643d0bf9",
+        ".pms-loop/runs/R0037/artifacts/ui-0dedc0c9b9177bfdcd726568909d0e9dec6dba22.json": "546a151c695e2ab9d53a2bbe4cdea002bd7ac4d1184b6254c194625d4edca8f4",
+        ".pms-loop/runs/R0037/artifacts/ui-0dedc0c9b9177bfdcd7280f84741b9ded5ecd3b6.json": "eca031e58e3e88ad80156528519fd56e7b723719a16e0e0eae50156e367d433f",
+        ".pms-loop/runs/R0037/artifacts/ui-0dedc0c9b9177bfdcd728a8ad43ea5d699e255ea.json": "183eb1337ff69e9ce263f1eb72f259909443d81d73ebeaf12ab22ec1bb90113c",
+        ".pms-loop/runs/R0037/artifacts/ui-0dedc0c9b9177bfdcd72b1078b1bbfce84cbc383.json": "cc8a12faa034e722f383ee9d7355967327b0bf9f9b37a92c13b094f3b1ef4e64",
+        ".pms-loop/runs/R0037/artifacts/ui-0dedc0c9b9177bfdcd72d2ca6c86b3d1e78ba8c3.json": "b2201b5b7c9706f265e61794f3db7044cdbc1273c93c69c7c37f13b10161d322",
+        ".pms-loop/runs/R0037/artifacts/WK01-1440.png": "fd8334255750f12e046a6bccb424f9d440e9e7b2c5d3279b88a14779264d8cef",
+        ".pms-loop/runs/R0037/artifacts/WK01-1280.png": "44e149f4e523d4f4eb87a9cbd0c4c723306745857c963cd295dbea24584b7651",
+        ".pms-loop/runs/R0037/artifacts/GL01-1440.png": "e00c6d1a0cb45a6125c00267eeac109a74455a5a6ff28dc7f41152dd6b2b5de5",
+        ".pms-loop/runs/R0037/artifacts/GL01-1280.png": "419e0d8706a92870feb40e802950e7e12efee46bd4d22f383d63a1f5f7f2c97b",
+        ".pms-loop/runs/R0037/artifacts/HS01-1440.png": "57fc55d06db861e3855e522e5d5a002043f49430bb59c62a5642644aac77afab",
+        ".pms-loop/runs/R0037/artifacts/HS01-1280.png": "44f481f028b8702e35864f772b8ba3d24a8ce833f4c08c7f6b6c359879c2b34b",
+        ".pms-loop/runs/R0037/checks.json": "e0d1e3480f11ff3efb3f89538ce430d0593b1cbfd26dc64dd27ec6bc2efef5cc",
+        ".pms-loop/runs/R0037/evidence.json": "f042eb8e1df74e96874a75633fb732506e7ed4085c5f178f28e1a94cda1f21b9"
+      }
     }
   ],
   "notes": [
@@ -1272,6 +1311,26 @@
     {
       "at": "2026-09-10T15:26:28+00:00",
       "text": "用户要求先push，保存R0029开发检查点，正式仍42/72、GS10/11活动未accept。修复快速保存草稿后提交重复建单，批准额度重复告警、状态门禁、配置临期提醒及URL筛选回填；EARLY-QA c6d648d范围检查后单向集成bedbbf6，工作副本已停写归档。最新工程revision=cde167712af632e9e298413d4fdb65c719876a397ab3c75557d3a2e86279cc36，typecheck/lint/build及235领域测试通过。前版本5条正式浏览器场景全部通过、consoleErrors空，成本20万元真实立项继承一次、配置30天提醒和URL返回已验证；1440来源抽屉截图抓到展开动画，因此测试截图新增animations disabled并重新check。旧证据保留R0029/attempts/drawer-animation，不充作最新正式证据。下一步保持源码冻结，在R0029/artifacts重新跑e2e/early-investments.spec.ts全部5条，查看双宽主页面及来源抽屉，填evidence后accept。当前没有运行测试或所启服务，构建约2.29MB告警仍待优化。"
+    },
+    {
+      "at": "2026-09-10T17:21:13+00:00",
+      "text": "reopen FINAL, GL-01, HS-01, WK-01: 用户授权UI优化：重排工作台和驾驶舱首屏、项目详情分组导航及统一视觉，重新验证三页与公共组件回归。"
+    },
+    {
+      "at": "2026-09-10T17:39:05+00:00",
+      "text": "R0037工程检查已通过。验收准备复核发现first-batch浏览器测试的8处标题断言仍依赖已移除的开发编号，回到本轮修复阶段适配业务标题；当前证据不接受。旧check日志保留artifacts/before-test-title-update，修改后重新check及当前版本浏览器验证。"
+    },
+    {
+      "at": "2026-09-10T17:44:47+00:00",
+      "text": "R0037浏览器回归发现access.spec.ts仍以JS-07/JS-08编号查找侧栏；与本轮隐藏导航编号不一致。终止本次回归并回到修复阶段，仅更新菜单的业务名称断言，权限规则与期望保持。保留本次日志并重新check后完整运行浏览器回归。"
+    },
+    {
+      "at": "2026-09-10T18:00:01+00:00",
+      "text": "R0037当前源码冻结，check e49c132b30ae0d6b116a09d9df90b992ef26990e26286cbc5364fdd2e0b10109四项通过，235领域测试通过。三页UI与公共组件完成。完整浏览器进程被SIGTERM终止(exit143)，browser-regression.log前16场景通过；仅清理本次遗留4179服务组2784861。改串行分批：batch1=first-batch剩余2场景+ui-refinement6场景正在运行；随后batch2=internal-supplier-acceptance与opportunity-ledger(10)，batch3=presales、r0024-controls、r0024-unsigned(10)，batch4=receipts、settlement、workbench(7)。完成后查看新三页双宽截图、补真实权限观察、写evidence再accept。用户既有5174预览保留。"
+    },
+    {
+      "at": "2026-09-10T18:25:18+00:00",
+      "text": "R0037 UI优化已正式验收WK-01、GL-01、HS-01。最终typecheck/lint/build及235个领域测试通过；51个浏览器场景分批通过，最终check后6项UI场景重跑通过，并补查财务403及高风险KPI到P-003成本凭证完整链路。1440/1280截图已查看，记录见本轮artifacts/UI_REVIEW.md。临时测试浏览器已关闭，保留用户原有5174预览服务。此次为限定UI迭代，FINAL仍待全项目单独验收，不继续全量开发。"
     }
   ],
   "history": [

@@ -213,6 +213,7 @@ test('JS01/02筛选空态、错误记录、未知项目和只读角色', async (
   await expect(page.getByRole('button', { name: '发起供应商验收', exact: true })).toBeDisabled();
   for (const path of ['internal-acceptance', 'supplier-acceptance']) {
     await navigate(page, `${base}/${path}`);
+    await expect(page.locator('.pms-page-header')).toContainText('P-006');
     await closeDrawer(page);
     await page.getByLabel('验收查询', { exact: true }).fill('NO-SUCH-ACCEPTANCE');
     await expect(page.locator('.ant-table-placeholder')).toContainText('暂无数据');

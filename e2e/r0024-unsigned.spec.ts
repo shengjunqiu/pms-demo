@@ -42,7 +42,7 @@ test('YS-13 未签台账按风险过滤并保留真实下钻', async ({ page }) 
   await expect(
     page.getByRole('heading', { name: '未签立项台账', exact: true }),
   ).toBeVisible();
-  await expect(page.getByText('未签项目').locator('..')).toContainText(
+  await expect(page.getByText('未签项目', { exact: true }).locator('..')).toContainText(
     String(fixture.unsignedCount),
   );
   const visibleRows = page.locator(

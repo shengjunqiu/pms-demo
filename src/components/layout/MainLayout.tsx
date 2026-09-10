@@ -4,7 +4,7 @@ import { canAccessPage, canAccessProject, selectAccessPolicy } from '@/mock/conf
 import { projectForTarget } from '@/mock/access';
 import { StateView } from '@/components/common/StateView';
 import { GlobalSearchModal } from '@/components/common/GlobalSearchModal';
-import { Layout, Menu, Select, Space, Typography, Tag, Button, Dropdown, Avatar, theme } from 'antd';
+import { Layout, Menu, Select, Space, Typography, Button, Dropdown, Avatar } from 'antd';
 import {
   DashboardOutlined,
   ProjectOutlined,
@@ -33,7 +33,7 @@ export const MainLayout: React.FC = () => {
   const navigate = useNavigate();
   const { currentRole, setRole, currentUser, asOfDate } = useAppStore();
   const { data, recordAccess } = useBusinessStore();
-  const { token } = theme.useToken();
+  const [openGroups, setOpenGroups] = useState<string[]>(['WK']);
 
   const groups = [
     { key: 'GL', label: '领导经营驾驶舱', icon: <DashboardOutlined /> },
@@ -47,7 +47,7 @@ export const MainLayout: React.FC = () => {
   const menuItems = groups.map((group) => ({
     ...group,
     children: PAGE_MANIFEST.filter((page) => page.id.startsWith(group.key) && canAccessPage(data, currentUser, page.id)).map((page) => ({
-      key: demoRoute(page.route), label: `${page.id} ${page.title}`,
+      key: demoRoute(page.route), label: page.title,
     })),
   })).filter((group) => group.children.length > 0);
 
@@ -59,6 +59,11 @@ export const MainLayout: React.FC = () => {
   const targetId = location.pathname.split('/')[2] ?? '';
   const routeProject = projectForTarget(data, targetId);
   const allowed = (!currentPage || canAccessPage(data, currentUser, currentPage.id)) && (!routeProject || canAccessProject(data, currentUser, routeProject));
+  const activeGroup = currentPage?.id.split('-')[0];
+  const isWorkspace = ['WK-01', 'GL-01', 'HS-01'].includes(currentPage?.id ?? '');
+  useEffect(() => {
+    if (activeGroup) setOpenGroups((keys) => keys.includes(activeGroup) ? keys : [...keys, activeGroup]);
+  }, [activeGroup]);
   const policyId = selectAccessPolicy(data, currentRole)?.id;
   useEffect(() => {
     recordAccess(location.pathname + location.search, allowed, currentUser);
@@ -113,8 +118,9 @@ export const MainLayout: React.FC = () => {
         <Menu
           theme="dark"
           mode="inline"
-          selectedKeys={[location.pathname]}
-          defaultOpenKeys={['GL', 'WK']}
+          selectedKeys={[currentPage ? demoRoute(currentPage.route) : location.pathname]}
+          openKeys={openGroups}
+          onOpenChange={setOpenGroups}
           items={menuItems}
           onClick={({ key }) => navigate(key)}
           style={{ borderRight: 0, background: '#0f172a' }}
@@ -147,7 +153,9 @@ export const MainLayout: React.FC = () => {
             />
 
             {/* Spotlight 风格全局搜索入口 */}
-            <div
+            <button
+              type="button"
+              aria-label="搜索项目、合同、单据"
               onClick={() => setSearchOpen(true)}
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-400 hover:border-blue-400 hover:text-slate-600 cursor-pointer transition-all w-48 sm:w-64 text-xs select-none"
             >
@@ -156,13 +164,11 @@ export const MainLayout: React.FC = () => {
               <kbd className="hidden sm:inline-block px-1.5 py-0.5 bg-white border border-slate-200 rounded font-mono text-[10px] text-slate-500">
                 ⌘K
               </kbd>
-            </div>
+            </button>
 
             {currentPage ? (
               <Space size={8} className="hidden md:inline-flex">
-                <Tag color="blue" className="font-mono">{currentPage.id}</Tag>
                 <Text strong style={{ fontSize: 15 }}>{currentPage.title}</Text>
-                <Tag color="default">{currentPage.kind}</Tag>
               </Space>
             ) : (
               <Text strong style={{ fontSize: 15 }} className="hidden md:inline-block">项目管理全生命周期平台</Text>
@@ -170,7 +176,7 @@ export const MainLayout: React.FC = () => {
           </Space>
 
           <Space size={16} align="center">
-            <Tag color="purple" className="font-mono">基准日: {asOfDate}</Tag>
+            <Text type="secondary" style={{ fontSize: 12 }}>数据截至 {asOfDate}</Text>
             <Space size={4} align="center">
               <Text type="secondary" style={{ fontSize: 12 }}>角色:</Text>
               <Select
@@ -210,13 +216,13 @@ export const MainLayout: React.FC = () => {
         </Header>
 
         <Content
+          className={isWorkspace ? 'pms-workspace' : 'pms-content'}
           style={{
-            margin: '16px',
-            padding: '20px',
-            background: '#ffffff',
-            borderRadius: token.borderRadiusLG ?? 12,
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+            margin: '20px',
+            padding: isWorkspace ? 0 : '20px',
+            background: isWorkspace ? 'transparent' : '#ffffff',
+            borderRadius: 12,
+            border: isWorkspace ? undefined : '1px solid #e2e8f0',
             minHeight: 'calc(100vh - 96px)',
             overflowX: 'auto',
           }}

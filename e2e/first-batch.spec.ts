@@ -24,7 +24,7 @@ for (const width of [1440, 1280]) test(`首批页面可见性和布局 ${width}`
   for (const [id, path, name] of pages) {
     if (name !== current) { await role(page, name); current = name; }
     await navigate(page, path);
-    const titles: Record<string, string> = { GS01: '商机台账', GS02: '新建商机', GS03: '福建省晋江市岸海防综合治理平台商机', GS04: '初步评估', YS06: 'YS-06', YS07: 'YS-07', YS08: 'YS-08', JS01: 'JS-01', JS02: 'JS-02', JS03: 'JS-03', JS04: 'JS-04' };
+    const titles: Record<string, string> = { GS01: '商机台账', GS02: '新建商机', GS03: '福建省晋江市岸海防综合治理平台商机', GS04: '初步评估', YS06: 'WBS计划编制', YS07: '里程碑计划', YS08: '计划评审', JS01: '内部验收', JS02: '供应商验收', JS03: '客户验收', JS04: '项目报验' };
     await expect(page.locator('h4').first()).toContainText(titles[id]);
     await expect(page.getByText('403', { exact: true })).toHaveCount(0);
     await expect(page.getByText('404', { exact: true })).toHaveCount(0);
@@ -132,7 +132,7 @@ test('策划计划经PMO评审、预算审批与独立基线确认', async ({ pa
   await expect(page.getByRole('button', { name: '进入预算编制', exact: true })).toBeVisible();
   await role(page, '项目经理');
   await navigate(page, '/projects/P-PLAN-001/budget');
-  await expect(page.locator('h4').first()).toContainText('YS-09');
+  await expect(page.locator('h4').first()).toContainText('项目预算编制');
   await page.getByRole('button', { name: '保存草稿', exact: true }).click();
   await expect(page.getByText('预算草稿 R1', { exact: false })).toBeVisible();
   await page.getByRole('button', { name: '提交审批', exact: true }).click();

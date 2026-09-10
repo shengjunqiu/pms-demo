@@ -1,7 +1,7 @@
 import { canViewSensitiveField } from '@/mock/configuration-access';
 import { marginReason } from '@/utils/sensitive';
 import { useState } from 'react';
-import { Button, Card, Col, Descriptions, Drawer, Empty, Progress, Row, Select, Space, Statistic, Steps, Table, Tabs, Tag, Timeline, Typography } from 'antd';
+import { Alert, Button, Card, Col, Descriptions, Drawer, Empty, Progress, Row, Select, Space, Statistic, Steps, Table, Tabs, Tag, Timeline, Typography } from 'antd';
 import { ArrowLeftOutlined, ArrowRightOutlined, DollarOutlined, FundOutlined, LineChartOutlined } from '@ant-design/icons';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useBusinessStore } from '@/mock/business';
@@ -52,7 +52,7 @@ export function ProjectOverviewPage() {
   const overview = <Row gutter={20}>
     <Col span={14}>
       <Card title="项目经营摘要" size="small">
-        <Row gutter={[12, 12]}>{[
+        <Row gutter={[0, 0]} className="pms-summary-metrics">{[
           { label: '有效预算', value: calc.budget?.totalAmount, icon: <FundOutlined /> },
           { label: '滚动预测成本', value: calc.rolling, icon: <LineChartOutlined /> },
           { label: '预测成本偏差', value: calc.variance, icon: <DollarOutlined />, signed: true, statusText: calc.variance > 0 ? '超预算' : '成本受控', statusType: calc.variance > 0 ? ('danger' as const) : ('healthy' as const) },
@@ -60,6 +60,8 @@ export function ProjectOverviewPage() {
         ].map((m) => (
           <Col span={12} key={m.label}>
             <MetricStatCard
+              variant="flat"
+              signed={m.signed}
               title={m.label}
               value={m.value ?? '—'}
               unit={m.unit ?? (m.value !== undefined ? '万元' : '')}
@@ -79,6 +81,7 @@ export function ProjectOverviewPage() {
           {counts.map((c) => (
             <Col span={6} key={c.label}>
               <MetricStatCard
+                variant="flat"
                 title={c.label}
                 value={String(c.value)}
                 unit="项"
@@ -119,8 +122,7 @@ export function ProjectOverviewPage() {
     { key: 'receipts', label: '回款', children: <><Space size={24}><Statistic title="签约金额（万元）" value={receipt.signed} formatter={() => <MoneyText value={receipt.signed} />} /><Statistic title="已收（万元）" value={receipt.paid} formatter={() => <MoneyText value={receipt.paid} />} /><Statistic title="合同剩余应收（万元）" value={receipt.outstanding} formatter={() => <MoneyText value={receipt.outstanding} />} /></Space><Table rowKey="id" size="small" dataSource={receipt.contracts} columns={[{ title: '合同编号', dataIndex: 'code' }, { title: '合同名称', dataIndex: 'name' }, { title: '实收（万元）', dataIndex: 'paidAmount', render: (v: number) => <MoneyText value={v} /> }]} /><Table rowKey="id" size="small" pagination={false} dataSource={receipt.plans} columns={[{ title: '计划编号', dataIndex: 'id' }, { title: '回款节点', dataIndex: 'title' }, { title: '到期日期', dataIndex: 'dueDate' }, { title: '应收（万元）', dataIndex: 'amount', render: (v: number) => <MoneyText value={v} /> }, { title: '实收（万元）', dataIndex: 'paidAmount', render: (v: number) => <MoneyText value={v} /> }]} /><Text type="secondary">未签项目的预计收入不计入合同及回款；剩余应收不等同于逾期应收。</Text></> },
     { key: 'audit', label: '操作记录', children: <Timeline items={[...data.audit.filter((a) => a.target === p.id).map((a) => ({ children: `${a.date} ${a.actor} · ${a.action}` })), ...data.baselines.filter((b) => b.projectId === p.id).map((b) => ({ children: `${b.createdAt} 基线 ${b.version} · ${b.status} · ${b.scopeDesc}` }))]} /> },
   ];
-  return <div><PageHeader title="HS-01 项目详情总览" description={`${p.id} · ${p.name}`} breadcrumbs={[{ title: '首页', href: '/' }, { title: p.name }]} extra={<Space><Select aria-label="切换项目" value={p.id} style={{ width: 250 }} options={allowed.map((row) => ({ value: row.id, label: `${row.id} ${row.name}` }))} onChange={(value) => navigate(`/projects/${value}?${params}`)} /><Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>返回</Button></Space>} />
-    <Card size="small" style={{ marginBottom: 16 }}><Descriptions column={3} size="small" items={[
+  const summaryItems = [
       { key: 'source', label: '来源商机', children: source ? <Button type="link" size="small" onClick={() => open(source.name, [['商机编号', source.code], ['客户', source.customerName], ['负责人', source.ownerName], ['状态', source.status], ['概算版本', calc.estimate?.version], ['关联项目', p.id]])}>{source.code}</Button> : '无关联商机' },
       { key: 'customer', label: '客户', children: p.customerName }, { key: 'pm', label: '主项目经理', children: p.pmName }, { key: 'org', label: '主责部门', children: p.departmentName },
       { key: 'phase', label: '执行阶段', children: <div className="flex items-center gap-1.5"><BusinessStageBadge stage={p.phase} /><DeliveryStageBadge stage={p.subPhase} /></div> },
@@ -128,9 +130,32 @@ export function ProjectOverviewPage() {
       { key: 'income', label: '拟签/项目收入', children: <><MoneyText value={calc.income} /> 万元</> }, { key: 'margin', label: '预测毛利率', children: showMargin?formatPercent(calc.grossMarginRate):'已隐藏' }, { key: 'date', label: '计划验收', children: p.plannedEndDate },
       { key: 'director', label: '项目总监（演示任命）', children: mockDepartments.find((d) => d.id === mockDepartments.find((org) => org.id === p.departmentId)?.parentId)?.leader ?? '王总' },
       { key: 'actual', label: '已发生成本', children: <><MoneyText value={calc.actual} /> 万元</> }, { key: 'signed', label: '已签合同金额', children: <><MoneyText value={receipt.signed} /> 万元</> },
-    ]} /><Text type="secondary">{marginReason(p.healthReason,showMargin)} · 数据更新至 {AS_OF_DATE} · 当前角色：{role === 'executive' ? '集团领导（只读）' : role === 'project-manager' ? '项目经理' : '业务查看'}</Text></Card>
-    <Steps size="small" style={{ marginBottom: 20 }} current={['概算', '预算', '核算', '结算及运维'].indexOf(fourStage(p))} items={['概算', '预算', '核算', '结算及运维'].map((title) => ({ title }))} />
-    <Tabs activeKey={currentTab} onChange={selectTab} items={tabs} />
+    ];
+  const groups = [
+    { key: 'overview', label: '项目总览', tabs: ['overview', 'team', 'audit'] },
+    { key: 'delivery', label: '计划与交付', tabs: ['progress', 'quality', 'deliverables'] },
+    { key: 'finance', label: '成本与四算', tabs: ['four', 'cost', 'supply', 'changes'] },
+    { key: 'collaboration', label: '协作事项', tabs: ['reports', 'risks', 'requirements'] },
+    { key: 'settlement', label: '验收与回款', tabs: ['acceptance', 'receipts'] },
+  ];
+  const activeGroup = groups.find((group) => group.tabs.includes(currentTab)) ?? groups[0];
+  const activeTab = tabs.some((tab) => tab.key === currentTab) ? currentTab : 'overview';
+  return <div><PageHeader title={p.name} description={`${p.code} · ${p.departmentName} · 更新至 ${AS_OF_DATE}${role === 'executive' ? ' · 管理视角：只读' : ''}`} tags={[<HealthBadge key="health" status={healthNames[p.health]} />]} breadcrumbs={[{ title: '首页', href: '/' }, { title: '项目详情' }]} extra={<Space><Select aria-label="切换项目" value={p.id} style={{ width: 250 }} options={allowed.map((row) => ({ value: row.id, label: `${row.id} ${row.name}` }))} onChange={(value) => navigate(`/projects/${value}?${params}`)} /><Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>返回</Button></Space>} />
+    <Card size="small" className="pms-project-summary">
+      <Descriptions column={3} size="small" items={summaryItems.filter((item) => ['customer', 'pm', 'date', 'income', 'actual', 'margin'].includes(item.key))} />
+      <Alert showIcon type={p.health === 'red' ? 'error' : p.health === 'green' ? 'success' : 'warning'} message={marginReason(p.healthReason, showMargin)} />
+      <details className="pms-project-meta">
+        <summary>更多项目信息 · 来源、组织与合同</summary>
+        <Descriptions style={{ marginTop: 12 }} column={3} size="small" items={summaryItems.filter((item) => !['customer', 'pm', 'date', 'income', 'actual', 'margin', 'status', 'phase', 'contract'].includes(item.key))} />
+      </details>
+    </Card>
+    <div className="pms-project-lifecycle"><Space size={8}><BusinessStageBadge stage={p.phase} /><DeliveryStageBadge stage={p.subPhase} />{p.isUnsigned ? <Tag color="warning">已立项未签约</Tag> : <Tag color="success">已签约</Tag>}</Space>
+    <Steps size="small" style={{ flex: 1, minWidth: 420 }} current={['概算', '预算', '核算', '结算及运维'].indexOf(fourStage(p))} items={['概算', '预算', '核算', '结算及运维'].map((title) => ({ title }))} />
+    </div>
+    <div className="pms-project-tabs">
+      <Tabs className="pms-project-groups" activeKey={activeGroup.key} onChange={(key) => selectTab(groups.find((group) => group.key === key)!.tabs[0])} items={groups.map(({ key, label }) => ({ key, label }))} />
+      <Tabs size="small" type="card" activeKey={activeTab} onChange={selectTab} items={tabs.filter((tab) => activeGroup.tabs.includes(tab.key))} />
+    </div>
     <Drawer title={detail?.title ?? '原始业务记录'} open={!!detail} onClose={() => setDetail(undefined)} width={560}>{detail ? <Descriptions bordered column={1} items={detail.fields.map((field) => ({ key: field.label, label: field.label, children: field.value }))} /> : <Empty />}</Drawer>
   </div>;
 }

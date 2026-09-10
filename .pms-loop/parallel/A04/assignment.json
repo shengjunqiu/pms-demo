@@ -10,9 +10,9 @@
   "branch": "pms/estimate",
   "base_commit": "527fa20",
   "contract_commit": "1d2c49e",
-  "status": "integrated_pending_acceptance",
+  "status": "accepted",
   "writer": "",
-  "last_confirmed_at": "2026-09-10",
+  "last_confirmed_at": "2026-09-11",
   "owned_paths": [
     "src/pages/opportunities/EarlyInvestmentPage.tsx",
     "src/pages/opportunities/EarlyInvestmentsPage.tsx",
@@ -26,7 +26,7 @@
   "acceptance_dependencies": [],
   "scenarios": "catalog对应页面的全部条件及正常/阻断/角色/版本同步场景",
   "fixtures": "现有固定故事；B01另建合法规划期对象",
-  "next_action": "R0029 GS10/11 integration precheck, engineering check and browser acceptance",
+  "next_action": "历史包页面已正式验收；当前无活跃agent，关闭旧调度归属。UI改造使用新包。",
   "delivery_commits": [
     "da90ade",
     "5fea9bb"

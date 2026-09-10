@@ -340,8 +340,8 @@ test('未知商机、组织拒绝和已立项商机的真实项目下钻', async
   await navigate(page, '/opportunities/OPP-001');
   await page.getByRole('link', { name: '已转入项目：福建省晋江市岸海防综合治理平台', exact: true }).click();
   await expect(page).toHaveURL('/projects/P-001');
-  await expect(page.getByRole('heading', { name: 'HS-01 项目详情总览', exact: true })).toBeVisible();
-  await expect(page.getByText('P-001 · 福建省晋江市岸海防综合治理平台', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '福建省晋江市岸海防综合治理平台', exact: true })).toBeVisible();
+  await expect(page.locator('.ant-select[aria-label="切换项目"]')).toContainText('P-001 福建省晋江市岸海防综合治理平台');
   await role(page, '财务专员');
   await page.evaluate(async () => {
     const path = '/src/mock/business.ts';

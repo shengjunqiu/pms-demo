@@ -22,9 +22,9 @@
     "src/pages/initiation/InitiationShared.tsx"
   ],
   "shared_changes": "root only",
-  "status": "integrated",
+  "status": "accepted",
   "writer": "",
-  "last_confirmed_at": "2026-09-10",
+  "last_confirmed_at": "2026-09-11",
   "development_dependencies": [
     "published contract commit"
   ],
@@ -33,7 +33,7 @@
   ],
   "scenarios": "Assigned in collaboration task; normal, role, immutable history and cross-domain consistency checks",
   "fixtures": "P006 receipts / actual initiation rounds",
-  "next_action": "验收冲刺库存；只准备场景与缺陷，不从旧分支继续普通开发",
+  "next_action": "历史包页面已正式验收；当前无活跃agent，关闭旧调度归属。UI改造使用新包。",
   "delivery_commits": [
     "36a0432",
     "20bd258"

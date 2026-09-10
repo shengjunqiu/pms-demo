@@ -1,7 +1,7 @@
 import { marginReason } from '@/utils/sensitive';
 import { canViewSensitiveField } from '@/mock/configuration-access';
 import { useState } from 'react';
-import { Alert, Button, Card, Col, Collapse, Empty, Progress, Radio, Row, Space, Table, Tabs, Tag, Typography } from 'antd';
+import { Alert, Button, Card, Col, Empty, Popover, Progress, Radio, Row, Space, Table, Tabs, Tag, Typography } from 'antd';
 import {
   ProjectOutlined,
   DollarOutlined,
@@ -53,10 +53,9 @@ export function GL01DashboardPage() {
   };
   const selectedColumns = columnsByTab[analysis as keyof typeof columnsByTab] ?? columnsByTab.cost;
   const content = <>
-    <ProjectFilters params={params} onChange={setParams} /><AnalysisTools storageKey="pms-dashboard-views" params={params} onChange={setParams} />
-    <Space wrap style={{ marginBottom: 12 }}><Typography.Text type="secondary">口径：项目规模含未签与运维；签约额排除未签；毛利按预计项目收入减滚动成本；回款完成率=到期计划实收/到期应收。</Typography.Text></Space>
+    <ProjectFilters compact params={params} onChange={setParams} />
     <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>{[
-      { label: '在管项目', value: String(scope.length), unit: '个', icon: <ProjectOutlined />, action: () => drill(), statusText: '运行正常', statusType: 'healthy' as const },
+      { label: '在管项目', value: String(scope.length), unit: '个', icon: <ProjectOutlined />, action: () => drill(), statusText: '当前筛选范围', statusType: 'info' as const },
       { label: '已签合同总额', value: receipt.signed, icon: <DollarOutlined />, action: () => drill({ metric: 'signed' }) },
       { label: '有效预算', value: kpi.totalBudgetAmount, icon: <FundOutlined />, action: () => drill() },
       { label: '实时滚动成本', value: kpi.totalRollingCost, icon: <LineChartOutlined />, action: () => drill() },
@@ -77,19 +76,27 @@ export function GL01DashboardPage() {
         />
       </Col>
     ))}</Row>
+    {!!scope.length && <>
+      <Row gutter={[16, 16]} className="pms-focus-row"><Col span={14}><Card size="small" title={`重点异常项目（${exceptions.length}）`} extra={<Button type="link" onClick={() => exception()}>全部异常</Button>}><Table rowKey="id" size="small" pagination={false} dataSource={[...exceptions].sort((a, b) => (b.health === 'red' ? 1 : 0) - (a.health === 'red' ? 1 : 0) || b.calc.variance - a.calc.variance).slice(0, 3)} columns={[{ title: '项目', width: '43%', render: (_, p) => <Button type="link" style={{ whiteSpace: 'normal', textAlign: 'left' }} onClick={() => goProject(p.id)}>{p.name}</Button> }, { title: '原因', dataIndex: 'healthReason', render:(value:string)=>marginReason(value,!!canViewMargin) }]} /></Card></Col><Col span={10}><Card size="small" title={`待决策（${pending.length}）`} extra={<Button type="link" onClick={() => navigate(`/executive/decisions?${query()}`)}>全部事项</Button>}>
+        {pending.slice(0, 2).map((d) => <div key={d.id} className="pms-decision"><div className="pms-decision-title">{d.projectName}</div><div><Tag>{d.type}</Tag>影响 <MoneyText value={d.impactAmount} signed /></div><Typography.Text type="secondary">{d.level} · 提交于 {d.createdAt}</Typography.Text><div><Button type="link" onClick={() => navigate(`${d.targetRoute}?${query()}`)}>查看原审批</Button></div></div>)}{!pending.length && <Empty description="当前范围无待决策事项" />}
+      </Card></Col></Row>
+    </>}
     <Space wrap size={[20, 8]} style={{ marginBottom: 16 }}><span>预计项目收入 <MoneyText value={kpi.totalRevenue} /></span><span>冻结概算 <MoneyText value={estimate} /></span><span>预算毛利 {canViewMargin ? <MoneyText value={sumMoney([kpi.totalRevenue, -kpi.totalBudgetAmount])} /> : '已隐藏'}</span><span>预测毛利率 {canViewMargin ? formatPercent(kpi.weightedGrossMarginRate) : '已隐藏'}</span><span>毛利偏差 {canViewMargin ? <MoneyText value={-kpi.totalCostVariance} signed /> : '已隐藏'}</span><span>已收 <MoneyText value={receipt.paid} /></span><Button type="link" onClick={() => exception({ exception: 'receipt' })}>逾期 <MoneyText value={receipt.overdue} /></Button></Space>
     <Space wrap style={{ marginBottom: 16 }}>{[{ label: '在建', rows: scope.filter((p) => p.phase === '执行'), metric: 'construction' }, { label: '未签立项', rows: scope.filter((p) => p.isUnsigned), metric: 'unsigned' }, { label: '验收收尾', rows: scope.filter((p) => p.phase === '收尾'), metric: 'closing' }, { label: '运维', rows: scope.filter((p) => p.isMaintenance), metric: 'maintenance' }].map((group) => <Button key={group.label} disabled={!group.rows.length} onClick={() => drill({ metric: group.metric })}>{group.label} {group.rows.length} 个 · <MoneyText value={sumMoney(group.rows.map((p) => p.revenueAmount ?? p.contractAmount))} /></Button>)}</Space>
+    <details className="pms-analysis-options">
+      <summary>指标口径与常用视图</summary>
+      <div style={{ paddingTop: 12 }}><AnalysisTools storageKey="pms-dashboard-views" params={params} onChange={setParams} />
+    <Space wrap style={{ marginBottom: 12 }}><Typography.Text type="secondary">口径：项目规模含未签与运维；签约额排除未签；毛利按预计项目收入减滚动成本；回款完成率=到期计划实收/到期应收。</Typography.Text></Space>
+      </div>
+    </details>
     {!scope.length ? <Empty description="当前筛选无项目，请调整条件" /> : <>
       <Row gutter={16} style={{ marginBottom: 16 }}><Col span={12}><Card size="small" title="四阶段项目分布 · 预计项目金额"><Table rowKey="stage" size="small" pagination={false} dataSource={stages} columns={[{ title: '四算阶段', render: (_, r) => <Button type="link" disabled={!r.count} onClick={() => drill({ stage: r.stage })}>{r.stage}</Button> }, { title: '数量', dataIndex: 'count' }, { title: '金额（万元）', dataIndex: 'amount', render: (v: number) => <MoneyText value={v} /> }]} /></Card></Col>
       <Col span={12}><Card size="small" title="项目健康度 · 最严重因素优先">{health.map((h) => <Row key={h.key} align="middle" gutter={8}><Col span={6}><Button type="link" disabled={!h.count} onClick={() => exception({ health: h.key })}>{h.name} {h.count}</Button></Col><Col span={18}><Progress percent={percentage(h.count, scope.length) ?? 0} format={(v) => `${v?.toFixed(1)}%`} strokeColor={h.color} size="small" /></Col></Row>)}<Typography.Text type="secondary">关注/预警/高风险共 {health.filter((h) => h.key !== 'green').reduce((n, h) => n + h.count, 0)} 项；点击查看原始原因。</Typography.Text></Card></Col></Row>
       <Card size="small" title="经营与执行分析" extra={<Button type="link" onClick={() => drill()}>查看全部项目</Button>}><Tabs activeKey={analysis} onChange={(key) => { const next = new URLSearchParams(params); next.set('analysis', key); setParams(next, { replace: true }); }} items={[['progress', '进度'], ['cost', '成本'], ['margin', '毛利'], ['receipt', '回款'], ['four', '四算']].map(([key, label]) => ({ key, label }))} /><Table rowKey="id" size="small" dataSource={rows} pagination={{ pageSize: 5, showSizeChanger: false }} columns={[{ title: '项目', width: 300, render: (_, p) => <Button type="link" style={{ whiteSpace: 'normal', textAlign: 'left' }} onClick={() => goProject(p.id)}>{p.name}</Button> }, ...selectedColumns]} /></Card>
-      <Row gutter={16} style={{ marginTop: 16 }}><Col span={14}><Card size="small" title={`重点异常项目（${exceptions.length}）`} extra={<Button type="link" onClick={() => exception()}>全部异常</Button>}><Table rowKey="id" size="small" pagination={false} dataSource={[...exceptions].sort((a, b) => (b.health === 'red' ? 1 : 0) - (a.health === 'red' ? 1 : 0) || b.calc.variance - a.calc.variance).slice(0, 5)} columns={[{ title: '项目', render: (_, p) => <Button type="link" style={{ whiteSpace: 'normal', textAlign: 'left' }} onClick={() => goProject(p.id)}>{p.name}</Button> }, { title: '原因', dataIndex: 'healthReason', render:(value:string)=>marginReason(value,!!canViewMargin) }]} /></Card></Col><Col span={10}><Card size="small" title={`待决策（${pending.length}）`} extra={<Button type="link" onClick={() => navigate(`/executive/decisions?${query()}`)}>全部事项</Button>}>
-        {pending.slice(0, 4).map((d) => <div key={d.id} style={{ padding: '10px 0', borderBottom: '1px solid #f0f0f0' }}><Typography.Text strong>{d.projectName}</Typography.Text><div><Tag>{d.type}</Tag>影响 <MoneyText value={d.impactAmount} signed /></div><Typography.Text type="secondary">{d.level} · 提交于 {d.createdAt}</Typography.Text><div><Button type="link" onClick={() => navigate(`${d.targetRoute}?${query()}`)}>查看原审批</Button></div></div>)}{!pending.length && <Empty description="当前范围无待决策事项" />}
-      </Card></Col></Row>
+
     </>}
   </>;
-  return <><PageHeader title="GL-01 项目经营驾驶舱" description={`集团经营规模、四算、健康异常与待决策 · 更新至 ${AS_OF_DATE} 18:30 · 金额单位：万元`} breadcrumbs={[{ title: '首页', href: '/' }]} extra={<Button onClick={() => setRefresh((n) => n + 1)}>刷新数据{refresh ? `（已刷新${refresh}次）` : ''}</Button>} />
-    {allowed && <Collapse size="small" style={{ marginBottom: 16 }} items={[{ key: 'demo', label: '演示场景', children: <Radio.Group value={mode} onChange={(e) => { const next = new URLSearchParams(params); next.set('demo', e.target.value); setParams(next); }} options={[{ value: 'normal', label: '正常' }, { value: 'delayed', label: '部分数据延迟' }, { value: 'empty', label: '无数据' }, { value: 'denied', label: '无权限' }, { value: 'loading', label: '计算中' }, { value: 'changed', label: '口径变更' }]} /> }]} />}
+  return <><PageHeader title="GL-01 项目经营驾驶舱" description={`集团经营规模、四算、健康异常与待决策 · 更新至 ${AS_OF_DATE} 18:30 · 金额单位：万元`} breadcrumbs={[{ title: '首页', href: '/' }]} extra={<Space>{allowed && <Popover trigger="click" placement="bottomRight" title="演示场景" content={<Radio.Group value={mode} onChange={(e) => { const next = new URLSearchParams(params); next.set('demo', e.target.value); setParams(next); }} options={[{ value: 'normal', label: '正常' }, { value: 'delayed', label: '部分数据延迟' }, { value: 'empty', label: '无数据' }, { value: 'denied', label: '无权限' }, { value: 'loading', label: '计算中' }, { value: 'changed', label: '口径变更' }]} />}><Button>演示场景</Button></Popover>}<Button onClick={() => setRefresh((n) => n + 1)}>刷新数据{refresh ? `（已刷新${refresh}次）` : ''}</Button></Space>} />
     {mode === 'delayed' && <Alert showIcon type="warning" style={{ marginBottom: 16 }} message="演示：采购来源同步延迟，暂使用最近已确认快照" description="采购快照截至2026-09-08 18:30，其他来源截至2026-09-09 18:30；不把未确认金额加入已发生成本。" />}
     {mode === 'changed' && <Alert showIcon type="info" style={{ marginBottom: 16 }} message="演示口径公告：回款完成率按到期计划计算" description="分母为到期应收，不再使用合同总额。合同余额、到期应收和逾期分别展示，历史预算与结算快照不回写。" />}
     {!allowed || mode === 'denied' ? <StateView type="403" /> : mode === 'loading' ? <StateView type="loading" /> : content}

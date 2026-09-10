@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Tag, Typography, Space, Breadcrumb, Divider } from 'antd';
+import { Typography, Space, Breadcrumb } from 'antd';
 import { RouteItem } from '@/routes/manifest';
 
 const { Title, Paragraph } = Typography;
@@ -22,14 +22,14 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   extra,
   breadcrumbs = [{ title: '首页', href: '/' }],
 }) => {
-  const displayTitle = title || item?.title || '页面标题';
+  const displayTitle = (title || item?.title || '页面标题').replace(/^[A-Z]{2}-\d{2}\s+/, '');
   const displayDesc = description || item?.upstream_feature_scope;
 
   return (
-    <div style={{ marginBottom: 16 }}>
+    <div className="pms-page-header">
       {breadcrumbs && breadcrumbs.length > 0 && (
         <Breadcrumb
-          style={{ marginBottom: 12 }}
+          style={{ marginBottom: 8 }}
           items={breadcrumbs.map((b) => ({ title: b.href ? <Link to={b.href}>{b.title}</Link> : b.title }))}
         />
       )}
@@ -39,8 +39,6 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             <Title level={4} style={{ margin: 0 }}>
               {displayTitle}
             </Title>
-            {item && <Tag color="blue">{item.id}</Tag>}
-            {item && <Tag color="cyan">{item.kind}</Tag>}
             {tags?.map((t, i) => (
               <React.Fragment key={i}>{t}</React.Fragment>
             ))}
@@ -53,7 +51,6 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         </div>
         {extra && <div>{extra}</div>}
       </div>
-      <Divider style={{ margin: '12px 0 16px' }} />
     </div>
   );
 };

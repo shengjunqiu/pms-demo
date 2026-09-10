@@ -145,9 +145,11 @@ test('CF07发布财务页面与人员单价限制，CF08保留发布差异及访
   await screenshots(page, 'CF07-finance-restrictions-published');
 
   await role(page, '财务专员');
-  await page.locator('.ant-menu-submenu-title').filter({ hasText: '结算与收尾阶段' }).click();
-  await expect(page.getByRole('menuitem', { name: /^JS-07 / })).toBeVisible();
-  await expect(page.getByRole('menuitem', { name: /^JS-08 / })).toHaveCount(0);
+  const settlementMenu = page.getByRole('menuitem', { name: /结算与收尾阶段/ });
+  if (await settlementMenu.getAttribute('aria-expanded') !== 'true') await settlementMenu.click();
+  await expect(settlementMenu).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.getByRole('menuitem', { name: '四算对比分析', exact: true })).toBeVisible();
+  await expect(page.getByRole('menuitem', { name: '项目经营结果', exact: true })).toHaveCount(0);
   await navigate(page, resultPath);
   await expect(page.getByText('403 无访问权限', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: '财务确认收款', exact: true })).toHaveCount(0);

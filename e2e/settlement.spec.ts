@@ -187,7 +187,7 @@ test('OPS007真实运维原单经财务单次入账，与独立周期关联', as
   await page.goto('/workbench/project-manager');
   await role(page, 'PMO负责人');
   await navigate(page, '/operations/OPS-007?tab=costs');
-  await expect(page.getByRole('heading', { name: 'JS-12 运维服务管理', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '运维服务管理', exact: true })).toBeVisible();
   await page.getByRole('button', { name: '填报运维工时 / 费用', exact: true }).click();
   const dialog = page.locator('.ant-modal:visible');
   await dialog.getByLabel('原工时单 / 报销单编号（唯一）', { exact: true }).fill('E2E-OPS007-EXP-001');
