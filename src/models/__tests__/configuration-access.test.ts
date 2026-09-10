@@ -24,3 +24,5 @@ it('配置审批节点给出的动态角色按当前轮次授予，指定对象�
  selectAccessPolicy(dynamic,finance.role)!.actions=selectAccessPolicy(dynamic,finance.role)!.actions.filter(a=>a!=='decide-initiation');expect(canAccessAction(dynamic,finance,'decide-initiation','INIT-TEST')).toBe(false);
  expect(canAccessAction(dynamic,{role:'pmo'},'decide-initiation','UNSUBMITTED')).toBe(true);
 });
+
+it('确认实际收款仅财务白名单可进入，配置仍可收紧',()=>{const s=fixture();expect(canAccessAction(s,finance,'confirm-project-receipt')).toBe(true);for(const role of ['admin','executive','pmo','market','project-manager','solution-tech'] as const)expect(canAccessAction(s,{role},'confirm-project-receipt')).toBe(false);selectAccessPolicy(s,'finance')!.actions=selectAccessPolicy(s,'finance')!.actions.filter(a=>a!=='confirm-project-receipt');expect(canAccessAction(s,finance,'confirm-project-receipt')).toBe(false);});
