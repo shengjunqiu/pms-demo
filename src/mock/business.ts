@@ -1,3 +1,4 @@
+import { applyLaborAction, type LaborAction, type LaborEntry } from '@/mock/labor';
 import { applyDeliverableAction, type DeliverableAction, type DocumentDetails, type QualityPlan } from '@/mock/deliverables';
 import { applyReportAction, type ReportAction } from '@/mock/reports';
 import { applyCostOrderAction, type CostOrder, type CostOrderAction } from '@/mock/cost-orders';
@@ -27,7 +28,7 @@ export interface PlanRequest {
 }
 export interface Material extends DocumentDetails { id: string; projectId: string; name: string; required: boolean; status: '缺失' | '待提交' | '待审核' | '通过' | '驳回' }
 export interface BusinessState {
-  qualityPlans: Record<string, QualityPlan>; dailyReports: DailyReport[]; weeklyReports: WeeklyReport[]; costOrders: CostOrder[]; requirements: Requirement[]; ticketMeta: Record<string, TicketMeta>; tasks: WbsTask[]; planRequests: PlanRequest[]; projects: Project[]; budgets: BudgetVersion[]; baselines: BaselineVersion[];
+  laborEntries: LaborEntry[]; qualityPlans: Record<string, QualityPlan>; dailyReports: DailyReport[]; weeklyReports: WeeklyReport[]; costOrders: CostOrder[]; requirements: Requirement[]; ticketMeta: Record<string, TicketMeta>; tasks: WbsTask[]; planRequests: PlanRequest[]; projects: Project[]; budgets: BudgetVersion[]; baselines: BaselineVersion[];
   estimates: EstimateVersion[]; milestones: Milestone[]; settlements: SettlementRecord[];
   issues: Issue[]; risks: Risk[]; bugs: Bug[]; costs: CostItem[];
   changes: ProjectChange[]; managementApprovals: ManagementApproval[]; approvals: Approval[]; decisions: DecisionItem[]; acceptances: AcceptanceRecord[];
@@ -35,7 +36,7 @@ export interface BusinessState {
   audit: { id: string; actor: string; action: string; target: string; date: string }[];
 }
 export function createBusinessState(): BusinessState {
-  return structuredClone({ qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects, budgets: mockBudgetVersions, baselines: mockBaselineVersions,
+  return structuredClone({ laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects, budgets: mockBudgetVersions, baselines: mockBaselineVersions,
     estimates: mockEstimateVersions, milestones: mockMilestones, settlements: mockSettlements,
     issues: mockIssues, risks: mockRisks, bugs: mockBugs, costs: mockCostItems, approvals: [], changes: mockChanges, managementApprovals: [],
     decisions: mockDecisions, acceptances: mockAcceptances, lockedProjects: ['P-008'], maintenanceCosts: [], audit: [],
@@ -45,7 +46,7 @@ export function createBusinessState(): BusinessState {
     }))),
   });
 }
-export type BusinessAction = DeliverableAction | ReportAction | CostOrderAction | TicketAction
+export type BusinessAction = LaborAction | DeliverableAction | ReportAction | CostOrderAction | TicketAction
   | { type: 'submit-budget'; projectId: string; budget: BudgetVersion; reason: string }
   | { type: 'review'; approvalId: string; approve: boolean; opinion: string }
   | { type: 'review-management'; id: string; approve: boolean; opinion: string }
@@ -69,7 +70,9 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     return value;
   };
   let target = '';
-  if (action.type === 'document-action' || action.type === 'add-document' || action.type === 'quality-plan' || action.type === 'quality-check' || action.type === 'complete-milestone') {
+  if (action.type === 'submit-labor' || action.type === 'review-labor') {
+    target = applyLaborAction(state, action, actor);
+  } else if (action.type === 'document-action' || action.type === 'add-document' || action.type === 'quality-plan' || action.type === 'quality-check' || action.type === 'complete-milestone') {
     target = applyDeliverableAction(state, action, actor);
   } else if (action.type === 'save-daily' || action.type === 'create-weekly' || action.type === 'save-weekly') {
     target = applyReportAction(state, action, actor);

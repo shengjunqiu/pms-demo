@@ -159,8 +159,8 @@
       "round": "R0014"
     },
     "HS-09": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0018"
     },
     "HS-10": {
       "status": "done",
@@ -734,6 +734,37 @@
         ".pms-loop/runs/R0017/artifacts/hs-17-1280.png": "4da321bbf794495ce00f9034bbef4e03aa8b87bf2db93e5a31377a19d6a8565c",
         ".pms-loop/runs/R0017/checks.json": "5a8485bafdc7284da6defc50d101de1aabc67e79d0705880deb0c369bbae3971",
         ".pms-loop/runs/R0017/evidence.json": "b31392955d84bcb0aff9f7c8ed42553bed17e784c49c664479e60307ec861606"
+      }
+    },
+    {
+      "id": "R0018",
+      "items": [
+        "HS-09"
+      ],
+      "started_at": "2026-09-10T00:42:53+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-10T00:57:53+00:00",
+      "revision": "ab742fe6117cf994e3091c54e425e444c01d7bb8dcbad8f776f40b21bbd6b8be",
+      "proof": {
+        ".pms-loop/runs/R0018/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0018/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0018/build.log": "6cb82e67177b76a1de85e7c2a516a7634a33c95b37210b6988be9661600e05ff",
+        ".pms-loop/runs/R0018/test-domain.log": "319626d4a6b9f1886a732bb83b1b7ed20bebf249e0f73b6fdfdeec5f22c9a235",
+        ".pms-loop/runs/R0018/artifacts/console.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        ".pms-loop/runs/R0018/artifacts/approved-labor.txt": "ce34c6bb9a6360d57a5c334028fa3798021bec2ff2fc48bc24bc9a0bb317b45f",
+        ".pms-loop/runs/R0018/artifacts/labor-todo.txt": "51c658e26c0cb3a0956a227f8873af799af8b30f414318d49e63ee2abb9edcaa",
+        ".pms-loop/runs/R0018/artifacts/member-permissions.txt": "f7771807a9f6ff44c9aff56e3f4e6e029f12530393146da27d648bd6ac648697",
+        ".pms-loop/runs/R0018/artifacts/member-view.png": "4c20e7e0cd0c2ab275955a2a45da8b031a53920cb5b0121d85759925c85f2afc",
+        ".pms-loop/runs/R0018/artifacts/hs-09-1440.png": "442bf753c4eb00ebecfdd1a2f16baf0838ad73d378832e3ee83468b54b11591e",
+        ".pms-loop/runs/R0018/artifacts/hs-09-1280.png": "fa6dceaabd0f352c81117f1f8366447ab83f1faab1b2d834d2b78d65c96f9783",
+        ".pms-loop/runs/R0018/checks.json": "0ca5c62c3e6be681852997b09f7f9accf9353f9e38aa76c13fe068ad02f35343",
+        ".pms-loop/runs/R0018/evidence.json": "39ee3bbc12ac0fb523a685474fdb1fecf4cdedf4783267d52dab0678c9040c99"
       }
     }
   ],

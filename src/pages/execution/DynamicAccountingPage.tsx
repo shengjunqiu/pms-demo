@@ -85,6 +85,7 @@ export function DynamicAccountingPage() {
         { key: 'owner', label: '项目责任人', children: p.pmName }, { key: 'upstream', label: '上游单据', children: sourceVoucher?.upstreamId ?? '本轮录入凭证' },
         { key: 'description', label: '摘要', children: source.description },
       ]} />
+      {data.laborEntries.some((e) => e.id === source.sourceId) && <Button onClick={() => navigate(`/projects/${p.id}/labor-cost?entry=${source.sourceId}`)}>进入工时原单与成本基准</Button>}
       {data.costOrders.find((o) => o.id === source.sourceId) && <Button onClick={() => { const o = data.costOrders.find((o) => o.id === source.sourceId)!; navigate(`/projects/${p.id}/${o.kind === 'procurement' ? 'procurement' : o.kind === 'outsource' ? 'outsourcing' : 'expenses'}?source=${o.id}`); }}>进入原申请及履约记录</Button>}
       {upstream && <Card title="上游记录摘要" size="small" style={{ marginTop: 16 }}>{'supplierName' in upstream ? `供应商：${upstream.supplierName}` : 'vendorName' in upstream ? `外包单位：${upstream.vendorName}` : 'applicant' in upstream ? `报销人：${upstream.applicant}` : `填报人：${upstream.userName} · ${upstream.hours} 小时`}<p>单据状态：{upstream.status}</p><Text type="secondary">上游单据可能分期确认；此处展示关联关系，核算只累计本凭证金额。</Text></Card>}
       <Alert style={{ marginTop: 16 }} type="info" message="经营穿透为只读查看；关闭后保留科目、查询与上一级筛选。" />

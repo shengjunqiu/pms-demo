@@ -1,0 +1,202 @@
+- complementary:
+  - img "safety-certificate":
+  - generic: 企业四算管控平台
+  - menu:
+    - menuitem "dashboard 领导经营驾驶舱" [expanded]:
+      - img "dashboard":
+      - generic: 领导经营驾驶舱
+    - menu:
+      - menuitem "GL-01 项目经营驾驶舱":
+        - generic: GL-01 项目经营驾驶舱
+      - menuitem "GL-02 四算经营专题":
+        - generic: GL-02 四算经营专题
+      - menuitem "GL-03 项目穿透分析":
+        - generic: GL-03 项目穿透分析
+      - menuitem "GL-04 项目组合分析":
+        - generic: GL-04 项目组合分析
+      - menuitem "GL-05 项目异常中心":
+        - generic: GL-05 项目异常中心
+      - menuitem "GL-06 领导待决策事项":
+        - generic: GL-06 领导待决策事项
+    - menuitem "appstore 工作台与待办" [expanded]:
+      - img "appstore":
+      - generic: 工作台与待办
+    - menu:
+      - menuitem "WK-01 项目经理工作台":
+        - generic: WK-01 项目经理工作台
+      - menuitem "WK-02 我的待办中心":
+        - generic: WK-02 我的待办中心
+    - menuitem "dollar 商机与概算阶段":
+      - img "dollar":
+      - generic: 商机与概算阶段
+    - menuitem "project 预算与立项阶段":
+      - img "project":
+      - generic: 预算与立项阶段
+    - menuitem "schedule 核算与执行阶段":
+      - img "schedule":
+      - generic: 核算与执行阶段
+    - menuitem "check-circle 结算与收尾阶段":
+      - img "check-circle":
+      - generic: 结算与收尾阶段
+- banner:
+  - button "折叠或展开导航":
+    - img "menu-fold":
+  - generic: HS-09
+  - strong: 工时与人力成本
+  - generic: 专题
+  - generic: "基准日: 2026-09-09"
+  - generic: "角色:"
+  - generic "模拟身份":
+    - combobox "模拟身份"
+    - img "user":
+    - generic: 项目经理 (张建国)
+  - img "user":
+  - generic: 张建国
+- main:
+  - navigation:
+    - list:
+      - link "首页":
+        - /url: /
+      - listitem: /
+      - link "福建省晋江市岸海防综合治理平台":
+        - /url: /projects/P-001
+      - listitem: /
+      - listitem: 工时与人力成本
+  - heading "HS-09 工时与人力成本" [level=4]
+  - generic: P-001 · 福建省晋江市岸海防综合治理平台 · 交付中心一部 · 执行/开发实施
+  - button "查看人力核算明细":
+    - generic: 查看人力核算明细
+  - button "填报本人工时":
+    - generic: 填报本人工时
+  - separator
+  - alert:
+    - img "info-circle":
+    - generic: 演示规则 LAB-2026-01：按0.5小时填报，同人跨项目每日最多8小时；仅执行项目成员填报，主PM审核（含本人）。通过后一次计费，优先从未发生人力承诺转为已发生。
+  - generic: 当前阶段人力预算释放
+  - table:
+    - rowgroup:
+      - 'row "人力预算 : 1,281.47 万元 阶段累计释放 75% : 961.10 万元 累计实际人力 : 742.56 万元"':
+        - 'cell "人力预算 : 1,281.47 万元"':
+          - generic: "人力预算 :"
+          - generic: 1,281.47
+          - text: 万元
+        - 'cell "阶段累计释放 75% : 961.10 万元"':
+          - generic: "阶段累计释放 75% :"
+          - generic: "961.10"
+          - text: 万元
+        - 'cell "累计实际人力 : 742.56 万元"':
+          - generic: "累计实际人力 :"
+          - generic: "742.56"
+          - text: 万元
+      - 'row "待审占用 : 0.00 万元 释放可用 : 218.54 万元 未发生人力承诺 : 376.23 万元"':
+        - 'cell "待审占用 : 0.00 万元"':
+          - generic: "待审占用 :"
+          - generic: "0.00"
+          - text: 万元
+        - 'cell "释放可用 : 218.54 万元"':
+          - generic: "释放可用 :"
+          - generic: "218.54"
+          - text: 万元
+        - 'cell "未发生人力承诺 : 376.23 万元"':
+          - generic: "未发生人力承诺 :"
+          - generic: "376.23"
+          - text: 万元
+  - paragraph: 启动60% → 开发完成75% → 内部初验90% → 客户终验100%；按已达成里程碑释放，超额须先审批。实际以核算凭证为准。
+  - textbox "工时查询":
+    - /placeholder: 原单、姓名或工作内容
+  - generic "工时状态":
+    - combobox "工时状态"
+    - generic: 全部状态
+  - textbox "工时开始日期":
+    - /placeholder: 开始 YYYY-MM-DD
+  - textbox "工时结束日期":
+    - /placeholder: 结束 YYYY-MM-DD
+  - button "重置工时查询":
+    - generic: 重置工时查询
+  - tablist:
+    - tab "本轮填报（1）" [selected]
+    - tab "投入分析"
+    - tab "历史导入（13）"
+  - tabpanel "本轮填报（1）":
+    - table:
+      - rowgroup:
+        - row "工时原单 人员 / 日期 任务 / 工作内容 小时 状态 折算成本（万元） 办理":
+          - columnheader "工时原单"
+          - columnheader "人员 / 日期"
+          - columnheader "任务 / 工作内容"
+          - columnheader "小时":
+            - generic: 小时
+          - columnheader "状态"
+          - columnheader "折算成本（万元）"
+          - columnheader "办理"
+      - rowgroup:
+        - generic: 小时
+        - row "LAB-1 张建国 2026-09-09 需求调研与确认 复核需求确认记录并整理联调清单 4 已通过 0.06 原单详情":
+          - cell "LAB-1":
+            - button "LAB-1":
+              - generic: LAB-1
+          - cell "张建国 2026-09-09":
+            - text: 张建国
+            - generic: 2026-09-09
+          - cell "需求调研与确认 复核需求确认记录并整理联调清单":
+            - text: 需求调研与确认
+            - generic: 复核需求确认记录并整理联调清单
+          - cell "4"
+          - cell "已通过":
+            - generic: 已通过
+          - cell "0.06"
+          - cell "原单详情":
+            - button "原单详情":
+              - generic: 原单详情
+    - list:
+      - listitem "上一页":
+        - button "left" [disabled]:
+          - img "left":
+      - listitem "1":
+        - generic: "1"
+      - listitem "下一页":
+        - button "right" [disabled]:
+          - img "right":
+- dialog "工时原单与成本依据":
+  - button "关闭":
+    - img "close":
+  - generic: 工时原单与成本依据
+  - table:
+    - rowgroup:
+      - row "工时原单 LAB-1":
+        - rowheader "工时原单"
+        - cell "LAB-1"
+      - row "人员 / 日期 / 工时 张建国 / 2026-09-09 / 4小时":
+        - rowheader "人员 / 日期 / 工时"
+        - cell "张建国 / 2026-09-09 / 4小时"
+      - row "所属WBS TSK-0001 需求调研与确认":
+        - rowheader "所属WBS"
+        - cell "TSK-0001 需求调研与确认"
+      - row "工作内容 复核需求确认记录并整理联调清单":
+        - rowheader "工作内容"
+        - cell "复核需求确认记录并整理联调清单"
+      - row "状态 已通过":
+        - rowheader "状态"
+        - cell "已通过"
+      - row "提交时成本基准 LAB-2026-01 · 150元/小时":
+        - rowheader "提交时成本基准"
+        - cell "LAB-2026-01 · 150元/小时"
+      - row "折算成本（万元） 0.06":
+        - rowheader "折算成本（万元）"
+        - cell "0.06":
+          - generic: "0.06"
+      - row "提交时项目基线 BASE-VER-001":
+        - rowheader "提交时项目基线"
+        - cell "BASE-VER-001"
+      - row "审核记录 2026-09-09 张建国：核对投入记录后确认四小时有效":
+        - rowheader "审核记录"
+        - cell "2026-09-09 张建国：核对投入记录后确认四小时有效"
+      - row "成本确认 LEDGER-LAB-1":
+        - rowheader "成本确认"
+        - cell "LEDGER-LAB-1"
+  - button "审核工时通过" [disabled]:
+    - generic: 审核工时通过
+  - button "驳回工时" [disabled]:
+    - generic: 驳回工时
+  - button "查看已确认人力凭证":
+    - generic: 查看已确认人力凭证

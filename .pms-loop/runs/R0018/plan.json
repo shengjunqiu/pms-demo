@@ -1,0 +1,74 @@
+{
+  "round": "R0018",
+  "items": [
+    {
+      "id": "HS-09",
+      "title": "工时与人力成本",
+      "route": "/projects/:id/labor-cost",
+      "kind": "专题",
+      "roles": "项目经理、项目成员、财务",
+      "phase": 6,
+      "feature_ids": [
+        "HS-040",
+        "HS-041",
+        "HS-042",
+        "HS-043",
+        "HS-044",
+        "HS-045"
+      ],
+      "upstream_feature_scope": "工时、预算、实际人力成本",
+      "source_lines": {
+        "pages": 139,
+        "brief": 438
+      },
+      "criteria": [
+        "工时填报审核与阶段/WBS/人员人力成本预算实际分析",
+        "成员/日期累计/额度/阶段校验，审核后计成本，隐藏成员成本单价"
+      ]
+    }
+  ],
+  "sources": {
+    "prd": {
+      "path": "docs/项目管理平台PRD_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "6dac675ca22237b7fa59129eccc466a9e242d20f948c0b68e958a7227bb2bd1b"
+    },
+    "features": {
+      "path": "docs/项目管理平台详细功能清单_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "fabfac73b480ccaf01aa831ae3c5d0a6485e33fff80f517468b2b6c52829ddfb"
+    },
+    "pages": {
+      "path": "docs/项目管理平台页面清单与原型设计说明_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "db1c548b5f5ef025eb90fef06422e132f003665fc7e6156dd706b7f095c994dc"
+    },
+    "brief": {
+      "path": "docs/项目管理平台高保真原型_AgentLoop开发任务书_V1.0.md",
+      "sha256": "286f917d5edc99a4a0c7da97515a3d6308cae7395fb287bbcd1846de60045b43"
+    }
+  },
+  "feature_references": {
+    "HS-040": {
+      "title": "工时填报",
+      "line": 291
+    },
+    "HS-041": {
+      "title": "工时校验",
+      "line": 292
+    },
+    "HS-042": {
+      "title": "工时审核",
+      "line": 293
+    },
+    "HS-043": {
+      "title": "人力成本计算",
+      "line": 294
+    },
+    "HS-044": {
+      "title": "工时分析",
+      "line": 295
+    },
+    "HS-045": {
+      "title": "预算释放约束",
+      "line": 296
+    }
+  }
+}
