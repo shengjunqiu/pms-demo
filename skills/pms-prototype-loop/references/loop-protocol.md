@@ -4,7 +4,7 @@
 
 `scripts/loop.py` 依赖 Python 3.10+ 标准库，适用于 macOS/Linux（文件锁和子进程组使用POSIX接口）。它不调用模型、不自动安装依赖、不运行后台无限循环；Agent在当前授权会话中执行“选择→实现→检查→证据→验收→下一轮”。跨会话依靠文件恢复。
 
-多 agent 模式下，本文件的状态命令与正式轮次只由协调者在集成目录执行。开发包的并发实施、自检和交付按 [并发协议](parallel-protocol.md) 进行；可在正式 `begin` 前准备，不改变本控制器的单活动轮次和证据校验规则。
+多 agent 模式下，本文件的状态命令与正式轮次只由协调者在集成目录执行。开发包的并发实施、自检和交付按 [并发协议](parallel-protocol.md) 进行；可在正式 `begin` 前准备，不改变本控制器的单活动轮次和证据校验规则。协调者另用 `scripts/pipeline.py --root "$PROJECT_ROOT"` 只读检查验收库存、WIP、重复归属和候选批次；它不调用或替代`begin/check/accept`，也不产生第二份完成状态。
 
 两种实际请求：
 
@@ -160,6 +160,7 @@ pages实际需完整72条且无重复，示例仅示结构。路由测试验证�
 ```bash
 python3 -B "$SKILL_DIR/scripts/validate_bundle.py" --root "$PROJECT_ROOT"
 PMS_TEST_PROJECT_ROOT="$PROJECT_ROOT" python3 -B "$SKILL_DIR/scripts/test_loop.py"
+python3 -B "$SKILL_DIR/scripts/test_pipeline.py"
 ```
 
 前者逐项核对原文ID、标题、路由、来源行、功能覆盖和Mock最低量；后者在临时目录验证控制器的失败、恢复、证据过期和最终门禁。测试中的合成截图/命令仅用于验证控制器，不能作为应用页面已完成的证据。技能前置信息另用skill-creator的quick_validate.py验证。

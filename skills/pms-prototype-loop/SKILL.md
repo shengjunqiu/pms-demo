@@ -37,6 +37,16 @@ python3 "$SKILL_DIR/scripts/loop.py" --root "$PWD" next
 
 并发开发包可在正式 `begin` 前实现和自检，以便多个包同时推进；协调者根据交付结果建立正式轮次并完成集成、检查和验收。开发包不得写正式进度或冒充已验收页。详细分工、交付、证据和恢复方法见 [并发协议](references/parallel-protocol.md)；项目剩余页面与首批安排读项目内 `docs/PARALLEL_DEVELOPMENT.md`（若存在）。只设计/检查技能时不进入应用开发。
 
+每次恢复、派发或准备正式轮次前运行只读流水线检查，先消化已集成待验收库存，不按空闲席位盲目增加开发包：
+
+```bash
+python3 "$SKILL_DIR/scripts/pipeline.py" --root "$PWD"
+# CI/调度治理需要把重复归属、漏分配和WIP超限视为失败时：
+python3 "$SKILL_DIR/scripts/pipeline.py" --root "$PWD" --strict --format json
+```
+
+有活动轮次时，报告根据真实run阶段区分“尚可修复”和“check通过后已冻结”；冻结期其他工作目录只准备下一轮、补自动化或修复独占模块。只有显式记录`acceptance_ready: true`、`acceptance_group`且验收依赖清空的分组才会成为正式轮次候选，其余只列为库存。`acceptance_sprint` 表示瓶颈在正式验收，应将空闲开发席位改为验收准备、自动化和缺陷修复，而不是继续堆积页面实现。
+
 ## 每轮工作
 
 1. **恢复事实**：读取 `DEV_PROGRESS.md`、结构化状态、活动轮次及源码。原文指纹改变时先阅读差异并维护目录映射，不仅更新哈希来绕过检查。

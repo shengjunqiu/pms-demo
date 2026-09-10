@@ -25,6 +25,27 @@ FND-01、FND-02 已验收。后续共享语义调整仍需验证；发现已有�
 
 本文件不修改四份原文、页面编号和需求优先级。执行方法见 [并发协议](../skills/pms-prototype-loop/references/parallel-protocol.md)，验收要求见 [验收说明](../skills/pms-prototype-loop/references/acceptance.md)。
 
+### 1.1 执行期切换：验收冲刺
+
+设计时的22/72和任务包安排只是起点。执行期间每次恢复先运行：
+
+```bash
+python3 skills/pms-prototype-loop/scripts/pipeline.py --root "$PWD"
+```
+
+当报告为`acceptance_sprint`时，说明开发产能已经超过正式验收吞吐。此时暂停普通页面新包，把团队临时调整为：
+
+| 槽位 | 职责 | 可写范围 |
+|---|---|---|
+| M | 当前正式轮次、唯一可见浏览器、证据与accept | 集成目录；check到accept期间不再写源码/docs |
+| P | 下一轮入口、角色、fixture、正常/阻断动作和预期 | 只读集成源码；准备材料放独立工作区 |
+| A | Playwright串行场景、重置、双宽截图、控制台采集 | 独立worktree的测试独占路径 |
+| F | 当前验收缺陷、未覆盖页面、最终E2E | 独立worktree和精确owned_paths |
+
+使用A/B双缓冲：A轮`begin`后可以完成本轮实现与修复，从正式`check`开始直到`accept`冻结集成目录；同期B轮只在外部worktree备料。A轮accept后开启一次短合入窗口，范围检查并接入B轮所需修复，再运行正式门禁。验收准备可以预写动作和预期，但不得预填实际观察或`passed: true`。集成待验收包回落到2个以内后，才恢复普通开发并发。
+
+调度治理要求：一个未完成页面只有一个当前包；重复旧包明确标记终态和替代包；活跃包移除已验收页面；空包关闭；未覆盖页先建立唯一分配。协调者核对当前集成版本后，只有同时写明`acceptance_ready: true`、不超过5页的`acceptance_group`且`acceptance_dependencies/remaining_dependencies`清空，脚本才将其列为可正式begin的闭环；否则只显示为已集成库存。脚本输出是诊断，不自动改`.pms-loop/state.json`或分配单。
+
 ## 2. 团队分工与目录归属
 
 | 角色 | 主责 | 独占业务目录（新增路径为开工时的约定） |

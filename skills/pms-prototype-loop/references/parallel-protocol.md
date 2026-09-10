@@ -48,9 +48,10 @@ python3 skills/pms-prototype-loop/scripts/check_delivery.py \
 | `integration_root / workdir / branch / base_commit` | 集成与开发目录、分支、共同起点 |
 | `contract_commit` | 本包依赖的公共接口提交号 |
 | `owned_paths / shared_changes` | 独占路径、已确认共享改动清单 |
-| `development_dependencies / acceptance_dependencies` | 开始实现与可正式验收的前置条件，分开记录 |
+| `development_dependencies / acceptance_dependencies` | 开始实现与可正式验收的计划前置，分开记录；delivery存在时，其`remaining_dependencies`是当前未解决项的权威列表，依赖解决后允许为空数组 |
+| `acceptance_ready / acceptance_group` | 仅协调者核对集成版本后将前者设为`true`；后者标识≤5页且共享角色、fixture、业务状态和连续跳转的闭环。缺字段表示尚未确认，不可直接begin |
 | `scenarios / fixtures` | 正常、阻断、角色、跨页场景，真实对象ID或创建步骤 |
-| `status / next_action` | `assigned / submitted / integrated / needs_revision / blocked` 与准确下一步；页面是否done只读正式状态 |
+| `status / next_action` | `assigned / in_progress / submitted / integrated / integrated_pending_acceptance / needs_revision / blocked / accepted / archived / superseded` 与准确下一步；页面是否done只读正式状态。`accepted`只表示该包所含页面已在正式状态完成，`superseded`必须指向替代包，均不得自行改页面状态 |
 | `writer / last_confirmed_at` | 活跃写入者agent标识及最近核实时间；恢复时仍须查询实际活动，不能因记录过期直接转派目录 |
 
 开发者交付：起点与最终提交号（或相对起点的补丁）、实际改动路径、共享改动说明、路由/真实ID/角色、测试命令与退出码、观察记录和证据位置、未解决依赖。不能只报告“完成了几个文件”。协调者检查 diff 的范围与完整性后才合入。
@@ -61,15 +62,40 @@ A交付后可在原worktree接下一包，先固定旧包交付提交/补丁，�
 
 需要跨包功能时，开发者报告具体依赖；可先实现已有数据支持的部分，交付为“待集成/待验收”，继续独立工作。**依赖未完成时不能隐藏原文要求的按钮、用提示替代下钻，或填假来源数据来获得验收。**
 
+## 流水线模式、WIP与双缓冲
+
+协调者恢复现场、派发新包或选择正式轮次前，先运行只读调度检查：
+
+```bash
+python3 skills/pms-prototype-loop/scripts/pipeline.py --root "$PWD"
+```
+
+该脚本只读取 `.pms-loop/state.json` 与 `.pms-loop/parallel/*/{assignment,delivery}.json`，不修改正式状态或调度记录。它输出活动轮次、基于run阶段的集成冻结状态、已集成待验收库存、重复页面归属、活跃包中的已验收页面、空包、未覆盖页面和显式就绪的验收分组。缺少`acceptance_ready: true`、`acceptance_group`或仍有验收依赖时只列为库存，不直接建议`begin`；`--batch-size`只控制库存展示切片。需要机器处理时用 `--format json`；治理检查用 `--strict`，任何错误或WIP超限都返回非零。
+
+默认WIP上限如下；可用命令行参数临时收紧，但提高上限不能代替处理瓶颈：
+
+| 阶段 | 默认上限 | 超限动作 |
+|---|---:|---|
+| `assigned/in_progress/needs_revision/blocked` | 3包 | 停止派发，先交付或解除阻塞 |
+| `submitted` | 2包 | 协调者优先范围检查和合入 |
+| `integrated*`且仍含未验收页面 | 2包 | 进入`acceptance_sprint`，暂停普通页面开发 |
+
+`acceptance_sprint`使用一个协调者加三个可并行角色：协调者独占集成目录和正式浏览器；验收准备员只读整理下一轮入口、角色、fixture、动作和预期；自动化员在独立工作区维护串行场景、状态重置、双宽截图和控制台采集；修复员只处理本轮缺陷、唯一未覆盖页面或最终E2E。正式观察和`passed`仍由协调者依据当前集成版本填写，不能由准备材料预先冒充。
+
+采用双缓冲：A槽在`begin`后仍可完成该轮实现与修复；从正式`check`开始，经浏览器观察直到`accept`冻结集成目录。B槽始终在其他worktree准备下一轮；A槽完成后开启短合入窗口，一次接入已审查的兼容交付、运行集成门禁，再把B槽转为正式轮次。不得在A槽冻结期把B槽代码或文档写入集成目录。控制器若无法从run记录可靠判断冻结阶段，流水线必须报告unknown并要求人工核对，不能仅因存在活动轮次猜测已冻结。
+
+候选轮次按共享角色、fixture、业务状态和连续跳转链分组，不机械凑满5页。同一`acceptance_group`可跨包，但它是原子闭环：任一成员包未就绪或仍有依赖，整组都不能进入候选；5页上限也按完整组计算。已经有活动轮次时必须先恢复该轮；重复归属先确定唯一当前包并将旧包标记为`accepted/archived/superseded`等明确终态，已验收页面从新活跃包移除，空包关闭或补齐精确items。`.pms-loop/state.json`仍是页面完成事实，流水线报告不是新的状态源。
+
 ## 集成流程
 
 ```text
 公共接口及分配单
   ├─ GS 工作目录：实现 → 自检 → 交付 ─┐
-  ├─ YS 工作目录：实现 → 自检 → 交付 ─┼─ 协调者合入队列
+  ├─ YS 工作目录：实现 → 自检 → 交付 ─┼─ 协调者短合入窗口
   └─ JS 工作目录：实现 → 自检 → 交付 ─┘
-       ↓（其他工作目录可继续下一包）
+       ↓（其他工作目录准备下一轮、自动化或缺陷修复）
 集成源码稳定 → 正式 begin → check → 浏览器观察/截图 → accept
+       ↑ A槽正式验收                         B槽并行备料 ↑
 ```
 
 - 独立功能可以先合入再等待下钻依赖。正式 `begin` 只选择已经具备验收前提的 1–5 项，避免长时间占住唯一轮次。已提前实现的页面仍按原文与 `plan.json` 完整核对。
