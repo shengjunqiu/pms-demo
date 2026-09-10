@@ -1,3 +1,6 @@
+import { initAcceptanceFixture } from '@/mock/acceptance-fixture';
+import { applyAcceptanceAction, type AcceptanceAction } from '@/mock/acceptance';
+import type { AcceptanceDetail, AcceptanceReport } from '@/models/settlement';
 import { applyOpportunityAction, type OpportunityAction } from '@/mock/opportunities';
 import type { OpportunityMeta } from '@/models/opportunities';
 import { stageChecks, stageSnapshot, STAGE_RULE, type StageSnapshot } from '@/mock/stage';
@@ -35,7 +38,7 @@ export interface PlanRequest {
 export interface Material extends DocumentDetails { id: string; projectId: string; name: string; required: boolean; status: '缺失' | '待提交' | '待审核' | '通过' | '驳回' }
 export interface BusinessState {
   opportunities: Opportunity[]; opportunityMeta: Record<string, OpportunityMeta>;
-  contracts: Contract[];
+  contracts: Contract[]; acceptanceDetails: Record<string, AcceptanceDetail>; acceptanceReports: AcceptanceReport[];
   receiptPlans: ReceiptPlan[];
   constructionFreezes: Record<string, { requestId: string; reason: string }>;
   laborEntries: LaborEntry[]; qualityPlans: Record<string, QualityPlan>; dailyReports: DailyReport[]; weeklyReports: WeeklyReport[]; costOrders: CostOrder[]; requirements: Requirement[]; ticketMeta: Record<string, TicketMeta>; tasks: WbsTask[]; planRequests: PlanRequest[]; projects: Project[]; budgets: BudgetVersion[]; baselines: BaselineVersion[];
@@ -46,7 +49,7 @@ export interface BusinessState {
   audit: { id: string; actor: string; action: string; target: string; date: string }[];
 }
 export function createBusinessState(): BusinessState {
-  return structuredClone({ opportunities: mockOpportunities, opportunityMeta: {}, contracts: mockContracts, receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
+  const state: BusinessState = structuredClone({ acceptanceDetails: {}, acceptanceReports: [], opportunities: mockOpportunities, opportunityMeta: {}, contracts: mockContracts, receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
     estimates: mockEstimateVersions, milestones: mockMilestones, settlements: mockSettlements,
     issues: mockIssues, risks: mockRisks, bugs: mockBugs, costs: mockCostItems, approvals: [], changes: mockChanges, managementApprovals: [],
     decisions: mockDecisions, acceptances: mockAcceptances, lockedProjects: ['P-008'], maintenanceCosts: [], audit: [],
@@ -55,8 +58,10 @@ export function createBusinessState(): BusinessState {
       status: p.status === '已结算' || name === '实施计划' && mockMilestones.some((m) => m.projectId === p.id && m.type === '启动' && m.status === '已达成') ? '通过' as const : '缺失' as const,
     }))),
   });
+  initAcceptanceFixture(state);
+  return state;
 }
-export type BusinessAction = OpportunityAction | LaborAction | DeliverableAction | ReportAction | CostOrderAction | TicketAction
+export type BusinessAction = AcceptanceAction | OpportunityAction | LaborAction | DeliverableAction | ReportAction | CostOrderAction | TicketAction
   | { type: 'submit-budget'; projectId: string; budget: BudgetVersion; reason: string }
   | { type: 'review'; approvalId: string; approve: boolean; opinion: string }
   | { type: 'review-management'; id: string; approve: boolean; opinion: string }
@@ -82,6 +87,8 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
   let target = '';
   if (action.type === 'save-opportunity' || action.type === 'start-opportunity-assessment' || action.type === 'save-opportunity-dimension' || action.type === 'conclude-opportunity' || action.type === 'follow-opportunity') {
     target = applyOpportunityAction(state, action, actor);
+  } else if (action.type === 'submit-acceptance' || action.type === 'review-acceptance' || action.type === 'reply-acceptance' || action.type === 'confirm-acceptance' || action.type === 'save-acceptance-proof' || action.type === 'save-acceptance-report' || action.type === 'confirm-acceptance-report') {
+    target = applyAcceptanceAction(state, action, actor);
   } else if (action.type === 'submit-labor' || action.type === 'review-labor') {
     target = applyLaborAction(state, action, actor);
   } else if (action.type === 'document-action' || action.type === 'add-document' || action.type === 'quality-plan' || action.type === 'quality-check' || action.type === 'complete-milestone') {

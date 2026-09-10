@@ -1,3 +1,4 @@
+import { settlementRoutes } from '@/routes/modules/settlement';
 import { opportunityRoutes } from '@/routes/modules/opportunities';
 import { ProjectManagerWorkbenchPage } from '@/pages/workbench/ProjectManagerWorkbenchPage';
 import { LaborCostPage } from '@/pages/execution/LaborCostPage';
@@ -70,10 +71,12 @@ export const AppRouter: React.FC = () => {
         <Route path="projects/:id/plan-requests/:requestId" element={<PlanRequestPage />} />
         <Route path="projects/:id" element={<ProjectOverviewPage />} />
 
+        {settlementRoutes.map((r) => <Route key={r.path} path={r.path} element={r.element} />)}
         {/* 其余 72 个页面的标准路由占位与挂载 */}
         {PAGE_MANIFEST.map((item) => {
           const relativeRoute = item.route.startsWith('/') ? item.route.slice(1) : item.route;
           // 跳过已实现的页面
+          if (settlementRoutes.some(r=>r.path===relativeRoute)) return null;
           if (opportunityRoutes.some(r=>r.path===relativeRoute)) return null;
           if (['workbench/project-manager', 'projects/:id/stage-switch', 'projects/:id/labor-cost', 'projects/:id/daily-reports', 'projects/:id/weekly-reports', 'projects/:id/deliverables', 'projects/:id/procurement', 'projects/:id/outsourcing', 'projects/:id/expenses', 'requirements-bugs', 'requirements-bugs/:id', 'issues-risks', 'issues-risks/:id', 'workbench/todos', 'projects/:id/progress', 'projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/four-calculations', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions', 'executive/decisions'].includes(relativeRoute)) {
             return null;
