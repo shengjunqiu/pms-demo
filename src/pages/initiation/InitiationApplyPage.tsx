@@ -21,7 +21,7 @@ import {
   Tabs,
   Upload,
 } from "antd";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import dayjs from "dayjs";
 import { useBusinessStore } from "@/mock/business";
 import { useAppStore } from "@/store/useAppStore";
@@ -38,6 +38,7 @@ import {
   InitiationHeader,
   InitiationHistory,
   SourceSummary,
+  useInitiationNavigation,
 } from "./InitiationShared";
 export function InitiationApplyPage() {
  const {canDo}=useActionAccess();
@@ -49,14 +50,13 @@ export function InitiationApplyPage() {
     !viewMargin && /毛利|gross.?margin/i.test(value ?? "")
       ? hiddenMargin
       : value;
-  const [query] = useSearchParams();
-  const go = useNavigate();
+  const [query, setQuery] = useSearchParams();
+  const { go } = useInitiationNavigation();
   const { message } = App.useApp();
   const [form] = Form.useForm();
   const app = data.initiations.find((a) => a.id === query.get("id"));
-  const [selected, setSelected] = useState(
-    app?.input.opportunityId ?? query.get("opportunityId") ?? "",
-  );
+  const selected = app?.input.opportunityId ?? query.get("opportunityId") ?? "";
+  const [tab, setTab] = useState("basic");
   const selectedOpportunity = data.opportunities.find((o) => o.id === selected);
   const o = selectedOpportunity && canViewOpportunity(data, selectedOpportunity, actor)
     ? selectedOpportunity
@@ -109,6 +109,15 @@ export function InitiationApplyPage() {
   const save = async (submit: boolean) => {
     try {
       if (!canEdit || !canDo("save-initiation", app?.id ?? o?.id) || (submit && !canDo("submit-initiation", app?.id ?? o?.id))) throw new Error("当前策略不允许保存或提交立项申请");
+      if (submit) {
+        const values = { ...form.getFieldsValue(true), ...hiddenInput };
+        const missing = [
+          { key: 'basic', fields: ['name', 'necessity', 'recommendation', 'region'] },
+          { key: 'delivery', fields: ['scope', 'customerNeeds', 'plannedStartDate', 'plannedEndDate', 'expectedSignDate'] },
+          { key: 'files', fields: ['files'] },
+        ].find((group) => group.fields.some((name) => !values[name] || (Array.isArray(values[name]) && !values[name].length)));
+        if (missing) { setTab(missing.key); message.error('请补全当前页签的必填申请资料后提交'); return; }
+      }
       await form.validateFields();
       const v = form.getFieldsValue(true);
       const next: InitiationInput = {
@@ -142,6 +151,7 @@ export function InitiationApplyPage() {
       <InitiationHeader app={app} title="立项申请" />
       <Card size="small" title="关联商机">
         <Select
+          aria-label="关联立项商机"
           style={{ width: "100%" }}
           showSearch
           optionFilterProp="label"
@@ -149,7 +159,7 @@ export function InitiationApplyPage() {
           disabled={!!app}
           placeholder="选择拟立项商机"
           onChange={(value) => {
-            setSelected(value);
+            const next = new URLSearchParams(query); next.set("opportunityId", value); next.delete("id"); setQuery(next); setTab("basic");
           }}
           options={data.opportunities
             .filter(
@@ -161,6 +171,7 @@ export function InitiationApplyPage() {
               label: `${x.id} · ${x.name} · ${x.status}`,
             }))}
         />
+        {o && <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', marginTop: 12, color: '#64748b' }}><span>客户：{o.customerName}</span><span>主办部门：{o.departmentName}</span><span>业务经理：{o.ownerName}</span></div>}
         {o &&
           initiationPrerequisites(data, o).length > 0 &&
           !app?.projectId && (
@@ -194,7 +205,13 @@ export function InitiationApplyPage() {
             })),
           }}
         >
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap', padding: '16px 0 0' }}>
+            <div><strong>申请资料</strong><div style={{ marginTop: 4, color: '#64748b', fontSize: 12 }}>{locked ? '本轮已提交；来源版本与申请资料只读，整改退回后可重新修订。' : '补充基本信息、交付要求及附件；商机与冻结概算按原版本承接。'}</div></div>
+            <span style={{ color: '#64748b', fontSize: 12 }}>金额单位：万元</span>
+          </div>
           <Tabs
+            activeKey={tab}
+            onChange={setTab}
             style={{ marginTop: 16 }}
             items={[
               {
@@ -308,7 +325,7 @@ export function InitiationApplyPage() {
                       pagination={false}
                       columns={[
                         { title: "科目", dataIndex: "subjectName" },
-                        { title: "概算金额（万元）", dataIndex: "amount" },
+                        { title: "概算金额（万元）", dataIndex: "amount", align: "right" },
                       ]}
                     />
                   </Card>
@@ -486,7 +503,7 @@ export function InitiationApplyPage() {
               },
             ]}
           />
-          <Space style={{ margin: "16px 0" }}>
+          <Space wrap style={{ margin: "16px 0", padding: 16, background: "#fff", border: "1px solid #e2e8f0", borderRadius: 10, width: "100%", justifyContent: "flex-end" }}>
             <Button disabled={!canEdit} onClick={() => save(false)}>
               保存草稿
             </Button>

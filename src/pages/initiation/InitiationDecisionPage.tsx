@@ -28,6 +28,7 @@ import {
   initiationClassification,
 } from "@/mock/initiation";
 import type { Project } from "@/models/types";
+import { PageSection } from "@/components/common/PageSection";
 import { StateView } from "@/components/common/StateView";
 import {
   InitiationHeader,
@@ -120,15 +121,11 @@ export function InitiationDecisionPage() {
   return (
     <>
       <InitiationHeader app={app} title="项目分级与决策" />
-      <SourceSummary
-        source={{
-          ...round.source,
-          expertOpinions: round.source.expertOpinions.map((row) => ({
-            ...row,
-            opinion: displayText(row.opinion) ?? "",
-          })),
-        }}
-      />
+      <PageSection title="当前办理节点" description={ended ? '本轮已结束，原申请版本与历史记录保留' : '根据当前风险、分级和角色完成本人节点'}>
+        <Space wrap size={24}><span>评审阶段 <Tag color="processing">{round.status}</Tag></span><span>审批路径 <strong>{round.path ?? '待风险评估与分级'}</strong></span><span>当前节点 <strong>{activeNode?.name ?? (round.status === '会签中' ? '六专业会签' : '待分级')}</strong></span></Space>
+        {round.ruleReasons.length > 0 && <p style={{ color: '#64748b', marginBottom: 0 }}>{round.ruleReasons.map((reason) => displayText(reason)).join('；')}</p>}
+      </PageSection>
+      <details open={round.status === '待分级'} style={{ margin: '16px 0' }}><summary style={{ cursor: 'pointer', padding: '8px 0' }}>项目分级依据与审批路径 · {round.level ?? suggested?.level} · 综合风险 {round.riskLevel ?? '待确认'}</summary>
       <Row gutter={16} style={{ marginTop: 16 }}>
         <Col span={12}>
           <Card title="项目分级依据">
@@ -150,6 +147,7 @@ export function InitiationDecisionPage() {
             />
             <p>PMO 确认级别（可上调，不能低于规则下限）</p>
             <Select
+              aria-label="确认项目级别"
               value={level}
               style={{ width: 160 }}
               disabled={!canClassify}
@@ -161,12 +159,14 @@ export function InitiationDecisionPage() {
             />
             <Input.TextArea
               style={{ margin: "12px 0" }}
+              aria-label="分级确认依据"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="分级确认或人工调整的具体依据"
               disabled={!canClassify}
             />
             <Select
+              aria-label="PMO补充必须交付物"
               mode="tags"
               style={{ width: "100%", marginBottom: 12 }}
               disabled={!canClassify}
@@ -218,9 +218,19 @@ export function InitiationDecisionPage() {
             />
           </Card>
         </Col>
-      </Row>
+      </Row></details>
+      <PageSection title="办理意见" description="会签与决策共用本次意见，提交后写入各自记录">
+        <p>办理意见（会签与决策均须填写）</p>
+        <Input.TextArea
+          aria-label="立项办理意见"
+          rows={3}
+          disabled={ended || (!canDecisionFields && !canSign)}
+          value={opinion}
+          onChange={(e) => setOpinion(e.target.value)}
+        />
+      </PageSection>
       {round.path === "线上会签" && (
-        <Card style={{ marginTop: 16 }} title="专业会签">
+        <details open={round.status === "会签中"} style={{ marginTop: 16 }}><summary style={{ cursor: "pointer", padding: "8px 0" }}>专业会签 · 已签 {round.signatures.length} / 6 个节点</summary><Card title="专业会签">
           <Table
             rowKey="node"
             pagination={false}
@@ -246,6 +256,7 @@ export function InitiationDecisionPage() {
             <Select
               style={{ width: 200 }}
               disabled={!canSign} placeholder="选择本人待办节点"
+              aria-label="本人会签节点"
               value={node || undefined}
               onChange={setNode}
               options={rows
@@ -253,6 +264,7 @@ export function InitiationDecisionPage() {
                 .map((r) => ({ value: r.node, label: r.node }))}
             />
             <Select
+              aria-label="专业会签结论"
               disabled={!canSign} value={signConclusion}
               onChange={setSignConclusion}
               options={["同意", "否决"].map((value) => ({
@@ -280,10 +292,10 @@ export function InitiationDecisionPage() {
               签署当前节点
             </Button>
           </Space>
-        </Card>
+        </Card></details>
       )}
       {approval && (
-        <Card title="本轮正式决策路径（CF 快照）" style={{ marginTop: 16 }}>
+        <details style={{ margin: "16px 0" }}><summary style={{ cursor: "pointer", padding: "8px 0" }}>正式审批节点与签署记录 · {activeNode?.name ?? "已完成"}</summary><Card title="本轮正式决策路径（CF 快照）">
           <Alert
             showIcon
             message={`${approval.snapshot.ruleVersion} · ${displayText(approval.snapshot.reason)}`}
@@ -320,7 +332,7 @@ export function InitiationDecisionPage() {
               },
             ]}
           />
-        </Card>
+        </Card></details>
       )}
       <Card title="决策办理" style={{ marginTop: 16 }}>
         <Alert
@@ -328,24 +340,19 @@ export function InitiationDecisionPage() {
           type="warning"
           message="通过后生成正式项目并继承可追溯前期成本；PMO 任命主 PM、候选人接受后开始策划。"
         />
-        <p>办理意见（会签与决策均须填写）</p>
-        <Input.TextArea
-          rows={3}
-          disabled={ended || (!canDecisionFields && !canSign)}
-          value={opinion}
-          onChange={(e) => setOpinion(e.target.value)}
-        />
         {round.path && round.path !== "线上会签" && (
           <>
             <Space style={{ marginTop: 16 }}>
               <span>会议日期</span>
               <DatePicker
+                aria-label="决策会议日期"
                 disabled={ended || !canDecisionFields}
                 value={meetingDate ? dayjs(meetingDate) : null}
                 onChange={(v) => setMeetingDate(v?.format("YYYY-MM-DD") ?? "")}
               />
               <Select
                 disabled={ended || !canDecisionFields}
+                aria-label="决策参会人"
                 mode="multiple"
                 style={{ width: 350 }}
                 placeholder="至少两位参会人"
@@ -358,6 +365,7 @@ export function InitiationDecisionPage() {
               disabled={ended || !canDecisionFields}
               rows={3}
               style={{ marginTop: 12 }}
+              aria-label="会议纪要与表决结果"
               placeholder="会议纪要与表决结果"
               value={minutes}
               onChange={(e) => setMinutes(e.target.value)}
@@ -368,6 +376,7 @@ export function InitiationDecisionPage() {
           <span>决策结果</span>
           <Select
             disabled={ended || !canDecisionFields}
+            aria-label="立项决策结果"
             value={result}
             onChange={setResult}
             options={["通过", "整改", "否决", "暂缓"].map((value) => ({
@@ -376,7 +385,7 @@ export function InitiationDecisionPage() {
             }))}
           />
           {result === "暂缓" && (
-            <DatePicker disabled={ended || !canDecisionFields}
+            <DatePicker aria-label="暂缓复评日期" disabled={ended || !canDecisionFields}
               placeholder="复评日期"
               value={resumeDate ? dayjs(resumeDate) : null}
               onChange={(v) => setResumeDate(v?.format("YYYY-MM-DD") ?? "")}
@@ -399,6 +408,7 @@ export function InitiationDecisionPage() {
             {rectifications.map((r, i) => (
               <Space key={i} style={{ display: "flex", margin: "12px 0" }}>
                 <Input disabled={ended || !canDecisionFields}
+                  aria-label={`整改事项${i + 1}`}
                   placeholder="整改事项"
                   value={r.content}
                   onChange={(e) =>
@@ -411,6 +421,7 @@ export function InitiationDecisionPage() {
                 />
                 <Select disabled={ended || !canDecisionFields}
                   style={{ width: 140 }}
+                  aria-label={`整改责任人${i + 1}`}
                   placeholder="责任人"
                   value={r.ownerId || undefined}
                   options={mockUsers.map((u) => ({
@@ -423,7 +434,7 @@ export function InitiationDecisionPage() {
                     )
                   }
                 />
-                <DatePicker disabled={ended || !canDecisionFields}
+                <DatePicker aria-label={`整改截止日期${i + 1}`} disabled={ended || !canDecisionFields}
                   value={r.deadline ? dayjs(r.deadline) : null}
                   onChange={(v) =>
                     setRectifications((rows) =>
@@ -445,11 +456,13 @@ export function InitiationDecisionPage() {
             style={{ width: "100%", marginBottom: 16 }}
           >
             <Input.TextArea disabled={ended || !canDecisionFields}
+              aria-label="沉没成本处置说明"
               value={costDisposition}
               onChange={(e) => setCostDisposition(e.target.value)}
               placeholder="沉没成本处置与复盘计划（登记说明，不自动冲销已发生成本）"
             />
             <Select disabled={ended || !canDecisionFields}
+              aria-label="跟踪责任人"
               value={trackingOwnerId || undefined}
               placeholder="跟踪责任人"
               style={{ width: 200 }}
@@ -507,6 +520,7 @@ export function InitiationDecisionPage() {
             {round.decision?.trackingOwnerId}
           </p>
           <Input.TextArea
+            aria-label="复评触发依据"
             disabled={!canResume} value={resumeReason}
             onChange={(e) => setResumeReason(e.target.value)}
             placeholder="复评触发依据与风险变化"
@@ -531,6 +545,17 @@ export function InitiationDecisionPage() {
           </Button>
         </Card>
       )}
+      <PageSection title="本轮来源资料">
+      <SourceSummary compact
+        source={{
+          ...round.source,
+          expertOpinions: round.source.expertOpinions.map((row) => ({
+            ...row,
+            opinion: displayText(row.opinion) ?? "",
+          })),
+        }}
+      />
+      </PageSection>
       {viewMargin ? (
         <InitiationHistory app={app} />
       ) : (
