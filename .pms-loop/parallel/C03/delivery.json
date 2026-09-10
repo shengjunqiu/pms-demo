@@ -1,0 +1,19 @@
+{
+  "base_commit": "b2c1713",
+  "delivery_commit": "48306dc",
+  "depends_on_deliveries": [],
+  "shared_changes": {
+    "status": "integrated",
+    "contract_commit": "e3ae595"
+  },
+  "integration_commit": "e3ae595",
+  "checks": {
+    "integration_typecheck": "pass",
+    "integration_domain": "116 tests passed after C03 integration"
+  },
+  "artifacts": [],
+  "remaining_dependencies": [
+    "正式双宽度浏览器与业务验收"
+  ],
+  "formal_rounds": []
+}

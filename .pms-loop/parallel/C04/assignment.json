@@ -1,17 +1,18 @@
 {
-  "package_id": "B03",
+  "package_id": "C04",
   "items": [
-    "HS-14",
-    "HS-15"
+    "JS-11",
+    "JS-12",
+    "JS-13"
   ],
-  "owner": "develop_ys",
+  "owner": "develop_js",
   "integration_root": "/Users/shengjunqiu/Documents/Code/pms-demo",
-  "workdir": "/private/tmp/pms-parallel-ys",
-  "branch": "pms/budget",
-  "base_commit": "15e4204",
+  "workdir": "/private/tmp/pms-parallel-js",
+  "branch": "pms/settlement",
+  "base_commit": "48306dc",
   "contract_commit": "1d2c49e",
-  "status": "integrated",
-  "writer": "/root/develop_ys",
+  "status": "developing",
+  "writer": "/root/develop_js",
   "last_confirmed_at": "2026-09-10",
   "owned_paths": "按docs/PARALLEL_DEVELOPMENT.md对应业务域",
   "shared_changes": "已确认使用统一BusinessState扩展；公共补丁单列，由主agent最终集成",
@@ -23,13 +24,7 @@
   ],
   "scenarios": "catalog对应页面的全部条件及正常/阻断/角色/版本同步场景",
   "fixtures": "现有固定故事；B01另建合法规划期对象",
-  "next_action": "当前集成版本完成正式浏览器验收后才能计入完成页",
-  "delivery_commits": [
-    "b2bae85",
-    "85711c0"
-  ],
-  "integration_commits": [
-    "0e9cca0",
-    "3e30506"
-  ]
+  "next_action": "按本轮已确认接口完成业务与共享提交，暂不操作正式Loop",
+  "delivery_commits": [],
+  "integration_commits": []
 }

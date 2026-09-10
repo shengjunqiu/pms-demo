@@ -3,15 +3,15 @@
 <!-- pms-loop:begin -->
 ## Loop 当前进度
 
-已验收：**24 / 72 页面**
+已验收：**27 / 72 页面**
 
-状态：`in_progress`；更新时间：2026-09-10T02:59:56+00:00
+状态：`in_progress`；更新时间：2026-09-10T03:27:19+00:00
 
 | 模块 | 已验收 | 待办/活动/阻塞 |
 |---|---:|---|
 | WK | 1/2 | WK-01(pending) |
 | GS | 2/11 | GS-01(pending)、GS-03(pending)、GS-05(pending)、GS-06(pending)、GS-07(pending)、GS-08(pending)、GS-09(pending)、GS-10(pending)、GS-11(pending) |
-| YS | 0/15 | YS-01(pending)、YS-02(pending)、YS-03(pending)、YS-04(pending)、YS-05(pending)、YS-06(pending)、YS-07(pending)、YS-08(pending)、YS-09(pending)、YS-10(pending)、YS-11(pending)、YS-12(pending)、YS-13(pending)、YS-14(pending)、YS-15(pending) |
+| YS | 3/15 | YS-01(pending)、YS-02(pending)、YS-03(pending)、YS-04(pending)、YS-05(pending)、YS-09(pending)、YS-10(pending)、YS-11(pending)、YS-12(pending)、YS-13(pending)、YS-14(pending)、YS-15(pending) |
 | HS | 15/17 | HS-14(pending)、HS-15(pending) |
 | JS | 0/13 | JS-01(pending)、JS-02(pending)、JS-03(pending)、JS-04(pending)、JS-05(pending)、JS-06(pending)、JS-07(pending)、JS-08(pending)、JS-09(pending)、JS-10(pending)、JS-11(pending)、JS-12(pending)、JS-13(pending) |
 | GL | 6/6 | 无 |
@@ -23,7 +23,6 @@
 
 ### 最近轮次与验证
 
-- R0016：HS-03, HS-04；deferred；证据目录 `.pms-loop/runs/R0016/`
 - R0017：HS-03, HS-04, HS-17；accepted；证据目录 `.pms-loop/runs/R0017/`
   验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
 - R0018：HS-09；accepted；证据目录 `.pms-loop/runs/R0018/`
@@ -31,6 +30,8 @@
 - R0019：HS-16；accepted；证据目录 `.pms-loop/runs/R0019/`
   验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
 - R0020：GS-02, GS-04；accepted；证据目录 `.pms-loop/runs/R0020/`
+  验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
+- R0021：YS-06, YS-07, YS-08；accepted；证据目录 `.pms-loop/runs/R0021/`
   验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
 
 ### 假设、已知问题与恢复说明

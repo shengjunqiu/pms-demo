@@ -1,0 +1,19 @@
+{
+  "base_commit": "15e4204",
+  "delivery_commit": "85711c0",
+  "depends_on_deliveries": [],
+  "shared_changes": {
+    "status": "integrated",
+    "contract_commit": "3e30506"
+  },
+  "integration_commit": "3e30506",
+  "checks": {
+    "integration_typecheck": "pass",
+    "integration_domain": "116 tests passed after C03 integration"
+  },
+  "artifacts": [],
+  "remaining_dependencies": [
+    "正式双宽度浏览器与业务验收"
+  ],
+  "formal_rounds": []
+}

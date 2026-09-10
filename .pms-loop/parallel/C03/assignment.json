@@ -10,7 +10,7 @@
   "branch": "pms/settlement",
   "base_commit": "b2c1713",
   "contract_commit": "1d2c49e",
-  "status": "developing",
+  "status": "integrated",
   "writer": "/root/develop_js",
   "last_confirmed_at": "2026-09-10",
   "owned_paths": "按docs/PARALLEL_DEVELOPMENT.md对应业务域",
@@ -23,6 +23,13 @@
   ],
   "scenarios": "catalog对应页面的全部条件及正常/阻断/角色/版本同步场景",
   "fixtures": "现有固定故事；B01另建合法规划期对象",
-  "next_action": "按已确认共享接口继续开发，独立提交检查结果",
-  "delivery_commits": []
+  "next_action": "当前集成版本完成正式浏览器验收后才能计入完成页",
+  "delivery_commits": [
+    "f692b8a",
+    "48306dc"
+  ],
+  "integration_commits": [
+    "fd32b42",
+    "e3ae595"
+  ]
 }

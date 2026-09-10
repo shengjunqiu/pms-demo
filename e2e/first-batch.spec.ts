@@ -81,23 +81,79 @@ test('商机提交和重新打开保留同一份业务记录', async ({ page }) 
   await page.getByRole('button', { name: '确认拟立项', exact: true }).click();
   await page.getByRole('dialog').getByRole('button', { name: /确\s*定/ }).click();
   await expect(page.getByText('已生成方案调研任务', { exact: true })).toBeVisible();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.locator('.ant-modal-mask')).toBeHidden();
   for (const width of [1440, 1280]) { await page.setViewportSize({ width, height: 900 }); await page.evaluate(() => window.scrollTo(0, 0)); await page.screenshot({ path: join(process.env.PMS_LOOP_ARTIFACT_DIR ?? 'test-results', `GS04-completed-${width}.png`), fullPage: true }); }
   await page.getByRole('button', { name: '进入方案任务' }).click();
   await expect(page).toHaveURL(`${path}/solution`);
 });
 
-test('策划计划经PMO评审后进入预算编制入口', async ({ page }) => {
-  await page.goto('/projects/P-PLAN-001/plan-review');
+test('策划计划经PMO评审、预算审批与独立基线确认', async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.goto('/projects/P-PLAN-001/wbs');
+  await page.getByRole('button', { name: 'Excel模板导入', exact: true }).click();
+  await page.getByLabel('WBS导入内容').fill('编码\t名称\t父编码\t责任人ID\t开始\t结束\t工时\t前置编码\t完成条件\n1\t错误任务\t\tU-001\t2026-12-31\t2026-09-10\t8\t1\t交付');
+  await expect(page.getByRole('button', { name: '校验通过，替换草稿任务' })).toBeDisabled();
+  await page.getByRole('button', { name: '载入模板样例' }).click();
+  await page.getByRole('button', { name: '校验通过，替换草稿任务' }).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.getByText('1 平台交付', { exact: true })).toBeVisible();
+  await navigate(page, '/projects/P-PLAN-001/milestones');
+  await page.getByRole('button', { name: /^编\s*辑$/ }).first().click();
+  await page.getByLabel('达成条件', { exact: true }).fill('启动会议纪要与责任分工确认');
+  await page.getByRole('dialog').getByRole('button', { name: /确\s*定/ }).click();
+  await expect(page.getByText('启动会议纪要与责任分工确认', { exact: true })).toBeVisible();
+  await navigate(page, '/projects/P-PLAN-001/plan-review');
   await page.getByRole('button', { name: '提交 / 整改重提', exact: true }).click();
   await page.getByRole('dialog').getByRole('button', { name: /确\s*定/ }).click();
   await expect(page.getByText('评审中', { exact: true })).toBeVisible();
   await role(page, 'PMO负责人');
   await navigate(page, '/projects/P-PLAN-001/plan-review');
+  await page.getByLabel('计划评审意见', { exact: true }).fill('补充启动交付责任确认');
+  await page.getByRole('button', { name: /^整\s*改$/ }).click();
+  await page.getByLabel('整改事项', { exact: true }).fill('确认启动资料与培训责任分工');
+  await page.getByRole('dialog').getByRole('button', { name: /确\s*定/ }).click();
+  await expect(page.getByText('整改中', { exact: true })).toBeVisible();
+  await role(page, '项目经理'); await navigate(page, '/projects/P-PLAN-001/plan-review');
+  await page.getByRole('button', { name: /^回\s*复$/ }).click();
+  await page.getByLabel('整改落实回复', { exact: true }).fill('启动纪要已明确主PM负责资料确认与交付培训');
+  await page.getByRole('dialog').getByRole('button', { name: /确\s*定/ }).click();
+  await page.getByRole('button', { name: '提交 / 整改重提', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: /确\s*定/ }).click();
+  await expect(page.getByText('第2轮', { exact: false }).first()).toBeVisible();
+  await role(page, 'PMO负责人'); await navigate(page, '/projects/P-PLAN-001/plan-review');
   await page.getByLabel('计划评审意见', { exact: true }).fill('WBS职责、里程碑、资源与范围逐项核对一致');
   await page.getByRole('button', { name: /^通\s*过$/ }).click();
   await page.getByRole('dialog').getByRole('button', { name: /确\s*定/ }).click();
   await expect(page.getByText('已通过', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: '进入预算编制', exact: true })).toBeVisible();
+  await role(page, '项目经理');
+  await navigate(page, '/projects/P-PLAN-001/budget');
+  await expect(page.locator('h4').first()).toContainText('YS-09');
+  await page.getByRole('button', { name: '保存草稿', exact: true }).click();
+  await expect(page.getByText('预算草稿 R1', { exact: false })).toBeVisible();
+  await page.getByRole('button', { name: '提交审批', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: /确\s*定/ }).click();
+  await expect(page).toHaveURL(/P-PLAN-001\/budget\/review$/);
+  await expect(page.getByRole('button', { name: '通过，待基线确认' })).toBeDisabled();
+  await role(page, 'PMO负责人'); await navigate(page, '/projects/P-PLAN-001/budget/review');
+  await page.getByLabel('审批意见', { exact: true }).fill('各成本科目与冻结概算一致，范围、计划和资源完整');
+  await page.getByRole('button', { name: '通过，待基线确认' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: /确\s*定/ }).click();
+  await expect(page.getByRole('button', { name: '确认基线生效' })).toBeVisible();
+  await navigate(page, '/projects/P-PLAN-001/baseline');
+  await expect(page.getByText('尚未形成生效基线', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: '确认基线', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: /确\s*定/ }).click();
+  await expect(page.getByText('尚未形成生效基线', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('基线版本快照', { exact: true })).toBeVisible();
+  await role(page, '项目经理'); await navigate(page, '/projects/P-PLAN-001/wbs');
+  await expect(page.getByRole('button', { name: '新增工作包' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: '进入项目变更', exact: true })).toBeVisible();
+  await navigate(page, '/projects/P-PLAN-001/milestones');
+  await expect(page.getByRole('button', { name: '补充节点' })).toBeDisabled();
+
+
 });
 
 test('商机必填、草稿、取消及冻结编辑限制', async ({ page }) => {

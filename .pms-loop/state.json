@@ -87,16 +87,16 @@
       "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
     },
     "YS-06": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0021"
     },
     "YS-07": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0021"
     },
     "YS-08": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0021"
     },
     "YS-09": {
       "status": "pending",
@@ -829,6 +829,42 @@
         ".pms-loop/runs/R0020/artifacts/GS04-completed-1280.png": "7a7b819b02a1c168443ba166d0625c2b21b7dbddd8856abb3731768444455df3",
         ".pms-loop/runs/R0020/checks.json": "662fd752c7a5dded250e125a2024ce2673858a7393fe0cdbefb3f0af0ce863f9",
         ".pms-loop/runs/R0020/evidence.json": "13e4d6a968c24440eccaf40a453316daa6dce0fb72612ab18862aa921d49b8b4"
+      }
+    },
+    {
+      "id": "R0021",
+      "items": [
+        "YS-06",
+        "YS-07",
+        "YS-08"
+      ],
+      "started_at": "2026-09-10T03:22:50+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-10T03:27:19+00:00",
+      "revision": "4b09b8dc289690a193eee1bc27d3a9f1fcf53956f057e554fb6c7fb12c1f6ee5",
+      "proof": {
+        ".pms-loop/runs/R0021/test-domain.log": "80398056ee25fdbf6b912b08c6bb7d945842069f6a52971c7a3b9dcab8abb61c",
+        ".pms-loop/runs/R0021/build.log": "e7e9fdd19dec0efd537481897c97c228cd428b3661266c4eaba272a863ea1fc5",
+        ".pms-loop/runs/R0021/lint.log": "257e04ddd8733fd59f16ff528f593b88c1fe59f044ef033b555c85568c03f33d",
+        ".pms-loop/runs/R0021/typecheck.log": "0cbb735b6f0f0beb07e73868e143e2a41ee87411e874d273088e1adceeb7efe0",
+        ".pms-loop/runs/R0021/browser.log": "2e98d73c1054cf6997e3646dd851c6f0412a3f647ca122748aafbf4644be89ea",
+        ".pms-loop/runs/R0021/artifacts/browser-501aaaeb656e8ee17bbc4a155c59121d9c4f3185.json": "e85bf16e7176c6bba684c2ce2b44cc8f6991138e8eb30a09c5f8617d899b5e8e",
+        ".pms-loop/runs/R0021/artifacts/browser-501aaaeb656e8ee17bbca77426cefba8a8ebaa25.json": "861a1630043eba683b8dd999e03d8d3171019e8f374449075da6621308091f40",
+        ".pms-loop/runs/R0021/artifacts/browser-501aaaeb656e8ee17bbc8742958e3aac80167e29.json": "18a01807c8f316dda0eb9faeb963728da3769e8cd2158f750eb82c480a1e63ed",
+        ".pms-loop/runs/R0021/artifacts/YS06-1440.png": "c804f128279117122dbcb329ef71fcdb479cec06ce34abf71ad0abe8a2b77e1a",
+        ".pms-loop/runs/R0021/artifacts/YS06-1280.png": "3d4ad676d232249f89e702eb5b8dcc1cc9b32540cfaa9822f85481e54e36adde",
+        ".pms-loop/runs/R0021/artifacts/YS07-1440.png": "600503532991b1b72933538085bd9d3894ea2c85f2ceb7d68bc40f05d9561402",
+        ".pms-loop/runs/R0021/artifacts/YS07-1280.png": "c866b8b658ca4bc005c5c80d49ca9eb5478f57ce032102d2f216448cc246d049",
+        ".pms-loop/runs/R0021/artifacts/YS08-1440.png": "76359aa69df4474e2becdd667424a870fe6ed29db5f6a576b2b60cad5ead9185",
+        ".pms-loop/runs/R0021/artifacts/YS08-1280.png": "c30379ac8eb216186f6c39cbe5ffc3451cdc771e930c7d91bba8d36ca3de981a",
+        ".pms-loop/runs/R0021/checks.json": "a2de915a2ebb54d19cf1c94c09bd8d1d8c12b8492037ef0b0c531fca65bba027",
+        ".pms-loop/runs/R0021/evidence.json": "cbc3195e568dff6841ae2253a030cf2e4b59b277f4242ba04f3723dbda5f1112"
       }
     }
   ],

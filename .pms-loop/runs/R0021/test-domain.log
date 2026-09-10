@@ -1,0 +1,90 @@
+
+> pms-demo@1.0.0 test:domain /Users/shengjunqiu/Documents/Code/pms-demo
+> vitest run src
+
+
+ RUN  v3.2.7 /Users/shengjunqiu/Documents/Code/pms-demo
+
+ ✓ src/models/__tests__/early-investments.test.ts (6 tests) 1637ms
+   ✓ 立项前投入额度与成本继承 > 多个待审申请批准时再次校验累计上限，驳回保持原额度  523ms
+   ✓ 立项前投入额度与成本继承 > 财务登记按申请额度、来源单据去重，超额/超期/暂缓/签约逾期被拦截  518ms
+ ✓ src/models/__tests__/acceptance.test.ts (9 tests) 2605ms
+   ✓ 验收与报验业务约束 > 客户通过、签署证明、PMO最终确认独立，确认不能重复  643ms
+   ✓ 验收与报验业务约束 > 分批分税点按原单累计，重复审批与超合同被拒绝  415ms
+   ✓ 验收与报验业务约束 > 报验批次唯一、税点唯一，待确认占用额度，退回后可编辑  372ms
+   ✓ 验收与报验业务约束 > 已锁定项目禁止新增验收，草稿不改变财务成本  366ms
+ ✓ src/models/__tests__/presales.test.ts (6 tests) 2968ms
+   ✓ 方案成本与专家评审 > 评审绑定只读版本、专业意见不可代填或重复提交  686ms
+   ✓ 方案成本与专家评审 > 专家意见未齐或有整改时PMO不能直接通过  446ms
+   ✓ 方案成本与专家评审 > 整改回复后产生新方案/成本与新轮次，旧快照保持不变  685ms
+   ✓ 方案成本与专家评审 > 真实评审通过才完成方案任务，领导角色不能代替PMO  689ms
+ ✓ src/models/__tests__/opportunities.test.ts (8 tests) 3399ms
+   ✓ 商机初评业务闭环 > 六维完成后形成快照与唯一方案任务，锁定基础字段  855ms
+   ✓ 商机初评业务闭环 > 低毛利、不可行专业结论都不能绕过条件门  471ms
+   ✓ 商机初评业务闭环 > 暂缓必须安排复评，复评追加轮次且保留历史  645ms
+   ✓ 商机初评业务闭环 > 终止保留提前投入并强制成本处置与复盘  462ms
+   ✓ 商机初评业务闭环 > 跟进只追加且角色和日期受约束  321ms
+ ✓ src/models/__tests__/closeout.test.ts (7 tests) 4249ms
+   ✓ 后评价与正式归档 > 六类目标及复盘完整才能提交，确认后不可覆盖经验记录  766ms
+   ✓ 后评价与正式归档 > 14目录原记录不冒充正式文件，缺件阻断；补档不解除建设锁定  390ms
+   ✓ 后评价与正式归档 > 退回补档创建新版本，保留旧文件结论且禁止跨项目来源  415ms
+   ✓ 后评价与正式归档 > 完整目录归档保留全部来源版本，正式文件和后评价不可覆写  1298ms
+   ✓ 后评价与正式归档 > 归档后旧问题/成本入口不可写，管理员无解档旁路，运维成本仍独立  946ms
+ ✓ src/models/__tests__/portfolio.test.ts (2 tests) 4493ms
+   ✓ 四算科目跨项目加总守恒，结算比较只纳入锁定项目  4483ms
+ ✓ src/models/__tests__/todos.test.ts (1 test) 4528ms
+   ✓ 预算审批办理后转为独立PMO确认待办，确认后原节点进入已办且不重复生成  4525ms
+ ✓ src/models/__tests__/project-changes.test.ts (5 tests) 6538ms
+   ✓ 原CHG-0006待审编号金额不变，PMO可以真实退回解除未决变更且不改预算成本  4519ms
+   ✓ 新增范围先评估分级，再由PMO批准；追加完整基线，旧版本与最新执行事实保留  681ms
+   ✓ 重大工期或金额必须高阶审批；角色不能绕过；建设冻结和源基线变化阻断  656ms
+   ✓ 驳回不改原基线，重提保留上一修订和意见；非法核减不能保存  302ms
+   ✓ 历史补齐快照不能冒充已齐材料直接通过，须退回补充；不存在重复新基线  377ms
+ ✓ src/models/__tests__/settlement.test.ts (8 tests) 7619ms
+   ✓ 正式结算与冻结协议 > 客户通过未确认、历史未决与原变更均阻断  349ms
+   ✓ 正式结算与冻结协议 > 逐科目承诺/预测实际发生守恒，旧滚动科目快照保留  1512ms
+   ✓ 正式结算与冻结协议 > 提交冻结成本入口，材料退回保持冻结、追加版本保留旧快照  1852ms
+   ✓ 正式结算与冻结协议 > 仅财务金额退回可解冻；重提引用新金额，旧结果保留  1737ms
+   ✓ 正式结算与冻结协议 > 财务→PMO审核→评审→最终锁定，建设锁定但不关闭项目且运维隔离  1691ms
+ ✓ src/models/__tests__/reports.test.ts (3 tests) 1638ms
+   ✓ 质量整改独立闭环，材料版本经质量门与PMO审核后才允许里程碑达成  1140ms
+ ✓ src/models/__tests__/budget-editor.test.ts (5 tests) 1246ms
+   ✓ 任命仅PMO发起且本人接受后切换，拒绝保留旧PM，唯一主PM与历史责任保留  339ms
+   ✓ 计划→预算草稿→审批→待确认版本→基线生效保留所有提交明细  429ms
+ ✓ src/models/__tests__/cost-orders.test.ts (3 tests) 1470ms
+   ✓ 采购批准增加指定科目承诺，验收入账等额转换且重复入账被拦截  449ms
+   ✓ 外包引用本项目WBS与基线并通过履约验收，费用只在财务入账后进入实际  737ms
+ ✓ src/models/__tests__/tickets.test.ts (4 tests) 1397ms
+   ✓ 需求责任人提交后仅发起人确认关闭或退回，处理历史保留  361ms
+   ✓ 转办更新责任人与参与权限；BUG仍由发起人关闭  322ms
+   ✓ 重大风险升级持续跟踪，转问题保留关联且主PM最终关问题  363ms
+   ✓ 影响基线需求先走真实变更审批，未批准时不能提交解决；超期升级按规则计算  349ms
+ ✓ src/models/__tests__/stage.test.ts (2 tests) 981ms
+   ✓ 阶段申请保留提交校验快照，PMO批准才前进并释放预算，原基线和客户验收不改  404ms
+   ✓ 实际时间、重大风险、任务与材料在审批时重验，失败原子回滚且可驳回保留原阶段  574ms
+ ✓ src/models/__tests__/domain.test.ts (10 tests) 652ms
+   ✓ Domain & Data Contract Invariants > 所有实体ID唯一，所有项目和上游引用可解析；已确认流水绑定唯一来源凭证  557ms
+ ✓ src/models/__tests__/estimates.test.ts (4 tests) 941ms
+   ✓ 概算版本与冻结 > PMO冻结只更新商机引用，旧项目绑定和旧版本均保持  311ms
+ ✓ src/models/__tests__/labor.test.ts (3 tests) 1212ms
+   ✓ 成员、任务、有效日期、同日重复和跨项目累计工时执行硬校验  596ms
+   ✓ 审核后按提交费率一次计成本，消耗承诺不重复增加滚动；审核权限和锁定有效  352ms
+ ✓ src/models/__tests__/budget-planning.test.ts (9 tests) 10984ms
+   ✓ 新策划期 / WBS完整性 / 评审版本 > 评审冻结提交快照，整改必填负责人期限，回复后重提交新轮次，原版本保留  721ms
+   ✓ 预算通过与PMO确认独立 / 完整基线不可变 > 首次预算须计划评审通过；预算通过不生效，PMO确认冻结完整范围/计划/资源/预算，重复确认阻断  484ms
+   ✓ 预算通过与PMO确认独立 / 完整基线不可变 > 既有预算确认不修改实际/滚动，来源基线失效与建设冻结均阻断  4824ms
+   ✓ 预算通过与PMO确认独立 / 完整基线不可变 > 项目变更审批仍直接追加基线且保留来源变更ID  4227ms
+ ✓ src/models/__tests__/business.test.ts (13 tests) 11135ms
+   ✓ 审批、权限及成本锁定 > 超概算由真实金额判定；原因必填；原概算变化不改写提交快照；通过追加版本并更新原决策  412ms
+   ✓ 审批、权限及成本锁定 > 驳回不改变生效基线，失败动作不产生部分写入  318ms
+   ✓ 审批、权限及成本锁定 > BUG仅发起人确认，问题仅所属主PM关闭，风险转问题保留来源且防重复  322ms
+   ✓ 领导待决策与到期回款 > 每条决策关联真实审批快照；审批后原事项及当前预算联动，历史记录仍可读取  4782ms
+   ✓ 管理审批联动原事项但不跳过风险、终验和结算流程；未签审批只变更额度  4613ms
+ ✓ src/models/__tests__/shared-contracts.test.ts (4 tests) 460ms
+ ✓ src/models/__tests__/progress.test.ts (4 tests) 481ms
+
+ Test Files  21 passed (21)
+      Tests  116 passed (116)
+   Start at  11:23:56
+   Duration  17.13s (transform 1.42s, setup 0ms, collect 84.20s, tests 70.63s, environment 8ms, prepare 3.88s)
+

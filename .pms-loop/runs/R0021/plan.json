@@ -1,0 +1,128 @@
+{
+  "round": "R0021",
+  "items": [
+    {
+      "id": "YS-06",
+      "title": "WBS计划编制",
+      "route": "/projects/:id/wbs",
+      "kind": "编制",
+      "roles": "项目经理、技术经理",
+      "phase": 5,
+      "feature_ids": [
+        "YS-022",
+        "YS-023",
+        "YS-024",
+        "YS-025",
+        "YS-026",
+        "YS-027"
+      ],
+      "upstream_feature_scope": "YS-022~027",
+      "source_lines": {
+        "pages": 121,
+        "brief": 415
+      },
+      "criteria": [
+        "多级WBS树和甘特、依赖、任务人日期工时里程碑",
+        "拒绝循环依赖；模拟导入校验；冻结计划引导变更"
+      ]
+    },
+    {
+      "id": "YS-07",
+      "title": "里程碑计划",
+      "route": "/projects/:id/milestones",
+      "kind": "编制/列表",
+      "roles": "项目经理、PMO",
+      "phase": 5,
+      "feature_ids": [
+        "YS-028",
+        "YS-029",
+        "YS-030"
+      ],
+      "upstream_feature_scope": "YS-028~030",
+      "source_lines": {
+        "pages": 122,
+        "brief": 416
+      },
+      "criteria": [
+        "合同/计划/实际日期、关键里程碑、交付物与达成条件",
+        "临期超期原因可查，冻结里程碑不能直接删除改写"
+      ]
+    },
+    {
+      "id": "YS-08",
+      "title": "计划评审",
+      "route": "/projects/:id/plan-review",
+      "kind": "评审",
+      "roles": "PMO、交付部门",
+      "phase": 5,
+      "feature_ids": [
+        "YS-030"
+      ],
+      "upstream_feature_scope": "YS-030",
+      "source_lines": {
+        "pages": 123,
+        "brief": 417
+      },
+      "criteria": [
+        "WBS里程碑资源材料、评审意见与整改",
+        "通过才允许正式基线，退回保留材料版本和整改轨迹"
+      ]
+    }
+  ],
+  "sources": {
+    "prd": {
+      "path": "docs/项目管理平台PRD_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "6dac675ca22237b7fa59129eccc466a9e242d20f948c0b68e958a7227bb2bd1b"
+    },
+    "features": {
+      "path": "docs/项目管理平台详细功能清单_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "fabfac73b480ccaf01aa831ae3c5d0a6485e33fff80f517468b2b6c52829ddfb"
+    },
+    "pages": {
+      "path": "docs/项目管理平台页面清单与原型设计说明_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "db1c548b5f5ef025eb90fef06422e132f003665fc7e6156dd706b7f095c994dc"
+    },
+    "brief": {
+      "path": "docs/项目管理平台高保真原型_AgentLoop开发任务书_V1.0.md",
+      "sha256": "286f917d5edc99a4a0c7da97515a3d6308cae7395fb287bbcd1846de60045b43"
+    }
+  },
+  "feature_references": {
+    "YS-022": {
+      "title": "WBS新建",
+      "line": 157
+    },
+    "YS-023": {
+      "title": "Excel导入",
+      "line": 158
+    },
+    "YS-024": {
+      "title": "任务增删改",
+      "line": 159
+    },
+    "YS-025": {
+      "title": "任务依赖",
+      "line": 160
+    },
+    "YS-026": {
+      "title": "任务责任人",
+      "line": 161
+    },
+    "YS-027": {
+      "title": "计划工期",
+      "line": 162
+    },
+    "YS-028": {
+      "title": "里程碑定义",
+      "line": 163
+    },
+    "YS-029": {
+      "title": "达成条件",
+      "line": 164
+    },
+    "YS-030": {
+      "title": "计划评审",
+      "line": 165
+    }
+  }
+}
