@@ -1,5 +1,5 @@
 import type {BusinessState} from '@/mock/business';
-const lifecycleActions=new Set(['start-operation-handover','save-operation-handover','accept-operation-handover','record-operation-event','record-operation-cost','renew-operation','request-project-close','confirm-project-close']);
+const lifecycleActions=new Set(['submit-operation-cost','reject-operation-cost','activate-operation','configure-operation','resolve-operation-event','exit-operation','start-operation-handover','save-operation-handover','accept-operation-handover','record-operation-event','record-operation-cost','renew-operation','request-project-close','confirm-project-close']);
 /** Resolve actual business objects, never infer a project from an ID prefix. */
 export function assertArchiveActionWritable(state:BusinessState,action:{type:string;projectId?:string;opportunityId?:string;id?:string;approvalId?:string;cost?:{projectId:string};report?:{projectId:string};maintenance?:boolean}){
  if(lifecycleActions.has(action.type)||action.type==='confirm-cost'&&action.maintenance)return;

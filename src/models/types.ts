@@ -306,6 +306,7 @@ export interface Timesheet {
 
 // 成本流水
 export interface CostItem {
+  operationId?: string;
   id: string;
   projectId: string;
   type: 'labor' | 'procurement' | 'outsource' | 'expense';
