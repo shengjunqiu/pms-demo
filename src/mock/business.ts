@@ -1,3 +1,5 @@
+import { applyPresalesAction, type PresalesAction } from '@/mock/presales';
+import type { PresalesWorkspace } from '@/models/presales';
 import { applyBudgetPlanningAction, budgetBaselineProposal, confirmBudgetBaseline, initializePlanning, planningSnapshot, type BudgetPlanningAction } from '@/mock/budget';
 import type { PlanningDraft, PlanningReview } from '@/models/budget';
 import { initAcceptanceFixture } from '@/mock/acceptance-fixture';
@@ -39,6 +41,7 @@ export interface PlanRequest {
 }
 export interface Material extends DocumentDetails { id: string; projectId: string; name: string; required: boolean; status: '缺失' | '待提交' | '待审核' | '通过' | '驳回' }
 export interface BusinessState {
+  presales: Record<string, PresalesWorkspace>;
   planningDrafts: Record<string,PlanningDraft>; planningReviews: PlanningReview[];
   opportunities: Opportunity[]; opportunityMeta: Record<string, OpportunityMeta>;
   contracts: Contract[]; acceptanceDetails: Record<string, AcceptanceDetail>; acceptanceReports: AcceptanceReport[];
@@ -52,7 +55,7 @@ export interface BusinessState {
   audit: { id: string; actor: string; action: string; target: string; date: string }[];
 }
 export function createBusinessState(): BusinessState {
-  const state: BusinessState = structuredClone({ planningDrafts: {}, planningReviews: [], acceptanceDetails: {}, acceptanceReports: [], opportunities: mockOpportunities, opportunityMeta: {}, contracts: mockContracts, receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
+  const state: BusinessState = structuredClone({ presales: {}, planningDrafts: {}, planningReviews: [], acceptanceDetails: {}, acceptanceReports: [], opportunities: mockOpportunities, opportunityMeta: {}, contracts: mockContracts, receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
     estimates: mockEstimateVersions, milestones: mockMilestones, settlements: mockSettlements,
     issues: mockIssues, risks: mockRisks, bugs: mockBugs, costs: mockCostItems, approvals: [], changes: mockChanges, managementApprovals: [],
     decisions: mockDecisions, acceptances: mockAcceptances, lockedProjects: ['P-008'], maintenanceCosts: [], audit: [],
@@ -69,7 +72,7 @@ export function createBusinessState(): BusinessState {
   initAcceptanceFixture(state);
   return state;
 }
-export type BusinessAction = BudgetPlanningAction | AcceptanceAction | OpportunityAction | LaborAction | DeliverableAction | ReportAction | CostOrderAction | TicketAction
+export type BusinessAction = PresalesAction | BudgetPlanningAction | AcceptanceAction | OpportunityAction | LaborAction | DeliverableAction | ReportAction | CostOrderAction | TicketAction
   | { type: 'submit-budget'; projectId: string; budget: BudgetVersion; reason: string }
   | { type: 'review'; approvalId: string; approve: boolean; opinion: string }
   | { type: 'review-management'; id: string; approve: boolean; opinion: string }
@@ -93,7 +96,9 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     return value;
   };
   let target = '';
-  if (action.type === 'save-opportunity' || action.type === 'start-opportunity-assessment' || action.type === 'save-opportunity-dimension' || action.type === 'conclude-opportunity' || action.type === 'follow-opportunity') {
+  if (action.type === 'presales-research' || action.type === 'presales-save-solution' || action.type === 'presales-save-cost' || action.type === 'presales-finance-check' || action.type === 'presales-submit-review' || action.type === 'presales-expert-opinion' || action.type === 'presales-review-decision' || action.type === 'presales-correction-reply') {
+    target = applyPresalesAction(state, action, actor);
+  } else if (action.type === 'save-opportunity' || action.type === 'start-opportunity-assessment' || action.type === 'save-opportunity-dimension' || action.type === 'conclude-opportunity' || action.type === 'follow-opportunity') {
     target = applyOpportunityAction(state, action, actor);
   } else if (action.type === 'submit-acceptance' || action.type === 'review-acceptance' || action.type === 'reply-acceptance' || action.type === 'confirm-acceptance' || action.type === 'save-acceptance-proof' || action.type === 'save-acceptance-report' || action.type === 'confirm-acceptance-report') {
     target = applyAcceptanceAction(state, action, actor);
