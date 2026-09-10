@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import type { Actor, BusinessAction } from '../src/mock/business-domain';
 import type { SolutionDraft, CostDraft } from '../src/models/presales';
 import { navigate, role } from './helpers';
-import { capturePageEvidence, collectBrowserErrors, prepareArtifacts } from './evidence';
+import { capturePageEvidence, collectBrowserErrors, prepareArtifacts, writeBrowserReport } from './evidence';
 
 type BusinessModule = typeof import('../src/mock/business');
 
@@ -18,17 +18,17 @@ async function seed(page: Page, mode: 'base' | 'ready' | 'stale' = 'base') {
     const pmo: Actor = { id: 'U-002', name: '李主任', role: 'pmo' };
     let state = business.createBusinessState();
     const act = (action: BusinessAction, actor: Actor) => { state = business.transition(state, action, actor); };
-    if (scenario === 'base') {
-      business.useBusinessStore.setState({ data: state });
-      return 'OPP-002';
-    }
     act({ type: 'save-opportunity', submit: true, input: {
       name: '台账验收数据共享项目', customerId: 'CUST-001', departmentId: 'D-002', ownerId: 'U-006',
-      estimatedAmount: 1000, expectedSignDate: '2026-11-30', winRate: 80, source: '客户需求',
+      estimatedAmount: 1000, expectedSignDate: scenario === 'base' ? '2026-10-15' : '2026-11-30', winRate: 80, source: '客户需求',
       projectType: '软件开发', description: '整合跨部门数据', competition: '公开比选',
       businessLine: '数字政务', region: '福建省', collaborators: ['U-005'], attachments: ['需求.pdf'],
     } }, market);
     const id = state.opportunities.at(-1)!.id;
+    if (scenario === 'base') {
+      business.useBusinessStore.setState({ data: state });
+      return id;
+    }
     act({ type: 'start-opportunity-assessment', id }, market);
     for (const dimension of ['customer', 'commercial', 'competition', 'technology', 'delivery', 'margin'] as const) {
       act({ type: 'save-opportunity-dimension', id, dimension, opinion: {
@@ -76,10 +76,28 @@ async function seed(page: Page, mode: 'base' | 'ready' | 'stale' = 'base') {
 }
 
 test.beforeAll(prepareArtifacts);
+const browserErrors = new WeakMap<Page, string[]>();
+test.beforeEach(({ page }) => { browserErrors.set(page, collectBrowserErrors(page)); });
+test.afterEach(({ page }, info) => {
+  const consoleErrors = browserErrors.get(page) ?? [];
+  writeBrowserReport(info, { url: page.url(), consoleErrors });
+  expect(consoleErrors).toEqual([]);
+});
 
 test('台账日期方案恢复、列设置导出与补录跟进日期', async ({ page }) => {
+  // Saved view, date edits, export and two follow-up submissions share one state.
+  test.setTimeout(60_000);
   const errors = collectBrowserErrors(page);
-  const id = await seed(page);
+  await seed(page);
+  // Backdated follow-ups require an existing, unlocked opportunity created before that date.
+  const { id, code } = await page.evaluate(async () => {
+    const path = '/src/mock/business.ts';
+    const business = await import(/* @vite-ignore */ path) as BusinessModule;
+    const opportunity = business.useBusinessStore.getState().data.opportunities.find(o =>
+      o.status === '跟进中' && o.createdAt <= '2026-09-08');
+    if (!opportunity) throw new Error('Missing historical active opportunity fixture');
+    return { id: opportunity.id, code: opportunity.code };
+  });
   await navigate(page, '/opportunities?start=2026-10-01&end=2026-10-31');
   await page.getByRole('button', { name: '更多筛选', exact: true }).click();
   const dates = page.locator('.ant-picker-range input');
@@ -87,31 +105,32 @@ test('台账日期方案恢复、列设置导出与补录跟进日期', async ({
   await page.getByRole('button', { name: '保存视图', exact: true }).click();
   await page.getByLabel('视图名称', { exact: true }).fill('十月签约');
   await page.getByRole('dialog').getByRole('button', { name: /确\s*定/ }).click();
-  await page.getByRole('button', { name: '重置', exact: true }).click();
+  await page.getByRole('button', { name: /^重\s*置$/ }).click();
   await expect(dates.nth(0)).toHaveValue('');
   await dates.nth(0).fill('2026-11-01');
   await dates.nth(0).press('Enter');
   await dates.nth(1).fill('2026-11-30');
   await dates.nth(1).press('Enter');
-  await page.getByRole('button', { name: '查询', exact: true }).click();
+  await page.getByRole('button', { name: /^查\s*询$/ }).click();
   await expect(page.locator('.ant-table-tbody tr.ant-table-row')).toHaveCount(0);
-  await page.locator('.ant-select[aria-label="常用视图"] .ant-select-selector').click();
-  await page.locator('.ant-select-dropdown:visible').getByText('十月签约', { exact: true }).click();
+  await page.getByRole('combobox', { name: '常用视图', exact: true }).focus();
+  await page.getByRole('combobox', { name: '常用视图', exact: true }).press('ArrowDown');
+  await page.locator('.ant-select-dropdown:visible .ant-select-item-option').getByText('十月签约', { exact: true }).click();
   await expect(dates.nth(0)).toHaveValue('2026-10-01');
   await expect(dates.nth(1)).toHaveValue('2026-10-31');
-  await page.getByRole('button', { name: '查询', exact: true }).click();
+  await page.getByRole('button', { name: /^查\s*询$/ }).click();
   await expect(page).toHaveURL(/start=2026-10-01&end=2026-10-31/);
   await page.getByLabel('编号 / 商机名称', { exact: true }).fill('OPP-2026-002');
-  await page.getByRole('button', { name: '查询', exact: true }).click();
+  await page.getByRole('button', { name: /^查\s*询$/ }).click();
   await expect(page.locator('.ant-table-tbody tr.ant-table-row')).toHaveCount(1);
   await page.getByRole('button', { name: '列设置', exact: true }).click();
   await page.getByRole('dialog').getByLabel('主办部门', { exact: true }).uncheck();
-  await page.getByRole('dialog').getByRole('button', { name: '完成', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: /^完\s*成$/ }).click();
   await expect(page.getByRole('columnheader', { name: '主办部门', exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: '导出预览', exact: true }).click();
   await expect(page.getByLabel('导出CSV预览')).toHaveValue(/OPP-2026-002/);
   await expect(page.getByLabel('导出CSV预览')).not.toHaveValue(/OPP-2026-001/);
-  await page.getByRole('dialog').getByRole('button', { name: '关闭', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: /^关\s*闭$/ }).click();
   await navigate(page, `/opportunities/${id}`);
   await page.getByRole('tab', { name: '跟进记录', exact: true }).click();
   for (const date of ['2026-09-09', '2026-09-08']) {
@@ -126,7 +145,8 @@ test('台账日期方案恢复、列设置导出与补录跟进日期', async ({
   }
   await expect(page.getByText('客户沟通：2026-09-09客户会议', { exact: true })).toBeVisible();
   await expect(page.getByText('客户沟通：2026-09-08客户会议', { exact: true })).toBeVisible();
-  await navigate(page, '/opportunities?keyword=OPP-2026-002');
+  await navigate(page, '/opportunities?keyword=' + encodeURIComponent(code));
+  await expect(page.locator('.ant-table-tbody tr.ant-table-row')).toHaveCount(1);
   await expect(page.locator('.ant-table-tbody tr.ant-table-row')).toContainText('2026-09-09');
   await capturePageEvidence(page, 'GS01-ledger');
   expect(errors).toEqual([]);
@@ -170,8 +190,9 @@ test('新评审与旧冻结概算不一致时两页共同阻断，项目经理�
   await navigate(page, `/opportunities?keyword=${id}`);
   // Search accepts business code rather than internal id; use the unique business name.
   await page.getByLabel('编号 / 商机名称', { exact: true }).fill('台账验收数据共享项目');
-  await page.getByRole('button', { name: '查询', exact: true }).click();
-  await expect(page.getByRole('button', { name: '发起立项', exact: true })).toBeDisabled();
+  await page.getByRole('button', { name: /^查\s*询$/ }).click();
+  await expect(page.locator('.ant-table-tbody tr.ant-table-row')).toHaveCount(1);
+  await expect(page.locator(`tr[data-row-key="${id}"]`).getByRole('button', { name: '发起立项', exact: true })).toBeDisabled();
   await navigate(page, `/opportunities/${id}`);
   await expect(page.getByRole('button', { name: '发起立项', exact: true })).toBeDisabled();
   await expect(page.getByText(/冻结概算与当前通过的方案\/专家评审版本链不一致/)).toBeVisible();
@@ -198,6 +219,7 @@ test('台账分页和金额排序使用完整可见集合', async ({ page }) => 
   await page.locator('.ant-pagination-next').click();
   await expect(rows.first()).toHaveAttribute('data-row-key', 'OPP-011');
   await page.getByRole('columnheader', { name: /预计金额（万元）/ }).click();
+  await page.locator('.ant-pagination-item-1').click();
   const expectedIds = await page.evaluate(async () => {
     const path = '/src/mock/business.ts';
     const business = await import(/* @vite-ignore */ path) as BusinessModule;
@@ -207,7 +229,7 @@ test('台账分页和金额排序使用完整可见集合', async ({ page }) => 
   await expect.poll(async () => rows.evaluateAll(nodes => nodes.map(node => node.getAttribute('data-row-key')))).toEqual(expectedIds);
   await page.getByRole('button', { name: '更多筛选', exact: true }).click();
   await page.getByLabel('最低金额（万元）', { exact: true }).fill('8000');
-  await page.getByRole('button', { name: '查询', exact: true }).click();
+  await page.getByRole('button', { name: /^查\s*询$/ }).click();
   const filteredIds = await page.evaluate(async () => {
     const path = '/src/mock/business.ts';
     const business = await import(/* @vite-ignore */ path) as BusinessModule;
@@ -222,7 +244,7 @@ test('暂缓必须安排复评，详情与台账提醒同步并能发起复评',
   const errors = collectBrowserErrors(page);
   const id = await seed(page);
   await navigate(page, `/opportunities/${id}`);
-  await page.getByRole('button', { name: '暂缓', exact: true }).click();
+  await page.getByRole('button', { name: /^暂\s*缓$/ }).click();
   const dialog = page.getByRole('dialog');
   await dialog.getByRole('button', { name: '确认并记录', exact: true }).click();
   await expect(dialog.locator('.ant-form-item-explain-error')).toHaveCount(3);
@@ -238,7 +260,7 @@ test('暂缓必须安排复评，详情与台账提醒同步并能发起复评',
   await expect(page.getByText('暂缓原因：客户预算审批推迟，安排下周复评', { exact: true })).toBeVisible();
   await expect(page.getByText(/复评日期 2026-09-15 · 责任人 陈亮/)).toBeVisible();
   await capturePageEvidence(page, 'GS03-paused');
-  await navigate(page, '/opportunities?keyword=OPP-2026-002');
+  await navigate(page, '/opportunities?keyword=' + encodeURIComponent('台账验收数据共享项目'));
   await expect(page.getByText('未来7日需复评 1 个商机', { exact: true })).toBeVisible();
   await expect(page.locator('.ant-table-tbody tr.ant-table-row')).toContainText('暂缓');
   await page.locator('.ant-table-tbody tr.ant-table-row').getByRole('button', { name: '发起评估', exact: true }).click();
@@ -277,7 +299,7 @@ test('真实前期投入终止时强制处置说明，保留来源成本与只�
     return { earlyCosts: data.earlyCosts.filter(c => c.opportunityId === opportunityId), costs: data.costs };
   }, id);
   await navigate(page, `/opportunities/${id}`);
-  await page.getByRole('button', { name: '终止', exact: true }).click();
+  await page.getByRole('button', { name: /^终\s*止$/ }).click();
   const dialog = page.getByRole('dialog');
   await expect(dialog).toContainText('已发生提前投入：12.00 万元');
   await dialog.getByLabel('决策原因', { exact: true }).fill('客户取消采购');
@@ -288,7 +310,7 @@ test('真实前期投入终止时强制处置说明，保留来源成本与只�
   await dialog.getByRole('button', { name: '确认并记录', exact: true }).click();
   await expect(dialog).toBeHidden();
   await expect(page.getByText(/历史投入 12 万元继续保留/)).toBeVisible();
-  await expect(page.getByRole('button', { name: '编辑', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: /^编\s*辑$/ })).toBeDisabled();
   await page.getByRole('tab', { name: '跟进记录', exact: true }).click();
   await expect(page.getByRole('button', { name: '追加跟进', exact: true })).toHaveCount(0);
   const after = await page.evaluate(async (opportunityId) => {
@@ -318,7 +340,8 @@ test('未知商机、组织拒绝和已立项商机的真实项目下钻', async
   await navigate(page, '/opportunities/OPP-001');
   await page.getByRole('link', { name: '已转入项目：福建省晋江市岸海防综合治理平台', exact: true }).click();
   await expect(page).toHaveURL('/projects/P-001');
-  await expect(page.getByRole('heading', { name: '福建省晋江市岸海防综合治理平台', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'HS-01 项目详情总览', exact: true })).toBeVisible();
+  await expect(page.getByText('P-001 · 福建省晋江市岸海防综合治理平台', { exact: true })).toBeVisible();
   await role(page, '财务专员');
   await page.evaluate(async () => {
     const path = '/src/mock/business.ts';
