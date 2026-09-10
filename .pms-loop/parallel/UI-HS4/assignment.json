@@ -1,0 +1,42 @@
+{
+  "package_id": "UI-HS4",
+  "items": [
+    "HS-09",
+    "HS-10",
+    "HS-11",
+    "HS-12",
+    "HS-13"
+  ],
+  "owner": "/root/ui_planning",
+  "writer": "",
+  "integration_root": "/home/shengjunqiu/code/pms-demo",
+  "workdir": "/tmp/pms-ui-costs",
+  "branch": "pms/ui-costs",
+  "base_commit": "e17a6ac",
+  "contract_commit": "e17a6ac",
+  "owned_paths": [
+    "src/pages/execution/LaborCostPage.tsx",
+    "src/pages/execution/CostSourcesPage.tsx",
+    "src/pages/execution/DynamicAccountingPage.tsx",
+    "e2e/ui-cost-workspace.spec.ts"
+  ],
+  "shared_changes": [],
+  "development_dependencies": [],
+  "acceptance_dependencies": [],
+  "acceptance_ready": true,
+  "acceptance_group": "UI-HS4",
+  "status": "integrated_pending_acceptance",
+  "last_confirmed_at": "2026-09-11",
+  "acceptance_checklist": [
+    "工程检查",
+    "真实工时/采购外包费用入账核算链",
+    "双宽及敏感权限",
+    "正式accept"
+  ],
+  "scenarios": "按/tmp/pms-ui-costs-preparation.md",
+  "fixtures": "真实原单UI链，不伪造金额和状态",
+  "next_action": "正式工程与真实成本入账链",
+  "delivery_commit": "df55d7eef0de17d1b4f41caf35cbd26d228f217c",
+  "scope_check": "passed",
+  "integration_commit": "b79eff0"
+}

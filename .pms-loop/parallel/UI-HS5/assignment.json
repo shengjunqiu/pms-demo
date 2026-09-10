@@ -1,0 +1,38 @@
+{
+  "package_id": "UI-HS5",
+  "items": [
+    "HS-14",
+    "HS-15"
+  ],
+  "owner": "/root/ui_opportunities",
+  "writer": "",
+  "integration_root": "/home/shengjunqiu/code/pms-demo",
+  "workdir": "/tmp/pms-ui-changes",
+  "branch": "pms/ui-changes",
+  "base_commit": "7fdb144",
+  "contract_commit": "7fdb144",
+  "owned_paths": [
+    "src/pages/changes/ChangesPage.tsx",
+    "src/pages/changes/ChangeFormPage.tsx",
+    "e2e/ui-changes.spec.ts"
+  ],
+  "shared_changes": [],
+  "development_dependencies": [],
+  "acceptance_dependencies": [
+    "root接入旧审批返回筛选与评估原收入快照"
+  ],
+  "acceptance_ready": false,
+  "acceptance_group": "UI-HS5",
+  "status": "submitted",
+  "last_confirmed_at": "2026-09-11",
+  "acceptance_checklist": [
+    "工程检查",
+    "真实变更评估审批基线链",
+    "双宽及权限",
+    "正式accept"
+  ],
+  "scenarios": "按/tmp/pms-ui-changes-preparation.md",
+  "fixtures": "真实UI评估审批，不直接伪造通过状态",
+  "next_action": "范围检查已通过，等待工单和成本验收后集成",
+  "delivery_commit": "93987a5cdcadb43439bc1bda6dfed225216b3502"
+}

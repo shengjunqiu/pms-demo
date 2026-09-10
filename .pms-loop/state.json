@@ -195,20 +195,20 @@
       "round": "R0047"
     },
     "JS-01": {
-      "status": "done",
-      "round": "R0028"
+      "status": "pending",
+      "reason": "继续全页面UI改造：内部供应商客户验收与报验当前办理、准备条件和版本清晰。"
     },
     "JS-02": {
-      "status": "done",
-      "round": "R0028"
+      "status": "pending",
+      "reason": "继续全页面UI改造：内部供应商客户验收与报验当前办理、准备条件和版本清晰。"
     },
     "JS-03": {
-      "status": "done",
-      "round": "R0022"
+      "status": "pending",
+      "reason": "继续全页面UI改造：内部供应商客户验收与报验当前办理、准备条件和版本清晰。"
     },
     "JS-04": {
-      "status": "done",
-      "round": "R0022"
+      "status": "pending",
+      "reason": "继续全页面UI改造：内部供应商客户验收与报验当前办理、准备条件和版本清晰。"
     },
     "JS-05": {
       "status": "done",
@@ -320,7 +320,7 @@
     },
     "FINAL": {
       "status": "pending",
-      "reason": "继续全页面UI改造：变更台账与申请评估审批对比，保留基线和专业权限。"
+      "reason": "继续全页面UI改造：内部供应商客户验收与报验当前办理、准备条件和版本清晰。"
     }
   },
   "runs": [
@@ -1929,6 +1929,10 @@
     {
       "at": "2026-09-10T21:36:48+00:00",
       "text": "R0048工单四页验收，新UI44/72。最终62400ffc工程235领域及browser-complete五例2.6min exit0，四页双宽/表单已查看。修Select歧义/长表单/实时筛选链接；测试等待query实际渲染、有效团队transition前置，保留失败和143中断日志。独立setsid nohup /tmp/pms-browser-run.py解决测试shell中断，后续可复用参数化runner，须等exit.json=0。继续成本fe6bf2b+df55d7e；变更93987a5待共享返回/收入快照评估。"
+    },
+    {
+      "at": "2026-09-10T21:37:03+00:00",
+      "text": "reopen FINAL, JS-01, JS-02, JS-03, JS-04: 继续全页面UI改造：内部供应商客户验收与报验当前办理、准备条件和版本清晰。"
     }
   ],
   "history": [
