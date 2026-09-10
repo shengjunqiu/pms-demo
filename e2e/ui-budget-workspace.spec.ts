@@ -38,12 +38,13 @@ test('UI 团队：维护成员投入、原因与当前主PM退出限制', async 
   await dialog.getByRole('button', { name: /^确\s*定$/ }).click();
   await expect(dialog).toBeHidden();
   await expect(memberTable).toContainText('80% / 240小时');
-  await expect(page.getByText(/按交付阶段调整资源投入/)).toBeVisible();
+  await expect(page.locator('.ant-timeline').getByText(/按交付阶段调整资源投入/)).toBeVisible();
 });
 test('UI 预算工作区：五页上下文、版本来源、只读审批与基线快照', async ({ page }) => {
   await navigate(page, '/projects/P-PLAN-001/budget');
   await expect(page.getByRole('heading', { name: '项目预算编制', exact: true })).toBeVisible();
   await expect(page.locator('.ant-statistic')).toHaveCount(6);
+  await expect(page.locator('.ant-statistic').filter({ hasText: '预算差异（万元）' }).locator('.ant-statistic-content')).toHaveText('0.00');
   await capture(page, 'YS09');
   await page.getByRole('tab', { name: '建设采购', exact: true }).click();
   await page.getByRole('button', { name: '新增建设采购', exact: true }).click();

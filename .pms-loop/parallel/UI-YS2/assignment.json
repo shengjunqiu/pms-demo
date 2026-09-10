@@ -27,9 +27,9 @@
   "shared_changes": [],
   "development_dependencies": [],
   "acceptance_dependencies": [],
-  "acceptance_ready": true,
+  "acceptance_ready": false,
   "acceptance_group": "UI-YS2",
-  "status": "integrated",
+  "status": "accepted",
   "last_confirmed_at": "2026-09-11",
   "acceptance_checklist": [
     "工程检查及235领域测试",
@@ -39,7 +39,8 @@
   ],
   "scenarios": "按/tmp/pms-ui-ys2-preparation.md实施；范围/预算版本和权限保持",
   "fixtures": "P-PLAN-001/P-001及真实transition准备",
-  "next_action": "范围检查通过并集成；等待正式当前源码验收",
+  "next_action": "五页新UI正式验收完成",
   "delivery_commit": "75625c7e4fe20b8302bde50d76df53a57450fbec",
-  "integration_commit": "74d6954"
+  "integration_commit": "74d6954",
+  "acceptance_round": "R0042"
 }
