@@ -8,6 +8,7 @@ import type {
 import { assertConstructionWritable } from './construction-lock';
 import { validPlanDate } from './budget';
 import { canManageOpportunity } from './opportunities';
+import { canAccessProject } from './configuration-access';
 import { money, percentage, sumMoney } from '@/utils/money';
 
 export const UNSIGNED_RULE = {
@@ -112,14 +113,31 @@ export function canManageUnsigned(
   return !!opportunity && canManageOpportunity(state, opportunity, actor);
 }
 
+export function canViewUnsignedProject(
+  state: BusinessState,
+  project: Project,
+  actor: Actor,
+) {
+  if (!canAccessProject(state, actor, project)) return false;
+  return (
+    ['pmo', 'executive', 'finance', 'admin'].includes(actor.role) ||
+    canManageUnsigned(state, project, actor)
+  );
+}
+
 export function startupChecks(state: BusinessState, project: Project) {
   const application = state.initiations.find((item) => item.projectId === project.id);
   const team = state.projectTeams[project.id];
-  const acceptedAppointments =
-    team?.appointments.filter((appointment) => appointment.status === '已接受') ?? [];
-  const appointed = acceptedAppointments.find(
-    (appointment) => appointment.userId === project.pmId,
-  );
+  const appointed = [...(team?.appointments ?? [])]
+    .reverse()
+    .find(
+      (appointment) =>
+        appointment.userId === project.pmId && appointment.status === '已接受',
+    );
+  const activePmMembers =
+    team?.members.filter(
+      (member) => member.active && member.role === '项目经理',
+    ) ?? [];
   const baseline = state.baselines.find(
     (item) =>
       item.projectId === project.id &&
@@ -190,10 +208,11 @@ export function startupChecks(state: BusinessState, project: Project) {
       passed:
         !!project.pmId &&
         !!appointed &&
-        acceptedAppointments.length === 1 &&
+        activePmMembers.length === 1 &&
+        activePmMembers[0].userId === project.pmId &&
         !team?.appointments.some((appointment) => appointment.status === '待接受'),
       detail: appointed
-        ? `${appointed.id} / ${project.pmName} 已接受；有效主PM ${acceptedAppointments.length} 人`
+        ? `${appointed.id} / ${project.pmName} 已接受；当前有效项目经理 ${activePmMembers.length} 人`
         : '待PMO任命并由候选人接受',
     },
     {
@@ -424,6 +443,20 @@ export function applyUnsignedAction(
       throw new Error(
         failed.map((check) => `${check.name}：${check.detail}`).join('；'),
       );
+    const backdatedSources = [
+      { name: '合同签订日期', date: result.contract!.signDate },
+      { name: '当前基线生效日期', date: result.baseline!.createdAt },
+      { name: '当前主PM接受任命日期', date: result.appointed!.respondedAt },
+    ].filter(
+      (source): source is { name: string; date: string } =>
+        !!source.date && action.date < source.date,
+    );
+    if (backdatedSources.length)
+      throw new Error(
+        `实际启动日期不得早于${backdatedSources
+          .map((source) => `${source.name} ${source.date}`)
+          .join('、')}`,
+      );
     const work = executionWork(state, project);
     const recipients = [
       ...new Set([
@@ -475,6 +508,8 @@ export function applyUnsignedAction(
     return project.id;
   }
 
+  if (action.type === 'exit-unsigned' && control.exit)
+    throw new Error('退出复盘已形成，不得重复决策或覆盖历史');
   if (!project.isUnsigned || control.exit?.terminated)
     throw new Error('仅有效未签项目可办理');
 

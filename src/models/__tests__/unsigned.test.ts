@@ -2,18 +2,22 @@ import { AS_OF_DATE } from '@/mock';
 import { describe, expect, it } from 'vitest';
 import { createBusinessState, transition, type Actor } from '@/mock/business';
 import {
+  canViewUnsignedProject,
+  startupChecks,
   unsignedControl,
   unsignedSummary,
   type ContractRegistration,
 } from '@/mock/unsigned';
 import { selectTodos } from '@/mock/todos';
 import { canAccessAction, selectAccessPolicy } from '@/mock/configuration-access';
+import { inOrganization } from '@/mock/selectors';
 
 const market: Actor = { id: 'U-006', name: '陈亮', role: 'market' };
 const pmo: Actor = { id: 'U-002', name: '李主任', role: 'pmo' };
 const pm: Actor = { id: 'U-001', name: '张伟', role: 'project-manager' };
 const finance: Actor = { id: 'U-004', name: '刘敏', role: 'finance' };
 const leader: Actor = { id: 'U-003', name: '王总', role: 'executive' };
+const replacementPm: Actor = { id: 'U-005', name: '赵工', role: 'solution-tech' };
 const planId = 'P-PLAN-001';
 const registration: ContractRegistration = {
   code: 'CON-TEST-START',
@@ -29,10 +33,18 @@ const registration: ContractRegistration = {
   ],
 };
 
-function planned() {
+function planned(plannedStartDate = AS_OF_DATE) {
   const initial = createBusinessState();
-  initial.projects.find((project) => project.id === planId)!.plannedStartDate = AS_OF_DATE;
-  initial.planningDrafts[planId].plannedStartDate = AS_OF_DATE;
+  initial.projects.find((project) => project.id === planId)!.plannedStartDate =
+    plannedStartDate;
+  initial.planningDrafts[planId].plannedStartDate = plannedStartDate;
+  const currentAppointment = initial.projectTeams[planId].appointments.find(
+    (appointment) =>
+      appointment.userId === initial.projects.find((project) => project.id === planId)!.pmId &&
+      appointment.status === '已接受',
+  )!;
+  currentAppointment.nominatedAt = plannedStartDate;
+  currentAppointment.respondedAt = plannedStartDate;
   let state = transition(
     initial,
     { type: 'submit-planning', projectId: planId },
@@ -91,6 +103,38 @@ const requestInvestment = {
 };
 
 describe('未签投入、合同及正式启动', () => {
+  it('未签台账与详情使用当前操作者的组织和本人范围过滤项目', () => {
+    const state = createBusinessState();
+    const inside = state.projects.find((project) => project.id === planId)!;
+    const outside = state.projects.find(
+      (project) =>
+        project.isUnsigned &&
+        !inOrganization(project.departmentId, inside.departmentId),
+    )!;
+    const policy = selectAccessPolicy(state, pmo.role)!;
+    policy.dataScope = 'organizations';
+    policy.orgIds = [inside.departmentId];
+    expect(canViewUnsignedProject(state, inside, pmo)).toBe(true);
+    expect(canViewUnsignedProject(state, outside, pmo)).toBe(false);
+
+    state.projectTeams[inside.id].members.push({
+      userId: pmo.id,
+      name: pmo.name,
+      departmentId: inside.departmentId,
+      role: 'PMO监督',
+      active: true,
+      startDate: '2026-01-01',
+      endDate: '2026-12-31',
+      allocation: 10,
+      plannedHours: 8,
+      keyPosition: false,
+    });
+    policy.dataScope = 'self';
+    policy.orgIds = [];
+    expect(canViewUnsignedProject(state, inside, pmo)).toBe(true);
+    expect(canViewUnsignedProject(state, outside, pmo)).toBe(false);
+  });
+
   it('追加申请固定敞口与额度，待审不释放，重复申请阻断，批准后只改额度和授权时限', () => {
     const initial = createBusinessState();
     const project = initial.projects.find((item) => item.id === planId)!;
@@ -344,6 +388,125 @@ describe('未签投入、合同及正式启动', () => {
     ).toThrow('不得重复');
   });
 
+  it('主PM合法换任只认当前接受任命和唯一有效项目经理，不把历史接受记录计为冲突', () => {
+    let state = planned();
+    state = transition(
+      state,
+      {
+        type: 'nominate-pm',
+        projectId: planId,
+        userId: replacementPm.id,
+        reason: '原主PM调整，由交付骨干接任',
+      },
+      pmo,
+    );
+    state = transition(
+      state,
+      {
+        type: 'respond-pm',
+        projectId: planId,
+        accept: true,
+        opinion: '接受任命并承接当前有效基线',
+      },
+      replacementPm,
+    );
+    const project = state.projects.find((item) => item.id === planId)!;
+    const team = state.projectTeams[planId];
+    expect(team.appointments.filter((appointment) => appointment.status === '已接受')).toHaveLength(2);
+    expect(
+      team.members.filter(
+        (member) => member.active && member.role === '项目经理',
+      ),
+    ).toMatchObject([{ userId: replacementPm.id }]);
+    const result = startupChecks(state, project);
+    expect(result.appointed?.userId).toBe(replacementPm.id);
+    expect(result.checks.find((check) => check.key === 'pm')?.passed).toBe(true);
+
+    state = transition(
+      state,
+      {
+        type: 'confirm-project-contract',
+        projectId: planId,
+        registration,
+        source: '原单一致',
+      },
+      market,
+    );
+    state = transition(
+      state,
+      {
+        type: 'confirm-project-start',
+        projectId: planId,
+        date: AS_OF_DATE,
+        opinion: '换任责任已落实，正式启动',
+      },
+      pmo,
+    );
+    expect(state.startConfirmations[planId].appointmentId).toBe(
+      team.appointments.at(-1)!.id,
+    );
+  });
+
+  it('实际启动日期不得早于合同签订、当前基线生效或当前主PM接受任命日期', () => {
+    let ready = planned('2026-09-01');
+    ready = transition(
+      ready,
+      {
+        type: 'confirm-project-contract',
+        projectId: planId,
+        registration,
+        source: '原单一致',
+      },
+      market,
+    );
+    const command = {
+      type: 'confirm-project-start' as const,
+      projectId: planId,
+      date: '2026-09-08',
+      opinion: '补录启动',
+    };
+
+    const beforeContract = structuredClone(ready);
+    beforeContract.baselines.find(
+      (baseline) =>
+        baseline.projectId === planId && baseline.status === '已生效',
+    )!.createdAt = '2026-09-01';
+    beforeContract.projectTeams[planId].appointments.find(
+      (appointment) =>
+        appointment.userId === beforeContract.projects.find((item) => item.id === planId)!.pmId &&
+        appointment.status === '已接受',
+    )!.respondedAt = '2026-09-01';
+    expect(() => transition(beforeContract, command, pmo)).toThrow('合同签订日期');
+
+    const beforeBaseline = structuredClone(ready);
+    beforeBaseline.contracts.find(
+      (contract) => contract.projectId === planId && contract.status === '已签订',
+    )!.signDate = '2026-09-01';
+    beforeBaseline.projectTeams[planId].appointments.find(
+      (appointment) =>
+        appointment.userId === beforeBaseline.projects.find((item) => item.id === planId)!.pmId &&
+        appointment.status === '已接受',
+    )!.respondedAt = '2026-09-01';
+    expect(() => transition(beforeBaseline, command, pmo)).toThrow('当前基线生效日期');
+
+    const beforeAppointment = structuredClone(ready);
+    beforeAppointment.contracts.find(
+      (contract) => contract.projectId === planId && contract.status === '已签订',
+    )!.signDate = '2026-09-01';
+    beforeAppointment.baselines.find(
+      (baseline) =>
+        baseline.projectId === planId && baseline.status === '已生效',
+    )!.createdAt = '2026-09-01';
+    beforeAppointment.projectTeams[planId].appointments.find(
+      (appointment) =>
+        appointment.userId === beforeAppointment.projects.find((item) => item.id === planId)!.pmId &&
+        appointment.status === '已接受',
+    )!.respondedAt = AS_OF_DATE;
+    expect(() => transition(beforeAppointment, command, pmo)).toThrow(
+      '当前主PM接受任命日期',
+    );
+  });
+
   it('执行事项保存原业务动作标识，后续策略收紧会实时禁止办理而非绕过', () => {
     let state = planned();
     state = transition(
@@ -409,6 +572,39 @@ describe('未签投入、合同及正式启动', () => {
       reason: '结算检查',
     };
     expect(() => transition(state, command, pmo)).toThrow('冻结');
+  });
+
+  it('退出复盘一经形成即不可二次决策覆盖，包括首次选择继续跟踪', () => {
+    let state = createBusinessState();
+    const project = state.projects.find((item) => item.id === 'P-004')!;
+    const firstDecision = {
+      type: 'exit-unsigned' as const,
+      projectId: project.id,
+      reason: '客户采购计划暂缓',
+      resources: '保留最小跟进团队',
+      recoverableAssets: '测试设备可调拨',
+      responsibility: '主办部门继续跟踪',
+      recommendation: '维持未签管控并定期复盘',
+      terminated: false,
+      reactivationPossible: true,
+    };
+    state = transition(state, firstDecision, pmo);
+    const preserved = structuredClone(state.unsignedProjects[project.id].exit);
+    expect(() =>
+      transition(
+        state,
+        {
+          ...firstDecision,
+          reason: '第二次覆盖原决定',
+          terminated: true,
+        },
+        pmo,
+      ),
+    ).toThrow('不得重复决策或覆盖历史');
+    expect(state.unsignedProjects[project.id].exit).toEqual(preserved);
+    expect(state.projects.find((item) => item.id === project.id)?.status).not.toBe(
+      '已终止',
+    );
   });
 
   it('退出保留已发生流水和成本快照，追加审批不能给已终止项目释放额度', () => {
