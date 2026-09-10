@@ -16,7 +16,8 @@ export function laborAvailability(state: BusinessState, projectId: string, exclu
   const p = state.projects.find((p) => p.id === projectId)!;
   const s = selectFourCalculations(p, state).subjects.find((s) => s.subjectId === 'SUB-01');
   const milestones = state.milestones.filter((m) => m.projectId === p.id && m.status === '已达成');
-  const releaseRate = milestones.some((m) => m.type === '客户终验') ? 100 : milestones.some((m) => m.type === '内部初验') ? 90 : milestones.some((m) => m.type === '开发完成') ? 75 : milestones.some((m) => m.type === '启动') ? 60 : 0;
+  const milestoneRate = milestones.some((m) => m.type === '客户终验') ? 100 : milestones.some((m) => m.type === '内部初验') ? 90 : milestones.some((m) => m.type === '开发完成') ? 75 : milestones.some((m) => m.type === '启动') ? 60 : 0;
+  const releaseRate = Math.max(milestoneRate, p.releasedBudgetPercent ?? 0);
   const pending = sumMoney(state.laborEntries.filter((e) => e.projectId === p.id && e.status === '待审核' && e.id !== excludeId).map((e) => e.amount));
   const released = money((s?.budget ?? 0) * releaseRate / 100);
   return { budget: s?.budget ?? 0, actual: s?.actual ?? 0, committed: s?.committed ?? 0, released, releaseRate, pending, available: money(released - (s?.actual ?? 0) - pending) };

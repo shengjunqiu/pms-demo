@@ -48,6 +48,7 @@ export const AppRouter: React.FC = () => {
         <Route path="management-approvals/:id" element={<ManagementApprovalPage />} />
         <Route path="approvals/:id" element={<BudgetApprovalPage />} />
         <Route path="executive/exceptions" element={<GL05ExceptionsPage />} />
+        <Route path="projects/:id/stage-switch" element={<PlanRequestPage stageEntry />} />
         <Route path="projects/:id/labor-cost" element={<LaborCostPage />} />
         <Route path="projects/:id/daily-reports" element={<ReportsPage key="daily" />} />
         <Route path="projects/:id/weekly-reports" element={<ReportsPage key="weekly" weekly />} />

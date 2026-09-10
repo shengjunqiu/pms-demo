@@ -1,0 +1,28 @@
+
+> pms-demo@1.0.0 test:domain /home/shengjunqiu/code/pms-demo
+> vitest run
+
+
+ RUN  v3.2.7 /home/shengjunqiu/code/pms-demo
+
+ ✓ src/models/__tests__/cost-orders.test.ts (3 tests) 645ms
+   ✓ 外包引用本项目WBS与基线并通过履约验收，费用只在财务入账后进入实际  327ms
+ ✓ src/models/__tests__/portfolio.test.ts (2 tests) 1809ms
+   ✓ 四算科目跨项目加总守恒，结算比较只纳入锁定项目  1788ms
+ ✓ src/models/__tests__/reports.test.ts (3 tests) 819ms
+   ✓ 质量整改独立闭环，材料版本经质量门与PMO审核后才允许里程碑达成  535ms
+ ✓ src/models/__tests__/business.test.ts (13 tests) 5333ms
+   ✓ 领导待决策与到期回款 > 每条决策关联真实审批快照；审批后原事项及当前预算联动，历史记录仍可读取  2108ms
+   ✓ 管理审批联动原事项但不跳过风险、终验和结算流程；未签审批只变更额度  2265ms
+ ✓ src/models/__tests__/labor.test.ts (3 tests) 529ms
+ ✓ src/models/__tests__/domain.test.ts (10 tests) 763ms
+   ✓ Domain & Data Contract Invariants > 所有实体ID唯一，所有项目和上游引用可解析；已确认流水绑定唯一来源凭证  586ms
+ ✓ src/models/__tests__/tickets.test.ts (4 tests) 546ms
+ ✓ src/models/__tests__/stage.test.ts (2 tests) 413ms
+ ✓ src/models/__tests__/progress.test.ts (4 tests) 278ms
+
+ Test Files  9 passed (9)
+      Tests  44 passed (44)
+   Start at  09:07:13
+   Duration  15.04s (transform 2.01s, setup 0ms, collect 23.71s, tests 11.13s, environment 5ms, prepare 3.26s)
+

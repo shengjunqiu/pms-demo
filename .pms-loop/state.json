@@ -187,8 +187,8 @@
       "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
     },
     "HS-16": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0019"
     },
     "HS-17": {
       "status": "done",
@@ -765,6 +765,36 @@
         ".pms-loop/runs/R0018/artifacts/hs-09-1280.png": "fa6dceaabd0f352c81117f1f8366447ab83f1faab1b2d834d2b78d65c96f9783",
         ".pms-loop/runs/R0018/checks.json": "0ca5c62c3e6be681852997b09f7f9accf9353f9e38aa76c13fe068ad02f35343",
         ".pms-loop/runs/R0018/evidence.json": "39ee3bbc12ac0fb523a685474fdb1fecf4cdedf4783267d52dab0678c9040c99"
+      }
+    },
+    {
+      "id": "R0019",
+      "items": [
+        "HS-16"
+      ],
+      "started_at": "2026-09-10T00:58:28+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-10T01:15:14+00:00",
+      "revision": "796b39174def707fd407c23eb115b8d40f53580ccad9d709af0be2f5345f8957",
+      "proof": {
+        ".pms-loop/runs/R0019/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0019/test-domain.log": "64526f88d484c1b3756c08fbaca8bd7637acad664cd3eb07fc67f879bf762b88",
+        ".pms-loop/runs/R0019/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0019/build.log": "6a0c734bdfe0b3123e7d944cb8c74d7380917d517381fa2db9d06fa2d45211cb",
+        ".pms-loop/runs/R0019/artifacts/console.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        ".pms-loop/runs/R0019/artifacts/stage-approved.txt": "d29e963bba605087eb4414d63a503c0466e7015b893c640a68183da2e736b9ee",
+        ".pms-loop/runs/R0019/artifacts/stage-release.txt": "f0730b7e85e761b830a5f3801fa8fbfba581f5dad67e7f33467d8786f2c5b05d",
+        ".pms-loop/runs/R0019/artifacts/stage-archive.txt": "47b875b58b70b38241ab31ae152835cafe8642d5a770d9aa68bb61b194d141ce",
+        ".pms-loop/runs/R0019/artifacts/hs-16-1440.png": "b81b61e38708d11dcc1572274ca922d5f615e7f01b826d3436db809235c2f2f2",
+        ".pms-loop/runs/R0019/artifacts/hs-16-1280.png": "4fb8c713ed5e7fdc15883015fa3ee0dab3ba0170f5d362b1eb9a04f42b2e4b28",
+        ".pms-loop/runs/R0019/checks.json": "01ffc3bb964e7d30c5aceb3bfb9c1ec18bed8c621e3ddf1f0c5b92de66dfeec7",
+        ".pms-loop/runs/R0019/evidence.json": "95a3e31ca29eca0a1767fcc4952140d32c5213db1721335d044e35a3a1630dfa"
       }
     }
   ],

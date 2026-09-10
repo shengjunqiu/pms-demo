@@ -1,3 +1,4 @@
+import { stageChecks, stageSnapshot, STAGE_RULE, type StageSnapshot } from '@/mock/stage';
 import { applyLaborAction, type LaborAction, type LaborEntry } from '@/mock/labor';
 import { applyDeliverableAction, type DeliverableAction, type DocumentDetails, type QualityPlan } from '@/mock/deliverables';
 import { applyReportAction, type ReportAction } from '@/mock/reports';
@@ -23,6 +24,7 @@ export interface ManagementApproval {
   originalQuota?: number; proposedQuota?: number; impactAmount: number;
 }
 export interface PlanRequest {
+  stageSnapshot?: StageSnapshot; approvalSnapshot?: StageSnapshot; reviewedAt?: string;
   id: string; projectId: string; kind: 'schedule' | 'stage'; reason: string; status: '待审批' | '通过' | '驳回';
   requiredRoles: ('pmo' | 'finance')[]; reviews: { role: UserRole; approve: boolean; opinion: string }[]; sourceRequirementId?: string; submittedBy: string; submittedAt: string; baselineId: string; tasks: WbsTask[]; shiftDays: number; opinion?: string;
 }
@@ -166,6 +168,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     const p = project(action.projectId); target = p.id;
     requireRole('project-manager');
     if (actor.id !== p.pmId || state.lockedProjects.includes(p.id)) throw new Error('仅未锁定项目主PM可提交');
+    if (p.phase !== '执行' || p.status === '已终止') throw new Error('仅执行中项目可申请计划或阶段变更');
     if (!action.reason.trim()) throw new Error('申请说明必填');
     if (action.kind === 'schedule' && (!Number.isInteger(action.shiftDays) || action.shiftDays < 1 || action.shiftDays > 90)) throw new Error('演示计划顺延须为1至90天');
     if (state.planRequests.some((r) => r.projectId === p.id && r.status === '待审批')) throw new Error('已有待审批计划事项');
@@ -173,7 +176,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     if (action.sourceRequirementId && !origin) throw new Error('来源需求与项目不符');
     const baseline = state.baselines.find((b) => b.projectId === p.id && b.status === '已生效')!;
     if (origin && state.ticketMeta[origin.id]) state.ticketMeta[origin.id].changeRequestId = `PLAN-${state.planRequests.length + 1}`;
-    state.planRequests.push({ id: `PLAN-${state.planRequests.length + 1}`, projectId: p.id, kind: action.kind, sourceRequirementId: origin?.id, reason: action.reason, shiftDays: action.shiftDays, status: '待审批', requiredRoles: action.kind === 'schedule' && action.shiftDays > 30 ? ['pmo', 'finance'] : ['pmo'], reviews: [], submittedBy: actor.id, submittedAt: AS_OF_DATE, baselineId: baseline.id, tasks: structuredClone(state.tasks.filter((t) => t.projectId === p.id)), });
+    state.planRequests.push({ id: `PLAN-${state.planRequests.length + 1}`, projectId: p.id, kind: action.kind, sourceRequirementId: origin?.id, reason: action.reason, shiftDays: action.shiftDays, status: '待审批', requiredRoles: action.kind === 'schedule' && action.shiftDays > 30 ? ['pmo', 'finance'] : ['pmo'], reviews: [], submittedBy: actor.id, submittedAt: AS_OF_DATE, baselineId: baseline.id, tasks: structuredClone(state.tasks.filter((t) => t.projectId === p.id)), stageSnapshot: action.kind === 'stage' ? stageSnapshot(state,p.id) : undefined });
   } else if (action.type === 'review-plan') {
     const request = state.planRequests.find((r) => r.id === action.id);
     if (!request || request.status !== '待审批') throw new Error('事项不存在或已处理');
@@ -185,6 +188,8 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     const allPassed = request.requiredRoles.every((role) => request.reviews.some((r) => r.role === role && r.approve));
     if (action.approve && allPassed) {
       if (request.kind === 'stage') {
+        if (state.baselines.find((b) => b.projectId === p.id && b.status === '已生效')?.id !== request.baselineId) throw new Error('基线已变化，请重新申报阶段切换');
+        request.approvalSnapshot = stageSnapshot(state,p.id);
         const next = transition(state, { type: 'stage-gate', projectId: p.id }, actor);
         state.projects = next.projects;
       } else {
@@ -200,7 +205,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
         p.plannedEndDate = shift(p.plannedEndDate);
       }
     }
-    request.status = !action.approve ? '驳回' : allPassed ? '通过' : '待审批'; request.opinion = action.opinion;
+    request.status = !action.approve ? '驳回' : allPassed ? '通过' : '待审批'; request.opinion = action.opinion; request.reviewedAt = AS_OF_DATE;
   } else if (action.type === 'close-issue') {
     const issue = state.issues.find((i) => i.id === action.id);
     if (!issue) throw new Error('问题不存在');
@@ -225,12 +230,9 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     risk.status = '已转问题'; target = risk.id;
   } else if (action.type === 'stage-gate') {
     requireRole('pmo'); const p = project(action.projectId); target = p.id;
-    if (p.phase !== '执行') throw new Error('当前阶段不能切换');
-    const materials = state.materials.filter((m) => m.projectId === p.id && m.required);
-    if (!materials.length || materials.some((m) => m.status !== '通过')) throw new Error('必交材料缺失或审核未通过');
-    const milestone = state.milestones.find((m) => m.projectId === p.id && m.type === '开发完成');
-    if (milestone?.status !== '已达成' || p.progressRate < 100 || state.issues.some((i) => i.projectId === p.id && i.severity === '重大' && i.status !== '已关闭')) throw new Error('里程碑未完成或重大问题未关闭');
-    p.phase = '收尾'; p.subPhase = '客户终验';
+    const failed = stageChecks(state,p.id).filter((c) => !c.passed);
+    if (failed.length) throw new Error(failed.map((c) => `${c.name}：${c.detail}`).join('；'));
+    p.phase = STAGE_RULE.targetPhase; p.subPhase = STAGE_RULE.targetSubPhase; p.releasedBudgetPercent = STAGE_RULE.releasePercent;
   } else if (action.type === 'settle') {
     requireRole('finance'); const p = project(action.projectId); target = p.id;
     if (state.lockedProjects.includes(p.id)) throw new Error('禁止重复结算');

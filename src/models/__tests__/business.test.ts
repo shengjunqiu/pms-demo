@@ -90,6 +90,7 @@ describe('审批、权限及成本锁定', () => {
   it('阶段门缺材料/待审核/里程碑未完成均阻断；满足后实际进入收尾', () => {
     const state = createBusinessState();
     state.projects[0].progressRate = 100;
+    state.tasks.filter((t) => t.projectId === 'P-001').forEach((t) => { t.progress = 100; });
     expect(() => transition(state, { type: 'stage-gate', projectId: 'P-001' }, pmo)).toThrow('材料');
     state.materials.filter((m) => m.projectId === 'P-001').forEach((m) => { m.status = '待审核'; });
     expect(() => transition(state, { type: 'stage-gate', projectId: 'P-001' }, pmo)).toThrow('材料');

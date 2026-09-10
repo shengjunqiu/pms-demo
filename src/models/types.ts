@@ -75,6 +75,7 @@ export interface EstimateVersion {
 // 项目实体
 export interface Project {
   memberIds?: string[];
+  releasedBudgetPercent?: number;
   id: string;
   code: string;
   name: string;

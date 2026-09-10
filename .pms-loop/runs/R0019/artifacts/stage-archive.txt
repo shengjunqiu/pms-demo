@@ -1,0 +1,250 @@
+- complementary:
+  - img "safety-certificate":
+  - generic: 企业四算管控平台
+  - menu:
+    - menuitem "dashboard 领导经营驾驶舱" [expanded]:
+      - img "dashboard":
+      - generic: 领导经营驾驶舱
+    - menu:
+      - menuitem "GL-01 项目经营驾驶舱":
+        - generic: GL-01 项目经营驾驶舱
+      - menuitem "GL-02 四算经营专题":
+        - generic: GL-02 四算经营专题
+      - menuitem "GL-03 项目穿透分析":
+        - generic: GL-03 项目穿透分析
+      - menuitem "GL-04 项目组合分析":
+        - generic: GL-04 项目组合分析
+      - menuitem "GL-05 项目异常中心":
+        - generic: GL-05 项目异常中心
+      - menuitem "GL-06 领导待决策事项":
+        - generic: GL-06 领导待决策事项
+    - menuitem "appstore 工作台与待办" [expanded]:
+      - img "appstore":
+      - generic: 工作台与待办
+    - menu:
+      - menuitem "WK-01 项目经理工作台":
+        - generic: WK-01 项目经理工作台
+      - menuitem "WK-02 我的待办中心":
+        - generic: WK-02 我的待办中心
+    - menuitem "dollar 商机与概算阶段":
+      - img "dollar":
+      - generic: 商机与概算阶段
+    - menuitem "project 预算与立项阶段":
+      - img "project":
+      - generic: 预算与立项阶段
+    - menuitem "schedule 核算与执行阶段" [expanded]:
+      - img "schedule":
+      - generic: 核算与执行阶段
+    - menu:
+      - menuitem "HS-01 项目详情总览":
+        - generic: HS-01 项目详情总览
+      - menuitem "HS-02 项目进度":
+        - generic: HS-02 项目进度
+      - menuitem "HS-03 项目日报":
+        - generic: HS-03 项目日报
+      - menuitem "HS-04 项目周报":
+        - generic: HS-04 项目周报
+      - menuitem "HS-05 需求BUG台账":
+        - generic: HS-05 需求BUG台账
+      - menuitem "HS-06 需求BUG详情":
+        - generic: HS-06 需求BUG详情
+      - menuitem "HS-07 问题风险台账":
+        - generic: HS-07 问题风险台账
+      - menuitem "HS-08 问题风险详情":
+        - generic: HS-08 问题风险详情
+      - menuitem "HS-09 工时与人力成本":
+        - generic: HS-09 工时与人力成本
+      - menuitem "HS-10 采购成本":
+        - generic: HS-10 采购成本
+      - menuitem "HS-11 外包成本":
+        - generic: HS-11 外包成本
+      - menuitem "HS-12 项目费用":
+        - generic: HS-12 项目费用
+      - menuitem "HS-13 动态核算":
+        - generic: HS-13 动态核算
+      - menuitem "HS-14 项目变更台账":
+        - generic: HS-14 项目变更台账
+      - menuitem "HS-15 项目变更申请":
+        - generic: HS-15 项目变更申请
+      - menuitem "HS-16 阶段切换申请":
+        - generic: HS-16 阶段切换申请
+      - menuitem "HS-17 阶段交付物":
+        - generic: HS-17 阶段交付物
+    - menuitem "check-circle 结算与收尾阶段":
+      - img "check-circle":
+      - generic: 结算与收尾阶段
+    - menuitem "setting 系统与规则配置":
+      - img "setting":
+      - generic: 系统与规则配置
+- banner:
+  - button "折叠或展开导航":
+    - img "menu-fold":
+  - generic: HS-17
+  - strong: 阶段交付物
+  - generic: 列表/文档
+  - generic: "基准日: 2026-09-09"
+  - generic: "角色:"
+  - generic "模拟身份":
+    - combobox "模拟身份"
+    - img "user":
+    - generic: PMO负责人 (李主任)
+  - img "user":
+  - generic: 李主任
+- main:
+  - navigation:
+    - list:
+      - link "首页":
+        - /url: /
+      - listitem: /
+      - link "福建省晋江市岸海防综合治理平台":
+        - /url: /projects/P-001
+      - listitem: /
+      - listitem: 交付物
+  - heading "HS-17 阶段交付物" [level=4]
+  - generic: P-001 · 福建省晋江市岸海防综合治理平台 · 软件开发/特大型 · 目录模板 DOC-1
+  - button "返回日报与里程碑":
+    - generic: 返回日报与里程碑
+  - button "追加必交文档":
+    - generic: 追加必交文档
+  - separator
+  - alert:
+    - img "info-circle":
+    - generic: 演示规则 DOC-1：按项目类型/级别实例化已发布目录，必交项不可移除。文件仅登记名称与版本，不向外传输；质量检查通过后提交PMO审核，收尾后可归档并锁定。
+  - tablist:
+    - tab "交付物目录（3）" [selected]
+    - tab "质量计划、检查与整改"
+  - tabpanel "交付物目录（3）":
+    - textbox "文档查询":
+      - /placeholder: 名称或编号
+    - generic "文档阶段":
+      - combobox "文档阶段"
+      - generic: 全部阶段
+    - button "重置查询":
+      - generic: 重置查询
+    - generic: 必交通过 3 / 3
+    - table:
+      - rowgroup:
+        - row "文档 / 目录 阶段 / 必交 责任人 / 时点 当前文件 / 版本 审核 / 归档 原记录":
+          - columnheader "文档 / 目录"
+          - columnheader "阶段 / 必交"
+          - columnheader "责任人 / 时点"
+          - columnheader "当前文件 / 版本"
+          - columnheader "审核 / 归档"
+          - columnheader "原记录"
+      - rowgroup:
+        - row "测试报告 开发实施 必须 · DOC-1 张建国 2026-09-20 阶段测试报告.pdf V1 通过 已归档 2026-09-09 版本与办理":
+          - cell "测试报告":
+            - button "测试报告":
+              - generic: 测试报告
+          - cell "开发实施 必须 · DOC-1":
+            - text: 开发实施
+            - generic: 必须 · DOC-1
+          - cell "张建国 2026-09-20":
+            - text: 张建国
+            - generic: 2026-09-20
+          - cell "阶段测试报告.pdf V1":
+            - text: 阶段测试报告.pdf
+            - generic: V1
+          - cell "通过 已归档 2026-09-09":
+            - generic: 通过
+            - generic: 已归档 2026-09-09
+          - cell "版本与办理":
+            - button "版本与办理":
+              - generic: 版本与办理
+        - row "验收确认函 客户终验 必须 · DOC-1 张建国 2026-09-20 阶段确认函.pdf V1 通过 未归档 版本与办理":
+          - cell "验收确认函":
+            - button "验收确认函":
+              - generic: 验收确认函
+          - cell "客户终验 必须 · DOC-1":
+            - text: 客户终验
+            - generic: 必须 · DOC-1
+          - cell "张建国 2026-09-20":
+            - text: 张建国
+            - generic: 2026-09-20
+          - cell "阶段确认函.pdf V1":
+            - text: 阶段确认函.pdf
+            - generic: V1
+          - cell "通过 未归档":
+            - generic: 通过
+            - generic: 未归档
+          - cell "版本与办理":
+            - button "版本与办理":
+              - generic: 版本与办理
+        - row "实施计划 项目启动 必须 · DOC-1 张建国 2026-12-31 导入审核快照，未提供原文件 通过 未归档 版本与办理":
+          - cell "实施计划":
+            - button "实施计划":
+              - generic: 实施计划
+          - cell "项目启动 必须 · DOC-1":
+            - text: 项目启动
+            - generic: 必须 · DOC-1
+          - cell "张建国 2026-12-31":
+            - text: 张建国
+            - generic: 2026-12-31
+          - cell "导入审核快照，未提供原文件"
+          - cell "通过 未归档":
+            - generic: 通过
+            - generic: 未归档
+          - cell "版本与办理":
+            - button "版本与办理":
+              - generic: 版本与办理
+    - list:
+      - listitem "上一页":
+        - button "left" [disabled]:
+          - img "left":
+      - listitem "1":
+        - generic: "1"
+      - listitem "下一页":
+        - button "right" [disabled]:
+          - img "right":
+    - generic: 阶段门校验
+    - button "进入阶段切换原申请":
+      - generic: 进入阶段切换原申请
+- dialog "文档版本与阶段审核":
+  - button "关闭":
+    - img "close":
+  - generic: 文档版本与阶段审核
+  - table:
+    - rowgroup:
+      - row "文档 测试报告 阶段 开发实施":
+        - rowheader "文档"
+        - cell "测试报告"
+        - rowheader "阶段"
+        - cell "开发实施"
+      - row "目录模板 DOC-1 · 软件开发/特大型 状态 已归档，不可修改":
+        - rowheader "目录模板"
+        - cell "DOC-1 · 软件开发/特大型"
+        - rowheader "状态"
+        - cell "已归档，不可修改"
+      - row "当前质量检查 通过":
+        - rowheader "当前质量检查"
+        - cell "通过"
+  - button "登记文件新版本" [disabled]:
+    - generic: 登记文件新版本
+  - button "提交当前版本审核" [disabled]:
+    - generic: 提交当前版本审核
+  - button "审核通过" [disabled]:
+    - generic: 审核通过
+  - button "退回补充" [disabled]:
+    - generic: 退回补充
+  - button "确认归档" [disabled]:
+    - generic: 确认归档
+  - table:
+    - rowgroup:
+      - row "版本 / 文件名 上传人 / 日期 状态 审批人 / 意见":
+        - columnheader "版本 / 文件名"
+        - columnheader "上传人 / 日期"
+        - columnheader "状态"
+        - columnheader "审批人 / 意见"
+    - rowgroup:
+      - row "V1 阶段测试报告.pdf 张建国 2026-09-09 通过 李主任 PMO核对质量与测试材料，同意通过":
+        - cell "V1 阶段测试报告.pdf":
+          - text: V1
+          - generic: 阶段测试报告.pdf
+        - cell "张建国 2026-09-09":
+          - text: 张建国
+          - generic: 2026-09-09
+        - cell "通过"
+        - cell "李主任 PMO核对质量与测试材料，同意通过":
+          - text: 李主任
+          - generic: PMO核对质量与测试材料，同意通过
+  - paragraph: 历史版本保留；补充新版本后必须重新审核，不沿用旧版通过状态。
