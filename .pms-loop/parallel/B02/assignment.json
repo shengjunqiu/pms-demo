@@ -13,7 +13,7 @@
   "branch": "pms/budget",
   "base_commit": "085fc83",
   "contract_commit": "1d2c49e",
-  "status": "developing",
+  "status": "integrated_pending_acceptance",
   "writer": "/root/develop_ys",
   "last_confirmed_at": "2026-09-10",
   "owned_paths": "按docs/PARALLEL_DEVELOPMENT.md对应业务域",
@@ -26,6 +26,9 @@
   ],
   "scenarios": "catalog对应页面的全部条件及正常/阻断/角色/版本同步场景",
   "fixtures": "现有固定故事；B01另建合法规划期对象",
-  "next_action": "独立目录实现新业务包；共享接口提案已确认",
-  "delivery_commits": []
+  "next_action": "主目录真实验收与依赖补齐",
+  "delivery_commits": [
+    "201e1b0",
+    "15e4204"
+  ]
 }

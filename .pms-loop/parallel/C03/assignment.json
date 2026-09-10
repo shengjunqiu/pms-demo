@@ -1,18 +1,16 @@
 {
-  "package_id": "C02",
+  "package_id": "C03",
   "items": [
-    "JS-05",
-    "JS-06",
-    "JS-07",
-    "JS-08"
+    "JS-09",
+    "JS-10"
   ],
   "owner": "develop_js",
   "integration_root": "/Users/shengjunqiu/Documents/Code/pms-demo",
   "workdir": "/private/tmp/pms-parallel-js",
   "branch": "pms/settlement",
-  "base_commit": "8551a6d",
+  "base_commit": "b2c1713",
   "contract_commit": "1d2c49e",
-  "status": "integrated_pending_acceptance",
+  "status": "developing",
   "writer": "/root/develop_js",
   "last_confirmed_at": "2026-09-10",
   "owned_paths": "按docs/PARALLEL_DEVELOPMENT.md对应业务域",
@@ -25,9 +23,6 @@
   ],
   "scenarios": "catalog对应页面的全部条件及正常/阻断/角色/版本同步场景",
   "fixtures": "现有固定故事；B01另建合法规划期对象",
-  "next_action": "主目录真实验收与依赖补齐",
-  "delivery_commits": [
-    "a7897e9",
-    "b2c1713"
-  ]
+  "next_action": "按已确认共享接口继续开发，独立提交检查结果",
+  "delivery_commits": []
 }

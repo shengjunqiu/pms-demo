@@ -1,5 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { test, expect, type Page } from '@playwright/test';
 import { navigate, role } from './helpers';
+
+const errorsByPage = new WeakMap<Page, string[]>();
+test.beforeEach(async ({ page }) => { const errors: string[] = []; errorsByPage.set(page, errors); page.on('pageerror', (e) => errors.push(e.message)); page.on('console', (e) => { if (e.type() === 'error') errors.push(e.text()); }); });
+test.afterEach(async ({ page }, info) => { const errors = errorsByPage.get(page) ?? []; const dir = process.env.PMS_LOOP_ARTIFACT_DIR ?? 'test-results'; mkdirSync(dir, { recursive: true }); writeFileSync(join(dir, `browser-${info.testId.replace(/[^a-z0-9]/gi, '')}.json`), JSON.stringify({ title: info.title, status: info.status, url: page.url(), consoleErrors: errors }, null, 2)); expect(errors).toEqual([]); });
 
 const pages = [
   ['GS01', '/opportunities', '客户经理'], ['GS02', '/opportunities/new', '客户经理'],
@@ -23,12 +29,13 @@ for (const width of [1440, 1280]) test(`首批页面可见性和布局 ${width}`
     await expect(page.getByText('403', { exact: true })).toHaveCount(0);
     await expect(page.getByText('404', { exact: true })).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), id).toBe(true);
-    await page.screenshot({ path: `test-results/${id}-${width}.png`, fullPage: true });
+    await page.screenshot({ path: join(process.env.PMS_LOOP_ARTIFACT_DIR ?? 'test-results', `${id}-${width}.png`), fullPage: true });
   }
   expect(errors).toEqual([]);
 });
 
 test('商机提交和重新打开保留同一份业务记录', async ({ page }) => {
+  test.setTimeout(120_000);
   await page.goto('/');
   await role(page, '客户经理');
   await navigate(page, '/opportunities/new');
@@ -45,6 +52,38 @@ test('商机提交和重新打开保留同一份业务记录', async ({ page }) 
   await navigate(page, '/opportunities');
   await navigate(page, path);
   await expect(page.getByText('浏览器验证园区协同项目', { exact: true }).first()).toBeVisible();
+  await page.getByRole('button', { name: '发起评估', exact: true }).first().click();
+  await expect(page.getByRole('button', { name: '确认拟立项', exact: true })).toBeDisabled();
+  for (const [name, dimensions] of [
+    ['客户经理', ['客户价值', '商务风险', '竞争态势']],
+    ['方案架构师', ['技术可行性', '交付难度']],
+    ['财务专员', ['收益与毛利']],
+  ] as const) {
+    if (name !== '客户经理') { await role(page, name); await navigate(page, `${path}/evaluation`); }
+    const forbidden = name === '客户经理' ? '技术可行性' : name === '方案架构师' ? '客户价值' : '交付难度';
+    await expect(page.locator('tr').filter({ hasText: forbidden }).getByRole('button', { name: '填写意见' })).toBeDisabled();
+    for (const dimension of dimensions) {
+      await page.locator('tr').filter({ hasText: dimension }).getByRole('button', { name: '填写意见' }).click();
+      const dialog = page.getByRole('dialog');
+      await dialog.getByLabel('评分（0–100）', { exact: true }).fill('85');
+      await dialog.getByLabel('专业结论', { exact: true }).click();
+      await page.locator('.ant-select-dropdown:visible .ant-select-item-option').filter({ hasText: /^可行$/ }).click();
+      await dialog.getByLabel('风险项与应对建议', { exact: true }).fill('已明确第三方接口依赖与责任人，按周跟踪');
+      await dialog.locator('input[type=file]').setInputFiles({ name: `${dimension}核对.txt`, mimeType: 'text/plain', buffer: Buffer.from('客户需求和专业核对记录') });
+      await dialog.getByLabel('评估说明', { exact: true }).fill(`${dimension}已核对客户需求、资源条件和费用依据`);
+      if (dimension === '收益与毛利') await dialog.getByLabel('初步总成本（万元）').fill('600');
+      await dialog.getByRole('button', { name: '保存本专业意见' }).click();
+      await expect(dialog).toBeHidden();
+    }
+  }
+  await role(page, '客户经理'); await navigate(page, `${path}/evaluation`);
+  await page.getByPlaceholder('结合系统建议说明推进、风险处置与客户沟通依据').fill('六维核对完成，客户预算与交付资源满足，推进方案调研。');
+  await page.getByRole('button', { name: '确认拟立项', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: /确\s*定/ }).click();
+  await expect(page.getByText('已生成方案调研任务', { exact: true })).toBeVisible();
+  for (const width of [1440, 1280]) { await page.setViewportSize({ width, height: 900 }); await page.evaluate(() => window.scrollTo(0, 0)); await page.screenshot({ path: join(process.env.PMS_LOOP_ARTIFACT_DIR ?? 'test-results', `GS04-completed-${width}.png`), fullPage: true }); }
+  await page.getByRole('button', { name: '进入方案任务' }).click();
+  await expect(page).toHaveURL(`${path}/solution`);
 });
 
 test('策划计划经PMO评审后进入预算编制入口', async ({ page }) => {
@@ -59,4 +98,37 @@ test('策划计划经PMO评审后进入预算编制入口', async ({ page }) => 
   await page.getByRole('dialog').getByRole('button', { name: /确\s*定/ }).click();
   await expect(page.getByText('已通过', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: '进入预算编制', exact: true })).toBeVisible();
+});
+
+test('商机必填、草稿、取消及冻结编辑限制', async ({ page }) => {
+  test.setTimeout(60_000);
+  await page.goto('/'); await role(page, '客户经理'); await navigate(page, '/opportunities/new');
+  await page.getByRole('button', { name: '提交商机', exact: true }).click();
+  await expect(page.locator('.ant-form-item-explain-error').first()).toBeVisible();
+  await page.getByLabel('商机名称', { exact: true }).fill('草稿校验商机');
+  await page.getByLabel('客户', { exact: true }).click();
+  await page.locator('.ant-select-dropdown:visible .ant-select-item-option').first().click();
+  await page.getByRole('button', { name: '保存草稿', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: /确\s*定/ }).click();
+  await expect(page).toHaveURL(/\/opportunities\/OPP-NEW-\d+$/);
+  await expect(page.getByText('草稿', { exact: true }).first()).toBeVisible();
+  const path = new URL(page.url()).pathname;
+  await navigate(page, `${path}/edit`);
+  await page.getByLabel('商机名称', { exact: true }).fill('此修改应该取消');
+  await page.getByRole('button', { name: /^取\s*消$/ }).click();
+  await expect(page.getByRole('heading', { name: '草稿校验商机', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: /^暂\s*缓$/ }).click();
+  const pause = page.getByRole('dialog');
+  await pause.getByRole('button', { name: '确认并记录' }).click();
+  await expect(pause.locator('.ant-form-item-explain-error').first()).toBeVisible();
+  await pause.getByLabel('决策原因', { exact: true }).fill('客户预算安排待确认，指定复评责任人');
+  await pause.getByLabel('下次复评日期', { exact: true }).fill('2026-09-20');
+  await pause.getByLabel('下次复评日期', { exact: true }).press('Enter');
+  await pause.getByLabel('复评责任人', { exact: true }).click();
+  await page.locator('.ant-select-dropdown:visible .ant-select-item-option').filter({ hasText: '陈亮' }).click();
+  await pause.getByRole('button', { name: '确认并记录' }).click();
+  await expect(pause).toBeHidden();
+  await expect(page.getByText('暂缓', { exact: true }).first()).toBeVisible();
+  await navigate(page, '/opportunities/OPP-001/edit');
+  await expect(page.getByLabel('商机名称', { exact: true })).toBeDisabled();
 });
