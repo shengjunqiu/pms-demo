@@ -1,0 +1,15 @@
+{
+  "package_id": "access-e2e",
+  "status": "integrated",
+  "formal_acceptance": false,
+  "delivery_commits": [
+    "4be6ffc"
+  ],
+  "integration_commits": [
+    "a650360"
+  ],
+  "actual_paths": [
+    "e2e/access.spec.ts"
+  ],
+  "record_type": "reconstructed from immutable Git deliveries; not a new assignment"
+}

@@ -1,0 +1,22 @@
+{
+  "package_id": "D03",
+  "status": "integrated",
+  "formal_acceptance": false,
+  "delivery_commits": [
+    "8ee1a13",
+    "5986a1c"
+  ],
+  "integration_commits": [
+    "2a0306f",
+    "5371ead"
+  ],
+  "actual_paths": [
+    "src/mock/configuration-access.ts",
+    "src/models/__tests__/configuration-access.test.ts",
+    "src/models/configuration-access.ts",
+    "src/pages/configuration/AuditLogPage.tsx",
+    "src/pages/configuration/PermissionsPage.tsx",
+    "src/routes/modules/configuration-access.tsx"
+  ],
+  "record_type": "reconstructed from immutable Git deliveries; not a new assignment"
+}

@@ -1,0 +1,16 @@
+{
+  "package_id": "D05",
+  "status": "integrated",
+  "formal_acceptance": false,
+  "delivery_commits": [
+    "b850658"
+  ],
+  "integration_commits": [
+    "4c8ee08"
+  ],
+  "actual_paths": [
+    "src/pages/budget/BudgetEditorPage.tsx",
+    "src/pages/execution/LaborCostPage.tsx"
+  ],
+  "record_type": "reconstructed from immutable Git deliveries; not a new assignment"
+}

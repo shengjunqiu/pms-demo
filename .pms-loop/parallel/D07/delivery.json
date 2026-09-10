@@ -1,0 +1,15 @@
+{
+  "package_id": "D07",
+  "status": "integrated",
+  "formal_acceptance": false,
+  "delivery_commits": [
+    "75ec4bc"
+  ],
+  "integration_commits": [
+    "ec058b8"
+  ],
+  "actual_paths": [
+    "src/pages/settlement/PostEvaluationPage.tsx"
+  ],
+  "record_type": "reconstructed from immutable Git deliveries; not a new assignment"
+}

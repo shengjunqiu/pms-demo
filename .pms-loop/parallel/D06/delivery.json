@@ -1,0 +1,17 @@
+{
+  "package_id": "D06",
+  "status": "integrated",
+  "formal_acceptance": false,
+  "delivery_commits": [
+    "c4641a2"
+  ],
+  "integration_commits": [
+    "f100e23"
+  ],
+  "actual_paths": [
+    "src/pages/opportunities/EstimatePage.tsx",
+    "src/pages/opportunities/OpportunityDetailPage.tsx",
+    "src/pages/opportunities/TechCostPage.tsx"
+  ],
+  "record_type": "reconstructed from immutable Git deliveries; not a new assignment"
+}

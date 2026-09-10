@@ -1,0 +1,16 @@
+{
+  "package_id": "D04",
+  "status": "integrated",
+  "formal_acceptance": false,
+  "delivery_commits": [
+    "b4d1f33"
+  ],
+  "integration_commits": [
+    "08262d7"
+  ],
+  "actual_paths": [
+    "src/mock/configuration-access.ts",
+    "src/models/__tests__/configuration-access.test.ts"
+  ],
+  "record_type": "reconstructed from immutable Git deliveries; not a new assignment"
+}

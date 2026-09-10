@@ -1,0 +1,18 @@
+{
+  "package_id": "D08",
+  "status": "integrated",
+  "formal_acceptance": false,
+  "delivery_commits": [
+    "67a9c80"
+  ],
+  "integration_commits": [
+    "ab43f5a"
+  ],
+  "actual_paths": [
+    "src/pages/execution/DynamicAccountingPage.tsx",
+    "src/pages/executive/GL03ProjectDrilldownPage.tsx",
+    "src/pages/executive/GL04PortfolioPage.tsx",
+    "src/pages/settlement/SettlementAnalysisPage.tsx"
+  ],
+  "record_type": "reconstructed from immutable Git deliveries; not a new assignment"
+}

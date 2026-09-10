@@ -1,0 +1,19 @@
+{
+  "package_id": "D09",
+  "status": "integrated",
+  "formal_acceptance": false,
+  "delivery_commits": [
+    "d978009"
+  ],
+  "integration_commits": [
+    "fb5c20c"
+  ],
+  "actual_paths": [
+    "src/pages/initiation/InitiationApplyPage.tsx",
+    "src/pages/initiation/InitiationDecisionPage.tsx",
+    "src/pages/opportunities/EstimateComparePage.tsx",
+    "src/pages/opportunities/OpportunityAssessmentPage.tsx",
+    "src/pages/settlement/SettlementPage.tsx"
+  ],
+  "record_type": "reconstructed from immutable Git deliveries; not a new assignment"
+}
