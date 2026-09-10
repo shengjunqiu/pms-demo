@@ -1,6 +1,6 @@
 import { canAccessTargetScope, canAccessOpportunityScope, canAccessOrganization } from './access-scope';
 import type { Actor, BusinessAction, BusinessState } from '@/mock/business';
-import { canAccessAction, canAccessProject } from '@/mock/configuration-access';
+import { canAccessAction, canAccessProject, canEditSensitiveField } from '@/mock/configuration-access';
 
 export function actionTarget(action: BusinessAction): string {
   if ('operationId' in action && action.operationId) return action.operationId;
@@ -25,6 +25,12 @@ export function projectForTarget(state: BusinessState, id: string) {
 /** Applies configurable restrictions at the shared UI mutation boundary; domain handlers retain their own role and state checks. */
 export function assertActionAccess(state: BusinessState, action: BusinessAction, actor: Actor) {
   const target = actionTarget(action);
+  if ((action.type === 'save-post-evaluation' || action.type === 'score-post-evaluation') && !canEditSensitiveField(state, actor, 'evaluation')) throw new Error('当前策略禁止编辑评价字段');
+  if (action.type === 'finance-config-save' && action.kind === 'rates' && !canEditSensitiveField(state, actor, 'labor-rate')) throw new Error('当前策略禁止编辑人员费率');
+  if (action.type === 'submit-acceptance' && !canEditSensitiveField(state, actor, 'contact')) {
+    const original = action.id ? state.acceptanceDetails[action.id]?.customerContact ?? '' : '';
+    if (action.detail.customerContact !== original) throw new Error('当前策略禁止编辑客户联系方式');
+  }
   if (!canAccessAction(state, actor, action.type, target)) throw new Error('当前访问策略不允许办理此业务动作');
   if (!canAccessTargetScope(state, actor, target)) throw new Error('当前访问策略不允许访问该业务对象');
   if ('input' in action && 'opportunityId' in action.input) {
