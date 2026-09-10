@@ -16,13 +16,20 @@ async function state(page: Page) {
   });
 }
 async function select(page: Page, scope: Page | Locator, label: string, name: string) {
-  await scope.getByLabel(label, { exact: true }).click();
+  const control = scope.locator(`.ant-select[aria-label="${label}"]`);
+  await control.scrollIntoViewIfNeeded();
+  await control.locator('.ant-select-selector').click();
+  if ((await control.getAttribute('class'))?.includes('ant-select-show-search')) await control.getByRole('combobox').fill(name);
   await page.locator('.ant-select-dropdown:visible .ant-select-item-option').filter({ hasText: name }).click();
   await expect(page.locator('.ant-select-dropdown:visible')).toHaveCount(0);
+  await expect(control).toContainText(name);
 }
 async function list(page: Page, kind: Kind, query = 'projectId=P-001') {
   await navigate(page, `${base(kind)}?${query}&kind=${kind}`);
   await expect(page.getByRole('heading', { name: ['requirement', 'bug'].includes(kind) ? '需求与BUG' : '问题与风险', exact: true })).toBeVisible();
+  await expect(page.getByRole('tab', { selected: true })).toContainText(({ requirement: '需求', bug: 'BUG', issue: '问题', risk: '风险' })[kind]);
+  const projectId = new URLSearchParams(query).get('projectId') ?? new URLSearchParams(query).get('project');
+  if (projectId) await expect(page.locator('.ant-select[aria-label="事项项目"]')).toContainText((await state(page)).projects.find(p => p.id === projectId)!.name);
 }
 async function detail(page: Page, kind: Kind, id: string, title: string, query = '') {
   await navigate(page, `${base(kind)}/${id}${query ? `?${query}` : ''}`);
@@ -42,7 +49,7 @@ async function formEvidence(page: Page, name: string) {
   for (const width of [1440, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
-    await expect(page.getByRole('dialog').getByRole('button', { name: /^确\s*定$/ })).toBeVisible();
+    await expect(page.getByRole('dialog').getByRole('button', { name: '提交责任人', exact: true })).toBeInViewport();
     await page.screenshot({ path: join(artifactDir, `${name}-${width}.png`), fullPage: true, animations: 'disabled' });
   }
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -83,7 +90,10 @@ test.beforeEach(async ({ page }) => {
   await page.evaluate(async () => {
     const path = '/src/mock/business.ts';
     const business = await import(/* @vite-ignore */ path) as BusinessModule;
-    business.useBusinessStore.setState({ data: business.createBusinessState() });
+    // Establish a valid team relationship through the existing action; ticket creation and all decisions remain real UI.
+    const initial = business.createBusinessState();
+    const data = business.transition(initial, { type: 'save-team-member', projectId: 'P-001', member: { userId: 'U-005', name: '赵工', departmentId: 'D-TECH', role: '技术负责人', active: true, startDate: '2026-01-01', endDate: '2026-12-31', allocation: 50, plannedHours: 160, keyPosition: true }, reason: '工单场景安排有效技术责任人' }, { id: 'U-001', name: '张建国', role: 'project-manager' });
+    business.useBusinessStore.setState({ data });
   });
   await role(page, '项目经理');
 });
@@ -240,10 +250,10 @@ test('筛选与隔离：旧project链接、分页返回、类型和项目草稿�
   test.setTimeout(210_000);
   await list(page, 'requirement', 'project=P-001');
   const projectName = (await state(page)).projects.find((p) => p.id === 'P-001')!.name;
-  await expect(page.getByLabel('事项项目', { exact: true })).toContainText(projectName);
+  await expect(page.locator('.ant-select[aria-label="事项项目"]')).toContainText(projectName);
   await page.getByRole('button', { name: '新建事项', exact: true }).click();
   let dialog = page.getByRole('dialog');
-  await expect(dialog.getByLabel('新建事项项目', { exact: true })).toContainText(projectName);
+  await expect(dialog.locator('.ant-select[aria-label="新建事项项目"]')).toContainText(projectName);
   await dialog.getByLabel('事项标题', { exact: true }).fill('不可带入新类型');
   await dialog.getByLabel('产品名称', { exact: true }).fill('旧产品');
   await select(page, dialog, '新建事项类型', 'BUG');
@@ -259,8 +269,11 @@ test('筛选与隔离：旧project链接、分页返回、类型和项目草稿�
   await expect(dialog.getByLabel('事项标题', { exact: true })).toHaveValue('');
   await dialog.getByRole('button', { name: /^取\s*消$/ }).click();
   await page.getByRole('button', { name: '重置筛选', exact: true }).click();
+  await expect(page.locator('.ant-select[aria-label="事项项目"] .ant-select-selection-item')).toHaveCount(0);
+  await expect(page.getByRole('tab', { selected: true })).toContainText('全部事项');
   await expect(page.locator('.ant-pagination-item-2')).toBeVisible(); await page.locator('.ant-pagination-item-2').click();
   await expect(page).toHaveURL(/page=2/);
+  await expect(page.locator('.ant-pagination-item-active')).toHaveText('2');
   const row = page.locator('.ant-table-tbody tr.ant-table-row').first();
   await row.getByRole('button').click(); await expect(page.getByTestId('ticket-title')).toBeVisible();
   await page.getByRole('button', { name: '返回台账', exact: true }).click(); await expect(page).toHaveURL(/page=2/);
@@ -285,7 +298,7 @@ test('筛选与隔离：旧project链接、分页返回、类型和项目草稿�
   await role(page, '项目经理'); await list(page, 'risk');
   const data = await state(page); expect(data.lockedProjects.length).toBeGreaterThan(0);
   await page.getByRole('button', { name: '新建事项', exact: true }).click();
-  await page.getByRole('dialog').getByLabel('新建事项项目', { exact: true }).click();
+  await page.getByRole('dialog').locator('.ant-select[aria-label="新建事项项目"]').click();
   for (const project of data.projects.filter((p) => data.lockedProjects.includes(p.id))) await expect(page.locator('.ant-select-dropdown:visible .ant-select-item-option').filter({ hasText: project.name })).toHaveCount(0);
   await page.keyboard.press('Escape');
   await page.getByRole('dialog').getByRole('button', { name: /^取\s*消$/ }).click();

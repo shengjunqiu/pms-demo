@@ -143,20 +143,20 @@
       "round": "R0047"
     },
     "HS-05": {
-      "status": "pending",
-      "reason": "继续全页面UI改造：需求BUG和问题风险台账详情，当前动作、责任与流转轨迹清晰。"
+      "status": "done",
+      "round": "R0048"
     },
     "HS-06": {
-      "status": "pending",
-      "reason": "继续全页面UI改造：需求BUG和问题风险台账详情，当前动作、责任与流转轨迹清晰。"
+      "status": "done",
+      "round": "R0048"
     },
     "HS-07": {
-      "status": "pending",
-      "reason": "继续全页面UI改造：需求BUG和问题风险台账详情，当前动作、责任与流转轨迹清晰。"
+      "status": "done",
+      "round": "R0048"
     },
     "HS-08": {
-      "status": "pending",
-      "reason": "继续全页面UI改造：需求BUG和问题风险台账详情，当前动作、责任与流转轨迹清晰。"
+      "status": "done",
+      "round": "R0048"
     },
     "HS-09": {
       "status": "pending",
@@ -1605,6 +1605,48 @@
         ".pms-loop/runs/R0047/checks.json": "4bd0bd48b5b0d458d68ca4f60ddf4c7e0f59e080b72c7f4600e6fe106fbcba4b",
         ".pms-loop/runs/R0047/evidence.json": "7ae0ee69ddc49887c960c84f769b305c73f81a64a8f6dd065880baae8ece266b"
       }
+    },
+    {
+      "id": "R0048",
+      "items": [
+        "HS-05",
+        "HS-06",
+        "HS-07",
+        "HS-08"
+      ],
+      "started_at": "2026-09-10T21:09:17+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-10T21:36:34+00:00",
+      "revision": "62400ffc122b45294ebc299767bfed5c274759be0019145f371d6209af28544d",
+      "proof": {
+        ".pms-loop/runs/R0048/test-domain.log": "b5fe04337ea90f2323a10b7457007cd78c28fc26886f07c67223e8593a97b5ad",
+        ".pms-loop/runs/R0048/build.log": "1543c7680e597f53e144914dd2a7ebc1f5f3f3c049197f2804926caec09f9f20",
+        ".pms-loop/runs/R0048/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0048/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0048/browser-complete.log": "4d6f1f36e79e795b59efc63ad21129433fd8e87108d8df4f8262d15470808d9b",
+        ".pms-loop/runs/R0048/browser-complete.exit.json": "124fd50cb6d223cdd18fedc166d00af7254199b6e6dedf9be82f71db87af6d01",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a55f24fc19c8a6944ea99d.json": "4db12527cc1ba64e0b769eacd5017544eaa15d36807a7dde7fd15698b253cc9c",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a550141a3ea77c63db07c7.json": "d2fc1f5ef85dde277bbbd3aff8e1aff92ffbae6c7240e99eb71420cf69649a2d",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a5bede724eeddf3b808500.json": "25ef11f7d3a71490a3398f6014eabc38b0225709b9354dd738f8ebf4de8a7e07",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a5ac27b2024d988813ece7.json": "1049c7f24663176c9c56041a9fcf24c8fc0b76e36d6c1638ad339506bec9ca4b",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a5b2437d84a3c622a21a29.json": "ebec40f795e55c7ce7ca8ee5b674a73bd56b596f9d57b1ed919da299b06e1ce3",
+        ".pms-loop/runs/R0048/artifacts/UI-HS05-1440.png": "172f75377527c3e742362ba10c4dff1748bdb68e6b41dac3cac0ae0be54d4b57",
+        ".pms-loop/runs/R0048/artifacts/UI-HS05-1280.png": "9f8133dd71f8ecf398fad0d30dfb1cb6f4615530c4282778185f21d0cb63b6b9",
+        ".pms-loop/runs/R0048/artifacts/UI-HS06-1440.png": "a78889235a560a5b95d027263c42dccda25fb9c004f55e5287e693e52451e658",
+        ".pms-loop/runs/R0048/artifacts/UI-HS06-1280.png": "4a31e2de70a990a4787925846160f39522aa309f87a6ed2c1774512b355a93cf",
+        ".pms-loop/runs/R0048/artifacts/UI-HS07-1440.png": "a93f910c00348945af6a19555b34e26fa1b38dddc00cdddb2c5c1e5bd01eab1c",
+        ".pms-loop/runs/R0048/artifacts/UI-HS07-1280.png": "897378abad06893845f9401ff37f1d11ac01e501c608c881d0835c7c9c0665e9",
+        ".pms-loop/runs/R0048/artifacts/UI-HS08-issue-1440.png": "4a5c480cdf9be8356afe6e229656104454041eeb3f48e5156205ae39766f8581",
+        ".pms-loop/runs/R0048/artifacts/UI-HS08-issue-1280.png": "5d367e18464b37084d8637b084fe0acbab911f4f04466764c1ee3bd28cb9c983",
+        ".pms-loop/runs/R0048/checks.json": "ed5a59e485fae8097a0e770c5a26a1db80b463ce1c8fc613638583781a836882",
+        ".pms-loop/runs/R0048/evidence.json": "95f533935d34b5eefe6351d43d1be29567c43c2df2c9d9212bbe807f302f10d6"
+      }
     }
   ],
   "notes": [
@@ -1867,6 +1909,26 @@
     {
       "at": "2026-09-10T21:08:59+00:00",
       "text": "reopen FINAL, HS-14, HS-15: 继续全页面UI改造：变更台账与申请评估审批对比，保留基线和专业权限。"
+    },
+    {
+      "at": "2026-09-10T21:13:10+00:00",
+      "text": "R0048首浏览器三例均在新建责任人选择器失败：AntD showSearch aria-label同时出现在Select容器和combobox，getByLabel严格模式匹配2项。修测试统一按.ant-select[aria-label]容器操作及断言，业务尚未被验证，不计通过；同轮重查。"
+    },
+    {
+      "at": "2026-09-10T21:17:49+00:00",
+      "text": "R0048复跑暴露测试新增可见按钮断言误用确定而实际为提交责任人，修正；另一次长表单下拉在滚动中脱离，新增事项Modal限制body65vh并固定footer，Select先滚到可见再打开并对可搜索项输入定位。先浏览器调试全五例，修复完成再正式check和当前源码验证。"
+    },
+    {
+      "at": "2026-09-10T21:20:51+00:00",
+      "text": "R0048调试五例：技术角色P001无有效团队关系，测试前置须通过合法save-team-member加入处理团队，不扩大权限；分页用例P001不足两页却断言page2，改全权限范围真实分页。新建需求在下拉滚动后意外关闭，设置maskClosable=false保护未提交输入并核对已选值。"
+    },
+    {
+      "at": "2026-09-10T21:26:31+00:00",
+      "text": "R0048调试最终3例需求/基线/隔离全部exit0；前批BUG及风险链通过。根因之一是同路径query更新后旧Outlet仍可匹配标题，立即新建导致context remount清表单；list等待项目与选中类型，reset等真实清空，分页等active2；行链接用事件时query。合法save-team-member仅团队前置，不伪造工单/审批。现在正式check后全五例刷新证据。"
+    },
+    {
+      "at": "2026-09-10T21:36:48+00:00",
+      "text": "R0048工单四页验收，新UI44/72。最终62400ffc工程235领域及browser-complete五例2.6min exit0，四页双宽/表单已查看。修Select歧义/长表单/实时筛选链接；测试等待query实际渲染、有效团队transition前置，保留失败和143中断日志。独立setsid nohup /tmp/pms-browser-run.py解决测试shell中断，后续可复用参数化runner，须等exit.json=0。继续成本fe6bf2b+df55d7e；变更93987a5待共享返回/收入快照评估。"
     }
   ],
   "history": [

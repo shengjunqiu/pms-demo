@@ -75,7 +75,7 @@ function TicketsContent({ family }: { family: Family }) {
     <PageSection title="事项台账" description={family === 'quality' ? '责任人处理，发起人验证关闭；转办保留发起人。' : '问题由主PM最终关闭；风险发生后转问题，原记录保留。'}>
       <Tabs activeKey={params.get('kind') ?? 'all'} onChange={(key) => update('kind', key === 'all' ? undefined : key)} items={[{ key: 'all', label: `全部事项（${scope.length}）` }, ...kinds.map((kind) => ({ key: kind, label: `${ticketLabels[kind]}（${scope.filter((t) => t.kind === kind).length}）` }))]} />
       <Table rowKey="id" size="small" dataSource={filtered} scroll={{ x: 1280 }} pagination={{ pageSize: 10, current: Number(params.get('page')) || 1, showSizeChanger: false, onChange: (page) => { const next = new URLSearchParams(window.location.search); next.set('page', String(page)); setParams(next); } }} columns={[
-        { title: '编号 / 事项', width: 270, fixed: 'left', render: (_, t) => <Button type="link" style={{ whiteSpace: 'normal', overflowWrap: 'anywhere', textAlign: 'left', display: 'block', height: 'auto', padding: 0 }} onClick={() => navigate(`${base}/${t.id}?${params}`)}><span style={{ fontSize: 12, color: '#64748b' }}>{t.id}</span><div style={{ fontWeight: 600 }}>{t.title}</div></Button> },
+        { title: '编号 / 事项', width: 270, fixed: 'left', render: (_, t) => <Button type="link" style={{ whiteSpace: 'normal', overflowWrap: 'anywhere', textAlign: 'left', display: 'block', height: 'auto', padding: 0 }} onClick={() => navigate(`${base}/${t.id}${window.location.search}`)}><span style={{ fontSize: 12, color: '#64748b' }}>{t.id}</span><div style={{ fontWeight: 600 }}>{t.title}</div></Button> },
         { title: '状态 / 责任人', width: 145, render: (_, t) => <><Tag color={finished(t.status) ? 'green' : awaiting(t.status) ? 'gold' : 'blue'}>{t.status}</Tag><div>{t.owner}</div></> },
         { title: '类型 / 等级', width: 115, render: (_, t) => <>{ticketLabels[t.kind]}<div><Tag color={['致命', '严重', '重大', '特大'].includes(t.rank) ? 'red' : undefined}>{t.rank}</Tag></div></> },
         { title: '目标时间 / 提醒', width: 170, render: (_, t) => <>{t.meta.deadline}<div style={{ color: !finished(t.status) && t.meta.deadline < AS_OF_DATE ? '#b91c1c' : '#64748b' }}>{finished(t.status) ? t.status : t.meta.deadline < AS_OF_DATE ? '已超期，持续督办' : '按目标跟踪'}</div></> },
@@ -84,7 +84,7 @@ function TicketsContent({ family }: { family: Family }) {
       ]} />
     </PageSection>
     <details style={{ color: '#64748b', fontSize: 12 }}><summary style={{ cursor: 'pointer' }}>处理与统计口径</summary><p>摘要取当前全部筛选结果；页签计数沿用项目及其他筛选条件，不含类型筛选。需求按优先级、BUG按严重性跟踪，超期以期望日期计算。</p>{family === 'risk' && <p>演示规则 CASE-1：风险评分=概率×影响，6/12/20分对应中等/重大/特大；重大事项进入PMO视野。问题风险超期1/3/7天依次提示部门负责人/PMO/PMC；已解决问题仍须PM确认。</p>}</details>
-    {creating && <NewTicketModal key={`${currentUser.id}-${family}`} family={family} initialKind={kinds.find((k) => k === params.get('kind')) ?? kinds[0]} initialProjectId={eligibleProjects.find((p) => p.id === projectFilter)?.id ?? eligibleProjects[0]?.id} onCancel={() => setCreating(false)} onCreated={(id) => { setCreating(false); navigate(`${base}/${id}?${params}`); }} />}
+    {creating && <NewTicketModal key={`${currentUser.id}-${family}`} family={family} initialKind={kinds.find((k) => k === params.get('kind')) ?? kinds[0]} initialProjectId={eligibleProjects.find((p) => p.id === projectFilter)?.id ?? eligibleProjects[0]?.id} onCancel={() => setCreating(false)} onCreated={(id) => { setCreating(false); navigate(`${base}/${id}${window.location.search}`); }} />}
   </>;
 }
 
@@ -104,7 +104,7 @@ function NewTicketModal({ family, initialKind, initialProjectId, onCancel, onCre
   const canSubmit = writers.includes(currentRole) && eligible.some((p) => p.id === projectId) && canDo('create-ticket', projectId);
   const ranks = kind === 'requirement' ? ['高', '中', '低'] : kind === 'bug' ? ['致命', '严重', '一般', '轻微'] : ['重大', '重要', '一般'];
   const labelStyle = { display: 'block', marginBottom: 6, fontWeight: 500 };
-  return <Modal title={`新建${ticketLabels[kind]}`} width={760} open okText="提交责任人" okButtonProps={{ disabled: !canSubmit }} onCancel={onCancel} onOk={() => {
+  return <Modal title={`新建${ticketLabels[kind]}`} width={760} maskClosable={false} styles={{ body: { maxHeight: '65vh', overflowY: 'auto', overflowX: 'hidden', paddingRight: 4 } }} open okText="提交责任人" okButtonProps={{ disabled: !canSubmit }} onCancel={onCancel} onOk={() => {
     try {
       if (!canSubmit || !projectId) throw new Error('当前策略或项目范围不允许创建事项');
       const prefix = ({ requirement: 'REQ', bug: 'BUG', issue: 'ISSUE', risk: 'RSK' })[kind];

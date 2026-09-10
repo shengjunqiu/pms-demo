@@ -23,7 +23,7 @@
   "acceptance_dependencies": [],
   "acceptance_ready": true,
   "acceptance_group": "UI-HS3",
-  "status": "integrated_pending_acceptance",
+  "status": "accepted",
   "last_confirmed_at": "2026-09-11",
   "acceptance_checklist": [
     "工程检查",
@@ -33,7 +33,7 @@
   ],
   "scenarios": "按/tmp/pms-ui-tickets-preparation.md五链",
   "fixtures": "以真实UI创建和审批为主",
-  "next_action": "正式工程和真实UI验收",
+  "next_action": "R0048已正式验收",
   "delivery_commit": "663c577",
   "integration_commit": "3241c16"
 }
