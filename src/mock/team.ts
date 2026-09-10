@@ -18,7 +18,7 @@ export function applyTeamAction(state:BusinessState,action:TeamAction,actor:Acto
    const m=action.member,u=mockUsers.find(u=>u.id===m.userId);if(!u||!m.role.trim())throw new Error('成员须来自人才库并设置项目角色');if(!validPlanDate(m.startDate)||!validPlanDate(m.endDate)||m.startDate>m.endDate||m.allocation<=0||m.allocation>100||!Number.isFinite(m.plannedHours)||m.plannedHours<=0)throw new Error('成员参与周期、比例与工时无效');if(m.userId!==p.pmId&&m.role==='项目经理')throw new Error('主PM须通过任命接受，不可直接添加');const existing=team.members.find(x=>x.userId===m.userId);const value={...structuredClone(m),name:u.name,departmentId:u.departmentId,active:true,role:m.userId===p.pmId?'项目经理':m.role};if(existing)Object.assign(existing,value);else team.members.push(value);
   }else{const member=team.members.find(m=>m.userId===action.userId&&m.active);if(!member||member.userId===p.pmId)throw new Error('主PM不可直接退出，请先任命接任人');if(!validPlanDate(action.date)||action.date>AS_OF_DATE||action.date<member.startDate)throw new Error('退出日期须在参与日至基准日之间');member.active=false;member.endDate=action.date;}
  }
- p.memberIds=team.members.filter(m=>m.active).map(m=>m.userId);const draft=state.planningDrafts[p.id];
+ p.memberIds=[...new Set([...team.members.filter(m=>m.active).map(m=>m.userId),...team.appointments.filter(a=>a.status==='待接受').map(a=>a.userId)])];const draft=state.planningDrafts[p.id];
  // Keep historical tasks, costs and submitted review snapshots untouched.
  if(draft&&draft.status!=='已冻结'){draft.resources=structuredClone(team.members);if(draft.status==='已通过')draft.status='草稿';draft.revision++;}
  team.history.push({date:AS_OF_DATE,actor:actor.name,description:`${action.type} · ${'reason'in action?action.reason:action.opinion}`});return p.id;

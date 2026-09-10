@@ -119,6 +119,7 @@ export interface Project {
 
 // 合同
 export interface Contract {
+  opportunityId?: string;
   id: string;
   code: string;
   name: string;
