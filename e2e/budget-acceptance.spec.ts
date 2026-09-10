@@ -107,7 +107,7 @@ test('YS-09/10/11/12 超概算保存、原因阻断、高级审批和独立基�
   await confirm(page);
   await expect(page.getByText('基线版本快照', { exact: true })).toBeVisible();
   await page.getByRole('tab', { name: '成本基线', exact: true }).click();
-  await expect(page.getByText('生效预算 800.00 万元', { exact: true })).toBeVisible();
+  await expect(page.getByText('本版预算 800.00 万元', { exact: true })).toBeVisible();
   await capturePageEvidence(page, 'YS12-confirmed-baseline');
   await role(page, '项目经理');
   await navigate(page, `${project}/wbs`);
