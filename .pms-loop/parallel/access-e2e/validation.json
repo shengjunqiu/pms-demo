@@ -1,0 +1,17 @@
+{
+  "formal_acceptance": false,
+  "source_head": "fb5c20c",
+  "root_patch": "see subsequent integration commit",
+  "checks": {
+    "typecheck": "pass",
+    "lint": "pass",
+    "build": "pass",
+    "e2e/access.spec.ts": "2 passed",
+    "e2e/receipts.spec.ts": "2 passed"
+  },
+  "limitations": [
+    "CF07/CF08 organization scope and full approval trail pending",
+    "Screenshots are development evidence; some success toasts visible",
+    "No new formal accepted pages"
+  ]
+}

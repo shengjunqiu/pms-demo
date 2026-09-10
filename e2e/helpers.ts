@@ -1,7 +1,7 @@
 import { expect, type Page } from '@playwright/test';
 export async function role(page: Page, name: string) {
   await page.locator('.ant-select[aria-label="模拟身份"] .ant-select-selector').click();
-  await page.locator('.ant-select-item-option').filter({ hasText: name }).click();
+  await page.locator('.ant-select-dropdown:visible .ant-select-item-option').filter({ hasText: name }).click();
   const home = name === '客户经理' || name === '方案架构师' ? '/opportunities' : name === '项目经理' ? '/workbench/project-manager' : name === '财务专员' ? '/executive/four-calculations' : '/executive/dashboard';
   await expect(page).toHaveURL(home);
   await page.getByRole('heading').first().click();

@@ -1,3 +1,4 @@
+import { canViewSensitiveField } from '@/mock/configuration-access';
 import { useState } from 'react';
 import { Alert, Button, Card, Col, Drawer, Row, Table, Tabs, Tag } from 'antd';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -14,7 +15,7 @@ import { readProjectFilter } from '@/utils/project-query';
 import { sumMoney, percentage, formatPercent } from '@/utils/money';
 
 export function GL02FourCalculationsPage() {
-  const data = useBusinessStore((s) => s.data); const role = useAppStore((s) => s.currentRole);
+  const data = useBusinessStore((s) => s.data); const role = useAppStore((s) => s.currentRole); const canViewMargin = canViewSensitiveField(data, { role }, 'margin');
   const [params, setParams] = useSearchParams(); const navigate = useNavigate(); const [subject, setSubject] = useState<string>();
   if (!['executive', 'pmo', 'finance', 'admin'].includes(role)) return <StateView type="403" />;
   const scope = selectProjects(readProjectFilter(params), role, data.projects, data).map((p) => ({ p, ...selectFourCalculations(p, data) }));
@@ -37,7 +38,7 @@ export function GL02FourCalculationsPage() {
     <Tabs activeKey={settledOnly ? 'settled' : 'all'} onChange={(key) => { const next = new URLSearchParams(params); next.set('sample', key); next.delete('page'); setParams(next); }} items={[{ key: 'all', label: `概算 / 预算同样本（${scope.filter((r) => r.estimate && r.budget).length}）` }, { key: 'settled', label: `已结算同样本（${scope.filter((r) => r.estimate && r.budget && r.settlement).length}）` }]} />
     <Alert showIcon type="info" style={{ marginBottom: 16 }} message={`当前比较 ${rows.length} 个具备冻结概算及生效预算的项目；排除缺失版本 ${scope.filter((r) => !r.estimate || !r.budget).length} 个`} description="结算比较仅使用已锁定结算的同一组项目，未结算显示—。核算为基准日最新滚动值，非历史预测快照；科目承诺及剩余预测按生效预算权重分摊（演示规则）。" />
     <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>{[['冻结概算成本', estimate], ['生效预算成本', budget], ['最新滚动成本', rolling], ['同样本结算成本', complete ? settlement : undefined]].map(([name, value]) => <Col span={6} key={String(name)}><Card size="small" title={String(name)}><div style={{ fontSize: 24 }}><MoneyText value={value as number | undefined} /></div></Card></Col>)}</Row>
-    <Card size="small" title="毛利变化轨迹 · 同样本预计收入减各阶段成本" style={{ marginBottom: 16 }}><Row gutter={12}>{[['概算毛利', sumMoney([income, -estimate])], ['预算毛利', sumMoney([income, -budget])], ['预测毛利', sum((r) => r.grossMargin)], ['实际结算毛利', complete ? sum((r) => r.settlement!.finalGrossMargin) : undefined]].map(([label, value]) => <Col span={6} key={String(label)}>{label}<div><MoneyText value={value as number | undefined} /></div></Col>)}</Row><p>当前预计收入 <MoneyText value={income} />；概算/预算毛利按当前收入统一重算，不冒充历史收入快照。结算毛利使用原结算收入。</p></Card>
+    <Card size="small" title="毛利变化轨迹 · 同样本预计收入减各阶段成本" style={{ marginBottom: 16 }}>{canViewMargin ? <><Row gutter={12}>{[['概算毛利', sumMoney([income, -estimate])], ['预算毛利', sumMoney([income, -budget])], ['预测毛利', sum((r) => r.grossMargin)], ['实际结算毛利', complete ? sum((r) => r.settlement!.finalGrossMargin) : undefined]].map(([label, value]) => <Col span={6} key={String(label)}>{label}<div><MoneyText value={value as number | undefined} /></div></Col>)}</Row><p>当前预计收入 <MoneyText value={income} />；概算/预算毛利按当前收入统一重算，不冒充历史收入快照。结算毛利使用原结算收入。</p></> : <span>已隐藏：当前策略未开放毛利字段。</span>}</Card>
     <Card size="small" title="偏差分析" style={{ marginBottom: 16 }}><Row gutter={12}><Col span={8}>预算 − 概算<div><MoneyText value={sumMoney([budget, -estimate])} signed /></div></Col><Col span={8}>滚动 − 预算<div><MoneyText value={sumMoney([rolling, -budget])} signed /></div></Col><Col span={8}>结算 − 最新滚动（已结算{closed.length}项）<div><MoneyText value={settlement === undefined ? undefined : sumMoney([settlement, -sumMoney(closed.map((r) => r.rolling))])} signed /></div></Col></Row></Card>
     <Tabs activeKey={tab} onChange={(key) => { const next = new URLSearchParams(params); next.set('tab', key); setParams(next); }} items={[
       { key: 'projects', label: '项目与有效版本', children: <Table rowKey={(r) => r.p.id} size="small" dataSource={rows} scroll={{ x: 1350 }} pagination={{ pageSize: 8, current: Number(params.get('page')) || 1, showSizeChanger: false, onChange: (page) => { const next = new URLSearchParams(params); next.set('page', String(page)); setParams(next); } }} columns={[

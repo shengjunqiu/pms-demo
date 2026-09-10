@@ -150,7 +150,7 @@ test('CF07发布财务页面与人员单价限制，CF08保留发布差异及访
   await published.getByRole('button', { name: '查看详情', exact: true }).click();
   const audit = page.locator('.ant-drawer-content:visible');
   await expect(audit.getByText('ACCESS-admin-V1', { exact: true })).toBeVisible();
-  const statusChange = audit.locator('.ant-table-tbody > tr[data-row-key]').filter({ has: page.getByText('状态', { exact: true }) });
+  const statusChange = audit.locator('.ant-table-tbody > tr[data-row-key]').filter({ has: page.getByRole('cell', { name: /^状态 accessConfiguration/ }) });
   await expect(statusChange).toHaveCount(1);
   await expect(statusChange.locator('td').nth(1)).toHaveText('草稿');
   await expect(statusChange.locator('td').nth(2)).toHaveText('已发布');
@@ -169,6 +169,15 @@ test('默认PM仍可审核真实团队成员工时，个人单价和金额保持
   test.setTimeout(120_000);
   const description = 'E2E-ACCESS-TEAM-技术成员工时';
   await page.goto('/workbench/project-manager');
+  await role(page, '集团领导');
+  await navigate(page, '/approvals/APR-1');
+  await page.getByLabel('审批意见', { exact: true }).fill('先明确新增成员与资源范围后重提预算，保留当前生效基线。');
+  await page.getByRole('button', { name: '驳回整改', exact: true }).click();
+  const budgetReview = page.getByRole('dialog', { name: '确认驳回，保留原基线', exact: true });
+  await budgetReview.getByRole('button', { name: /^确\s*定$/ }).click();
+  await expect(budgetReview).toBeHidden();
+  await expect(page.locator('.ant-modal-mask:visible')).toHaveCount(0);
+  await role(page, '项目经理');
   await navigate(page, '/projects/P-001/team');
   await page.getByRole('button', { name: '加入成员', exact: true }).click();
   const memberDialog = page.getByRole('dialog', { name: '维护团队与资源', exact: true });

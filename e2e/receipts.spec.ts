@@ -102,6 +102,12 @@ test('P006财务收清1023万元后应收门禁解除，其他关闭条件仍待
     await expect(gate(label)).toContainText('待处理');
   }
   await expect(page.getByRole('button', { name: 'PMO确认关闭', exact: true })).toBeDisabled();
+  await gate('管理决策事项已办理').getByRole('button').click();
+  await expect(page).toHaveURL(/\/management-approvals\/MGT-003$/);
+  await navigate(page, '/projects/P-006/close');
+  await gate('合同及回款计划应收结清').getByRole('button').click();
+  await expect(page).toHaveURL(/\/projects\/P-006\/business-result$/);
+  await navigate(page, '/projects/P-006/close');
   await screenshots(page, 'JS13-P006-receivable-cleared-other-gates-pending');
 
   await navigate(page, resultPath);

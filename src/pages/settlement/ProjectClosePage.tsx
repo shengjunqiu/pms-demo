@@ -34,18 +34,22 @@ export function ProjectClosePage() {
   const closure = data.projectClosures[p.id];
   const history = p.phase === "已关闭" && !closure;
   const failed = checks.filter((c) => !c.ok);
-  const paths = [
-    "settlement",
-    "post-evaluation",
-    "archive",
-    "business-result",
-    "settlement/apply",
-    "operation-handover",
-    "issues",
-    "operation-handover",
-    "operation-handover",
-    "operation-handover",
-  ];
+  const management = data.managementApprovals.find((a) => a.projectId === p.id && a.status === '待审批') ?? data.managementApprovals.find((a) => a.projectId === p.id);
+  const cycle = data.operationCycles.find((c) => c.projectId === p.id);
+  const operationPath = cycle ? `/operations/${cycle.id}` : `/projects/${p.id}/operation-handover`;
+  const paths: Record<string, string> = {
+    '管理决策事项已办理': management ? `/management-approvals/${management.id}` : `/workbench/todos?project=${p.id}&type=管理决策`,
+    '财务最终结算锁定': `/projects/${p.id}/settlement`,
+    '后评价已完成': `/projects/${p.id}/post-evaluation`,
+    '正式归档已确认': `/projects/${p.id}/archive`,
+    '合同及回款计划应收结清': `/projects/${p.id}/business-result`,
+    '建设期未决成本及承诺预测清零': `/projects/${p.id}/settlement/apply`,
+    '运维判定明确、周期全部退出': operationPath,
+    '重大建设期问题已解决': `/issues-risks?projectId=${p.id}&kind=issue`,
+    '运维问题/风险全部解决': operationPath,
+    '运维工时 / 费用原单已核对': `${operationPath}${cycle ? '?tab=costs' : ''}`,
+    '运维历史费用均关联实际周期': `${operationPath}${cycle ? '?tab=costs' : ''}`,
+  };
   return (
     <>
       <PageHeader
@@ -96,10 +100,10 @@ export function ProjectClosePage() {
             },
             {
               title: "原业务",
-              render: (_, r, index) => (
+              render: (_, r) => (
                 <Button
                   type="link"
-                  onClick={() => navigate(`/projects/${p.id}/${paths[index]}`)}
+                  onClick={() => navigate(paths[r.label])}
                 >
                   查看{r.ok ? "来源" : "并处理"}
                 </Button>
