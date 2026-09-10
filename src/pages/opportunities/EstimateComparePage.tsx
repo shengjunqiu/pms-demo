@@ -1,14 +1,12 @@
 import { canViewSensitiveField } from "@/mock/configuration-access";
 import {
   Alert,
-  Card,
   Col,
   Descriptions,
   Empty,
   Row,
   Select,
   Space,
-  Statistic,
   Table,
   Tag,
 } from "antd";
@@ -17,6 +15,8 @@ import { useBusinessStore } from "@/mock/business";
 import { canViewOpportunity } from "@/mock/opportunities";
 import { costLineAmount } from "@/mock/presales";
 import { useAppStore } from "@/store/useAppStore";
+import { PageSection } from "@/components/common/PageSection";
+import { MetricStatCard } from "@/components/common/MetricStatCard";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StateView } from "@/components/common/StateView";
 import { MoneyText } from "@/components/common/MoneyText";
@@ -106,12 +106,12 @@ export function EstimateComparePage() {
         description="同一商机两版本按统一科目与来源明细比较；历史版本只读，差异＝对比版本−基准版本。"
         extra={<Link to={`/opportunities/${o.id}/estimate`}>返回概算编制</Link>}
       />
-      <Card size="small" style={{ marginBottom: 16 }}>
+      <PageSection title="选择对比版本" description="差异＝对比版本−基准版本，正值代表增加。">
         <Space wrap>
           <span>基准版本</span>
           <Select
             aria-label="基准概算版本"
-            style={{ width: 320 }}
+            style={{ width: 280 }}
             value={left?.id}
             onChange={(value) => selectVersion("base", value)}
             options={options}
@@ -119,15 +119,15 @@ export function EstimateComparePage() {
           <span>对比版本</span>
           <Select
             aria-label="对比概算版本"
-            style={{ width: 320 }}
+            style={{ width: 280 }}
             value={right?.id}
             onChange={(value) => selectVersion("compare", value)}
             options={options}
           />
         </Space>
-      </Card>
+      </PageSection>
       {!left || !right ? (
-        <Empty description="尚无概算版本，请先生成概算" />
+        <PageSection><Empty description="尚无概算版本，请先生成概算" /></PageSection>
       ) : (
         <>
           {versions.length < 2 && (
@@ -137,7 +137,7 @@ export function EstimateComparePage() {
               message="当前只有一个概算版本，生成新版本后可查看变化；当前对比同版本。"
             />
           )}
-          <Row gutter={16} style={{ marginBottom: 16 }}>
+          <PageSection className="pms-record-summary"><Row gutter={16}>
             {[
               {
                 title: "成本差异（万元）",
@@ -164,17 +164,59 @@ export function EstimateComparePage() {
               },
             ].map((s) => (
               <Col span={6} key={s.title}>
-                <Card size="small">
-                  <Statistic {...s} precision={2} />
-                </Card>
+                <MetricStatCard variant="flat" title={s.title} value={s.value} unit={s.suffix??''} signed/>
               </Col>
             ))}
-          </Row>
+          </Row></PageSection>
+          <PageSection title="统一科目差异" description="先看科目增减，再追溯版本来源和数量单价变化。">
+            <Table
+              size="small"
+              rowKey="id"
+              pagination={false}
+              dataSource={subjects}
+              columns={[
+                { title: "科目", dataIndex: "name" },
+                {
+                  title: "变化类型",
+                  render: (_, r) => (
+                    <Tag
+                      color={
+                        r.kind === "新增"
+                          ? "green"
+                          : r.kind === "删除"
+                            ? "red"
+                            : r.kind === "修改"
+                              ? "orange"
+                              : "default"
+                      }
+                    >
+                      {r.kind}
+                    </Tag>
+                  ),
+                },
+                {
+                  title: "基准金额（万元）",
+                  align: "right",
+                  render: (_, r) => <MoneyText value={r.before} />,
+                },
+                {
+                  title: "对比金额（万元）",
+                  align: "right",
+                  render: (_, r) => <MoneyText value={r.after} />,
+                },
+                {
+                  title: "差异（万元）",
+                  align: "right",
+                  sorter: (a, b) => a.delta - b.delta,
+                  render: (_, r) => <MoneyText signed value={r.delta} />,
+                },
+              ]}
+            />
+          </PageSection>
           <Row gutter={16} style={{ marginBottom: 16 }}>
             {[left, right].map((e, i) => (
               <Col span={12} key={`${i}-${e.id}`}>
-                <Card
-                  size="small"
+                <PageSection
                   title={`${i ? "对比" : "基准"} ${e.version}`}
                 >
                   <Descriptions
@@ -230,56 +272,11 @@ export function EstimateComparePage() {
                       },
                     ]}
                   />
-                </Card>
+                </PageSection>
               </Col>
             ))}
           </Row>
-          <Card size="small" title="统一科目差异" style={{ marginBottom: 16 }}>
-            <Table
-              size="small"
-              rowKey="id"
-              pagination={false}
-              dataSource={subjects}
-              columns={[
-                { title: "科目", dataIndex: "name" },
-                {
-                  title: "变化类型",
-                  render: (_, r) => (
-                    <Tag
-                      color={
-                        r.kind === "新增"
-                          ? "green"
-                          : r.kind === "删除"
-                            ? "red"
-                            : r.kind === "修改"
-                              ? "orange"
-                              : "default"
-                      }
-                    >
-                      {r.kind}
-                    </Tag>
-                  ),
-                },
-                {
-                  title: "基准金额（万元）",
-                  align: "right",
-                  render: (_, r) => <MoneyText value={r.before} />,
-                },
-                {
-                  title: "对比金额（万元）",
-                  align: "right",
-                  render: (_, r) => <MoneyText value={r.after} />,
-                },
-                {
-                  title: "差异（万元）",
-                  align: "right",
-                  sorter: (a, b) => a.delta - b.delta,
-                  render: (_, r) => <MoneyText signed value={r.delta} />,
-                },
-              ]}
-            />
-          </Card>
-          <Card size="small" title="数量、单价与范围明细差异">
+          <PageSection title="数量、单价与范围明细差异">
             {!lm || !rm ? (
               <Alert
                 type="info"
@@ -317,6 +314,7 @@ export function EstimateComparePage() {
                   },
                   {
                     title: "含税金额差异",
+                    align: "right",
                     width: 130,
                     render: (_, r) => <MoneyText signed value={r.delta} />,
                   },
@@ -337,7 +335,7 @@ export function EstimateComparePage() {
                 ]}
               />
             )}
-          </Card>
+          </PageSection>
         </>
       )}
     </>

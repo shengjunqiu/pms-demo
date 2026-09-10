@@ -126,6 +126,8 @@ test('GS-10/11 草稿提交、审批意见必填、批准额度与真实成本�
   const id = await seed(page);
   await navigate(page, `/opportunities/${id}/early-investment`);
   await fillApplication(page);
+  await expect(page.getByRole('heading', { name: '3. 风险控制与退出', exact: true })).toBeVisible();
+  await capturePageEvidence(page, 'UI-GS10-form');
   await page.getByRole('button', { name: '保存草稿', exact: true }).click();
   await expect(page.getByText('申请草稿已保存', { exact: true })).toBeVisible();
   let state = await snapshot(page, id);
@@ -190,8 +192,8 @@ test('GS-10/11 草稿提交、审批意见必填、批准额度与真实成本�
   await expect(page.getByText('投入不在批准有效期或发生日期无效', { exact: true })).toBeVisible();
   expect((await snapshot(page, id)).costs).toEqual(acceptedCosts);
   await modal.getByRole('button', { name: /取\s*消/ }).click();
-  await expect(page.locator('.ant-statistic').filter({ hasText: '累计批准额度（万元）' })).toContainText('50.00');
-  await expect(page.locator('.ant-statistic').filter({ hasText: '累计已发生（万元）' })).toContainText('20.00');
+  await expect(page.locator('.pms-metric').filter({ hasText: '累计批准额度' })).toContainText('50.00');
+  await expect(page.locator('.pms-metric').filter({ hasText: '累计已发生' })).toContainText('20.00');
   await expect(row).toContainText('40.0%');
   shots.ledger = await capturePageEvidence(page, 'GS-11');
   await page.getByRole('button', { name: '导出预览', exact: true }).click();

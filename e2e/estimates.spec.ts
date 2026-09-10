@@ -193,7 +193,7 @@ test('GS-08/09 从通过评审生成、追加、冻结、差异追溯并承接�
   await expect(page.getByRole('cell', { name: '修改', exact: true }).first()).toBeVisible();
   await expect(page.locator('.ant-table-row').filter({ hasText: '接口开发人力' })).toContainText('已隐藏');
   await expect(page.getByRole('link', { name: `评审 ${secondReviewId}`, exact: true })).toHaveAttribute('href', new RegExp(`review\\?review=${secondReviewId}$`));
-  const costDelta = page.locator('.ant-statistic').filter({ hasText: '成本差异（万元）' });
+  const costDelta = page.locator('.pms-metric').filter({ hasText: '成本差异（万元）' });
   await expect(costDelta).toContainText('21.16');
   await navigate(page, `/opportunities/${id}/estimate/compare?base=${secondId}&compare=${firstId}`);
   await expect(costDelta).toContainText('-21.16');
