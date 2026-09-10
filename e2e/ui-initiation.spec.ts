@@ -94,6 +94,8 @@ test.afterEach(async ({ page }, info) => {
   expect(errors).toEqual([]);
 });
 async function capture(page: Page, name: string) {
+  await expect(page.locator('.ant-message-notice')).toHaveCount(0);
+  await page.evaluate(() => document.querySelectorAll('.ant-table-content, .ant-table-body').forEach((element) => { element.scrollLeft = 0; }));
   for (const width of [1440, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     await page.evaluate(() => window.scrollTo(0, 0));
@@ -102,9 +104,12 @@ async function capture(page: Page, name: string) {
   }
 }
 async function select(page: Page, label: string, option: string) {
-  await page.locator(`.ant-select[aria-label="${label}"] .ant-select-selector`).click();
+  const control = page.locator(`.ant-select[aria-label="${label}"]`);
+  if ((await control.getAttribute('class'))?.includes('ant-select-multiple') && await control.locator('.ant-select-selection-item').filter({ hasText: option }).count()) return;
+  await control.locator('.ant-select-selector').click();
   await page.locator('.ant-select-dropdown:visible .ant-select-item-option').filter({ has: page.getByText(option, { exact: true }) }).click();
   await page.keyboard.press('Escape');
+  await expect(page.locator('.ant-select-dropdown:visible')).toHaveCount(0);
 }
 async function date(page: Page, label: string, value: string) {
   await page.getByLabel(label, { exact: true }).fill(value);
@@ -233,6 +238,7 @@ test('YS04 UI六专业独立会签与正式配置审批', async ({ page }) => {
   for (const [index, [actor, node]] of nodes.entries()) {
     await role(page, actor);
     await open(page, `/initiation/${id}/decision`, '项目分级与决策', id);
+    if (actor === '方案架构师') await expect(page.getByRole('button', { name: /^(提交决策|通过当前节点)/ })).toBeDisabled();
     await page.getByLabel('立项办理意见', { exact: true }).fill(`${node}核对来源、范围及责任，确认同意`);
     await select(page, '本人会签节点', node);
     await page.getByRole('button', { name: '签署当前节点', exact: true }).click();

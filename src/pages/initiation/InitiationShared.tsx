@@ -55,7 +55,7 @@ export function SourceSummary({ source, compact = false }: { source: InitiationS
       { key: 'e', label: '冻结概算', children: source.estimate.id }, { key: 'c', label: '概算成本（万元）', children: <MoneyText value={source.estimate.totalCost} /> }, { key: 'early', label: '前期投入（万元）', children: <MoneyText value={source.earlyCostTotal} /> },
     ]} />
     <Alert style={{ margin: '12px 0' }} type="info" showIcon message={`本轮固定上游版本；${source.earlyCostSources.length} 笔具备唯一来源的成本将在通过后继承。历史汇总不补造成本明细。`} />
-    <Table size="small" pagination={false} rowKey={(_, i) => String(i)} dataSource={source.expertOpinions} columns={[{ title: '专家', dataIndex: 'by' }, { title: '维度', dataIndex: 'dimension' }, { title: '结论', dataIndex: 'conclusion' }, { title: '意见', dataIndex: 'opinion', render: (value: string) => text(value) }]} />
+    <Table size="small" pagination={false} rowKey={(opinion) => `${opinion.dimension}-${opinion.by}`}  dataSource={source.expertOpinions} columns={[{ title: '专家', dataIndex: 'by' }, { title: '维度', dataIndex: 'dimension' }, { title: '结论', dataIndex: 'conclusion' }, { title: '意见', dataIndex: 'opinion', render: (value: string) => text(value) }]} />
   </>;
   return compact ? <details style={{ marginTop: 12 }}><summary style={{ cursor: 'pointer', color: '#475569', padding: '8px 0' }}>来源版本与专家意见 · {source.estimate.id} · 前期投入 <MoneyText value={source.earlyCostTotal} /> 万元</summary><div style={{ paddingTop: 12 }}>{content}</div></details> : content;
 }

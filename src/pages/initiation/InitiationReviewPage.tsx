@@ -21,7 +21,7 @@ export function InitiationReviewPage() {
     : round?.status === '待风险评估' ? 'PMO 综合风险评估' : round?.status === '待分级' ? 'PMO 分级' : round?.status === '待决策' ? round.approvalProgress?.snapshot.nodes[round.approvalProgress.node]?.name ?? (round.path === 'PMC决策会' ? '集团领导决策' : 'PMO 决策') : '查看历史记录';
   return <>
     <InitiationHeader title="立项评审工作台" />
-    <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>{[['待处理', pending.length], ['风险待确认', pending.filter((a) => a.status === '待风险评估').length], ['会签中', pending.filter((a) => a.status === '会签中').length], ['待决策', pending.filter((a) => a.status === '待决策').length]].map(([title, value]) => <Col span={6} key={title}><MetricStatCard title={String(title)} value={Number(value)} unit="项" /></Col>)}</Row>
+    <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>{[['待处理', pending.length], ['风险待确认', pending.filter((a) => a.status === '待风险评估').length], ['会签中', pending.filter((a) => a.status === '会签中').length], ['待决策', pending.filter((a) => a.status === '待决策').length]].map(([title, value]) => <Col span={6} key={title}><MetricStatCard title={String(title)} value={String(value)} unit="项" /></Col>)}</Row>
     <Row gutter={16}><Col span={7}>
       <PageSection title="立项项目列表" description={`当前筛选 ${list.length} 项`}>
         <Input.Search aria-label="搜索立项编号或名称" placeholder="搜索编号 / 名称" value={search} onChange={(e) => update('search', e.target.value)} />

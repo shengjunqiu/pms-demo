@@ -303,9 +303,9 @@ export function InitiationDecisionPage() {
           />
           <Table
             style={{ marginTop: 12 }}
-            rowKey={(_, i) => String(i)}
+            rowKey="key"
             pagination={false}
-            dataSource={approval.snapshot.nodes}
+            dataSource={approval.snapshot.nodes.map((node, index) => ({ ...node, key: index }))}
             columns={[
               { title: "节点", dataIndex: "name" },
               {

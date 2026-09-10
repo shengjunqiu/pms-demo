@@ -32,7 +32,7 @@ const defaultPages:Record<UserRole,string[]>={
  finance:[...ids('GL',[2]),...ids('WK',[2]),...ids('GS',[1,3,4,5,6,7,8,9,10,11]),...ids('YS',range(15)),...ids('HS',range(17)),...ids('JS',range(13)),...ids('CF',[4,5])],
  market:[...ids('GS',range(11)),...ids('WK',[2]),...ids('YS',[1,2,3,4,13,14]),...ids('HS',[1,13]),...ids('JS',[1,2,3,4])],
  'project-manager':[...ids('WK',range(2)),...ids('GS',[1,3,4,5,6,7,8,9,10,11]),...ids('YS',range(15)),...ids('HS',range(17)),...ids('JS',range(13))],
- 'solution-tech':[...ids('WK',[2]),...ids('GS',[1,3,4,5,6,7,8,9,10,11]),...ids('YS',[2,3,5,6,7,8]),...ids('HS',range(17)),...ids('JS',[1,2,3,4,9,10,11,12])],
+ 'solution-tech':[...ids('WK',[2]),...ids('GS',[1,3,4,5,6,7,8,9,10,11]),...ids('YS',[2,3,4,5,6,7,8]),...ids('HS',range(17)),...ids('JS',[1,2,3,4,9,10,11,12])],
  admin:PAGE_MANIFEST.map(p=>p.id)};
 export const ACCESS_ACTIONS=Array.from(new Set((Object.keys(defaultActions) as UserRole[]).flatMap(allowedActions))).sort();
 export const DEMO_TENANT='TENANT-DEMO';

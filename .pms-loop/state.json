@@ -67,20 +67,20 @@
       "round": "R0043"
     },
     "YS-01": {
-      "status": "pending",
-      "reason": "持续全页面UI改造：立项来源/风险/分级和决策分区，当前申请及返回上下文清晰。"
+      "status": "done",
+      "round": "R0044"
     },
     "YS-02": {
-      "status": "pending",
-      "reason": "持续全页面UI改造：立项来源/风险/分级和决策分区，当前申请及返回上下文清晰。"
+      "status": "done",
+      "round": "R0044"
     },
     "YS-03": {
-      "status": "pending",
-      "reason": "持续全页面UI改造：立项来源/风险/分级和决策分区，当前申请及返回上下文清晰。"
+      "status": "done",
+      "round": "R0044"
     },
     "YS-04": {
-      "status": "pending",
-      "reason": "持续全页面UI改造：立项来源/风险/分级和决策分区，当前申请及返回上下文清晰。"
+      "status": "done",
+      "round": "R0044"
     },
     "YS-05": {
       "status": "done",
@@ -1445,6 +1445,48 @@
         ".pms-loop/runs/R0043/checks.json": "b95c20424ea529aafa8e69c7419ae4a900688afee65c87d92845d3cfb099c730",
         ".pms-loop/runs/R0043/evidence.json": "c3e4297481b0e02f5e118314c44a06064188a89e716eb2c06baf0858be836b8c"
       }
+    },
+    {
+      "id": "R0044",
+      "items": [
+        "YS-01",
+        "YS-02",
+        "YS-03",
+        "YS-04"
+      ],
+      "started_at": "2026-09-10T20:02:52+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-10T20:22:31+00:00",
+      "revision": "1aa70973d81f9816df0e5f56aa3f42cfbad0b844deb6933e1c625bfad2b41c7c",
+      "proof": {
+        ".pms-loop/runs/R0044/test-domain.log": "60e2952bdc327856de3df1b7e43e5f352be64cb6fada2d4d9a429d514a8eca2c",
+        ".pms-loop/runs/R0044/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0044/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0044/build.log": "2b717fe19147253bfd3a96246f07fc92fc63a7271e184b7a78ca1dd6d13c8f48",
+        ".pms-loop/runs/R0044/browser-final-a.log": "1253ca4c65471127e0b96120ac2c8711c821bbd13172ef9e630a8029c2f762ae",
+        ".pms-loop/runs/R0044/browser-final-b.log": "30c46559ee770d4e35a4d814d2eee58a2f922e339ab8fbbe346de8cbb48ccd82",
+        ".pms-loop/runs/R0044/artifacts/initiation-402f8a691dafae9027ca77697145530399ee052a.json": "61ca751160e9cded7fe7ca78f5dfcfac584fba277123b40c610a6ba39fdf59bd",
+        ".pms-loop/runs/R0044/artifacts/initiation-402f8a691dafae9027cae3a704e5a68a2130eaaa.json": "f3dbe4bc69bb3230fb1ecdf49bea105857e1f1ab37de454c18258156b275db00",
+        ".pms-loop/runs/R0044/artifacts/initiation-402f8a691dafae9027cac472a1bb26136f2aa2ad.json": "7dd9e6b262522564527f29beaa7489c2a359b2b2b33b7f24c67345fb110fcb0a",
+        ".pms-loop/runs/R0044/artifacts/initiation-402f8a691dafae9027ca45126b71071e9706dab2.json": "55aa2eec16297b222d254f6923e118853a88710804ce1d7b5d5789eca7988e07",
+        ".pms-loop/runs/R0044/artifacts/initiation-402f8a691dafae9027ca30518e584a349cb92214.json": "895e3548de73127250622d4f56448977b05c8e76545bf66fec637770f65c7e7b",
+        ".pms-loop/runs/R0044/artifacts/YS01-basic-1440.png": "5a474b7bf96de2ce0656f82110c3a9d01d25660e9a154fb8933325af73f13167",
+        ".pms-loop/runs/R0044/artifacts/YS01-basic-1280.png": "2f5e1a244300280071dd4211927e7b8378ef2dbd83f05b0d00ec8a610fcaf007",
+        ".pms-loop/runs/R0044/artifacts/YS02-1440.png": "c249b8c1a687adcf411c286b6a4c90d320e410c2415cd7288347333116ef25ae",
+        ".pms-loop/runs/R0044/artifacts/YS02-1280.png": "e7927887c621de43d80c1a0b39e622d11b816cbbfafe1c1ff7a98e6e6194ef97",
+        ".pms-loop/runs/R0044/artifacts/YS03-1440.png": "296f822164f84e5d28c1a15eb1a9b5eab6cc87bfa9461f951d100c0d5efb7a74",
+        ".pms-loop/runs/R0044/artifacts/YS03-1280.png": "a001adfc28cc3a7cc998cc62b9d41c55de1d4f55f1dcfd93cbe281ba5dc405bf",
+        ".pms-loop/runs/R0044/artifacts/YS04-1440.png": "13925ecda38c1f26f4ea67d635f1d57f04117a66671fdf149998aea655f079a0",
+        ".pms-loop/runs/R0044/artifacts/YS04-1280.png": "781e59807a00bdd732ff6eaa1239ff2b649e3bc3b8f956102ed9ca271ffa8f72",
+        ".pms-loop/runs/R0044/checks.json": "7c5e0dcb652c9cff381308aaf30c7bbf585e8207cbe50536dd3bee76ba4760a7",
+        ".pms-loop/runs/R0044/evidence.json": "f69f15a8cec8b56762f788de2884910046da39c9cf61e2eed7afe59d0ebb69cc"
+      }
     }
   ],
   "notes": [
@@ -1651,6 +1693,18 @@
     {
       "at": "2026-09-10T20:02:17+00:00",
       "text": "reopen FINAL, HS-02, HS-16, WK-02: 继续全页面UI改造：本人待办、项目进度与阶段门/计划原单主要动作前置，保留执行与审批。"
+    },
+    {
+      "at": "2026-09-10T20:08:44+00:00",
+      "text": "R0044浏览器发现实际缺陷：SourceSummary/审批表rowKey(index)产生AntD警告；技术角色有sign-initiation动作但默认策略未含YS04，评审工作台进入会签页403。回到同轮修复：补会签页访问仍由原领域/动作控制；测试多节点同角色重复选择参会人会取消已有两人，改为确保选中并等待下拉关闭。保留失败证据后重新check与浏览器。"
+    },
+    {
+      "at": "2026-09-10T20:14:02+00:00",
+      "text": "R0044复核前4场景passed且console空，runner在第5场景前exit143，未将旧失败JSON计为新通过。只清理测试服务pgid2890085。人工截图发现评审数量显示小数、风险截图残留已校验toast并滚到表格中部；同轮修正数量显示为整数，capture等toast消失并复位表格局部滚动后重查。后续分两短批运行全部5例。"
+    },
+    {
+      "at": "2026-09-10T20:22:43+00:00",
+      "text": "R0044立项四页正式验收，新UI累计31/72。当前1aa70973工程四项235领域通过；最终浏览器A2+B3均exit0，八张主截图人工查看。修复技术会签403、Table旧rowKey与整数计数；保留原失败日志。继续YS4 6f16e5未签启动三页，HS1 f1a7257已提交待集成；后续报告/质量、工单、成本与验收准备文档在/tmp。"
     }
   ],
   "history": [
