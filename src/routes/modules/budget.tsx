@@ -1,3 +1,7 @@
+import {InitiationApplyPage} from '@/pages/initiation/InitiationApplyPage';
+import {InitiationReviewPage} from '@/pages/initiation/InitiationReviewPage';
+import {InitiationRiskPage} from '@/pages/initiation/InitiationRiskPage';
+import {InitiationDecisionPage} from '@/pages/initiation/InitiationDecisionPage';
 import {ChangesPage} from '@/pages/changes/ChangesPage';
 import {ChangeFormPage} from '@/pages/changes/ChangeFormPage';
 import {TeamPage} from '@/pages/budget/TeamPage';
@@ -9,6 +13,10 @@ import { WbsPlanningPage } from '@/pages/budget/WbsPlanningPage';
 import { MilestonePlanningPage } from '@/pages/budget/MilestonePlanningPage';
 import { PlanReviewPage } from '@/pages/budget/PlanReviewPage';
 export const budgetRoutes=[
+ {path:'initiation/apply',element:<InitiationApplyPage/>},
+ {path:'initiation/review',element:<InitiationReviewPage/>},
+ {path:'initiation/:id/risk-assessment',element:<InitiationRiskPage/>},
+ {path:'initiation/:id/decision',element:<InitiationDecisionPage/>},
  {path:'project-changes',element:<ChangesPage/>},
  {path:'project-changes/new',element:<ChangeFormPage/>},
  {path:'projects/:id/team',element:<TeamPage/>},
