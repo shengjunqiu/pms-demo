@@ -185,7 +185,7 @@ test('YS-14 签约进展和合同原单形成同源记录', async ({ page }) => 
   });
 });
 
-test('YS-15 阻断原因完整且满足条件后原子启动', async ({ page }) => {
+test('YS-15 未签合同阻断且不创建启动记录', async ({ page }) => {
   await seedAcceptanceScenario(page, 'unsigned-ready-for-contract');
   await role(page, 'PMO负责人');
   await navigate(page, '/projects/P-PLAN-001/start-confirmation');
@@ -202,7 +202,10 @@ test('YS-15 阻断原因完整且满足条件后原子启动', async ({ page }) 
   await expect(page.locator('.ant-message-notice').filter({ hasText: '未签项目不能确认正式启动' })).toBeVisible();
   await expect(page.getByText(/已确认正式启动/)).toHaveCount(0);
 
+  observe(page, { blockedFixture: 'unsigned-ready-for-contract', blockedResult: '真实合同未签时禁止启动且无记录' });
+});
 
+test('YS-15 满足条件后原子启动并提供执行入口', async ({ page }) => {
   await seedAcceptanceScenario(page, 'unsigned-ready-for-start');
   await role(page, 'PMO负责人');
   await navigate(page, '/projects/P-PLAN-001/start-confirmation');
@@ -251,8 +254,6 @@ test('YS-15 阻断原因完整且满足条件后原子启动', async ({ page }) 
   await expect(page.getByRole('button', { name: '填报本人工时', exact: true })).toBeEnabled();
 
   observe(page, {
-    blockedFixture: 'unsigned-ready-for-contract',
-    blockedResult: '真实合同未签时明确显示唯一未满足项及原业务入口',
     readyFixture: 'unsigned-ready-for-start',
     startResult:
       '七项启动检查全部满足后，PMO确认正式启动；生成WBS、日报、工时事项和4条模拟通知',

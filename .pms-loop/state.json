@@ -115,16 +115,16 @@
       "round": "R0042"
     },
     "YS-13": {
-      "status": "pending",
-      "reason": "持续全页面UI改造：未签台账、额度合同退出详情与启动确认分区，保留真实业务链。"
+      "status": "done",
+      "round": "R0045"
     },
     "YS-14": {
-      "status": "pending",
-      "reason": "持续全页面UI改造：未签台账、额度合同退出详情与启动确认分区，保留真实业务链。"
+      "status": "done",
+      "round": "R0045"
     },
     "YS-15": {
-      "status": "pending",
-      "reason": "持续全页面UI改造：未签台账、额度合同退出详情与启动确认分区，保留真实业务链。"
+      "status": "done",
+      "round": "R0045"
     },
     "HS-01": {
       "status": "done",
@@ -1487,6 +1487,51 @@
         ".pms-loop/runs/R0044/checks.json": "7c5e0dcb652c9cff381308aaf30c7bbf585e8207cbe50536dd3bee76ba4760a7",
         ".pms-loop/runs/R0044/evidence.json": "f69f15a8cec8b56762f788de2884910046da39c9cf61e2eed7afe59d0ebb69cc"
       }
+    },
+    {
+      "id": "R0045",
+      "items": [
+        "YS-13",
+        "YS-14",
+        "YS-15"
+      ],
+      "started_at": "2026-09-10T20:23:34+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-10T20:42:15+00:00",
+      "revision": "c0472d3c526e7a03feae77f95a18b37aaf43f25cd339552395726ef027d7c2ee",
+      "proof": {
+        ".pms-loop/runs/R0045/test-domain.log": "ef498065fbfdcb1c36f35c964945dd4efe7cd0f0a250b3e28d9c5b31e2644d93",
+        ".pms-loop/runs/R0045/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0045/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0045/build.log": "98ac794e224b055d78a82ecb00bc2515afe427bd670326a6a481d960d6d63438",
+        ".pms-loop/runs/R0045/browser-final-a.log": "be8bfab7f9782040a1f9b8fab20fb3aede135b8d737d007155cf65757c704634",
+        ".pms-loop/runs/R0045/browser-final-b.log": "334fb312477552f4f5ed25883b789e2c816b9ce9bb0485fc367a94da08439631",
+        ".pms-loop/runs/R0045/artifacts/r0024-9041e22008a7401df18bdcb1a14e71db714cf4bc.json": "fe3e586912ca39eaa4cc0fbcbde2c268844cbc4a303dc4c7376fb53bc9b0ce6e",
+        ".pms-loop/runs/R0045/artifacts/r0024-9041e22008a7401df18b29ad3c7ed6de2cadf8f7.json": "14dfcfe6aad3955d21e0e4a17e96758c016821b71dc2599bddf738951d98cac9",
+        ".pms-loop/runs/R0045/artifacts/r0024-ddbd7d35d15097f0e7b8f4bb973ff82154297878.json": "cdda4016c675b1f78fe31d011b4318eea4e8c94e0c46aee6141c7dfe864bb2cd",
+        ".pms-loop/runs/R0045/artifacts/r0024-ddbd7d35d15097f0e7b800d587cb5060835c6f16.json": "0d4414feb7992fd26f67a8c895fd4819476377ba389a5df83893a58b18480b63",
+        ".pms-loop/runs/R0045/artifacts/r0024-ddbd7d35d15097f0e7b889dc9c34fa8563cd7313.json": "e6d40670999fec05da9407845eb078dfd179537d9d41612076a68db83a884fa0",
+        ".pms-loop/runs/R0045/artifacts/r0024-42e37f2541ff4cab7d55c72f96bc9d1f1f29b8fb.json": "8f9242713831895cf55fbf17514223cb34fafdec0db3cb07d304dfc385d3da1a",
+        ".pms-loop/runs/R0045/artifacts/r0024-42e37f2541ff4cab7d55cb1ca1cc637d9a4f122c.json": "ad98343fa0b53dc1fd24f20dc215ea8ae19f2e269b0652be42710b172f5b4159",
+        ".pms-loop/runs/R0045/artifacts/r0024-9041e22008a7401df18b0a300105f39dc7b6d7d6.json": "cafe49b70f47c65dc1f2ed054b0feace6e3519b52570d16334caf7fca860f30f",
+        ".pms-loop/runs/R0045/artifacts/r0024-9041e22008a7401df18be7e2a55e0b98eda4ba0d.json": "a0245d76730bf34cf0c7ab6dbdfea6918e20863c9d69c210577c879419924989",
+        ".pms-loop/runs/R0045/artifacts/r0024-42e37f2541ff4cab7d55c9ffc241e7a36e9b2bcb.json": "fdcf72dae4840f9be0ff77ae5bcf86276839bcd760d3cb8486ce15bfae5b5bc8",
+        ".pms-loop/runs/R0045/artifacts/r0024-9041e22008a7401df18b6754c80abe57c2a14c76.json": "9412f7b88109f7ddf68a675db91d4f7a7a9331296754b7e8a0f323fc0d860720",
+        ".pms-loop/runs/R0045/artifacts/YS-13-1440.png": "7da83ab4c945ef03edd127c3fa4dc1bcdfe5b86acfa17971f5753af5eb83cf02",
+        ".pms-loop/runs/R0045/artifacts/YS-13-1280.png": "54f7598acba71ff1d1645e0a03e971649f9fdb8033caf9e8abe1fc8e969b4480",
+        ".pms-loop/runs/R0045/artifacts/YS-14-1440.png": "496ba57640137d1d58d9577944258eb2a13bea4b19ecb051ee28a98f68b7b876",
+        ".pms-loop/runs/R0045/artifacts/YS-14-1280.png": "d4e7273ab484f92b592631d3241c20d246807cab765dde65c7fa09f520e379e3",
+        ".pms-loop/runs/R0045/artifacts/YS-15-1440.png": "78f76869f093ab2003170e9ccf7d221e0f3d01075b0ef4feaffd3ba7aa9ca2bb",
+        ".pms-loop/runs/R0045/artifacts/YS-15-1280.png": "6e378d09d0ec7b66a3ddcdabfa11ebc8c05416ebb4931e9f79b14d20adb30bb5",
+        ".pms-loop/runs/R0045/checks.json": "d99ada092f4ce84eed06d83ee9d0a8f564e5d4be8275abbc6dda304fe5f5003a",
+        ".pms-loop/runs/R0045/evidence.json": "1d1a0b24bf9272f315327a5ec9fdc95cb0007ff7b6482e9aaeeb0a27f8e0f5a8"
+      }
     }
   ],
   "notes": [
@@ -1709,6 +1754,18 @@
     {
       "at": "2026-09-10T20:23:03+00:00",
       "text": "reopen FINAL, HS-03, HS-04, HS-17: 继续全页面UI改造：日报周报当前动作与历史快照分区，交付物及质量审核版本清晰。"
+    },
+    {
+      "at": "2026-09-10T20:28:36+00:00",
+      "text": "R0045首浏览器1pass3fail：未签台账URL筛选连续事件读取旧query，清风险后搜索恢复风险、搜索后切已签丢关键词；修复按事件时当前URL构建参数。启动真实成功已生成事项，旧单例两次fixture及跨页链累计30秒超时，拆独立未签阻断与就绪启动两场景，保留断言与默认超时。同轮修复重查。"
+    },
+    {
+      "at": "2026-09-10T20:35:23+00:00",
+      "text": "R0045 3e7118c最终业务5例+额度/新UI6例均exit0通过。双宽查看发现YS13项目编号被Button默认flex压为P-/004两列，回到同轮只修项目名称按钮块排版，保留完整编号和标题；再工程检查并重拍受影响台账及详情启动双宽。"
+    },
+    {
+      "at": "2026-09-10T20:42:31+00:00",
+      "text": "R0045未签启动三页验收，新UI34/72。c0472d3工程四项235领域、最终A5+B6共11UI通过exit0；双宽已查看。修复连续URL筛选旧query覆盖和编号flex断行；旧超时case拆两独立场景，旧失败报告保留未计通过。继续HS1 f1a7257合入，先修当前阶段丢失、跨项目弹窗残留、Todos日期及筛选，再正式check；HS2 47fc7ad已交付范围通过。"
     }
   ],
   "history": [

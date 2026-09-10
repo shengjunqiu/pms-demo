@@ -25,7 +25,7 @@
   "acceptance_dependencies": [],
   "acceptance_ready": true,
   "acceptance_group": "UI-YS4",
-  "status": "integrated_pending_acceptance",
+  "status": "accepted",
   "last_confirmed_at": "2026-09-11",
   "acceptance_checklist": [
     "工程检查",
@@ -35,7 +35,7 @@
   ],
   "scenarios": "按/tmp/pms-ui-unsigned-preparation.md，不改额度与成本或启动门禁",
   "fixtures": "已有r0024合法transition前置和真实UI动作",
-  "next_action": "R0045当前集成版工程及浏览器验收",
+  "next_action": "R0045已正式验收；新UI34/72",
   "delivery_commit": "6f16e59927edbb2c8e62186d1153cca9d49748ce",
   "integration_commit": "6c767ae"
 }
