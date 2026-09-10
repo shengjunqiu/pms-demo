@@ -50,7 +50,7 @@ const pane = (page: Page) => page.locator('.ant-tabs-tabpane-active');
 async function choose(page: Page, container: Locator, label: string, option: string) {
   const input = container.getByLabel(label, { exact: true });
   await input.focus(); await input.press('ArrowDown');
-  await page.locator('.ant-select-dropdown:visible').getByText(option, { exact: true }).click();
+  await page.locator('.ant-select-dropdown:visible .ant-select-item-option').getByText(option, { exact: true }).click();
 }
 async function confirm(page: Page) {
   await page.locator('.ant-modal-confirm:visible').getByRole('button', { name: /确\s*定/ }).click();

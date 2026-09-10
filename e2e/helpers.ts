@@ -1,5 +1,7 @@
 import { expect, type Page } from '@playwright/test';
 export async function role(page: Page, name: string) {
+  // Selecting the current identity does not fire the application's onChange.
+  if ((await page.locator('.ant-select[aria-label="模拟身份"] .ant-select-selection-item').innerText()).includes(name)) return;
   await page.locator('.ant-select[aria-label="模拟身份"] .ant-select-selector').click();
   await page.locator('.ant-select-dropdown:visible .ant-select-item-option').filter({ hasText: name }).click();
   const home = name === '客户经理' || name === '方案架构师' ? '/opportunities' : name === '项目经理' ? '/workbench/project-manager' : name === '财务专员' ? '/executive/four-calculations' : '/executive/dashboard';

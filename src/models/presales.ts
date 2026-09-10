@@ -1,5 +1,6 @@
 import type { UserRole } from '@/store/useAppStore';
 export interface SolutionDraft {
+  modifiedBy?: string; modifiedAt?: string;
   customerSituation: string; goals: string; scope: string; boundaries: string; architecture: string; implementation: string; deliverables: string; dependencies: string; assumptions: string;
   ownerId: string; participants: string[]; startDate: string; endDate: string; attachments: string[]; changeReason: string;
 }
