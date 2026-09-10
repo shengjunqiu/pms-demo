@@ -35,7 +35,7 @@ export async function capturePageEvidence(page: Page, pageId: string) {
       ),
     ).toBe(true);
     const path = join(artifactDir, `${pageId}-${width}.png`);
-    await page.screenshot({ path, fullPage: true });
+    await page.screenshot({ path, fullPage: true, animations: 'disabled' });
     screenshots[String(width)] = path;
   }
   await page.setViewportSize({ width: 1440, height: 900 });

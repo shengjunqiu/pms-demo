@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "base": "755dc82132c6ce0b6f8ade5c6279ed5a82a7e591",
+  "head": "f1a725769bcd1d66c34c4330156457b6be9138c9",
+  "paths": [
+    "e2e/ui-progress.spec.ts",
+    "src/pages/approvals/PlanRequestPage.tsx",
+    "src/pages/execution/ProjectProgressPage.tsx",
+    "src/pages/workbench/TodosPage.tsx"
+  ],
+  "shared_paths": [],
+  "outside_owned_paths": [],
+  "merge_commits": [],
+  "unresolved_conflicts": []
+}

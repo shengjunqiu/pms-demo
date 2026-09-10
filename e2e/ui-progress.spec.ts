@@ -20,9 +20,10 @@ test('待办 UI：35天计划会签、原单返回和本人已办',async({page})
  const row=page.locator('.ant-table-tbody tr.ant-table-row');await expect(row).toHaveCount(1);
  await capturePageEvidence(page,'UI-WK02');
  await row.getByRole('button',{name:'进入原业务',exact:true}).click();await expect(page).toHaveURL(original);
+ await capturePageEvidence(page,'UI-plan-request');
  await review(page,true,'PMO确认计划影响');await expect(page.getByText('PMO：PMO确认计划影响',{exact:true})).toBeVisible();
  expect((await state(page)).planRequests.find(r=>r.id===submitted.id)?.status).toBe('待审批');
- await page.getByRole('button',{name:'返回来源',exact:true}).click();await expect(page).toHaveURL(new RegExp(`todos\\?project=P-001&search=${submitted.id}`));
+ await page.getByRole('button',{name:'返回来源',exact:true}).click();await expect(page).toHaveURL(`/workbench/todos?project=P-001&search=${submitted.id}`);
  await page.getByRole('tab',{name:/已办/}).click();await expect(row).toContainText('PMO确认计划影响');
  await role(page,'财务专员');await navigate(page,original);await review(page,true,'财务确认资源影响');
  await expect(page.getByText('财务：财务确认资源影响',{exact:true})).toBeVisible();
@@ -62,4 +63,15 @@ test('阶段 UI：就绪前置后真实提交批准，历史使用批准快照',
  await role(page,'PMO负责人');await navigate(page,`/projects/P-001/stage-switch?request=${request.id}`);await review(page,true,'PMO复核全部条件');await expect(page.getByRole('dialog')).toBeHidden();
  const after=await state(page);expect(after.projects.find(p=>p.id==='P-001')).toMatchObject({phase:'收尾',subPhase:'客户终验',releasedBudgetPercent:request.stageSnapshot!.releasePercent});expect(after.budgets).toEqual(before.budgets);expect(after.baselines).toEqual(before.baselines);expect(after.acceptances).toEqual(before.acceptances);
  await expect(page.getByRole('cell',{name:'阻断',exact:true})).toHaveCount(0);await capturePageEvidence(page,'UI-HS16-approved');
+});
+
+
+test('进度 UI：跨项目导航关闭旧任务草稿',async({page})=>{
+ await page.goto('/projects/P-001/progress');await role(page,'项目经理');
+ await expect(page.getByText('当前阶段 执行 / 开发实施',{exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'更新执行',exact:true}).first().click();
+ await page.getByRole('dialog').getByLabel('执行说明',{exact:true}).fill('未提交的上一项目草稿');
+ await navigate(page,'/projects/P-002/progress');await expect(page.getByRole('dialog')).toBeHidden();
+ await navigate(page,'/projects/P-001/progress');await page.getByRole('button',{name:'更新执行',exact:true}).first().click();
+ await expect(page.getByRole('dialog').getByLabel('执行说明',{exact:true})).not.toHaveValue('未提交的上一项目草稿');
 });

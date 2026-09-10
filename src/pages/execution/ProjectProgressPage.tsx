@@ -13,6 +13,10 @@ import { StateView } from '@/components/common/StateView';
 import type { WbsTask } from '@/models/types';
 
 export function ProjectProgressPage() {
+  const { id } = useParams();
+  return <ProjectProgressContent key={id} />;
+}
+function ProjectProgressContent() {
   const {canDo}=useActionAccess();
   const { id } = useParams(); const [params] = useSearchParams(); const navigate = useNavigate(); const { message } = App.useApp();
   const { data, dispatch } = useBusinessStore(); const { currentRole, currentUser } = useAppStore();
@@ -34,7 +38,7 @@ export function ProjectProgressPage() {
   const min = Math.min(...tasks.map((t) => Date.parse(t.startDate))); const max = Math.max(...tasks.map((t) => Date.parse(t.endDate))); const range = Math.max(86400000, max - min);
   const open = (t: WbsTask) => { setEditing(t); setPercent(t.progress); setStart(t.actualStartDate ?? ''); setEnd(t.actualEndDate ?? ''); setNote(t.executionNote ?? ''); };
   return <><PageHeader title="HS-02 项目进度" description={`${p.id} · ${p.name} · 基准日 ${AS_OF_DATE}`} breadcrumbs={[{ title: '首页', href: '/' }, { title: p.name, href: `/projects/${p.id}` }, { title: '项目进度' }]} extra={<Button onClick={() => navigate(-1)}>返回上一级</Button>} />
-    <PageToolbar><Tag>有效计划基线 {p.currentBaselineVersion}</Tag><Button disabled={!pm||!canDo('request-plan',p.id)} onClick={() => navigate(`/projects/${p.id}/plan-requests/new?kind=schedule&${params}`)}>发起计划变更</Button><Button disabled={!pm||!canDo('request-plan',p.id)} onClick={() => navigate(`/projects/${p.id}/plan-requests/new?kind=stage&${params}`)}>发起阶段切换</Button><Button onClick={() => navigate(`/projects/${p.id}?tab=progress`)}>项目总览</Button></PageToolbar>
+    <PageToolbar><Tag>当前阶段 {p.phase} / {p.subPhase}</Tag><Tag>有效计划基线 {p.currentBaselineVersion}</Tag><Button disabled={!pm||!canDo('request-plan',p.id)} onClick={() => navigate(`/projects/${p.id}/plan-requests/new?kind=schedule&${params}`)}>发起计划变更</Button><Button disabled={!pm||!canDo('request-plan',p.id)} onClick={() => navigate(`/projects/${p.id}/plan-requests/new?kind=stage&${params}`)}>发起阶段切换</Button><Button onClick={() => navigate(`/projects/${p.id}?tab=progress`)}>项目总览</Button></PageToolbar>
     <PageSection className="pms-record-summary"><Row gutter={16}>{[
       {title:'总体实际完成率',value:`${p.progressRate.toFixed(1)}%`},
       {title:'计划完成率',value:`${planProgress.toFixed(1)}%`},

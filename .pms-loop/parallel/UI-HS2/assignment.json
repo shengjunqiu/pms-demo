@@ -1,0 +1,37 @@
+{
+  "package_id": "UI-HS2",
+  "items": [
+    "HS-03",
+    "HS-04",
+    "HS-17"
+  ],
+  "owner": "/root/ui_opportunities",
+  "writer": "",
+  "integration_root": "/home/shengjunqiu/code/pms-demo",
+  "workdir": "/tmp/pms-ui-reporting",
+  "branch": "pms/ui-reporting",
+  "base_commit": "2a33b79",
+  "contract_commit": "2a33b79",
+  "owned_paths": [
+    "src/pages/execution/ReportsPage.tsx",
+    "src/pages/execution/DeliverablesPage.tsx",
+    "e2e/ui-reporting.spec.ts"
+  ],
+  "shared_changes": [],
+  "development_dependencies": [],
+  "acceptance_dependencies": [],
+  "acceptance_ready": false,
+  "acceptance_group": "UI-HS2",
+  "status": "submitted",
+  "last_confirmed_at": "2026-09-11",
+  "acceptance_checklist": [
+    "工程检查",
+    "真实报告与质量材料版本业务流程",
+    "双宽截图及权限",
+    "正式accept"
+  ],
+  "scenarios": "按/tmp/pms-ui-reporting-preparation.md三链",
+  "fixtures": "真实UI写入；合法transition仅明确的前置",
+  "next_action": "范围检查通过；等待R45及HS1后集成，浏览器未执行",
+  "delivery_commit": "47fc7add3b56c89bbadf86611b2fa33e3116cb7f"
+}
