@@ -8,12 +8,15 @@
     "src/pages/tickets/TicketsPage.tsx",
     "src/pages/tickets/TicketDetailPage.tsx"
   ],
-  "status": "integrated",
+  "status": "archived",
   "scenarios": [
     "create and each update operation disabled by policy",
     "modal edit and confirmation policy controls"
   ],
   "formal_acceptance": false,
   "delivery_commit": "30ab8d0",
-  "integration_commit": "1b3a9f3e17cebe793be8ed67b02e3acf254b57bd"
+  "integration_commit": "1b3a9f3e17cebe793be8ed67b02e3acf254b57bd",
+  "package_kind": "cross-cutting-delivery",
+  "writer": "",
+  "next_action": "已集成横切修复记录；页面验收归属业务包，禁止重复派工"
 }

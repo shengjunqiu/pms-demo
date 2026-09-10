@@ -1,6 +1,6 @@
 {
   "package_id": "D08",
-  "status": "integrated",
+  "status": "archived",
   "formal_acceptance": false,
   "delivery_commits": [
     "67a9c80"
@@ -14,5 +14,8 @@
     "src/pages/executive/GL04PortfolioPage.tsx",
     "src/pages/settlement/SettlementAnalysisPage.tsx"
   ],
-  "record_type": "reconstructed from immutable Git deliveries; not a new assignment"
+  "record_type": "reconstructed from immutable Git deliveries; not a new assignment",
+  "package_kind": "cross-cutting-delivery",
+  "writer": "",
+  "next_action": "已集成横切修复记录；页面验收归属业务包，禁止重复派工"
 }

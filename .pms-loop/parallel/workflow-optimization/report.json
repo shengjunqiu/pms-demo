@@ -1,0 +1,463 @@
+{
+  "schema_version": 1,
+  "mode": "acceptance_sprint",
+  "active_round": "R0024",
+  "active_run_status": "checks_failed",
+  "freeze_integration": false,
+  "counts": {
+    "accepted_pages": 30,
+    "total_pages": 72,
+    "remaining_pages": 42,
+    "active_pages": 3,
+    "covered_remaining_pages": 42,
+    "uncovered_remaining_pages": 0,
+    "packages": 38,
+    "development_wip": 2,
+    "submitted_wip": 0,
+    "integrated_wip": 15,
+    "ready_acceptance_groups": 0
+  },
+  "wip_limits": {
+    "development": 3,
+    "submitted": 2,
+    "integrated": 2
+  },
+  "active_items": [
+    "YS-13",
+    "YS-14",
+    "YS-15"
+  ],
+  "next_action": "先恢复 R0024；当前尚未确认进入check冻结，可修复本轮，check后立即冻结。",
+  "ready_acceptance_batches": [],
+  "integrated_inventory": [
+    {
+      "package": "A01",
+      "status": "integrated_pending_acceptance",
+      "items": [
+        "GS-01",
+        "GS-03"
+      ],
+      "part": 1,
+      "acceptance_ready": false,
+      "blockers": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "按catalog和并发方案，所有真实下钻已集成可操作"
+      ]
+    },
+    {
+      "package": "A02",
+      "status": "integrated_pending_acceptance",
+      "items": [
+        "GS-05",
+        "GS-06",
+        "GS-07"
+      ],
+      "part": 1,
+      "acceptance_ready": false,
+      "blockers": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "current integration engineering checks",
+        "formal browser observation and 1440x900/1280x900 screenshots",
+        "formal Loop acceptance"
+      ]
+    },
+    {
+      "package": "A03",
+      "status": "integrated_pending_acceptance",
+      "items": [
+        "GS-08",
+        "GS-09"
+      ],
+      "part": 1,
+      "acceptance_ready": false,
+      "blockers": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "按catalog和并发方案，所有真实下钻已集成可操作"
+      ]
+    },
+    {
+      "package": "B02",
+      "status": "integrated_pending_acceptance",
+      "items": [
+        "YS-05",
+        "YS-09",
+        "YS-10",
+        "YS-11",
+        "YS-12"
+      ],
+      "part": 1,
+      "acceptance_ready": false,
+      "blockers": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "按catalog和并发方案，所有真实下钻已集成可操作"
+      ]
+    },
+    {
+      "package": "C01",
+      "status": "integrated_pending_acceptance",
+      "items": [
+        "JS-01",
+        "JS-02"
+      ],
+      "part": 1,
+      "acceptance_ready": false,
+      "blockers": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "按catalog和并发方案，所有真实下钻已集成可操作"
+      ]
+    },
+    {
+      "package": "C02",
+      "status": "integrated_pending_acceptance",
+      "items": [
+        "JS-05",
+        "JS-06",
+        "JS-07"
+      ],
+      "part": 1,
+      "acceptance_ready": false,
+      "blockers": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "按catalog和并发方案，所有真实下钻已集成可操作"
+      ]
+    },
+    {
+      "package": "C06",
+      "status": "integrated_pending_acceptance",
+      "items": [
+        "JS-08",
+        "JS-13"
+      ],
+      "part": 1,
+      "acceptance_ready": false,
+      "blockers": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "current integration build and full domain checks",
+        "receipt browser scenario including read-only plan-to-receipt drilldown",
+        "formal 1440x900/1280x900 screenshots and Loop acceptance"
+      ]
+    },
+    {
+      "package": "A04",
+      "status": "integrated",
+      "items": [
+        "GS-10",
+        "GS-11"
+      ],
+      "part": 1,
+      "acceptance_ready": false,
+      "blockers": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "正式双宽度浏览器与业务验收"
+      ]
+    },
+    {
+      "package": "B03",
+      "status": "integrated",
+      "items": [
+        "HS-14",
+        "HS-15"
+      ],
+      "part": 1,
+      "acceptance_ready": false,
+      "blockers": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "正式双宽度浏览器与业务验收"
+      ]
+    },
+    {
+      "package": "B04-CONFIG",
+      "status": "integrated",
+      "items": [
+        "YS-01",
+        "YS-02",
+        "YS-03",
+        "YS-04"
+      ],
+      "part": 1,
+      "acceptance_ready": false,
+      "blockers": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "formal browser acceptance"
+      ]
+    },
+    {
+      "package": "C03",
+      "status": "integrated",
+      "items": [
+        "JS-09",
+        "JS-10"
+      ],
+      "part": 1,
+      "acceptance_ready": false,
+      "blockers": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "正式双宽度浏览器与业务验收"
+      ]
+    },
+    {
+      "package": "C04",
+      "status": "integrated",
+      "items": [
+        "JS-11",
+        "JS-12"
+      ],
+      "part": 1,
+      "acceptance_ready": false,
+      "blockers": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "按catalog和并发方案，所有真实下钻已集成可操作"
+      ]
+    },
+    {
+      "package": "D01",
+      "status": "integrated",
+      "items": [
+        "CF-01",
+        "CF-02",
+        "CF-03"
+      ],
+      "part": 1,
+      "acceptance_ready": false,
+      "blockers": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "按catalog和并发方案，所有真实下钻已集成可操作"
+      ]
+    },
+    {
+      "package": "D02",
+      "status": "integrated",
+      "items": [
+        "CF-04",
+        "CF-05",
+        "CF-06"
+      ],
+      "part": 1,
+      "acceptance_ready": false,
+      "blockers": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "按catalog和并发方案，所有真实下钻已集成可操作"
+      ]
+    }
+  ],
+  "readiness_blockers": [
+    {
+      "package": "A01",
+      "items": [
+        "GS-01",
+        "GS-03"
+      ],
+      "reasons": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "按catalog和并发方案，所有真实下钻已集成可操作"
+      ]
+    },
+    {
+      "package": "A02",
+      "items": [
+        "GS-05",
+        "GS-06",
+        "GS-07"
+      ],
+      "reasons": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "current integration engineering checks",
+        "formal browser observation and 1440x900/1280x900 screenshots",
+        "formal Loop acceptance"
+      ]
+    },
+    {
+      "package": "A03",
+      "items": [
+        "GS-08",
+        "GS-09"
+      ],
+      "reasons": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "按catalog和并发方案，所有真实下钻已集成可操作"
+      ]
+    },
+    {
+      "package": "B02",
+      "items": [
+        "YS-05",
+        "YS-09",
+        "YS-10",
+        "YS-11",
+        "YS-12"
+      ],
+      "reasons": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "按catalog和并发方案，所有真实下钻已集成可操作"
+      ]
+    },
+    {
+      "package": "C01",
+      "items": [
+        "JS-01",
+        "JS-02"
+      ],
+      "reasons": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "按catalog和并发方案，所有真实下钻已集成可操作"
+      ]
+    },
+    {
+      "package": "C02",
+      "items": [
+        "JS-05",
+        "JS-06",
+        "JS-07"
+      ],
+      "reasons": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "按catalog和并发方案，所有真实下钻已集成可操作"
+      ]
+    },
+    {
+      "package": "C06",
+      "items": [
+        "JS-08",
+        "JS-13"
+      ],
+      "reasons": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "current integration build and full domain checks",
+        "receipt browser scenario including read-only plan-to-receipt drilldown",
+        "formal 1440x900/1280x900 screenshots and Loop acceptance"
+      ]
+    },
+    {
+      "package": "A04",
+      "items": [
+        "GS-10",
+        "GS-11"
+      ],
+      "reasons": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "正式双宽度浏览器与业务验收"
+      ]
+    },
+    {
+      "package": "B03",
+      "items": [
+        "HS-14",
+        "HS-15"
+      ],
+      "reasons": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "正式双宽度浏览器与业务验收"
+      ]
+    },
+    {
+      "package": "B04-CONFIG",
+      "items": [
+        "YS-01",
+        "YS-02",
+        "YS-03",
+        "YS-04"
+      ],
+      "reasons": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "formal browser acceptance"
+      ]
+    },
+    {
+      "package": "C03",
+      "items": [
+        "JS-09",
+        "JS-10"
+      ],
+      "reasons": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "正式双宽度浏览器与业务验收"
+      ]
+    },
+    {
+      "package": "C04",
+      "items": [
+        "JS-11",
+        "JS-12"
+      ],
+      "reasons": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "按catalog和并发方案，所有真实下钻已集成可操作"
+      ]
+    },
+    {
+      "package": "D01",
+      "items": [
+        "CF-01",
+        "CF-02",
+        "CF-03"
+      ],
+      "reasons": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "按catalog和并发方案，所有真实下钻已集成可操作"
+      ]
+    },
+    {
+      "package": "D02",
+      "items": [
+        "CF-04",
+        "CF-05",
+        "CF-06"
+      ],
+      "reasons": [
+        "缺少 acceptance_ready=true",
+        "缺少 acceptance_group",
+        "按catalog和并发方案，所有真实下钻已集成可操作"
+      ]
+    }
+  ],
+  "blocked_acceptance_groups": [],
+  "oversized_acceptance_groups": [],
+  "duplicates": [],
+  "uncovered_items": [],
+  "live_packages_with_done_items": [],
+  "empty_live_packages": [],
+  "warnings": [
+    {
+      "code": "ACTIVE_ROUND",
+      "severity": "info",
+      "message": "R0024 为活动轮次（checks_failed）；修复可继续，但下一次check开始后必须冻结。"
+    },
+    {
+      "code": "ACCEPTANCE_READINESS_UNCONFIRMED",
+      "severity": "warning",
+      "message": "14 个已集成包尚未显式确认验收分组和依赖已清空。"
+    },
+    {
+      "code": "WIP_INTEGRATED",
+      "severity": "warning",
+      "message": "integrated WIP=15，超过上限 2。"
+    }
+  ]
+}

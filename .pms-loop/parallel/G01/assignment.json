@@ -1,0 +1,26 @@
+{
+  "package_id": "G01",
+  "items": [
+    "CF-07"
+  ],
+  "owner": "coordinator",
+  "writer": "",
+  "status": "blocked",
+  "integration_root": "/Users/shengjunqiu/Documents/Code/pms-demo",
+  "base_commit": "9dccb9231b95726db6a9c10d6c0e1870703b3bd9",
+  "owned_paths": [],
+  "development_dependencies": [
+    "收入/成本字段权限、按对象组织生效的共享契约及消费者尚需补齐"
+  ],
+  "acceptance_dependencies": [
+    "收入/成本字段权限、按对象组织生效的共享契约及消费者尚需补齐",
+    "当前集成源码工程检查、浏览器场景与正式Loop"
+  ],
+  "acceptance_group": "field-access",
+  "acceptance_ready": false,
+  "last_confirmed_at": "2026-09-10",
+  "next_action": "等待R0024闭环；协调者确认依赖和精确文件归属后才分配新worktree",
+  "blocked_reason": "收入/成本字段权限、按对象组织生效的共享契约及消费者尚需补齐",
+  "fixtures": [],
+  "scenarios": []
+}

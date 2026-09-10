@@ -16,5 +16,7 @@
   },
   "remaining_dependencies": [
     "formal browser acceptance"
-  ]
+  ],
+  "writer": "",
+  "next_action": "验收冲刺库存；只准备场景与缺陷，不从旧分支继续普通开发"
 }

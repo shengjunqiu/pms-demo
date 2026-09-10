@@ -13,7 +13,7 @@
   "base_commit": "ea6903f",
   "contract_commit": "ea6903f",
   "status": "integrated_pending_acceptance",
-  "writer": "subagent:b05-worker",
+  "writer": "",
   "last_confirmed_at": "2026-09-10",
   "owned_paths": [
     "src/models/unsigned.ts",
@@ -37,7 +37,7 @@
     "角色和动作策略限制与不可变历史"
   ],
   "fixtures": "现有固定故事与合法规划期对象，沿用统一BusinessState",
-  "next_action": "在当前集成版本完成YS-13/14/15浏览器场景、双宽度截图和正式Loop验收",
+  "next_action": "恢复R0024：定位3条测试超时，完成当前源码检查及双宽浏览器证据",
   "delivery_commits": [
     "f54928e",
     "a1dc85a",
@@ -47,5 +47,7 @@
     "2ded27b",
     "e7deba3",
     "dc7aa7b"
-  ]
+  ],
+  "acceptance_ready": false,
+  "acceptance_group": "unsigned-start"
 }

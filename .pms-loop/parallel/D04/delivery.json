@@ -1,6 +1,6 @@
 {
   "package_id": "D04",
-  "status": "integrated",
+  "status": "archived",
   "formal_acceptance": false,
   "delivery_commits": [
     "b4d1f33"
@@ -12,5 +12,8 @@
     "src/mock/configuration-access.ts",
     "src/models/__tests__/configuration-access.test.ts"
   ],
-  "record_type": "reconstructed from immutable Git deliveries; not a new assignment"
+  "record_type": "reconstructed from immutable Git deliveries; not a new assignment",
+  "package_kind": "cross-cutting-delivery",
+  "writer": "",
+  "next_action": "已集成横切修复记录；页面验收归属业务包，禁止重复派工"
 }

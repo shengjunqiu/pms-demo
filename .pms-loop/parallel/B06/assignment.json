@@ -15,8 +15,8 @@
     "src/models/__tests__/initiation-todos.test.ts"
   ],
   "shared_changes": "root only",
-  "status": "assigned",
-  "writer": "/root/develop_ys",
+  "status": "superseded",
+  "writer": "",
   "last_confirmed_at": "2026-09-10",
   "development_dependencies": [
     "published contract commit"
@@ -26,7 +26,8 @@
   ],
   "scenarios": "Assigned in collaboration task; normal, role, immutable history and cross-domain consistency checks",
   "fixtures": "P006 receipts / actual initiation rounds",
-  "next_action": "deliver one-way independent commit",
+  "next_action": "历史记录；由接替包跟进，不得恢复旧分支派工",
   "delivery_commits": [],
-  "integration_commits": []
+  "integration_commits": [],
+  "superseded_by": "M01"
 }

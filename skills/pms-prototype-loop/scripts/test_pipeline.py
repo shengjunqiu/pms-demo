@@ -30,6 +30,30 @@ class PipelineTests(unittest.TestCase):
             'runs': [],
         })
 
+    def test_returned_delivery_is_not_still_ready(self):
+        self.package('A', ['GS-01'], status='needs_revision', assignment={
+            'acceptance_ready': True, 'acceptance_group': 'A',
+        }, delivery={'status': 'integrated', 'remaining_dependencies': []})
+        report = pipeline.build_report(self.root)
+        self.assertEqual([], report['ready_acceptance_batches'])
+        self.assertEqual(1, report['counts']['development_wip'])
+
+    def test_checking_freezes_integration(self):
+        self.activate('checking')
+        report = pipeline.build_report(self.root)
+        self.assertTrue(report['freeze_integration'])
+        self.assertIn('保持冻结', report['next_action'])
+
+    def test_duplicate_ready_packages_cannot_begin(self):
+        for name in ['A', 'B']:
+            self.package(name, ['GS-01'], assignment={
+                'acceptance_ready': True, 'acceptance_group': name,
+                'acceptance_dependencies': [],
+            })
+        report = pipeline.build_report(self.root)
+        self.assertEqual([], report['ready_acceptance_batches'])
+        self.assertTrue(report['duplicates'])
+
     def state(self, value):
         path = self.root / '.pms-loop/state.json'
         path.parent.mkdir(parents=True, exist_ok=True)

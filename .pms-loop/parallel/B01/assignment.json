@@ -11,8 +11,8 @@
   "branch": "pms/budget",
   "base_commit": "141ae681bca3c04302fcafee4d61252dbd341906",
   "contract_commit": "1d2c49e",
-  "status": "integrated_pending_acceptance",
-  "writer": "/root/develop_ys",
+  "status": "accepted",
+  "writer": "",
   "last_confirmed_at": "2026-09-10",
   "owned_paths": "按docs/PARALLEL_DEVELOPMENT.md对应业务域",
   "shared_changes": "已确认使用统一BusinessState扩展；公共补丁单列，由主agent最终集成",
@@ -24,7 +24,7 @@
   ],
   "scenarios": "catalog对应页面的全部条件及正常/阻断/角色/版本同步场景",
   "fixtures": "现有固定故事；B01另建合法规划期对象",
-  "next_action": "集成检查与真实浏览器验收；下游依赖包继续开发",
+  "next_action": "本包三页已正式验收；后续仅按缺陷单回归",
   "delivery_commits": [
     "ffc4747",
     "085fc83"

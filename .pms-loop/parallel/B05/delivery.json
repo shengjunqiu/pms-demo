@@ -46,6 +46,8 @@
     "e7deba3",
     "dc7aa7b"
   ],
-  "formal_rounds": [],
+  "formal_rounds": [
+    "R0024"
+  ],
   "status": "integrated_pending_acceptance"
 }

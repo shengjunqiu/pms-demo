@@ -14,7 +14,7 @@
   "base_commit": "085fc83",
   "contract_commit": "1d2c49e",
   "status": "integrated_pending_acceptance",
-  "writer": "/root/develop_ys",
+  "writer": "",
   "last_confirmed_at": "2026-09-10",
   "owned_paths": "按docs/PARALLEL_DEVELOPMENT.md对应业务域",
   "shared_changes": "已确认使用统一BusinessState扩展；公共补丁单列，由主agent最终集成",
@@ -26,9 +26,10 @@
   ],
   "scenarios": "catalog对应页面的全部条件及正常/阻断/角色/版本同步场景",
   "fixtures": "现有固定故事；B01另建合法规划期对象",
-  "next_action": "主目录真实验收与依赖补齐",
+  "next_action": "验收冲刺库存；只准备场景与缺陷，不从旧分支继续普通开发",
   "delivery_commits": [
     "201e1b0",
     "15e4204"
-  ]
+  ],
+  "acceptance_ready": false
 }

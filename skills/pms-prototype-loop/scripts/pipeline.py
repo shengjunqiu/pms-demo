@@ -61,6 +61,9 @@ def package_status(assignment, delivery, label):
     for status in statuses:
         if not isinstance(status, str) or status not in STATUS_RANK:
             raise PipelineError(f'{label}: 未知 status {status!r}')
+    # A coordinator's return-for-fix must not be hidden by an older delivery.
+    if assignment.get('status') in {'needs_revision', 'blocked'}:
+        return assignment['status']
     return max(statuses, key=lambda value: STATUS_RANK[value])
 
 
@@ -237,6 +240,8 @@ def build_report(root, batch_size=5, wip=None):
         if not package['acceptance_group']:
             blockers.append('缺少 acceptance_group')
         blockers.extend(package['acceptance_dependencies'])
+        if any(len(live_owners[item]) > 1 for item in items):
+            blockers.append('页面存在重复归属，先确定唯一当前包')
         for index, part in enumerate(chunk(items, batch_size), 1):
             inventory.append({
                 'package': package_id,
@@ -304,12 +309,12 @@ def build_report(root, batch_size=5, wip=None):
             'severity': 'warning',
             'message': f'{active_round} 找不到对应run，无法判断是否已进入check冻结窗口。',
         })
-    elif active_run_status == 'awaiting_evidence':
+    elif active_run_status in {'checking', 'awaiting_evidence'}:
         freeze_integration = True
         warnings.append({
             'code': 'ACTIVE_FREEZE',
             'severity': 'info',
-            'message': f'{active_round} 已通过check并等待证据；accept前禁止修改集成目录输入。',
+            'message': f'{active_round} 正在check或等待证据；本轮验证完成前禁止修改集成目录输入。',
         })
     else:
         freeze_integration = False

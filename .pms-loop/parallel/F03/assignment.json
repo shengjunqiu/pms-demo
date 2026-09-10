@@ -15,7 +15,7 @@
     "src/pages/settlement/OperationsPage.tsx",
     "src/pages/settlement/ProjectClosePage.tsx"
   ],
-  "status": "integrated",
+  "status": "archived",
   "contract": "src/hooks/useActionAccess.ts: canDo(actionType,targetId), canEditField(field); retain domain checks",
   "scenarios": [
     "disabled action cannot open/edit/confirm business forms",
@@ -25,5 +25,8 @@
   ],
   "formal_acceptance": false,
   "delivery_commit": "8f72a2b",
-  "integration_commit": "32f6d93652268fcda0bc4624f0bf49499335bfb1"
+  "integration_commit": "32f6d93652268fcda0bc4624f0bf49499335bfb1",
+  "package_kind": "cross-cutting-delivery",
+  "writer": "",
+  "next_action": "已集成横切修复记录；页面验收归属业务包，禁止重复派工"
 }

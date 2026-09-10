@@ -15,5 +15,7 @@
   "remaining_dependencies": [
     "正式双宽度浏览器与业务验收"
   ],
-  "formal_rounds": []
+  "formal_rounds": [],
+  "status": "integrated",
+  "next_action": "验收冲刺库存；只准备场景与缺陷，不从旧分支继续普通开发"
 }

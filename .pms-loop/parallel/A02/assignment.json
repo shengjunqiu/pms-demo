@@ -13,7 +13,7 @@
   "base_commit": "ea6903f",
   "contract_commit": "ea6903f",
   "status": "integrated_pending_acceptance",
-  "writer": "subagent:a02-worker",
+  "writer": "",
   "last_confirmed_at": "2026-09-10",
   "owned_paths": [
     "src/pages/opportunities/*",
@@ -45,7 +45,7 @@
     "1440x900与1280x900正式截图由协调者在集成版本生成"
   ],
   "fixtures": "现有固定商机故事与真实方案/成本/评审记录",
-  "next_action": "在当前集成版本运行工程检查并完成GS-05/06/07正式浏览器验收",
+  "next_action": "验收冲刺库存；只准备场景与缺陷，不从旧分支继续普通开发",
   "delivery_commits": [
     "1c28523",
     "88c6c17",
@@ -55,5 +55,6 @@
   "integration_commits": [
     "bde391a",
     "4bba520"
-  ]
+  ],
+  "acceptance_ready": false
 }

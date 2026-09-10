@@ -14,12 +14,15 @@
     "new application URL cannot show out-of-scope source",
     "duplicate hints redact inaccessible records but preserve duplicate check"
   ],
-  "status": "integrated",
+  "status": "archived",
   "delivery_commits": [
     "b8f2c367483531548cae6cdbd7ad91c1732fe72d"
   ],
   "integration_commits": [
     "b66cdbd"
   ],
-  "formal_acceptance": false
+  "formal_acceptance": false,
+  "package_kind": "cross-cutting-delivery",
+  "writer": "",
+  "next_action": "已集成横切修复记录；页面验收归属业务包，禁止重复派工"
 }

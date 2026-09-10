@@ -18,7 +18,7 @@
     "src/pages/unsigned/UnsignedProjectPage.tsx",
     "src/pages/unsigned/StartConfirmationPage.tsx"
   ],
-  "status": "integrated",
+  "status": "archived",
   "contract": "src/hooks/useActionAccess.ts: canDo(actionType,targetId), canEditField(field); retain domain checks",
   "scenarios": [
     "disabled action cannot open/edit/confirm business forms",
@@ -28,5 +28,8 @@
   ],
   "formal_acceptance": false,
   "delivery_commit": "bf4c48c",
-  "integration_commit": "de83bf8"
+  "integration_commit": "de83bf8",
+  "package_kind": "cross-cutting-delivery",
+  "writer": "",
+  "next_action": "已集成横切修复记录；页面验收归属业务包，禁止重复派工"
 }

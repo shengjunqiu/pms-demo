@@ -9,7 +9,7 @@
     "src/pages/approvals/PlanRequestPage.tsx",
     "src/pages/execution/ReportsPage.tsx"
   ],
-  "status": "integrated",
+  "status": "archived",
   "contract": "useActionAccess canDo(type, actual target); retain domain guards; latest getState at call",
   "scenarios": [
     "disabled controls and forms and modal confirmations",
@@ -18,5 +18,8 @@
   ],
   "formal_acceptance": false,
   "delivery_commit": "1e1f284",
-  "integration_commit": "a205763dc11acf125da2d46f1fc460bcd21e6000"
+  "integration_commit": "a205763dc11acf125da2d46f1fc460bcd21e6000",
+  "package_kind": "cross-cutting-delivery",
+  "writer": "",
+  "next_action": "已集成横切修复记录；页面验收归属业务包，禁止重复派工"
 }

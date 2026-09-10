@@ -23,7 +23,7 @@
   ],
   "shared_changes": "root only",
   "status": "integrated",
-  "writer": "/root/develop_ys",
+  "writer": "",
   "last_confirmed_at": "2026-09-10",
   "development_dependencies": [
     "published contract commit"
@@ -33,7 +33,7 @@
   ],
   "scenarios": "Assigned in collaboration task; normal, role, immutable history and cross-domain consistency checks",
   "fixtures": "P006 receipts / actual initiation rounds",
-  "next_action": "root browser acceptance",
+  "next_action": "验收冲刺库存；只准备场景与缺陷，不从旧分支继续普通开发",
   "delivery_commits": [
     "36a0432",
     "20bd258"
@@ -41,5 +41,6 @@
   "integration_commits": [
     "b928331",
     "441604d"
-  ]
+  ],
+  "acceptance_ready": false
 }

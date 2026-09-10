@@ -17,7 +17,7 @@
     "src/pages/opportunities/EarlyInvestmentsPage.tsx",
     "src/pages/opportunities/OpportunitiesPage.tsx"
   ],
-  "status": "integrated",
+  "status": "archived",
   "contract": "src/hooks/useActionAccess.ts: canDo(actionType,targetId), canEditField(field); retain domain checks",
   "scenarios": [
     "disabled action cannot open/edit/confirm business forms",
@@ -27,5 +27,8 @@
   ],
   "formal_acceptance": false,
   "delivery_commit": "61bf520",
-  "integration_commit": "30c0fbf"
+  "integration_commit": "30c0fbf",
+  "package_kind": "cross-cutting-delivery",
+  "writer": "",
+  "next_action": "已集成横切修复记录；页面验收归属业务包，禁止重复派工"
 }

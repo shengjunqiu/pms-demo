@@ -11,7 +11,7 @@
   "base_commit": "b2c1713",
   "contract_commit": "1d2c49e",
   "status": "integrated",
-  "writer": "/root/develop_js",
+  "writer": "",
   "last_confirmed_at": "2026-09-10",
   "owned_paths": "按docs/PARALLEL_DEVELOPMENT.md对应业务域",
   "shared_changes": "已确认使用统一BusinessState扩展；公共补丁单列，由主agent最终集成",
@@ -23,7 +23,7 @@
   ],
   "scenarios": "catalog对应页面的全部条件及正常/阻断/角色/版本同步场景",
   "fixtures": "现有固定故事；B01另建合法规划期对象",
-  "next_action": "当前集成版本完成正式浏览器验收后才能计入完成页",
+  "next_action": "验收冲刺库存；只准备场景与缺陷，不从旧分支继续普通开发",
   "delivery_commits": [
     "f692b8a",
     "48306dc"
@@ -31,5 +31,6 @@
   "integration_commits": [
     "fd32b42",
     "e3ae595"
-  ]
+  ],
+  "acceptance_ready": false
 }

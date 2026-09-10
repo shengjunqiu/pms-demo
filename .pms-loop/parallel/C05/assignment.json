@@ -7,8 +7,8 @@
   "branch": "pms/settlement",
   "base_commit": "b4e320c",
   "contract_commit": "b4e320c",
-  "status": "assigned",
-  "writer": "/root/develop_js",
+  "status": "superseded",
+  "writer": "",
   "last_confirmed_at": "2026-09-10",
   "owned_paths": [
     "src/models/closeout.ts",
@@ -25,7 +25,8 @@
   ],
   "scenarios": "catalog对应页面的全部条件及正常/阻断/角色/版本同步场景",
   "fixtures": "现有固定故事；B01另建合法规划期对象",
-  "next_action": "保存旧分支/WIP；从统一同步点创建新任务分支，仅迁移未交付独占模块；check_delivery.py通过后交付",
+  "next_action": "历史记录；由接替包跟进，不得恢复旧分支派工",
   "delivery_commits": [],
-  "integration_commits": []
+  "integration_commits": [],
+  "superseded_by": "C03"
 }
