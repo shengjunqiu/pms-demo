@@ -1,6 +1,7 @@
 import { AS_OF_DATE,mockUsers,mockDepartments } from '@/mock';
 import type { Actor,BusinessState } from '@/mock/business';
 import type { ApprovalProgress } from '@/models/configuration';
+import { canScoreTemplate } from '@/mock/closeout';
 import { canReviewEarlyInvestment } from '@/mock/early-investments';
 import type { Project } from '@/models/types';
 import type { AccessConfigurationAction,AccessConfigurationState,AccessPolicyVersion,AuditChange,AuditEvent,SensitiveField } from '@/models/configuration-access';
@@ -8,7 +9,7 @@ import type { UserRole } from '@/store/useAppStore';
 import { PAGE_MANIFEST } from '@/routes/manifest';
 import { effectiveVersions } from '@/mock/configuration';
 import { inOrganization } from '@/mock/selectors';
-export type AccessState=Pick<BusinessState,'projects'|'projectTeams'|'opportunities'|'approvals'|'audit'> & Partial<Pick<BusinessState,'operationHandovers'|'operationCycles'>> & {accessConfiguration?:AccessConfigurationState;initiations?:{id:string;status:string;rounds:{status:string;approvalProgress?:ApprovalProgress}[]}[];earlyInvestmentRequests?:BusinessState['earlyInvestmentRequests']};
+export type AccessState=Pick<BusinessState,'projects'|'projectTeams'|'opportunities'|'approvals'|'audit'> & Partial<Pick<BusinessState,'operationHandovers'|'operationCycles'|'operationEvents'|'planningReviews'|'planningDrafts'|'postEvaluations'|'projectArchives'>> & {accessConfiguration?:AccessConfigurationState;initiations?:{id:string;status:string;rounds:{status:string;approvalProgress?:ApprovalProgress}[]}[];earlyInvestmentRequests?:BusinessState['earlyInvestmentRequests']};
 const ids=(prefix:string,numbers:number[])=>numbers.map(n=>`${prefix}-${String(n).padStart(2,'0')}`);
 const range=(end:number)=>Array.from({length:end},(_,i)=>i+1);
 export const SENSITIVE_FIELD_LABELS:Record<SensitiveField,string>={'labor-rate':'人员成本单价',margin:'毛利与收益',evaluation:'经营评价与绩效',contact:'联系方式'};
@@ -16,15 +17,15 @@ const execution=['update-task','request-plan','create-ticket','update-ticket','c
 const initiation=['save-initiation','submit-initiation'];
 const operations=['submit-operation-cost','activate-operation','configure-operation','save-operation-handover','accept-operation-handover','record-operation-event','resolve-operation-event','renew-operation','exit-operation','confirm-project-close'];
 const defaultActions:Record<UserRole,string[]>={
- market:['follow-unsigned','request-unsigned-investment','confirm-project-contract','save-settlement','assess-project-change','save-post-evaluation','save-opportunity','start-opportunity-assessment','save-opportunity-dimension','conclude-opportunity','follow-opportunity','save-early-investment',...initiation],
+ market:['presales-research','follow-unsigned','request-unsigned-investment','confirm-project-contract','save-settlement','assess-project-change','save-post-evaluation','save-opportunity','start-opportunity-assessment','save-opportunity-dimension','conclude-opportunity','follow-opportunity','save-early-investment',...initiation],
  'solution-tech':['respond-pm','accept-operation-handover','update-task','sign-initiation','assess-project-change','save-post-evaluation','save-opportunity-dimension','presales-save-solution','presales-save-cost','presales-research','presales-expert-opinion','presales-correction-reply','estimate-create-draft','estimate-save-draft','estimate-publish','submit-labor','save-daily','create-ticket','update-ticket','submit-cost-order','document-action','record-operation-event','resolve-operation-event','submit-operation-cost'],
  'project-manager':['confirm-project-start',...execution,'sign-initiation','save-settlement','review-acceptance','process-cost-order','save-planning','submit-planning','reply-planning','save-team-member','exit-team-member','respond-pm','save-budget-draft','submit-budget-draft','submit-budget','review-labor','save-project-change','submit-project-change','submit-acceptance','reply-acceptance','save-acceptance-proof','save-acceptance-report','submit-archive-file','save-post-evaluation','score-post-evaluation','record-operation-event','resolve-operation-event','submit-operation-cost','configure-operation','save-operation-handover','accept-operation-handover','exit-operation'],
  finance:['confirm-project-receipt','submit-budget','estimate-create-draft','estimate-save-draft','estimate-publish','save-opportunity-dimension','presales-finance-check','presales-expert-opinion','record-early-cost','review-early-investment','sign-initiation','assess-project-change','review-plan','process-cost-order','confirm-cost','review-settlement','resolve-settlement-source','dispose-settlement-balance','save-settlement-analysis','confirm-acceptance-report','record-operation-cost','reject-operation-cost','finance-config-save','finance-config-publish'],
  pmo:['exit-unsigned','confirm-project-start','assess-initiation-risk','update-ticket','quality-check','presales-submit-review','presales-review-decision','estimate-freeze','review-early-investment','sign-initiation','classify-initiation','decide-initiation','review-planning','nominate-pm','review','confirm-budget-baseline','classify-project-change','review-project-change','review-plan','stage-gate','add-document','document-action','review-acceptance','confirm-acceptance','review-settlement','start-post-evaluation','confirm-post-evaluation','review-archive-file','confirm-project-archive','save-post-evaluation','score-post-evaluation','submit-archive-file','resume-initiation',...operations,'configuration-save','configuration-publish','configuration-apply-template','finance-config-save','finance-config-publish'],
  executive:['review','review-management','review-early-investment','decide-initiation','review-project-change'],
  admin:['configuration-save','configuration-publish','configuration-apply-template','finance-config-save','finance-config-publish','access-policy-save','access-policy-publish']};
-const conditionalActions=['decide-initiation','review-early-investment'];
-const allowedActions=(role:UserRole)=>Array.from(new Set([...defaultActions[role],...conditionalActions]));
+const conditionalActions=['decide-initiation','review-early-investment','reply-planning','score-post-evaluation','accept-operation-handover','submit-operation-cost','record-operation-event','resolve-operation-event'];
+const allowedActions=(role:UserRole)=>Array.from(new Set([...defaultActions[role],...conditionalActions,...(role==='pmo'?['create-ticket']:[])]));
 const defaultPages:Record<UserRole,string[]>={
  executive:[...ids('GL',range(6)),...ids('WK',[2]),...ids('GS',[1,3,4,5,6,7,8,9,10,11]),...ids('YS',range(15)),...ids('HS',range(17)),...ids('JS',range(13))],
  pmo:[...ids('GL',range(6)),...ids('WK',range(2)),...ids('GS',[1,3,4,5,6,7,8,9,10,11]),...ids('YS',range(15)),...ids('HS',range(17)),...ids('JS',range(13)),...ids('CF',[1,2,3,4,6])],
@@ -33,14 +34,33 @@ const defaultPages:Record<UserRole,string[]>={
  'project-manager':[...ids('WK',range(2)),...ids('GS',[1,3,4,5,6,7,8,9,10,11]),...ids('YS',range(15)),...ids('HS',range(17)),...ids('JS',range(13))],
  'solution-tech':[...ids('WK',[2]),...ids('GS',[1,3,4,5,6,7,8,9,10,11]),...ids('YS',[2,3,5,6,7,8]),...ids('HS',range(17)),...ids('JS',[1,2,3,4,9,10,11,12])],
  admin:PAGE_MANIFEST.map(p=>p.id)};
-export const ACCESS_ACTIONS=Array.from(new Set(Object.values(defaultActions).flat())).sort();
+export const ACCESS_ACTIONS=Array.from(new Set((Object.keys(defaultActions) as UserRole[]).flatMap(allowedActions))).sort();
 export const DEMO_TENANT='TENANT-DEMO';
 export function createAccessConfiguration():AccessConfigurationState{return {versions:(Object.keys(defaultActions) as UserRole[]).map(role=>({id:`ACCESS-${role}-V1`,key:`ACCESS-${role}`,version:1,name:`${role} 默认访问策略`,status:'已发布',enabled:true,effectiveDate:'2026-01-01',orgId:'all',projectType:'all',changeReason:'沿用当前业务职责与项目关系；配置只能收紧领域权限',createdBy:'系统管理员',createdAt:'2026-01-01',publishedBy:'系统管理员',publishedAt:'2026-01-01',tenantId:DEMO_TENANT,role,dataScope:['project-manager','solution-tech'].includes(role)?'self':'all',orgIds:[],pages:defaultPages[role].filter(id=>PAGE_MANIFEST.some(p=>p.id===id)),actions:allowedActions(role),fields:role==='admin'||role==='finance'?['labor-rate','margin','evaluation','contact']:role==='executive'?['margin','evaluation','contact']:role==='pmo'?['margin','evaluation']:role==='market'?['margin','contact']:role==='project-manager'?['margin']:role==='solution-tech'?['labor-rate']:[],projectRelationRequired:['project-manager','solution-tech'].includes(role)}))};}
 export function selectAccessPolicy(state:Pick<AccessState,'accessConfiguration'>,role:UserRole){return effectiveVersions(state.accessConfiguration?.versions??[]).filter(v=>v.role===role).sort((a,b)=>b.version-a.version)[0];}
 export function canAccessPage(state:Pick<AccessState,'accessConfiguration'>,actor:Pick<Actor,'role'>,pageId:string){const p=selectAccessPolicy(state,actor.role);return !!p&&p.tenantId===DEMO_TENANT&&p.pages.includes(pageId);}
-/** Target id is the initiation id or early-investment request id. Omitting it only previews action availability; the domain still checks the actual object. */
-export function canAccessAction(state:Pick<AccessState,'accessConfiguration'|'initiations'|'earlyInvestmentRequests'>,actor:Pick<Actor,'role'>,actionType:string,targetId?:string){
+/** Targets: initiation/review/request ids, project id for template scoring/handover/ticket, cycle id for operation entry, event id for resolution. Relationship actions require an exact target and actor id. */
+export function canAccessAction(state:Partial<AccessState>,actor:Pick<Actor,'role'> & Partial<Pick<Actor,'id'|'name'>>,actionType:string,targetId?:string){
  const p=selectAccessPolicy(state,actor.role);if(!p||p.tenantId!==DEMO_TENANT||!p.actions.includes(actionType))return false;
+ const project=state.projects?.find(p=>p.id===targetId);
+ if(actionType==='create-ticket'&&actor.role==='pmo')return !!actor.id&&!!project?.memberIds?.includes(actor.id);
+ if(actionType==='reply-planning'){
+  const review=state.planningReviews?.find(r=>r.id===targetId),draft=review&&state.planningDrafts?.[review.projectId],project=review&&state.projects?.find(p=>p.id===review.projectId);
+  return !!actor.id&&review?.status==='整改'&&draft?.status==='整改中'&&draft.reviewId===review.id&&review.rectifications.some(r=>!r.reply?.trim()&&(r.ownerId===actor.id||actor.role==='project-manager'&&project?.pmId===actor.id));
+ }
+ if(actionType==='score-post-evaluation'){
+  if(!actor.id||!project||!state.postEvaluations||!state.projectArchives||!state.opportunities)return false;
+  const evaluation=state.postEvaluations[project.id];if(!evaluation||evaluation.status!=='编制中'||state.projectArchives[project.id])return false;
+  if(actor.role==='pmo'||actor.role==='project-manager'&&project.pmId===actor.id)return true;
+  return evaluation.templateSnapshot?.rows.some(row=>canScoreTemplate(state as BusinessState,project.id,{role:actor.role,id:actor.id!,name:actor.name??''},row.id))??false;
+ }
+ if(actionType==='accept-operation-handover'){const h=targetId&&state.operationHandovers?.[targetId];return !!actor.id&&!!project&&!!h&&h.status==='待接收'&&h.receiverId===actor.id;}
+ if(['submit-operation-cost','record-operation-event','resolve-operation-event'].includes(actionType)){
+  const event=actionType==='resolve-operation-event'?state.operationEvents?.find(e=>e.id===targetId&&e.status!=='已解决'):undefined;
+  if(actionType==='resolve-operation-event'&&!event)return false;
+  const cycle=state.operationCycles?.find(c=>c.id===(event?event.operationId:targetId)&&(!event||c.projectId===event.projectId));
+  return !!actor.id&&!!cycle&&!!state.projects?.some(p=>p.id===cycle.projectId)&&['服务中','退出中'].includes(cycle.status)&&(actor.role==='pmo'||cycle.teamIds.includes(actor.id));
+ }
  if(defaultActions[actor.role].includes(actionType))return true;
  if(actionType==='decide-initiation')return state.initiations?.some(app=>{const round=app.rounds.at(-1),progress=round?.approvalProgress;return (!targetId||app.id===targetId)&&app.status==='待决策'&&round?.status==='待决策'&&progress?.status==='待审批'&&progress.snapshot.nodes[progress.node]?.roles.includes(actor.role)&&!progress.reviews.some(r=>r.node===progress.node&&r.role===actor.role);})??false;
  if(actionType==='review-early-investment')return state.earlyInvestmentRequests?.some(r=>(!targetId||r.id===targetId)&&canReviewEarlyInvestment(r,{...actor,id:'',name:''}))??false;
