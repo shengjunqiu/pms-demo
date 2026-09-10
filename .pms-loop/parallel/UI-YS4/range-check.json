@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "base": "39a7b1a4e84b325626997ca987ec31cbcd1d1c5e",
+  "head": "6f16e59927edbb2c8e62186d1153cca9d49748ce",
+  "paths": [
+    "e2e/ui-unsigned-workspace.spec.ts",
+    "src/pages/unsigned/StartConfirmationPage.tsx",
+    "src/pages/unsigned/UnsignedProjectPage.tsx",
+    "src/pages/unsigned/UnsignedProjectsPage.tsx"
+  ],
+  "shared_paths": [],
+  "outside_owned_paths": [],
+  "merge_commits": [],
+  "unresolved_conflicts": []
+}

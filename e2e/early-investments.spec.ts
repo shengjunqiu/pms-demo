@@ -194,6 +194,9 @@ test('GS-10/11 草稿提交、审批意见必填、批准额度与真实成本�
   await modal.getByRole('button', { name: /取\s*消/ }).click();
   await expect(page.locator('.pms-metric').filter({ hasText: '累计批准额度' })).toContainText('50.00');
   await expect(page.locator('.pms-metric').filter({ hasText: '累计已发生' })).toContainText('20.00');
+  await page.getByRole('button', { name: '列设置', exact: true }).click();
+  await page.getByRole('dialog').getByLabel('使用率', { exact: true }).check();
+  await page.getByRole('dialog').getByRole('button', { name: /^完\s*成$/ }).click();
   await expect(row).toContainText('40.0%');
   shots.ledger = await capturePageEvidence(page, 'GS-11');
   await page.getByRole('button', { name: '导出预览', exact: true }).click();

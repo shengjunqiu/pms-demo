@@ -1,0 +1,40 @@
+{
+  "package_id": "UI-YS4",
+  "items": [
+    "YS-13",
+    "YS-14",
+    "YS-15"
+  ],
+  "owner": "/root/ui_planning",
+  "writer": "",
+  "integration_root": "/home/shengjunqiu/code/pms-demo",
+  "workdir": "/tmp/pms-ui-unsigned",
+  "branch": "pms/ui-unsigned",
+  "base_commit": "39a7b1a",
+  "contract_commit": "39a7b1a",
+  "owned_paths": [
+    "src/pages/unsigned/UnsignedProjectsPage.tsx",
+    "src/pages/unsigned/UnsignedProjectPage.tsx",
+    "src/pages/unsigned/StartConfirmationPage.tsx",
+    "e2e/ui-unsigned-workspace.spec.ts",
+    "e2e/r0024-unsigned.spec.ts",
+    "e2e/r0024-controls.spec.ts"
+  ],
+  "shared_changes": [],
+  "development_dependencies": [],
+  "acceptance_dependencies": [],
+  "acceptance_ready": false,
+  "acceptance_group": "UI-YS4",
+  "status": "submitted",
+  "last_confirmed_at": "2026-09-11",
+  "acceptance_checklist": [
+    "工程检查",
+    "未签合同额度退出与启动真实流程",
+    "双宽截图和权限",
+    "正式accept"
+  ],
+  "scenarios": "按/tmp/pms-ui-unsigned-preparation.md，不改额度与成本或启动门禁",
+  "fixtures": "已有r0024合法transition前置和真实UI动作",
+  "next_action": "范围检查通过，等待当前GS3及YS3后集成验收",
+  "delivery_commit": "6f16e59927edbb2c8e62186d1153cca9d49748ce"
+}
