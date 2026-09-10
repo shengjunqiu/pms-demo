@@ -1,3 +1,4 @@
+import { useActionAccess } from "@/hooks/useActionAccess";
 import { canViewSensitiveField } from "@/mock/configuration-access";
 import { useState } from "react";
 import {
@@ -51,6 +52,7 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
   const [params, setParams] = useSearchParams();
   const { data, dispatch } = useBusinessStore();
   const { currentRole, currentUser } = useAppStore();
+  const { canDo } = useActionAccess();
   const viewMargin = canViewSensitiveField(data, currentUser, "margin");
   const hiddenMargin = "毛利字段无查看权限";
   const displayText = (value?: string) =>
@@ -120,8 +122,15 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
     (pm || currentRole === "market") &&
     !final &&
     (!request || ["草稿", "材料整改", "金额退回"].includes(request.status)) &&
-    live;
+    live &&
+    canDo("save-settlement", request?.id ?? p.id);
+  const canResolve =
+    finance && !frozen && canDo("resolve-settlement-source", p.id);
+  const canDispose =
+    finance && !frozen && canDo("dispose-settlement-balance", p.id);
   const run = (action: SettlementAction) => {
+    if (!canDo(action.type, "id" in action ? (action.id ?? p.id) : p.id))
+      return false;
     try {
       dispatch(action, actor);
       message.success("结算原单与状态已更新");
@@ -132,6 +141,7 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
     }
   };
   const beginEdit = () => {
+    if (!canEdit) return;
     setNote(
       displayText(request?.note) === hiddenMargin ? "" : (request?.note ?? ""),
     );
@@ -151,6 +161,22 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
     "待最终锁定",
     "已锁定",
   ].indexOf(request?.status ?? "");
+  const canReviewOperation = (op?: ReviewOperation) =>
+    !!op &&
+    !!request &&
+    live &&
+    canDo("review-settlement", request.id) &&
+    (op === "finance-confirm"
+      ? finance && request.status === "财务核算"
+      : op === "pmo-audit"
+        ? pmo && request.status === "PMO审核"
+        : op === "review-pass"
+          ? pmo && request.status === "结算评审"
+          : op === "lock"
+            ? finance && request.status === "待最终锁定"
+            : op === "amount-return"
+              ? finance && stage >= 0 && stage < 4
+              : (finance || pmo) && stage >= 0 && stage < 4);
   return (
     <>
       <PageHeader
@@ -282,7 +308,7 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
                         原单
                       </Button>
                       <Button
-                        disabled={!finance || !!frozen || !s.imported}
+                        disabled={!canResolve || !s.imported}
                         onClick={() => {
                           setSourceId(s.id);
                           setEvidence("");
@@ -328,8 +354,7 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
                         <Button
                           key={bucket}
                           disabled={
-                            !finance ||
-                            !!frozen ||
+                            !canDispose ||
                             (bucket === "承诺" ? s.committed : s.remaining) <= 0
                           }
                           onClick={() => {
@@ -512,18 +537,7 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
                   "amount-return",
                 ] as ReviewOperation[]
               ).map((op) => {
-                const enabled =
-                  op === "finance-confirm"
-                    ? finance && request.status === "财务核算"
-                    : op === "pmo-audit"
-                      ? pmo && request.status === "PMO审核"
-                      : op === "review-pass"
-                        ? pmo && request.status === "结算评审"
-                        : op === "lock"
-                          ? finance && request.status === "待最终锁定"
-                          : op === "amount-return"
-                            ? finance && stage >= 0 && stage < 4
-                            : (finance || pmo) && stage >= 0 && stage < 4;
+                const enabled = canReviewOperation(op);
                 return (
                   <Button
                     key={op}
@@ -609,8 +623,9 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
           <Space>
             <Button onClick={() => setEdit(false)}>取消</Button>
             <Button
-              disabled={request?.status === "材料整改"}
+              disabled={!canEdit || request?.status === "材料整改"}
               onClick={() => {
+                if (!canEdit) return;
                 if (
                   run({
                     type: "save-settlement",
@@ -631,8 +646,9 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
             </Button>
             <Button
               type="primary"
-              disabled={checks.some((c) => !c.passed)}
+              disabled={!canEdit || checks.some((c) => !c.passed)}
               onClick={() => {
+                if (!canEdit) return;
                 if (
                   run({
                     type: "save-settlement",
@@ -660,11 +676,11 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
           type="warning"
           message="提交将保存本次金额和版本快照，并冻结建设期成本入口。"
         />
-        <Form layout="vertical">
+        <Form layout="vertical" disabled={!canEdit}>
           <Form.Item label="经营结论、主要偏差与遗留事项" required>
             <Input.TextArea
               aria-label="结算报告说明"
-              disabled={displayText(request?.note) === hiddenMargin}
+              disabled={!canEdit || displayText(request?.note) === hiddenMargin}
               placeholder={
                 displayText(request?.note) === hiddenMargin
                   ? "原说明含毛利，已隐藏并原样保留；可继续补充附件"
@@ -692,7 +708,9 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
         title={operation ? labels[operation] : ""}
         open={!!operation}
         onCancel={() => setOperation(undefined)}
+        okButtonProps={{ disabled: !canReviewOperation(operation) }}
         onOk={() => {
+          if (!canReviewOperation(operation)) return;
           if (
             run({
               type: "review-settlement",
@@ -707,7 +725,7 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
         }}
       >
         {operation === "finance-confirm" && (
-          <Form layout="vertical">
+          <Form layout="vertical" disabled={!canReviewOperation(operation)}>
             <Form.Item label="财务确认已开票金额（万元）">
               <InputNumber
                 aria-label="结算已开票金额"
@@ -741,7 +759,7 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
             message="财务明确要求调整金额：解除本申请临时冻结，原快照保留，修改成本后须重新提交。"
           />
         )}
-        <Form layout="vertical">
+        <Form layout="vertical" disabled={!canReviewOperation(operation)}>
           <Form.Item label="办理意见" required>
             <Input.TextArea
               aria-label="结算办理意见"
@@ -756,7 +774,9 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
         title="历史未决成本财务核对"
         open={!!sourceId}
         onCancel={() => setSourceId(undefined)}
+        okButtonProps={{ disabled: !canResolve }}
         onOk={() => {
+          if (!canResolve) return;
           if (
             run({
               type: "resolve-settlement-source",
@@ -771,7 +791,7 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
         }}
       >
         <p>原单：{sourceId}</p>
-        <Form layout="vertical">
+        <Form layout="vertical" disabled={!canResolve}>
           <Form.Item label="核对结论">
             <Select
               value={disposition}
@@ -811,7 +831,9 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
         title={`逐科目${balance?.bucket ?? ""}处置`}
         open={!!balance}
         onCancel={() => setBalance(undefined)}
+        okButtonProps={{ disabled: !canDispose }}
         onOk={() => {
+          if (!canDispose) return;
           if (
             run({
               type: "dispose-settlement-balance",
@@ -829,7 +851,7 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
         <p>
           {balance?.subjectId} · 可处置 {balance?.max} 万元
         </p>
-        <Form layout="vertical">
+        <Form layout="vertical" disabled={!canDispose}>
           <Form.Item label="实际发生或取消">
             <Select
               value={actual ? "actual" : "cancel"}

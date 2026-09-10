@@ -1,3 +1,4 @@
+import { useActionAccess } from "@/hooks/useActionAccess";
 import { useState } from "react";
 import {
   Alert,
@@ -25,13 +26,16 @@ export function OperationHandoverPage() {
   const navigate = useNavigate();
   const { data, dispatch } = useBusinessStore();
   const { currentRole, currentUser } = useAppStore();
+  const { canDo } = useActionAccess();
   const { message } = App.useApp();
   const [required, setRequired] = useState(true);
   const [form] = Form.useForm();
   const p = data.projects.find((p) => p.id === id);
   if (!p) return <StateView type="404" />;
   if (
-    !visibleProjects(currentRole, data.projects, data).some((v) => v.id === id) &&
+    !visibleProjects(currentRole, data.projects, data).some(
+      (v) => v.id === id,
+    ) &&
     data.operationHandovers[p.id]?.receiverId !== currentUser.id &&
     !data.operationHandovers[p.id]?.teamIds.includes(currentUser.id)
   )
@@ -41,13 +45,15 @@ export function OperationHandoverPage() {
   const canEdit =
     (currentRole === "pmo" ||
       (currentRole === "project-manager" && currentUser.id === p.pmId)) &&
-    !data.projectClosures[p.id];
+    !data.projectClosures[p.id] &&
+    canDo("save-operation-handover", p.id);
   const actor = {
     id: currentUser.id,
     name: currentUser.name,
     role: currentRole,
   };
   const submit = async () => {
+    if (!canEdit) return;
     try {
       const values = await form.validateFields();
       dispatch(
@@ -156,7 +162,9 @@ export function OperationHandoverPage() {
             h.receiverId === currentUser.id && (
               <Button
                 type="primary"
+                disabled={!canDo("accept-operation-handover", p.id)}
                 onClick={() => {
+                  if (!canDo("accept-operation-handover", p.id)) return;
                   try {
                     dispatch(
                       { type: "accept-operation-handover", projectId: p.id },
@@ -227,6 +235,7 @@ export function OperationHandoverPage() {
         <Card title="合同运维判定与移交清单" style={{ marginTop: 16 }}>
           <Form
             form={form}
+            disabled={!canEdit}
             layout="vertical"
             initialValues={h ?? { startDate: AS_OF_DATE }}
           >
@@ -321,7 +330,7 @@ export function OperationHandoverPage() {
             )}
             <Button
               type="primary"
-              disabled={!data.projectArchives[p.id]}
+              disabled={!canEdit || !data.projectArchives[p.id]}
               onClick={() => void submit()}
             >
               提交合同判定与移交

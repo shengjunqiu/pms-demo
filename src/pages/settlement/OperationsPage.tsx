@@ -1,3 +1,4 @@
+import { useActionAccess } from "@/hooks/useActionAccess";
 import { useState } from "react";
 import {
   Alert,
@@ -30,17 +31,21 @@ export function OperationsPage() {
   const [params, setParams] = useSearchParams();
   const { data, dispatch } = useBusinessStore();
   const { currentRole, currentUser } = useAppStore();
+  const { canDo, canEditField } = useActionAccess();
   const { message } = App.useApp();
   const [modal, setModal] = useState<
     "event" | "cost" | "renew" | "exit" | "resolve" | "config" | "reject"
   >();
   const [eventId, setEventId] = useState("");
   const [form] = Form.useForm();
+  const costKind = Form.useWatch("kind", form);
   const c = data.operationCycles.find((c) => c.id === id);
   const p = data.projects.find((p) => p.id === c?.projectId);
   if (!c || !p) return <StateView type="404" />;
   if (
-    !visibleProjects(currentRole, data.projects, data).some((v) => v.id === p.id) &&
+    !visibleProjects(currentRole, data.projects, data).some(
+      (v) => v.id === p.id,
+    ) &&
     !c.teamIds.includes(currentUser.id)
   )
     return <StateView type="403" />;
@@ -59,7 +64,35 @@ export function OperationsPage() {
   const orphan = data.maintenanceCosts.filter(
     (v) => v.projectId === p.id && !v.operationId,
   );
-  const open = (kind: typeof modal) => {
+  const canModal = (kind: typeof modal, targetId = eventId) => {
+    if (kind === "event")
+      return active && member && canDo("record-operation-event", c.id);
+    if (kind === "cost")
+      return active && member && canDo("submit-operation-cost", c.id);
+    if (kind === "resolve")
+      return active && member && canDo("resolve-operation-event", targetId);
+    if (kind === "reject")
+      return (
+        currentRole === "finance" && canDo("reject-operation-cost", targetId)
+      );
+    if (kind === "config")
+      return owner && active && canDo("configure-operation", c.id);
+    if (kind === "renew")
+      return owner && c.status === "服务中" && canDo("renew-operation", c.id);
+    if (kind === "exit")
+      return (
+        owner &&
+        (active || c.status === "待生效") &&
+        canDo("exit-operation", c.id)
+      );
+    return false;
+  };
+  const canSubmitModal =
+    canModal(modal) &&
+    !(modal === "cost" && costKind === "labor" && !canEditField("labor-rate"));
+  const open = (kind: typeof modal, targetId = eventId) => {
+    if (!canModal(kind, targetId)) return;
+    setEventId(targetId);
     setModal(kind);
     form.resetFields();
     form.setFieldsValue({
@@ -71,6 +104,17 @@ export function OperationsPage() {
     });
   };
   const run = (action: OperationsAction) => {
+    if (
+      !canDo(
+        action.type,
+        "operationId" in action
+          ? action.operationId
+          : "id" in action
+            ? action.id
+            : p.id,
+      )
+    )
+      return;
     try {
       dispatch(action, actor);
       message.success("已更新运维状态");
@@ -79,6 +123,7 @@ export function OperationsPage() {
     }
   };
   const submit = async () => {
+    if (!canSubmitModal) return;
     try {
       const v = await form.validateFields();
       const base = { projectId: p.id, operationId: c.id };
@@ -255,7 +300,7 @@ export function OperationsPage() {
                 <>
                   <Button
                     type="primary"
-                    disabled={!active || !member}
+                    disabled={!canModal("event")}
                     onClick={() => open("event")}
                   >
                     登记运维记录
@@ -293,9 +338,10 @@ export function OperationsPage() {
                           r.status === "未解决" && member ? (
                             <Button
                               type="link"
+                              disabled={!canModal("resolve", r.id)}
                               onClick={() => {
                                 setEventId(r.id);
-                                open("resolve");
+                                open("resolve", r.id);
                               }}
                             >
                               解决并留证
@@ -319,7 +365,7 @@ export function OperationsPage() {
                     message="金额单位万元。团队提交真实发生的工时或费用记录，财务审核后单次入账，不改变建设期实际成本和最终结算。"
                   />
                   <Button
-                    disabled={!active || !member}
+                    disabled={!canModal("cost")}
                     onClick={() => open("cost")}
                     style={{ margin: "12px 0" }}
                   >
@@ -352,6 +398,7 @@ export function OperationsPage() {
                             <Space>
                               <Button
                                 type="link"
+                                disabled={!canDo("record-operation-cost", c.id)}
                                 onClick={() =>
                                   run({
                                     type: "record-operation-cost",
@@ -370,9 +417,10 @@ export function OperationsPage() {
                               <Button
                                 type="link"
                                 danger
+                                disabled={!canModal("reject", s.id)}
                                 onClick={() => {
                                   setEventId(s.id);
-                                  open("reject");
+                                  open("reject", s.id);
                                 }}
                               >
                                 退回
@@ -405,14 +453,14 @@ export function OperationsPage() {
                 <>
                   <Space>
                     <Button
-                      disabled={!owner || !active}
+                      disabled={!canModal("config")}
                       onClick={() => open("config")}
                     >
                       配置到期提醒
                     </Button>
                     {c.status === "待生效" && (
                       <Button
-                        disabled={!owner}
+                        disabled={!owner || !canDo("activate-operation", c.id)}
                         onClick={() =>
                           run({
                             type: "activate-operation",
@@ -425,13 +473,13 @@ export function OperationsPage() {
                       </Button>
                     )}
                     <Button
-                      disabled={!owner || c.status !== "服务中"}
+                      disabled={!canModal("renew")}
                       onClick={() => open("renew")}
                     >
                       办理续期 · 新建周期
                     </Button>
                     <Button
-                      disabled={!owner || (!active && c.status !== "待生效")}
+                      disabled={!canModal("exit")}
                       onClick={() => open("exit")}
                     >
                       办理退出 / 提前终止
@@ -524,9 +572,11 @@ export function OperationsPage() {
         open={!!modal}
         onCancel={() => setModal(undefined)}
         onOk={() => void submit()}
+        okButtonProps={{ disabled: !canSubmitModal }}
       >
         <Form
           form={form}
+          disabled={!canModal(modal)}
           layout="vertical"
           initialValues={{
             kind: modal === "cost" ? "expense" : "问题",
@@ -603,7 +653,11 @@ export function OperationsPage() {
               >
                 <Select
                   options={[
-                    { value: "labor", label: "运维工时" },
+                    {
+                      value: "labor",
+                      label: "运维工时",
+                      disabled: !canEditField("labor-rate"),
+                    },
                     { value: "expense", label: "运维报销" },
                   ]}
                 />
@@ -619,7 +673,11 @@ export function OperationsPage() {
                 <InputNumber min={0.01} />
               </Form.Item>
               <Form.Item name="rate" label="人工：单价（万元/小时）">
-                <InputNumber min={0.0001} precision={4} />
+                <InputNumber
+                  disabled={!canModal(modal) || !canEditField("labor-rate")}
+                  min={0.0001}
+                  precision={4}
+                />
               </Form.Item>
               <Form.Item
                 name="date"

@@ -1,3 +1,4 @@
+import { useActionAccess } from "@/hooks/useActionAccess";
 import { useState } from "react";
 import {
   Alert,
@@ -23,32 +24,48 @@ export function ProjectClosePage() {
   const navigate = useNavigate();
   const { data, dispatch } = useBusinessStore();
   const { currentRole, currentUser } = useAppStore();
+  const { canDo } = useActionAccess();
   const { message } = App.useApp();
   const [confirm, setConfirm] = useState(false);
   const [note, setNote] = useState("");
   const p = data.projects.find((p) => p.id === id);
   if (!p) return <StateView type="404" />;
-  if (!visibleProjects(currentRole, data.projects, data).some((v) => v.id === id))
+  if (
+    !visibleProjects(currentRole, data.projects, data).some((v) => v.id === id)
+  )
     return <StateView type="403" />;
   const checks = closeChecks(data, p.id);
   const closure = data.projectClosures[p.id];
   const history = p.phase === "已关闭" && !closure;
   const failed = checks.filter((c) => !c.ok);
-  const management = data.managementApprovals.find((a) => a.projectId === p.id && a.status === '待审批') ?? data.managementApprovals.find((a) => a.projectId === p.id);
+  const canClose =
+    currentRole === "pmo" &&
+    !closure &&
+    !history &&
+    failed.length === 0 &&
+    canDo("confirm-project-close", p.id);
+  const management =
+    data.managementApprovals.find(
+      (a) => a.projectId === p.id && a.status === "待审批",
+    ) ?? data.managementApprovals.find((a) => a.projectId === p.id);
   const cycle = data.operationCycles.find((c) => c.projectId === p.id);
-  const operationPath = cycle ? `/operations/${cycle.id}` : `/projects/${p.id}/operation-handover`;
+  const operationPath = cycle
+    ? `/operations/${cycle.id}`
+    : `/projects/${p.id}/operation-handover`;
   const paths: Record<string, string> = {
-    '管理决策事项已办理': management ? `/management-approvals/${management.id}` : `/workbench/todos?project=${p.id}&type=管理决策`,
-    '财务最终结算锁定': `/projects/${p.id}/settlement`,
-    '后评价已完成': `/projects/${p.id}/post-evaluation`,
-    '正式归档已确认': `/projects/${p.id}/archive`,
-    '合同及回款计划应收结清': `/projects/${p.id}/business-result`,
-    '建设期未决成本及承诺预测清零': `/projects/${p.id}/settlement/apply`,
-    '运维判定明确、周期全部退出': operationPath,
-    '重大建设期问题已解决': `/issues-risks?projectId=${p.id}&kind=issue`,
-    '运维问题/风险全部解决': operationPath,
-    '运维工时 / 费用原单已核对': `${operationPath}${cycle ? '?tab=costs' : ''}`,
-    '运维历史费用均关联实际周期': `${operationPath}${cycle ? '?tab=costs' : ''}`,
+    管理决策事项已办理: management
+      ? `/management-approvals/${management.id}`
+      : `/workbench/todos?project=${p.id}&type=管理决策`,
+    财务最终结算锁定: `/projects/${p.id}/settlement`,
+    后评价已完成: `/projects/${p.id}/post-evaluation`,
+    正式归档已确认: `/projects/${p.id}/archive`,
+    合同及回款计划应收结清: `/projects/${p.id}/business-result`,
+    建设期未决成本及承诺预测清零: `/projects/${p.id}/settlement/apply`,
+    "运维判定明确、周期全部退出": operationPath,
+    重大建设期问题已解决: `/issues-risks?projectId=${p.id}&kind=issue`,
+    "运维问题/风险全部解决": operationPath,
+    "运维工时 / 费用原单已核对": `${operationPath}${cycle ? "?tab=costs" : ""}`,
+    运维历史费用均关联实际周期: `${operationPath}${cycle ? "?tab=costs" : ""}`,
   };
   return (
     <>
@@ -62,9 +79,7 @@ export function ProjectClosePage() {
         extra={
           <Button
             type="primary"
-            disabled={
-              currentRole !== "pmo" || !!closure || history || failed.length > 0
-            }
+            disabled={!canClose}
             onClick={() => setConfirm(true)}
           >
             PMO确认关闭
@@ -101,10 +116,7 @@ export function ProjectClosePage() {
             {
               title: "原业务",
               render: (_, r) => (
-                <Button
-                  type="link"
-                  onClick={() => navigate(paths[r.label])}
-                >
+                <Button type="link" onClick={() => navigate(paths[r.label])}>
                   查看{r.ok ? "来源" : "并处理"}
                 </Button>
               ),
@@ -178,8 +190,10 @@ export function ProjectClosePage() {
       <Modal
         title="确认关闭项目"
         open={confirm}
+        okButtonProps={{ disabled: !canClose }}
         onCancel={() => setConfirm(false)}
         onOk={() => {
+          if (!canClose) return;
           try {
             dispatch(
               { type: "confirm-project-close", projectId: p.id, note },
@@ -198,6 +212,7 @@ export function ProjectClosePage() {
             message="确认将保存归档、后评价、结算、周期和回款快照，项目进入历史只读状态。"
           />
           <Input.TextArea
+            disabled={!canClose}
             aria-label="项目关闭意见"
             rows={4}
             value={note}

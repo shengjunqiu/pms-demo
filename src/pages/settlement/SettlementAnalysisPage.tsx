@@ -1,4 +1,5 @@
-import { canViewSensitiveField } from '@/mock/configuration-access';
+import { useActionAccess } from "@/hooks/useActionAccess";
+import { canViewSensitiveField } from "@/mock/configuration-access";
 import { useState } from "react";
 import {
   Alert,
@@ -55,7 +56,12 @@ export function SettlementAnalysisPage({
   const navigate = useNavigate();
   const { data, dispatch } = useBusinessStore();
   const { currentRole, currentUser } = useAppStore();
-  const showMargin = canViewSensitiveField(data, { role: currentRole }, 'margin');
+  const { canDo } = useActionAccess();
+  const showMargin = canViewSensitiveField(
+    data,
+    { role: currentRole },
+    "margin",
+  );
   const { message } = App.useApp();
   const [editing, setEditing] = useState(false);
   const [rows, setRows] = useState<SettlementAnalysis[]>([]);
@@ -80,9 +86,10 @@ export function SettlementAnalysisPage({
   const rate = percentage(income - cost, income);
   const reasons = data.settlementAnalyses[p.id] ?? [];
   const canEdit =
-    currentRole === "pmo" ||
-    currentRole === "finance" ||
-    (currentRole === "project-manager" && currentUser.id === p.pmId);
+    canDo("save-settlement-analysis", p.id) &&
+    (currentRole === "pmo" ||
+      currentRole === "finance" ||
+      (currentRole === "project-manager" && currentUser.id === p.pmId));
   const paid = sumMoney(
     data.receiptPlans
       .filter((r) => r.projectId === p.id)
@@ -106,6 +113,7 @@ export function SettlementAnalysisPage({
     reason: reasons.find((r) => r.subjectId === s.subjectId),
   }));
   const start = () => {
+    if (!canEdit) return;
     setRows(
       subjects.map(
         (s) =>
@@ -187,7 +195,9 @@ export function SettlementAnalysisPage({
               title={final ? "结算毛利（万元）" : "当前测算毛利（万元）"}
               value={showMargin ? income - cost : "已隐藏"}
               precision={2}
-              valueStyle={{ color: showMargin && income - cost < 0 ? "#cf1322" : "#1677ff" }}
+              valueStyle={{
+                color: showMargin && income - cost < 0 ? "#cf1322" : "#1677ff",
+              }}
             />
           </Card>
         </Col>
@@ -195,7 +205,7 @@ export function SettlementAnalysisPage({
           <Card size="small">
             <Statistic
               title="毛利率"
-              value={showMargin ? rate ?? "—" : "已隐藏"}
+              value={showMargin ? (rate ?? "—") : "已隐藏"}
               precision={1}
               suffix={!showMargin || rate === null ? "" : "%"}
             />
@@ -242,7 +252,9 @@ export function SettlementAnalysisPage({
                 {
                   title: `概算 ${snapshot.estimateVersion}`,
                   render: (_, r) =>
-                    !showMargin && r.name === "毛利（万元）" ? "已隐藏" : r.estimate === undefined ? (
+                    !showMargin && r.name === "毛利（万元）" ? (
+                      "已隐藏"
+                    ) : r.estimate === undefined ? (
                       "—"
                     ) : (
                       <MoneyText value={r.estimate} />
@@ -250,16 +262,28 @@ export function SettlementAnalysisPage({
                 },
                 {
                   title: `预算 ${snapshot.budgetVersion}`,
-                  render: (_, r) => !showMargin && r.name === "毛利（万元）" ? "已隐藏" : <MoneyText value={r.budget} />,
+                  render: (_, r) =>
+                    !showMargin && r.name === "毛利（万元）" ? (
+                      "已隐藏"
+                    ) : (
+                      <MoneyText value={r.budget} />
+                    ),
                 },
                 {
                   title: `最后滚动 ${snapshot.lastRollingDate}`,
-                  render: (_, r) => !showMargin && r.name === "毛利（万元）" ? "已隐藏" : <MoneyText value={r.rolling} />,
+                  render: (_, r) =>
+                    !showMargin && r.name === "毛利（万元）" ? (
+                      "已隐藏"
+                    ) : (
+                      <MoneyText value={r.rolling} />
+                    ),
                 },
                 {
                   title: "冻结结算",
                   render: (_, r) =>
-                    !showMargin && r.name === "毛利（万元）" ? "已隐藏" : r.settlement === undefined ? (
+                    !showMargin && r.name === "毛利（万元）" ? (
+                      "已隐藏"
+                    ) : r.settlement === undefined ? (
                       "—"
                     ) : (
                       <MoneyText value={r.settlement} />
@@ -656,8 +680,10 @@ export function SettlementAnalysisPage({
         width={900}
         styles={{ body: { maxHeight: "65vh", overflowY: "auto" } }}
         open={editing}
+        okButtonProps={{ disabled: !canEdit }}
         onCancel={() => setEditing(false)}
         onOk={() => {
+          if (!canEdit) return;
           try {
             dispatch(
               { type: "save-settlement-analysis", projectId: p.id, rows },
@@ -670,7 +696,7 @@ export function SettlementAnalysisPage({
           }
         }}
       >
-        <Form layout="vertical">
+        <Form layout="vertical" disabled={!canEdit}>
           {rows.map((r, i) => (
             <Card
               key={r.subjectId}
@@ -747,6 +773,7 @@ export function SettlementAnalysisPage({
 function ReceiptPanel({ projectId }: { projectId: string }) {
   const { data, dispatch } = useBusinessStore();
   const { currentRole, currentUser } = useAppStore();
+  const { canDo } = useActionAccess();
   const { message } = App.useApp();
   const [draft, setDraft] =
     useState<Omit<ReceiptAction, "type" | "projectId">>();
@@ -760,8 +787,10 @@ function ReceiptPanel({ projectId }: { projectId: string }) {
     (p) => p.projectId === projectId && p.contractId === draft?.contractId,
   );
   const total = sumMoney(draft?.allocations.map((a) => a.amount) ?? []);
-  const finance = currentRole === "finance";
+  const finance =
+    currentRole === "finance" && canDo("confirm-project-receipt", projectId);
   const begin = () => {
+    if (!finance) return;
     const c = contracts.find((c) => c.unpaidAmount > 0);
     setDraft({
       contractId: c?.id ?? "",
@@ -773,7 +802,7 @@ function ReceiptPanel({ projectId }: { projectId: string }) {
     });
   };
   const confirm = () => {
-    if (!draft) return;
+    if (!draft || !finance) return;
     try {
       dispatch(
         { type: "confirm-project-receipt", projectId, ...draft },
@@ -920,7 +949,7 @@ function ReceiptPanel({ projectId }: { projectId: string }) {
         okButtonProps={{ disabled: !finance }}
       >
         {draft && (
-          <Form layout="vertical">
+          <Form layout="vertical" disabled={!finance}>
             <Alert
               type="warning"
               message="请核对原流水与凭据。一条流水可分配到同一合同多个节点，确认后保留记录，不提供直接覆盖或删除。"
@@ -1034,6 +1063,7 @@ function ReceiptPanel({ projectId }: { projectId: string }) {
                     render: (_, _a, i) => (
                       <Button
                         danger
+                        disabled={!finance}
                         onClick={() =>
                           setDraft({
                             ...draft,
@@ -1052,6 +1082,7 @@ function ReceiptPanel({ projectId }: { projectId: string }) {
               <Button
                 style={{ marginTop: 8 }}
                 disabled={
+                  !finance ||
                   !contract ||
                   draft.allocations.length >=
                     plans.filter((p) => p.amount > p.paidAmount).length

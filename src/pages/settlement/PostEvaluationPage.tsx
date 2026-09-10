@@ -1,3 +1,4 @@
+import { useActionAccess } from "@/hooks/useActionAccess";
 import { useState } from "react";
 import {
   Alert,
@@ -36,6 +37,7 @@ export function PostEvaluationPage() {
   const navigate = useNavigate();
   const { data, dispatch } = useBusinessStore();
   const { currentRole, currentUser } = useAppStore();
+  const { canDo, canEditField } = useActionAccess();
   const { message } = App.useApp();
   const [draft, setDraft] = useState<PostEvaluation>();
   const [person, setPerson] = useState<string>();
@@ -63,7 +65,12 @@ export function PostEvaluationPage() {
     data.opportunities.find((o) => o.id === p.opportunityId)?.ownerId ===
       currentUser.id;
   const canEdit =
-    !!e && e.status === "编制中" && !archive && (pmo || pm || member || market);
+    !!e &&
+    e.status === "编制中" &&
+    !archive &&
+    (pmo || pm || member || market) &&
+    canDo("save-post-evaluation", p.id) &&
+    canEditField("evaluation");
   const settled = data.settlements.some(
     (s) => s.projectId === p.id && s.status === "已锁定已生效",
   );
@@ -77,11 +84,30 @@ export function PostEvaluationPage() {
   // Writing a single score is independent of viewing existing evaluations.
   // Without read access, never replace another evaluator's current score.
   const canEnterTemplate = (rowId: string) =>
+    canDo("score-post-evaluation", p.id) &&
+    canEditField("evaluation") &&
     canScoreTemplate(data, p.id, actor, rowId) &&
     (viewEvaluation ||
       !e?.templateScores?.[rowId] ||
       e.templateScores[rowId].actorId === currentUser.id);
+  const canScorePerson =
+    !!e &&
+    e.status === "编制中" &&
+    !archive &&
+    canDo("score-post-evaluation", p.id) &&
+    canEditField("evaluation");
+  const canConfirm =
+    pmo &&
+    !archive &&
+    e?.status === "待确认" &&
+    canDo("confirm-post-evaluation", p.id);
   const run = (action: CloseoutAction) => {
+    if (!canDo(action.type, p.id)) return false;
+    if (
+      ["save-post-evaluation", "score-post-evaluation"].includes(action.type) &&
+      !canEditField("evaluation")
+    )
+      return false;
     try {
       dispatch(action, actor);
       message.success("后评价原任务已更新");
@@ -92,7 +118,7 @@ export function PostEvaluationPage() {
     }
   };
   const save = (submit: boolean) => {
-    if (!viewEvaluation || !draft) return;
+    if (!canEdit || !viewEvaluation || !draft) return;
     if (
       run({
         type: "save-post-evaluation",
@@ -131,7 +157,12 @@ export function PostEvaluationPage() {
             {!e ? (
               <Button
                 type="primary"
-                disabled={!pmo || !settled || !!archive}
+                disabled={
+                  !pmo ||
+                  !settled ||
+                  !!archive ||
+                  !canDo("start-post-evaluation", p.id)
+                }
                 onClick={() =>
                   run({ type: "start-post-evaluation", projectId: p.id })
                 }
@@ -490,6 +521,7 @@ export function PostEvaluationPage() {
                           render: (_, u) => (
                             <Button
                               disabled={
+                                !canScorePerson ||
                                 !e ||
                                 e.status !== "编制中" ||
                                 !!archive ||
@@ -600,7 +632,7 @@ export function PostEvaluationPage() {
             <Space style={{ marginBottom: 16 }}>
               <Button
                 type="primary"
-                disabled={!pmo || !!archive || e.status !== "待确认"}
+                disabled={!canConfirm}
                 onClick={() => {
                   setConfirm(true);
                   setNote("");
@@ -609,7 +641,7 @@ export function PostEvaluationPage() {
                 确认后评价完成
               </Button>
               <Button
-                disabled={!pmo || !!archive || e.status !== "待确认"}
+                disabled={!canConfirm}
                 onClick={() => {
                   setConfirm(false);
                   setNote("");
@@ -656,15 +688,21 @@ export function PostEvaluationPage() {
         footer={
           <Space>
             <Button onClick={() => setDraft(undefined)}>取消</Button>
-            <Button onClick={() => save(false)}>保存草稿</Button>
-            <Button type="primary" onClick={() => save(true)}>
+            <Button disabled={!canEdit} onClick={() => save(false)}>
+              保存草稿
+            </Button>
+            <Button
+              type="primary"
+              disabled={!canEdit}
+              onClick={() => save(true)}
+            >
               提交PMO确认
             </Button>
           </Space>
         }
       >
         {draft && viewEvaluation && (
-          <Form layout="vertical">
+          <Form layout="vertical" disabled={!canEdit}>
             {EVALUATION_GOALS.map((g) => (
               <Form.Item key={g} label={g} required>
                 <Space direction="vertical" style={{ width: "100%" }}>
@@ -729,7 +767,11 @@ export function PostEvaluationPage() {
         title="记录模板项目评分"
         open={!!templateRow}
         onCancel={() => setTemplateRow(undefined)}
+        okButtonProps={{
+          disabled: !(!!templateRow && canEnterTemplate(templateRow)),
+        }}
         onOk={() => {
+          if (!(!!templateRow && canEnterTemplate(templateRow))) return;
           if (!templateRow || !canEnterTemplate(templateRow)) return;
           if (
             run({
@@ -743,7 +785,10 @@ export function PostEvaluationPage() {
             setTemplateRow(undefined);
         }}
       >
-        <Form layout="vertical">
+        <Form
+          layout="vertical"
+          disabled={!(!!templateRow && canEnterTemplate(templateRow))}
+        >
           <Form.Item label="固定模板条目">
             {e?.templateSnapshot?.rows.find((r) => r.id === templateRow)?.name}
           </Form.Item>
@@ -771,7 +816,9 @@ export function PostEvaluationPage() {
         title="记录项目人员评价"
         open={!!person}
         onCancel={() => setPerson(undefined)}
+        okButtonProps={{ disabled: !canScorePerson }}
         onOk={() => {
+          if (!canScorePerson) return;
           if (
             run({
               type: "score-post-evaluation",
@@ -784,7 +831,7 @@ export function PostEvaluationPage() {
             setPerson(undefined);
         }}
       >
-        <Form layout="vertical">
+        <Form layout="vertical" disabled={!canScorePerson}>
           <Form.Item label="评价对象">
             {people.find((u) => u.id === person)?.name}
           </Form.Item>
@@ -811,7 +858,9 @@ export function PostEvaluationPage() {
         title={confirm ? "确认后评价完成" : "退回后评价"}
         open={confirm !== undefined}
         onCancel={() => setConfirm(undefined)}
+        okButtonProps={{ disabled: !canConfirm }}
         onOk={() => {
+          if (!canConfirm) return;
           if (
             run({
               type: "confirm-post-evaluation",
@@ -825,6 +874,7 @@ export function PostEvaluationPage() {
       >
         <Input.TextArea
           aria-label="后评价确认意见"
+          disabled={!canConfirm}
           rows={4}
           value={note}
           onChange={(e) => setNote(e.target.value)}
