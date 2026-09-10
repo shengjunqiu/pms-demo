@@ -51,12 +51,12 @@
       "round": "R0025"
     },
     "GS-08": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0027"
     },
     "GS-09": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0027"
     },
     "GS-10": {
       "status": "pending",
@@ -195,12 +195,12 @@
       "round": "R0017"
     },
     "JS-01": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0028"
     },
     "JS-02": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0028"
     },
     "JS-03": {
       "status": "done",
@@ -1046,6 +1046,74 @@
         ".pms-loop/runs/R0026/checks.json": "d84f51a2a87264055ab2439855a50fb28b21ae370aa6e96d06d2415c5acd2c02",
         ".pms-loop/runs/R0026/evidence.json": "8c8ec37f753bcac3357155667b53f37c56edaa2aaf44f8b856a0dd393e21c1e4"
       }
+    },
+    {
+      "id": "R0027",
+      "items": [
+        "GS-08",
+        "GS-09"
+      ],
+      "started_at": "2026-09-10T13:57:25+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-10T14:28:39+00:00",
+      "revision": "2e543fb999efe36e5e1027cb388d38fda2f23440be404c4b0c476c7bf5be0802",
+      "proof": {
+        ".pms-loop/runs/R0027/typecheck.log": "0cbb735b6f0f0beb07e73868e143e2a41ee87411e874d273088e1adceeb7efe0",
+        ".pms-loop/runs/R0027/lint.log": "257e04ddd8733fd59f16ff528f593b88c1fe59f044ef033b555c85568c03f33d",
+        ".pms-loop/runs/R0027/test-domain.log": "16cd108fe1d1a3d003be9ff232ebc8da01a06cfdf3d5e697057784d8e167a0f6",
+        ".pms-loop/runs/R0027/build.log": "ffeb548de80c88db3f3ef8d7d4a86b830a0ffe0376222a203f65da4a201a5075",
+        ".pms-loop/runs/R0027/artifacts-browser.log": "efcb2824f74c1e87022e1e2035b3e13c20b342e08d4d3a7807805f5d66b88fb0",
+        ".pms-loop/runs/R0027/artifacts/r0024-af0adcc299ebe2221317918d0adb4c081b6ed44f.json": "4f0b2d06e1f7a3d72541fa69e264b44e313ba4ca1bedd404139a01d1f0fa6db6",
+        ".pms-loop/runs/R0027/artifacts/r0024-af0adcc299ebe2221317c70147e254f800c07d1e.json": "b5ef2788d5037d00384aa5c7bbebcb4f7db796d7fbcc9e342ae955f7fd89387a",
+        ".pms-loop/runs/R0027/artifacts/GS-08-1440.png": "e3a88e6f30a4b9ec009e8334aa748df0a63d03f1b56e992df65582679de5f01e",
+        ".pms-loop/runs/R0027/artifacts/GS-08-1280.png": "2d22a3ce740c8101fc2d4299f2d36a6755c4d193b98472c12feff3ab37a9a04c",
+        ".pms-loop/runs/R0027/artifacts/GS-09-1440.png": "7758576c9570ab761df24a1e4c4a558b4373540dc41e20046925797dfabf71c8",
+        ".pms-loop/runs/R0027/artifacts/GS-09-1280.png": "ffb349cd666b06949b212763e380700d6546194d1e163e8a8836b5618839a604",
+        ".pms-loop/runs/R0027/checks.json": "8a47bb3d8f9778a0a019386f17b5afa6ca47a006d30b02ace993ca3cfba7f370",
+        ".pms-loop/runs/R0027/evidence.json": "ee493b2d5526a7eb12d91fba838e275bc57726f7cc757ea1be1e582f1de5a653"
+      }
+    },
+    {
+      "id": "R0028",
+      "items": [
+        "JS-01",
+        "JS-02"
+      ],
+      "started_at": "2026-09-10T14:44:15+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-10T14:56:58+00:00",
+      "revision": "35e18b7bc6c0382faf5228d666b90315f49ea04d1d9c1e6b07027456aa64e13b",
+      "proof": {
+        ".pms-loop/runs/R0028/test-domain.log": "36e79e48555b59f16802fba6bac78233c4149a0dd32cf9396c19526dac544bb7",
+        ".pms-loop/runs/R0028/build.log": "30f18fc90d43e45141e5372d2bb58de4225a8a1cac150e6fe398f3e0840c0d36",
+        ".pms-loop/runs/R0028/lint.log": "257e04ddd8733fd59f16ff528f593b88c1fe59f044ef033b555c85568c03f33d",
+        ".pms-loop/runs/R0028/typecheck.log": "0cbb735b6f0f0beb07e73868e143e2a41ee87411e874d273088e1adceeb7efe0",
+        ".pms-loop/runs/R0028/browser.log": "ba469ea6a77fab5840a877b092d5578cf3bb296485e938bba80609e0b71fcd94",
+        ".pms-loop/runs/R0028/artifacts/r0024-3ef49eee67d71f1b171681770a54ad38b979690a.json": "49e6e2fe02204048b2e0b2f96070a2e12a169066f064fdb2485a9f7997259b7e",
+        ".pms-loop/runs/R0028/artifacts/r0024-3ef49eee67d71f1b1716a66e4fb691aa153d4814.json": "e2728e519453f92875c12e1dd9086a2e2e5b40340a02b86835b167c49e5e13e1",
+        ".pms-loop/runs/R0028/artifacts/r0024-3ef49eee67d71f1b1716cb2943ab8b4d822855c5.json": "a33089fd71c9d11b039102dbc8f6c1a407e3d6366105253c177f5ca0b6953edf",
+        ".pms-loop/runs/R0028/artifacts/settlement-de12aa92550dfc05fc634c9031b0d965037cf83b.json": "965f72e5a49f4a0a625144e0f9b50497c6e885c3d3455308f063c54e0caa6d89",
+        ".pms-loop/runs/R0028/artifacts/settlement-de12aa92550dfc05fc637feb24a0bed95c0734f2.json": "f6c9f94618f7de9c4053125305f6de4d7e5d4ec015d80e8b1594540a2344f3eb",
+        ".pms-loop/runs/R0028/artifacts/settlement-de12aa92550dfc05fc63a2515ad7bc48d2d4e419.json": "8befcf5f7b941071f3ffcb6b3002d7d62dbbc1415903651e4dcec30b112a5ce4",
+        ".pms-loop/runs/R0028/artifacts/JS01-internal-reinspection-passed-1440.png": "ecc5285635f93abe5ff22b3794ae428ce2cfc1abc895282a8bf004dbd0afe4a7",
+        ".pms-loop/runs/R0028/artifacts/JS01-internal-reinspection-passed-1280.png": "64bdf1aaa203ded4df3000f74a7807789688546d419b455d19a056ea1c4aeac7",
+        ".pms-loop/runs/R0028/artifacts/JS02-dynamic-supplier-passed-1440.png": "b07d9ea799d0e0acee51a50fd6ae60e8edf8b40f4806bc49a9381a75ffd0569e",
+        ".pms-loop/runs/R0028/artifacts/JS02-dynamic-supplier-passed-1280.png": "3ff25d309e51b6a8216e5d752c498977aaddecc2ce1f8556b5744267565619bc",
+        ".pms-loop/runs/R0028/checks.json": "a0778dd34b2a2a4b0476e347ac93e8fb0ee4b9a812a4b7fa267984312496f346",
+        ".pms-loop/runs/R0028/evidence.json": "63802f50866254acebbf958e76df3fa2564d5c5bb4ba482233be666926a8d40c"
+      }
     }
   ],
   "notes": [
@@ -1148,6 +1216,10 @@
     {
       "at": "2026-09-10T12:29:55+00:00",
       "text": "R0025/R0026两轮已验收GS05/06/07及GS01/03，累计38/72，无活动轮次。R26最终revision=442d69c296f96bb22ab31a460f8a981b1c5fa1e99dd06fb3007e65fb19f42ad6，typecheck/lint/build与233领域测试通过（91.98秒）；9个正式浏览器场景通过、控制台error空，4张主页面双宽截图已查看，补充版本不匹配/暂缓截图已查看。修复立项版本门禁一致、日期视图恢复、最后跟进取业务日期、PM成本隐藏一致、详情金额日期；测试用真实生命周期fixture，不绕过已转立项/建档日期限制。A01/A02已accepted，子agent已停写，外部worktree保留；下一步先审A03 GS08/09真实依赖、补验收准备，继续消化库存。CF07收入/成本粒度及组织上下文、剩余34页和FINAL仍未完成。浏览器测试及所启服务已退出；本地提交未推送。"
+    },
+    {
+      "at": "2026-09-10T14:57:51+00:00",
+      "text": "本次按多agent并发完成R0027 GS08/09及R0028 JS01/02，累计42/72，无活动轮次。R28最终revision=35e18b7bc6c0382faf5228d666b90315f49ea04d1d9c1e6b07027456aa64e13b，typecheck/lint/build及234领域测试通过，6条正式浏览器验收与客户报验运维回归通过，主页面双宽截图均已查看，consoleErrors为空。概算修复同路径URL反向比较不同步，补偏离源成本冻结阻断及实际历史深链；供应商修复同轮次新建后误打开历史原单，验证整改复验、证明阻断、原单同步不增加成本。6个createDemoBusinessState测试文件将首次种子构建移到beforeAll，每例仍独立深拷贝，未提高超时或放宽断言；两次旧超时日志保留R27/attempts。两个子agent独占交付范围检查通过：c3b0eb3→bbc2b7f预算行UUID/概算毛利率及测试；faafa38→31560c6内部供应商e2e。主集成补毛利率四舍五入与抽屉动画定位，预算新增2场景通过。工作副本已停写，保留分支；支持包已归档。下一步继续消化库存：B02仍缺主PM接任的项目级菜单/动作/领域权限闭环、可响应候选及YS10科目下钻；CF07收入成本粒度仍待。C02 JS05/06/07需真实办理P006变更与管理审批、结清承诺预测后补正式结算闭环，不可借直接改状态fixture验收。所启浏览器测试和服务器已退出，尚余30页及FINAL，未推送。"
     }
   ]
 }

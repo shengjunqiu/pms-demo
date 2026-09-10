@@ -193,7 +193,25 @@ test('GS-08/09 从通过评审生成、追加、冻结、差异追溯并承接�
   await expect(page.getByRole('cell', { name: '修改', exact: true }).first()).toBeVisible();
   await expect(page.locator('.ant-table-row').filter({ hasText: '接口开发人力' })).toContainText('已隐藏');
   await expect(page.getByRole('link', { name: `评审 ${secondReviewId}`, exact: true })).toHaveAttribute('href', new RegExp(`review\\?review=${secondReviewId}$`));
+  const costDelta = page.locator('.ant-statistic').filter({ hasText: '成本差异（万元）' });
+  await expect(costDelta).toContainText('21.16');
+  await navigate(page, `/opportunities/${id}/estimate/compare?base=${secondId}&compare=${firstId}`);
+  await expect(costDelta).toContainText('-21.16');
+  await expect(page.locator('.ant-select[aria-label="基准概算版本"]')).toContainText(secondId);
+  await expect(page.locator('.ant-select[aria-label="对比概算版本"]')).toContainText(firstId);
+  await navigate(page, `/opportunities/${id}/estimate/compare?base=${firstId}&compare=${secondId}`);
+  await expect(costDelta).toContainText('21.16');
   shots.compare = await capturePageEvidence(page, 'GS-09');
+  await page.getByRole('link', { name: `方案 SOL-${id}-V1`, exact: true }).click();
+  const historicalSolution = page.getByRole('dialog', { name: '方案历史快照 V1', exact: true });
+  await expect(historicalSolution).toContainText('20个接口与统一门户');
+  await historicalSolution.getByRole('button', { name: /^关\s*闭$/ }).click();
+  await navigate(page, `/opportunities/${id}/estimate/compare?base=${firstId}&compare=${secondId}`);
+  await page.getByRole('link', { name: `成本 TECH-${id}-V1`, exact: true }).click();
+  await expect(page.getByRole('tab', { name: /历史成本快照/ })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('.ant-table-expanded-row:visible')).toContainText('现场差旅');
+  await expect(page.locator('.ant-table-expanded-row:visible')).not.toContainText('认证专项服务');
+
 
   await navigate(page, `/opportunities/${id}/estimate`);
   await page.getByRole('link', { name: '按当前冻结版发起立项', exact: true }).click();
@@ -235,5 +253,27 @@ test('GS-08/09 阻断偏离评审的冻结，并覆盖空态、404与403', async
     await navigate(page, `/opportunities/${deniedId}/${route}`);
     await expect(page.getByText('403 无访问权限', { exact: true })).toBeVisible();
   }
-  observations.set(page, { empty: id, invalid: 'OPP-NOT-FOUND', deniedId });
+  await navigate(page, `/opportunities/${id}/estimate`);
+  await generateFromReview(page);
+  await page.getByRole('tab', { name: '建设成本', exact: true }).click();
+  await page.getByRole('spinbutton', { name: '集成网关数量', exact: true }).fill('4');
+  await publishCurrentDraft(page);
+  await page.getByRole('tab', { name: /版本记录/ }).click();
+  await expect(page.getByRole('button', { name: '确认冻结', exact: true })).toBeDisabled();
+  await role(page, 'PMO负责人');
+  await navigate(page, `/opportunities/${id}/estimate`);
+  await page.getByRole('tab', { name: /版本记录/ }).click();
+  await page.getByRole('button', { name: '确认冻结', exact: true }).click();
+  const blocked = page.getByRole('dialog', { name: 'PMO确认冻结概算', exact: true });
+  await blocked.locator('textarea').fill('检查偏离评审的概算');
+  await expect(blocked.getByText('概算明细已偏离评审成本，请重新评审并从通过版本生成概算', { exact: true })).toBeVisible();
+  await expect(blocked.getByRole('button', { name: '确认冻结', exact: true })).toBeDisabled();
+  const unchanged = await page.evaluate(async target => {
+    const path = '/src/mock/business.ts'; const b = await import(/* @vite-ignore */ path) as BusinessModule;
+    const state = b.useBusinessStore.getState().data;
+    return { current: state.opportunities.find(o => o.id === target)!.currentEstimateVersionId ?? null,
+      frozen: state.estimates.filter(e => e.opportunityId === target).map(e => e.isFrozen) };
+  }, id);
+  expect(unchanged).toEqual({ current: null, frozen: [false] });
+  observations.set(page, { empty: id, invalid: 'OPP-NOT-FOUND', deniedId, blockedFreeze: unchanged });
 });

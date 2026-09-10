@@ -1,8 +1,11 @@
-import { expect, it } from 'vitest';
+import { beforeAll, expect, it } from 'vitest';
 import { createDemoBusinessState, transition } from '@/mock/business-domain';
 import { archiveSources } from '@/mock/closeout';
 import { closeChecks } from '@/mock/operations';
 import { settlementChecks } from '@/mock/settlement';
+
+// Build the shared demo seed during fixture setup; each test still receives its own deep clone.
+beforeAll(() => { createDemoBusinessState(); });
 
 it('待决管理事项阻断结算、归档和关闭；原领导审批办理后解除该项', () => {
   let state = createDemoBusinessState();

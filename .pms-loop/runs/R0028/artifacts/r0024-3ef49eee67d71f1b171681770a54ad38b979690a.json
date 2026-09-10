@@ -1,0 +1,18 @@
+{
+  "title": "JS01/02筛选空态、错误记录、未知项目和只读角色",
+  "status": "passed",
+  "url": "http://127.0.0.1:4179/projects/UNKNOWN/internal-acceptance",
+  "consoleErrors": [],
+  "observations": {
+    "screenshots": {
+      "internal-acceptance": {
+        "1280": ".pms-loop/runs/R0028/artifacts/JS-internal-acceptance-empty-1280.png",
+        "1440": ".pms-loop/runs/R0028/artifacts/JS-internal-acceptance-empty-1440.png"
+      },
+      "supplier-acceptance": {
+        "1280": ".pms-loop/runs/R0028/artifacts/JS-supplier-acceptance-empty-1280.png",
+        "1440": ".pms-loop/runs/R0028/artifacts/JS-supplier-acceptance-empty-1440.png"
+      }
+    }
+  }
+}

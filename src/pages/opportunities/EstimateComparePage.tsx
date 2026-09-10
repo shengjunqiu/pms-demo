@@ -1,5 +1,4 @@
 import { canViewSensitiveField } from "@/mock/configuration-access";
-import { useState } from "react";
 import {
   Alert,
   Card,
@@ -35,8 +34,8 @@ export function EstimateComparePage() {
     !viewMargin && /毛利|gross.?margin/i.test(value ?? "")
       ? hiddenMargin
       : value;
-  const [leftId, setLeftId] = useState<string | undefined>(() => query.get("base") ?? undefined);
-  const [rightId, setRightId] = useState<string | undefined>(() => query.get("compare") ?? undefined);
+  const leftId = query.get("base");
+  const rightId = query.get("compare");
   const o = data.opportunities.find((o) => o.id === id);
   if (!o) return <StateView type="404" />;
   if (!canViewOpportunity(data, o, actor)) return <StateView type="403" />;
@@ -91,8 +90,6 @@ export function EstimateComparePage() {
     label: `${e.version} · ${e.isFrozen ? "冻结" : "待确认"} · ${e.id}`,
   }));
   const selectVersion = (side: "base" | "compare", value: string) => {
-    if (side === "base") setLeftId(value);
-    else setRightId(value);
     const next = new URLSearchParams(query);
     next.set(side, value);
     setQuery(next, { replace: true });

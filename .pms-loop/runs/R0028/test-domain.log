@@ -1,0 +1,109 @@
+
+> pms-demo@1.0.0 test:domain /Users/shengjunqiu/Documents/Code/pms-demo
+> vitest run src --maxWorkers=1
+
+
+ RUN  v3.2.7 /Users/shengjunqiu/Documents/Code/pms-demo
+
+ ✓ src/models/__tests__/initiation.test.ts (16 tests) 9160ms
+   ✓ 立项评审与正式项目承接 > 不允许缺少真实上游或重复立项，提交后固定来源快照  331ms
+   ✓ 立项评审与正式项目承接 > 提交立项锁定所选概算，商机后来切换冻结版本不改审批与项目引用  691ms
+   ✓ 立项评审与正式项目承接 > 六节点分别签署，同角色节点不可合并或重复，一次 PMO 点击不能批准  929ms
+   ✓ 立项评审与正式项目承接 > 高风险不能绕过 PMC 路径，领导决策需会议证据  406ms
+   ✓ 立项评审与正式项目承接 > 通过项目初始无 PM/预算/基线，候选人可见接受且此前不能策划  806ms
+   ✓ 立项评审与正式项目承接 > 继承真实早期成本一次，旧汇总不虚构，投入来源仍可追溯  613ms
+   ✓ 立项评审与正式项目承接 > 整改保留上一轮资料，回复后形成新轮；否决暂缓留存成本处置责任  482ms
+   ✓ 立项评审与正式项目承接 > 已签依据仅允许归属该商机的真实未绑定合同，项目承接合同事实  618ms
+   ✓ 立项评审与正式项目承接 > 暂缓保存复评责任与成本处置，PMO恢复后须新轮提交，旧决定不变  390ms
+   ✓ 立项评审与正式项目承接 > 风险矩阵不许下调或丢失来源，PMO新增必交目录进入正式项目  772ms
+   ✓ 立项评审与正式项目承接 > 提交冻结分级规则：后来降低阈值只作用新申请，不回算当前轮次  428ms
+   ✓ 立项评审与正式项目承接 > 正式 CF 多节点按提交快照推进，停用配置不影响在途申请且未完成不生成项目  654ms
+   ✓ 立项评审与正式项目承接 > 配置任一签署节点记录独立拒绝，其他角色通过后可完成当前节点  639ms
+   ✓ 立项评审与正式项目承接 > 立项通过按提交模板实例化，后续新模板不改本轮目录且必交项不被降级  559ms
+   ✓ 立项评审与正式项目承接 > 第六专业签完成时才开始正式节点计时，保留规则快照与既有签署  539ms
+ ✓ src/models/__tests__/settlement.test.ts (8 tests) 7046ms
+   ✓ 正式结算与冻结协议 > 客户通过未确认、历史未决与原变更均阻断  447ms
+   ✓ 正式结算与冻结协议 > 逐科目承诺/预测实际发生守恒，旧滚动科目快照保留  1401ms
+   ✓ 正式结算与冻结协议 > 提交冻结成本入口，材料退回保持冻结、追加版本保留旧快照  1521ms
+   ✓ 正式结算与冻结协议 > 仅财务金额退回可解冻；重提引用新金额，旧结果保留  1595ms
+   ✓ 正式结算与冻结协议 > 财务→PMO审核→评审→最终锁定，建设锁定但不关闭项目且运维隔离  1705ms
+ ✓ src/models/__tests__/project-changes.test.ts (5 tests) 6745ms
+   ✓ 新增范围先评估分级，再由PMO批准；追加完整基线，旧版本与最新执行事实保留  415ms
+   ✓ 重大工期或金额必须高阶审批；角色不能绕过；建设冻结和源基线变化阻断  661ms
+   ✓ 历史补齐快照不能冒充已齐材料直接通过，须退回补充；不存在重复新基线  334ms
+ ✓ src/models/__tests__/business.test.ts (14 tests) 6630ms
+   ✓ 管理审批联动原事项但不跳过风险、终验和结算流程；未签审批只变更额度  542ms
+ ✓ src/models/__tests__/closeout.test.ts (12 tests) 5730ms
+   ✓ 后评价与正式归档 > 六类目标及复盘完整才能提交，确认后不可覆盖经验记录  593ms
+   ✓ 后评价与正式归档 > 14目录原记录不冒充正式文件，缺件阻断；补档不解除建设锁定  549ms
+   ✓ 后评价与正式归档 > 退回补档创建新版本，保留旧文件结论且禁止跨项目来源  602ms
+   ✓ 后评价与正式归档 > 完整目录归档保留全部来源版本，正式文件和后评价不可覆写  972ms
+   ✓ 后评价与正式归档 > 归档后旧问题/成本入口不可写，管理员无解档旁路，运维成本仍独立  1006ms
+   ✓ 后评价版本化模板消费 > 模板必填与系统必填评分阻断提交，评分后提交；完成记录不可改评分  856ms
+ ✓ src/models/__tests__/budget-planning.test.ts (9 tests) 8513ms
+   ✓ 新策划期 / WBS完整性 / 评审版本 > 评审冻结提交快照，整改必填负责人期限，回复后重提交新轮次，原版本保留  337ms
+   ✓ 预算通过与PMO确认独立 / 完整基线不可变 > 首次预算须计划评审通过；预算通过不生效，PMO确认冻结完整范围/计划/资源/预算，重复确认阻断  974ms
+   ✓ 预算通过与PMO确认独立 / 完整基线不可变 > 既有预算确认不修改实际/滚动，来源基线失效与建设冻结均阻断  347ms
+ ✓ src/models/__tests__/todos.test.ts (1 test) 3794ms
+ ✓ src/models/__tests__/closeout-integration.test.ts (2 tests) 3475ms
+ ✓ src/models/__tests__/portfolio.test.ts (2 tests) 3462ms
+ ✓ src/models/__tests__/presales.test.ts (8 tests) 2485ms
+   ✓ 方案成本与专家评审 > 整改回复和实质方案变更后才能产生新轮次，旧快照保持不变  497ms
+   ✓ 方案成本与专家评审 > 整改可仅实质调整成本并生成新轮次，旧双版本保持不变  417ms
+   ✓ 方案成本与专家评审 > 参与人和附件仅重排不能绕过整改实质变更门禁  354ms
+ ✓ src/models/__tests__/unsigned.test.ts (12 tests) 2651ms
+   ✓ 未签投入、合同及正式启动 > 签约必须有原单和守恒回款节点，并冻结合同、商机和回款来源轨迹  309ms
+   ✓ 未签投入、合同及正式启动 > 启动重验真实合同、任命、基线和阶段，达成启动里程碑并暴露真实执行待办  343ms
+   ✓ 未签投入、合同及正式启动 > 主PM合法换任只认当前接受任命和唯一有效项目经理，不把历史接受记录计为冲突  335ms
+   ✓ 未签投入、合同及正式启动 > 实际启动日期不得早于合同签订、当前基线生效或当前主PM接受任命日期  373ms
+   ✓ 未签投入、合同及正式启动 > 失效任命、历史摘要基线、启动里程碑缺失与建设冻结均不能启动  387ms
+ ✓ src/models/__tests__/opportunities.test.ts (8 tests) 1898ms
+   ✓ 商机初评业务闭环 > 六维完成后形成快照与唯一方案任务，锁定基础字段  403ms
+   ✓ 商机初评业务闭环 > 低毛利、不可行专业结论都不能绕过条件门  386ms
+   ✓ 商机初评业务闭环 > 暂缓必须安排复评，复评追加轮次且保留历史  400ms
+ ✓ src/models/__tests__/operations.test.ts (9 tests) 1224ms
+ ✓ src/models/__tests__/acceptance.test.ts (9 tests) 3156ms
+   ✓ 验收与报验业务约束 > 无权限及不完整检查不能通过；错误提交不改变原状态  401ms
+   ✓ 验收与报验业务约束 > 客户通过、签署证明、PMO最终确认独立，确认不能重复  453ms
+   ✓ 验收与报验业务约束 > 分批分税点按原单累计，重复审批与超合同被拒绝  793ms
+   ✓ 验收与报验业务约束 > 报验批次唯一、税点唯一，待确认占用额度，退回后可编辑  566ms
+   ✓ 验收与报验业务约束 > 已锁定项目禁止新增验收，草稿不改变财务成本  397ms
+ ✓ src/models/__tests__/receipts.test.ts (21 tests) 3179ms
+   ✓ 真实收款与合同计划单一实收 > 重复流水与重复节点拒绝，失败不会重复增加实收  312ms
+   ✓ 真实收款与合同计划单一实收 > 缺少流水、有效凭据或说明拒绝；支持精确到分和提前回款  363ms
+ ✓ src/models/__tests__/reports.test.ts (3 tests) 2256ms
+   ✓ 日报自动待办、草稿、无进展原因与唯一提交；报告不改WBS或独立问题  460ms
+   ✓ 周报保存来源与成本快照，补充模拟上报范围，后续事实改变不改历史  380ms
+   ✓ 质量整改独立闭环，材料版本经质量门与PMO审核后才允许里程碑达成  1411ms
+ ✓ src/models/__tests__/configuration-finance.test.ts (9 tests) 1554ms
+   ✓ 财务配置版本与消费快照 > 新工时使用新单价，已提交工时审核沿用原金额与版本  328ms
+ ✓ src/models/__tests__/tickets.test.ts (4 tests) 1258ms
+   ✓ 需求责任人提交后仅发起人确认关闭或退回，处理历史保留  470ms
+ ✓ src/models/__tests__/cost-orders.test.ts (3 tests) 1197ms
+   ✓ 采购批准增加指定科目承诺，验收入账等额转换且重复入账被拦截  443ms
+   ✓ 外包引用本项目WBS与基线并通过履约验收，费用只在财务入账后进入实际  552ms
+ ✓ src/models/__tests__/early-investments.test.ts (6 tests) 1136ms
+   ✓ 立项前投入额度与成本继承 > 财务登记按申请额度、来源单据去重，超额/超期/暂缓/签约逾期被拦截  317ms
+ ✓ src/models/__tests__/estimates.test.ts (5 tests) 1006ms
+ ✓ src/models/__tests__/budget-editor.test.ts (5 tests) 1123ms
+   ✓ 任命仅PMO发起且本人接受后切换，拒绝保留旧PM，唯一主PM与历史责任保留  350ms
+   ✓ 计划→预算草稿→审批→待确认版本→基线生效保留所有提交明细  380ms
+ ✓ src/models/__tests__/labor.test.ts (3 tests) 895ms
+   ✓ 成员、任务、有效日期、同日重复和跨项目累计工时执行硬校验  418ms
+ ✓ src/models/__tests__/configuration.test.ts (6 tests) 904ms
+ ✓ src/models/__tests__/stage.test.ts (2 tests) 763ms
+   ✓ 阶段申请保留提交校验快照，PMO批准才前进并释放预算，原基线和客户验收不改  332ms
+   ✓ 实际时间、重大风险、任务与材料在审批时重验，失败原子回滚且可驳回保留原阶段  427ms
+ ✓ src/models/__tests__/progress.test.ts (5 tests) 720ms
+ ✓ src/models/__tests__/shared-contracts.test.ts (4 tests) 638ms
+ ✓ src/models/__tests__/configuration-access.test.ts (14 tests) 678ms
+ ✓ src/models/__tests__/initiation-todos.test.ts (8 tests) 434ms
+ ✓ src/models/__tests__/access-scope.test.ts (6 tests) 355ms
+ ✓ src/models/__tests__/access-integration.test.ts (5 tests) 306ms
+ ✓ src/models/__tests__/domain.test.ts (10 tests) 307ms
+
+ Test Files  32 passed (32)
+      Tests  234 passed (234)
+   Start at  22:50:01
+   Duration  123.88s (transform 1.19s, setup 0ms, collect 23.34s, tests 84.68s, environment 10ms, prepare 4.34s)
+

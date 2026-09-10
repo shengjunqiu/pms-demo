@@ -1,10 +1,13 @@
-import { describe, it, expect } from 'vitest';
+import { beforeAll, describe, it, expect } from 'vitest';
 import { createBusinessState, createDemoBusinessState, transition, type Actor } from '@/mock/business-domain';
 import { mockProjects } from '@/mock';
 import { selectProjects, selectFourCalculations, selectReceipts } from '@/mock/selectors';
 import { calculateCockpitKPIs } from '@/utils/calculator';
 import { assessHealth } from '@/utils/health';
 import { sumMoney } from '@/utils/money';
+
+// Build the demo seed in fixture setup; tests retain independent deep clones.
+beforeAll(() => { createDemoBusinessState(); });
 
 const pm: Actor = { id: 'U-001', name: '张建国', role: 'project-manager' };
 const finance: Actor = { id: 'U-004', name: '刘敏', role: 'finance' };

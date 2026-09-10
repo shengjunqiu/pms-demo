@@ -1,0 +1,18 @@
+{
+  "base_commit": "fd72e0b",
+  "delivery_commit": "c3b0eb3a550a705b017c825341c1ec7716f69193",
+  "depends_on_deliveries": [],
+  "shared_changes": [],
+  "checks": {
+    "delivery_scope": "pass",
+    "browser": "not_run"
+  },
+  "artifacts": [],
+  "remaining_dependencies": [],
+  "paths": [
+    "e2e/budget-acceptance.spec.ts",
+    "src/pages/budget/BudgetEditorPage.tsx",
+    "src/pages/budget/BudgetSummary.tsx"
+  ],
+  "integration_commit": "bbc2b7f"
+}

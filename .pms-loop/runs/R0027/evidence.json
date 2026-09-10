@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "round": "R0027",
+  "revision": "2e543fb999efe36e5e1027cb388d38fda2f23440be404c4b0c476c7bf5be0802",
+  "items": {
+    "GS-08": {
+      "entry": "/opportunities/OPP-NEW-74/estimate",
+      "covered_features": [
+        "GS-032",
+        "GS-033",
+        "GS-034",
+        "GS-035",
+        "GS-036"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "核对页面清单4.5及详细功能GS-032至036，评审双版本、统一科目、追加概算及PMO冻结已实现。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "概算进入版本对比并返回；实际点击V1方案和成本来源打开历史快照；当前冻结V2进入立项页并显示相同版本。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "中文商机、成本项、税口径、来源版本、冻结记录及变更原因完整，无占位页。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "通过评审生成草稿→追加V1→PMO意见冻结→第二轮评审追加V2；越权冻结禁用，偏离评审明细冻结被阻断且current为空、isFrozen=false。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "两个冻结版本保留，当前引用仅切到V2；科目差额21.16万元，反向参数后为-21.16万元；PMO人力单价已隐藏。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "逐页验证无草稿/无版本空态、未知ID404及无协同范围403；偏离评审时明确阻断原因。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已逐张查看当前源码1440×900与1280×900截图；九页签可用，表格内部横向滚动，页面无横向溢出或遮挡。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "正式两条浏览器场景通过，报告consoleErrors均为空；无pageerror。"
+        },
+        "business-1": {
+          "requirement": "收入/建设/人力/第三方/期间/风险/毛利/版本完整",
+          "passed": true,
+          "observation": "九个页签完整；建设采购数量编辑及含税汇总、收入成本毛利指标、版本列表冻结记录均已观察。"
+        },
+        "business-2": {
+          "requirement": "统一科目实时汇总，评审通过才可冻结，来源版本可查",
+          "passed": true,
+          "observation": "草稿来自通过评审绑定方案和成本；V1成本38.50，V2成本59.66；来源历史链接可追溯，偏离源成本不能冻结。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "生成并冻结V1，第二轮评审后生成冻结V2，比较两版并交换URL参数，打开V1来源，再按V2发起立项",
+          "expected": "历史保留，当前引用V2；比较方向与来源一致",
+          "observed": "两版均冻结，差额21.16→-21.16；V1仍含旧范围和差旅，立项显示V2。"
+        },
+        {
+          "action": "技术角色修改采购数量并追加版本，PMO尝试冻结；分别访问无版本、无权限及非法ID",
+          "expected": "偏离评审与越权被阻断，异常态准确",
+          "observed": "技术不能冻结；PMO填写意见仍禁用冻结，未发生引用或冻结部分更新；空态/403/404符合预期。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0027/artifacts-browser.log",
+        ".pms-loop/runs/R0027/artifacts/r0024-af0adcc299ebe2221317918d0adb4c081b6ed44f.json",
+        ".pms-loop/runs/R0027/artifacts/r0024-af0adcc299ebe2221317c70147e254f800c07d1e.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0027/artifacts/GS-08-1440.png",
+        "1280": ".pms-loop/runs/R0027/artifacts/GS-08-1280.png"
+      }
+    },
+    "GS-09": {
+      "entry": "/opportunities/OPP-NEW-74/estimate/compare",
+      "covered_features": [
+        "GS-035",
+        "GS-036"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "核对页面清单4.5及详细功能GS-032至036，评审双版本、统一科目、追加概算及PMO冻结已实现。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "概算进入版本对比并返回；实际点击V1方案和成本来源打开历史快照；当前冻结V2进入立项页并显示相同版本。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "中文商机、成本项、税口径、来源版本、冻结记录及变更原因完整，无占位页。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "通过评审生成草稿→追加V1→PMO意见冻结→第二轮评审追加V2；越权冻结禁用，偏离评审明细冻结被阻断且current为空、isFrozen=false。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "两个冻结版本保留，当前引用仅切到V2；科目差额21.16万元，反向参数后为-21.16万元；PMO人力单价已隐藏。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "逐页验证无草稿/无版本空态、未知ID404及无协同范围403；偏离评审时明确阻断原因。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已逐张查看当前源码1440×900与1280×900截图；九页签可用，表格内部横向滚动，页面无横向溢出或遮挡。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "正式两条浏览器场景通过，报告consoleErrors均为空；无pageerror。"
+        },
+        "business-1": {
+          "requirement": "两版本按科目/数量/单价/金额对比，显示修改原因",
+          "passed": true,
+          "observation": "展示科目金额及明细数量/单价/税口径/金额/范围依据；人力100→120、采购2→3、差旅删除、专项服务新增，版本修改原因可见。"
+        },
+        "business-2": {
+          "requirement": "历史只读，明确立项引用版本和新增删除修改差异",
+          "passed": true,
+          "observation": "两版均保留冻结状态和来源，V2为当前指定且立项显示V2；比较方向与URL同步，历史方案及成本快照只读。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "生成并冻结V1，第二轮评审后生成冻结V2，比较两版并交换URL参数，打开V1来源，再按V2发起立项",
+          "expected": "历史保留，当前引用V2；比较方向与来源一致",
+          "observed": "两版均冻结，差额21.16→-21.16；V1仍含旧范围和差旅，立项显示V2。"
+        },
+        {
+          "action": "技术角色修改采购数量并追加版本，PMO尝试冻结；分别访问无版本、无权限及非法ID",
+          "expected": "偏离评审与越权被阻断，异常态准确",
+          "observed": "技术不能冻结；PMO填写意见仍禁用冻结，未发生引用或冻结部分更新；空态/403/404符合预期。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0027/artifacts-browser.log",
+        ".pms-loop/runs/R0027/artifacts/r0024-af0adcc299ebe2221317918d0adb4c081b6ed44f.json",
+        ".pms-loop/runs/R0027/artifacts/r0024-af0adcc299ebe2221317c70147e254f800c07d1e.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0027/artifacts/GS-09-1440.png",
+        "1280": ".pms-loop/runs/R0027/artifacts/GS-09-1280.png"
+      }
+    }
+  }
+}

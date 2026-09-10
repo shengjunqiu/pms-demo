@@ -1,0 +1,7 @@
+{
+  "title": "JS01/02筛选空态、错误记录、未知项目和只读角色",
+  "status": "failed",
+  "url": "http://127.0.0.1:4179/projects/P-006/internal-acceptance?record=UNKNOWN&q=NO-SUCH-ACCEPTANCE",
+  "consoleErrors": [],
+  "observations": {}
+}

@@ -1,6 +1,9 @@
-import {it,expect} from 'vitest';
+import { beforeAll,it,expect} from 'vitest';
 import {createBusinessState,createDemoBusinessState,transition,type Actor,type BusinessState} from '@/mock/business-domain';
 import {defaultChangeInput} from '@/mock/changes';
+
+// Build the demo seed in fixture setup; tests retain independent deep clones.
+beforeAll(() => { createDemoBusinessState(); });
 const pm:Actor={id:'U-001',name:'张建国',role:'project-manager'},pmo:Actor={id:'U-002',name:'李主任',role:'pmo'},leader:Actor={id:'U-003',name:'王总',role:'executive'};
 const experts:Actor[]=[{id:'U-005',name:'赵工',role:'solution-tech'},{id:'U-004',name:'刘敏',role:'finance'},{id:'U-006',name:'陈亮',role:'market'}];
 function submitted(cost=20,days=14){let s=createBusinessState();const input=defaultChangeInput(s,'P-001');Object.assign(input,{title:'增加设备接入范围',reason:'客户签证明确新增点位',scope:'增加10个设备点位',newWorkPackage:'新增设备点位接入',customerBasis:'客户签证2026-09-09',contractBasis:'合同范围变更条款',attachments:['客户签证.pdf'],risk:'按原技术栈交付，跟踪联调风险',procurementImpact:'增加设备20万元',outsourceImpact:'无新增外包',shiftDays:days,adjustments:{'SUB-03':cost}});s=transition(s,{type:'save-project-change',projectId:'P-001',input},pm);const id=s.changeRequests.at(-1)!.id;s=transition(s,{type:'submit-project-change',id},pm);return {s,id};}

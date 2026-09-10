@@ -216,10 +216,10 @@ export function AcceptancePage({ kind }: { kind: AcceptanceType }) {
       if (action.type === "submit-acceptance") {
         const next = useBusinessStore
           .getState()
-          .data.acceptances.filter(
-            (r) => r.projectId === p.id && r.type === kind,
-          )
-          .sort((a, b) => b.round - a.round)[0];
+          .data.acceptances.find(
+            (r) => r.projectId === p.id && r.type === kind &&
+              !data.acceptances.some((previous) => previous.id === r.id),
+          ) ?? useBusinessStore.getState().data.acceptances.find((r) => r.id === action.id);
         if (next) setParam("record", next.id);
       }
       setOperation(undefined);

@@ -1,6 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { createBusinessState, createDemoBusinessState, transition, type Actor } from '@/mock/business-domain';
 import { PLANNING_PROJECT_ID as id, validatePlanning } from '@/mock/budget';
+
+// Build the demo seed in fixture setup; tests retain independent deep clones.
+beforeAll(() => { createDemoBusinessState(); });
 const pm:Actor={id:'U-001',name:'张建国',role:'project-manager'};const pmo:Actor={id:'U-002',name:'李主任',role:'pmo'};const leader:Actor={id:'U-003',name:'王总',role:'executive'};
 function reviewed(){let s=transition(createBusinessState(),{type:'submit-planning',projectId:id},pm);s=transition(s,{type:'review-planning',id:'PREVIEW-1',result:'通过',opinion:'资源与交付周期可行',rectifications:[]},pmo);return s;}
 describe('新策划期 / WBS完整性 / 评审版本',()=>{

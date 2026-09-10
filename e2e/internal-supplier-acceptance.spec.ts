@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { capturePageEvidence, collectBrowserErrors, prepareArtifacts, writeBrowserReport } from './evidence';
-import { navigate, role } from './helpers';
+import { navigate, role as selectRole } from './helpers';
 
 type BusinessModule = typeof import('../src/mock/business');
 type AcceptanceModule = typeof import('../src/mock/acceptance');
@@ -17,6 +17,19 @@ test.afterEach(({ page }, info) => {
   writeBrowserReport(info, { url: page.url(), consoleErrors, observations: observations.get(page) ?? {} });
   expect(consoleErrors).toEqual([]);
 });
+
+async function closeDrawer(page: Page) {
+  const close = page.locator('.ant-drawer-open .ant-drawer-close');
+  if (new URL(page.url()).searchParams.has('record')) {
+    await expect(page.locator('.ant-message-notice')).toHaveCount(0, { timeout: 6000 });
+    await close.click();
+  }
+  await expect(page.locator('.ant-drawer-mask:visible')).toHaveCount(0);
+}
+async function role(page: Page, name: string) {
+  await closeDrawer(page);
+  await selectRole(page, name);
+}
 
 async function snapshot(page: Page) {
   return page.evaluate(async () => {
@@ -50,6 +63,7 @@ async function fillReview(page: Page, names: string[]) {
 }
 async function capture(page: Page, name: string, path: string) {
   await navigate(page, path);
+  await closeDrawer(page);
   return capturePageEvidence(page, name);
 }
 
@@ -143,7 +157,7 @@ test('JS02动态采购验收缺证明阻断，通过只同步履约不增加成�
   await page.getByRole('combobox', { name: '供应商原合同', exact: true }).click();
   await page.locator('.ant-select-dropdown:visible .ant-select-item-option').filter({ hasText: 'JS02-E2E-CG-001' }).click();
   await confirm(page);
-  const id = new URL(page.url()).searchParams.get('record')!;
+  let id = new URL(page.url()).searchParams.get('record')!;
   await expect(page.getByRole('button', { name: '登记验收结论', exact: true })).toBeDisabled();
   await role(page, 'PMO负责人');
   await navigate(page, `${base}/supplier-acceptance?record=${id}`);
@@ -152,11 +166,33 @@ test('JS02动态采购验收缺证明阻断，通过只同步履约不增加成�
   const pending = await snapshot(page);
   await confirmBlocked(page, '供应商验收通过须登记有效验收证明文件名');
   expect(await snapshot(page)).toEqual(pending);
+  const originalId = id;
+  const reviewDialog = page.locator('.ant-modal:visible');
+  await reviewDialog.locator('.ant-form-item').filter({ has: page.getByText('验收结论', { exact: true }) }).locator('.ant-select').click();
+  await page.locator('.ant-select-dropdown:visible').getByText('整改后复验', { exact: true }).click();
+  await reviewDialog.locator('.ant-form-item').filter({ has: page.getByText('整改内容', { exact: true }) }).locator('textarea').fill('补齐供应商交付文档与设备序列号清单');
+  await confirm(page);
+  await role(page, '项目经理');
+  await navigate(page, `${base}/supplier-acceptance?record=${id}`);
+  await page.getByRole('button', { name: '回复整改清单', exact: true }).click();
+  await page.getByLabel('整改回复', { exact: true }).fill('供应商文档与序列号已补齐，逐项复核一致');
+  await confirm(page);
+  await page.getByRole('button', { name: '整改后发起新轮次', exact: true }).click();
+  await fillApplication(page, '供应商文档与序列号整改复验');
+  await confirm(page);
+  id = new URL(page.url()).searchParams.get('record')!;
+  expect(id).not.toBe(originalId);
+  await role(page, 'PMO负责人');
+  await navigate(page, `${base}/supplier-acceptance?record=${id}`);
+  await page.getByRole('button', { name: '登记验收结论', exact: true }).click();
+  await fillReview(page, ['数量', '质量及技术参数', '服务', '交付时间', '成果及文档']);
   await page.getByLabel('供应商验收证明', { exact: true }).fill('供应商履约验收证明.pdf');
   await confirm(page);
   const after = await snapshot(page);
   expect(after.orders.find(o => o.id === orderId)?.status).toBe('验收通过');
   expect(after.details[id].supplierSourceId).toBe(orderId);
+  expect(after.details[id].previousId).toBe(originalId);
+  expect(after.acceptances.find(a => a.id === originalId)?.status).toBe('整改中');
   expect(after.acceptances.find(a => a.id === id)?.status).toBe('已通过');
   expect(after.costs).toEqual(before.costs);
   await expect(page.getByRole('button', { name: '登记验收结论', exact: true })).toBeDisabled();
@@ -172,8 +208,12 @@ test('JS02动态采购验收缺证明阻断，通过只同步履约不增加成�
 test('JS01/02筛选空态、错误记录、未知项目和只读角色', async ({ page }) => {
   await page.goto('/workbench/project-manager');
   const screenshots: Record<string, unknown> = {};
+  await navigate(page, '/projects/P-PLAN-001/supplier-acceptance');
+  await expect(page.getByText('供应商验收不适用：本项目无采购、外包或供应商交付合同。', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: '发起供应商验收', exact: true })).toBeDisabled();
   for (const path of ['internal-acceptance', 'supplier-acceptance']) {
     await navigate(page, `${base}/${path}`);
+    await closeDrawer(page);
     await page.getByLabel('验收查询', { exact: true }).fill('NO-SUCH-ACCEPTANCE');
     await expect(page.locator('.ant-table-placeholder')).toContainText('暂无数据');
     screenshots[path] = await capturePageEvidence(page, `JS-${path}-empty`);

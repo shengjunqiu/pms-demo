@@ -1,0 +1,53 @@
+{
+  "round": "R0028",
+  "revision": "35e18b7bc6c0382faf5228d666b90315f49ea04d1d9c1e6b07027456aa64e13b",
+  "status": "passed",
+  "started_at": "2026-09-10T14:48:49+00:00",
+  "commands": {
+    "typecheck": {
+      "argv": [
+        "/Users/shengjunqiu/.npm-global/bin/pnpm",
+        "run",
+        "typecheck"
+      ],
+      "exit_code": 0,
+      "log": ".pms-loop/runs/R0028/typecheck.log",
+      "sha256": "0cbb735b6f0f0beb07e73868e143e2a41ee87411e874d273088e1adceeb7efe0",
+      "seconds": 23.65
+    },
+    "lint": {
+      "argv": [
+        "/Users/shengjunqiu/.npm-global/bin/pnpm",
+        "run",
+        "lint"
+      ],
+      "exit_code": 0,
+      "log": ".pms-loop/runs/R0028/lint.log",
+      "sha256": "257e04ddd8733fd59f16ff528f593b88c1fe59f044ef033b555c85568c03f33d",
+      "seconds": 11.03
+    },
+    "build": {
+      "argv": [
+        "/Users/shengjunqiu/.npm-global/bin/pnpm",
+        "run",
+        "build"
+      ],
+      "exit_code": 0,
+      "log": ".pms-loop/runs/R0028/build.log",
+      "sha256": "30f18fc90d43e45141e5372d2bb58de4225a8a1cac150e6fe398f3e0840c0d36",
+      "seconds": 36.41
+    },
+    "test:domain": {
+      "argv": [
+        "/Users/shengjunqiu/.npm-global/bin/pnpm",
+        "run",
+        "test:domain"
+      ],
+      "exit_code": 0,
+      "log": ".pms-loop/runs/R0028/test-domain.log",
+      "sha256": "36e79e48555b59f16802fba6bac78233c4149a0dd32cf9396c19526dac544bb7",
+      "seconds": 125.69
+    }
+  },
+  "finished_at": "2026-09-10T14:52:06+00:00"
+}

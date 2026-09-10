@@ -1,8 +1,11 @@
-import { expect, it } from 'vitest';
+import { beforeAll, expect, it } from 'vitest';
 import { mockProjects, mockDepartments } from '@/mock';
 import { selectProjects, inOrganization, selectFourCalculations } from '@/mock/selectors';
 import { createDemoBusinessState } from '@/mock/business-domain';
 import { sumMoney } from '@/utils/money';
+
+// Build the shared demo seed during fixture setup; each test still receives its own deep clone.
+beforeAll(() => { createDemoBusinessState(); });
 
 it('集团与部门筛选包含后代，直属筛选排除后代且每个项目只计一次', () => {
   const group = selectProjects({ org: 'D-002' });

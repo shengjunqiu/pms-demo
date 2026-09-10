@@ -1,6 +1,9 @@
-import { it, expect } from 'vitest';
+import { beforeAll, it, expect } from 'vitest';
 import { createDemoBusinessState, transition } from '@/mock/business-domain';
 import { selectTodos } from '@/mock/todos';
+
+// Build the shared demo seed during fixture setup; each test still receives its own deep clone.
+beforeAll(() => { createDemoBusinessState(); });
 
 it('预算审批办理后转为独立PMO确认待办，确认后原节点进入已办且不重复生成', () => {
   const pmo = { id: 'U-002', name: '李主任', role: 'pmo' as const };

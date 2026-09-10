@@ -1,0 +1,17 @@
+[WebServer] (node:52708) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:52730) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 6 tests using 1 worker
+
+(node:52747) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/internal-supplier-acceptance.spec.ts:70:1 › JS01内部整改必须回复后复验，旧轮次与新结论保留 (38.7s)
+  ✓  2 e2e/internal-supplier-acceptance.spec.ts:150:1 › JS02动态采购验收缺证明阻断，通过只同步履约不增加成本 (37.4s)
+  ✓  3 e2e/internal-supplier-acceptance.spec.ts:208:1 › JS01/02筛选空态、错误记录、未知项目和只读角色 (13.5s)
+  ✓  4 e2e/settlement.spec.ts:51:1 › P006客户整改创建复验轮次，签署证明经PMO确认后分税点报验 (30.6s)
+  ✓  5 e2e/settlement.spec.ts:160:1 › 客户验收与报验的空态、未知对象和角色限制 (9.7s)
+  ✓  6 e2e/settlement.spec.ts:185:1 › OPS007真实运维原单经财务单次入账，与独立周期关联 (11.2s)
+
+  6 passed (2.4m)
