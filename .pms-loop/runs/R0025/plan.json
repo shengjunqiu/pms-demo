@@ -1,0 +1,162 @@
+{
+  "round": "R0025",
+  "items": [
+    {
+      "id": "GS-05",
+      "title": "需求调研与解决方案",
+      "route": "/opportunities/:id/solution",
+      "kind": "详情/编制",
+      "roles": "解决方案、技术、市场",
+      "phase": 4,
+      "feature_ids": [
+        "GS-016",
+        "GS-017",
+        "GS-018",
+        "GS-019",
+        "GS-020"
+      ],
+      "upstream_feature_scope": "GS-016~020",
+      "source_lines": {
+        "pages": 109,
+        "brief": 398
+      },
+      "criteria": [
+        "调研、方案范围/架构/交付物与版本记录",
+        "评审提交冻结版本；整改追加新版本和响应记录"
+      ]
+    },
+    {
+      "id": "GS-06",
+      "title": "技术与成本评估",
+      "route": "/opportunities/:id/tech-cost",
+      "kind": "编制",
+      "roles": "技术、方案、财务、采购",
+      "phase": 4,
+      "feature_ids": [
+        "GS-021",
+        "GS-022",
+        "GS-023",
+        "GS-024",
+        "GS-025",
+        "GS-026"
+      ],
+      "upstream_feature_scope": "GS-021~026",
+      "source_lines": {
+        "pages": 110,
+        "brief": 399
+      },
+      "criteria": [
+        "技术可行性、采购询价、人力/外包成本与风险假设",
+        "数量单价汇总、统一科目/成本基准、范围与测算关联"
+      ]
+    },
+    {
+      "id": "GS-07",
+      "title": "方案与成本专家评审",
+      "route": "/opportunities/:id/review",
+      "kind": "评审",
+      "roles": "PMO、专家组",
+      "phase": 4,
+      "feature_ids": [
+        "GS-027",
+        "GS-028",
+        "GS-029",
+        "GS-030",
+        "GS-031"
+      ],
+      "upstream_feature_scope": "GS-027~031",
+      "source_lines": {
+        "pages": 111,
+        "brief": 400
+      },
+      "criteria": [
+        "材料包、各专家独立意见、当前轮次与通过/整改/不通过",
+        "整改必填事项责任人截止日，新轮次保留原评审和方案版本"
+      ]
+    }
+  ],
+  "sources": {
+    "prd": {
+      "path": "docs/项目管理平台PRD_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "6dac675ca22237b7fa59129eccc466a9e242d20f948c0b68e958a7227bb2bd1b"
+    },
+    "features": {
+      "path": "docs/项目管理平台详细功能清单_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "fabfac73b480ccaf01aa831ae3c5d0a6485e33fff80f517468b2b6c52829ddfb"
+    },
+    "pages": {
+      "path": "docs/项目管理平台页面清单与原型设计说明_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "db1c548b5f5ef025eb90fef06422e132f003665fc7e6156dd706b7f095c994dc"
+    },
+    "brief": {
+      "path": "docs/项目管理平台高保真原型_AgentLoop开发任务书_V1.0.md",
+      "sha256": "286f917d5edc99a4a0c7da97515a3d6308cae7395fb287bbcd1846de60045b43"
+    }
+  },
+  "feature_references": {
+    "GS-016": {
+      "title": "调研任务创建",
+      "line": 65
+    },
+    "GS-017": {
+      "title": "调研记录",
+      "line": 66
+    },
+    "GS-018": {
+      "title": "解决方案编制",
+      "line": 67
+    },
+    "GS-019": {
+      "title": "方案版本管理",
+      "line": 68
+    },
+    "GS-020": {
+      "title": "售前交付范围确认",
+      "line": 69
+    },
+    "GS-021": {
+      "title": "技术可行性评估",
+      "line": 75
+    },
+    "GS-022": {
+      "title": "成本测算",
+      "line": 76
+    },
+    "GS-023": {
+      "title": "采购询价引用",
+      "line": 77
+    },
+    "GS-024": {
+      "title": "外包成本测算",
+      "line": 78
+    },
+    "GS-025": {
+      "title": "人力成本测算",
+      "line": 79
+    },
+    "GS-026": {
+      "title": "风险成本备注",
+      "line": 80
+    },
+    "GS-027": {
+      "title": "评审发起",
+      "line": 86
+    },
+    "GS-028": {
+      "title": "评审材料包",
+      "line": 87
+    },
+    "GS-029": {
+      "title": "专家意见填写",
+      "line": 88
+    },
+    "GS-030": {
+      "title": "评审结论",
+      "line": 89
+    },
+    "GS-031": {
+      "title": "整改闭环",
+      "line": 90
+    }
+  }
+}

@@ -32,13 +32,19 @@
   "integration_commit": "4bba520",
   "integration_commits": [
     "bde391a",
-    "4bba520"
+    "4bba520",
+    "57c2725",
+    "7a8613f",
+    "b73867e"
   ],
-  "formal_rounds": [],
-  "status": "integrated_pending_acceptance",
+  "formal_rounds": [
+    "R0025"
+  ],
+  "status": "accepted",
   "acceptance_checklist": [
     "current integration engineering checks",
     "formal browser observation and 1440x900/1280x900 screenshots",
     "formal Loop acceptance"
-  ]
+  ],
+  "next_action": "done; R0025 accepted on integration revision 7ff5d9c6"
 }

@@ -39,16 +39,16 @@
       "round": "R0020"
     },
     "GS-05": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0025"
     },
     "GS-06": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0025"
     },
     "GS-07": {
-      "status": "pending",
-      "reason": "新增回归测试复现四类数据契约失败，旧验收证据不足。"
+      "status": "done",
+      "round": "R0025"
     },
     "GS-08": {
       "status": "pending",
@@ -971,6 +971,42 @@
         ".pms-loop/runs/R0024/checks.json": "e8b5bb198c67710536744b429c452da02fe7034eb5d0c8429878fb4fa902ff8a",
         ".pms-loop/runs/R0024/evidence.json": "4705dc04371fc4781533102fac6e64148a79193353b8723d49eafdeda1e8750c"
       }
+    },
+    {
+      "id": "R0025",
+      "items": [
+        "GS-05",
+        "GS-06",
+        "GS-07"
+      ],
+      "started_at": "2026-09-10T11:56:52+00:00",
+      "status": "accepted",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-10T12:13:53+00:00",
+      "revision": "7ff5d9c6c8892b39619b5cbf3bbb8e1bb93e662e424073d5bec57dbce42df37b",
+      "proof": {
+        ".pms-loop/runs/R0025/typecheck.log": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+        ".pms-loop/runs/R0025/test-domain.log": "6389c497e1f3a46696f8201834d2b735690288a502cc1f57c7b453f16c4168bb",
+        ".pms-loop/runs/R0025/lint.log": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+        ".pms-loop/runs/R0025/build.log": "86aa8d34874a4780d2906ed4224fc13e283c7740079ecd446ae5265f19532c74",
+        ".pms-loop/runs/R0025/artifacts/r0024-fd61c1fe178e69c8118100464a56eaea996346f6.json": "1aa3b68574507b4238ca6ba3a0972229233c74499dc17d250a3131ade8008832",
+        ".pms-loop/runs/R0025/artifacts/r0024-fd61c1fe178e69c811813b725fd448b133fd33b1.json": "34b7cd5604321b9028c7a00d825318fc6b5221d91e727c4992793cf7b93906e0",
+        ".pms-loop/runs/R0025/artifacts/r0024-fd61c1fe178e69c8118154cd020dc505184b0748.json": "cfcfaf5c47e1ef9283aa508baa11402c081a518b09a19e8cb3517be60799a6fc",
+        ".pms-loop/runs/R0025/artifacts/browser.log": "8943df47cefaac922f2357b2d1b80f36febea2ec13d71368bdc62b1e66e70ad9",
+        ".pms-loop/runs/R0025/artifacts/GS-05-1440.png": "71aeef1a3e4fd2ac8c50b6556aabdf895b6531cfa30b37cbf7bce84f2db5acbb",
+        ".pms-loop/runs/R0025/artifacts/GS-05-1280.png": "a5992913be35463854ef0553a33b4e509fa9254b87dc180b007c99f16b063ffe",
+        ".pms-loop/runs/R0025/artifacts/GS-06-1440.png": "37c4df8960b1bf413ea85b814bde67ef8582f4caef4f4ede9bf3837cd14283b5",
+        ".pms-loop/runs/R0025/artifacts/GS-06-1280.png": "23385fc24ae9cfb0d4e02098c513b163faefa72b7e4872e1c9a7e26cb9f0d649",
+        ".pms-loop/runs/R0025/artifacts/GS-07-1440.png": "3286b9111f893a366938a86d770012c861a43958f4330b77eeaa212bb02fc207",
+        ".pms-loop/runs/R0025/artifacts/GS-07-1280.png": "3bf68456f046fe8efcc31603776153d2ea3868440e63ac4cd1d52b256800d1a6",
+        ".pms-loop/runs/R0025/checks.json": "86d769a4de22aa4b57d327148b1cf1f1356be47af1c99898fd0dce50b4f31cb4",
+        ".pms-loop/runs/R0025/evidence.json": "a6b1193538af353775d872ee9781dd2ad2ade9331b8f71b87d237adccd01b7b7"
+      }
     }
   ],
   "notes": [
@@ -1057,6 +1093,14 @@
     {
       "at": "2026-09-10T11:24:43+00:00",
       "text": "R0024已正式验收YS-13/14/15，累计33/72，无活动轮次。demo初始快照惰性构建并独立深拷贝，修复重复构建导致测试超时，未放宽时限；期望业务拒绝不再泄漏Promise控制台错误，统一前六个演示人员角色，启动页移除实现名。最终revision=d20df29c63407668d1bc927a43a9516a732e76c21a14f300144ccef463dccbd2，typecheck/lint/build及233领域测试通过；R24两份真实浏览器测试7/7通过，合同缺附件/回款不守恒、未签/缺基线/非法日期阻断，追加批准驳回、退出成本保留和启动执行链均核验。六张正式双宽截图已查看，通知角色正确，无console error；前置上游状态由统一transition准备，不冒充上游页面UI验收。旧失败日志与前版本截图保留attempts。R24-QA独占测试d394351范围检查后单向回收e20ab56，无冲突，支持任务已归档；B05已accepted。下一步继续验收已集成库存，按pipeline确认具体包依赖和acceptance_ready，不继续堆新页面。CF07收入/成本粒度及组织上下文仍待补齐；最终全量e2e与72页尚未完成。"
+    },
+    {
+      "at": "2026-09-10T12:01:03+00:00",
+      "text": "恢复开发：优化已提交eef434f；当前R0025验收GS05/06/07。主目录修复对象key隔离、预期业务拒绝处理、方案modifiedBy/At真实修改人；定向领域8测试与typecheck通过。PRESALES-QA首交付26007ab→57c2725，首轮浏览器只读/404通过，主链在成本科目Select定位器被显示值覆盖而超时（非业务断言失败）；子agent补真实403/不通过分支及Select定位器，等待增量交付。正式check尚未开始，evidence全部保持未通过。A01修复在/tmp/pms-opportunity-fix独立进行，范围仅三页及其e2e，合入前范围检查。系统Chromium通过PMS_BROWSER_EXECUTABLE=/usr/bin/chromium使用，重型测试由主线程串行。"
+    },
+    {
+      "at": "2026-09-10T12:14:09+00:00",
+      "text": "R0025已正式验收GS05/06/07，36/72；工程四项通过、3条浏览器场景通过，已查看两尺寸截图。接下来接入A01 0f1b49d与d8e92f1，验证GS01/03。"
     }
   ]
 }

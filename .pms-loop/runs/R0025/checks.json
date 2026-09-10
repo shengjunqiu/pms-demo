@@ -1,0 +1,53 @@
+{
+  "round": "R0025",
+  "revision": "7ff5d9c6c8892b39619b5cbf3bbb8e1bb93e662e424073d5bec57dbce42df37b",
+  "status": "passed",
+  "started_at": "2026-09-10T12:07:35+00:00",
+  "commands": {
+    "typecheck": {
+      "argv": [
+        "/home/shengjunqiu/.local/bin/pnpm",
+        "run",
+        "typecheck"
+      ],
+      "exit_code": 0,
+      "log": ".pms-loop/runs/R0025/typecheck.log",
+      "sha256": "1fbdfe4ea55827dc17fdd56e2cd1afa20a3e6522974603165f2848e9f0a73708",
+      "seconds": 20.03
+    },
+    "lint": {
+      "argv": [
+        "/home/shengjunqiu/.local/bin/pnpm",
+        "run",
+        "lint"
+      ],
+      "exit_code": 0,
+      "log": ".pms-loop/runs/R0025/lint.log",
+      "sha256": "943ce7b9fb122ab67240ee3df838b630d76e9cb287b9d746921c410de310a1cc",
+      "seconds": 9.63
+    },
+    "build": {
+      "argv": [
+        "/home/shengjunqiu/.local/bin/pnpm",
+        "run",
+        "build"
+      ],
+      "exit_code": 0,
+      "log": ".pms-loop/runs/R0025/build.log",
+      "sha256": "86aa8d34874a4780d2906ed4224fc13e283c7740079ecd446ae5265f19532c74",
+      "seconds": 31.38
+    },
+    "test:domain": {
+      "argv": [
+        "/home/shengjunqiu/.local/bin/pnpm",
+        "run",
+        "test:domain"
+      ],
+      "exit_code": 0,
+      "log": ".pms-loop/runs/R0025/test-domain.log",
+      "sha256": "6389c497e1f3a46696f8201834d2b735690288a502cc1f57c7b453f16c4168bb",
+      "seconds": 92.93
+    }
+  },
+  "finished_at": "2026-09-10T12:10:09+00:00"
+}

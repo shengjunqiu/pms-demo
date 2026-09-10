@@ -1,0 +1,263 @@
+{
+  "schema_version": 1,
+  "round": "R0025",
+  "revision": "7ff5d9c6c8892b39619b5cbf3bbb8e1bb93e662e424073d5bec57dbce42df37b",
+  "items": {
+    "GS-05": {
+      "entry": "/opportunities/OPP-NEW-74/solution",
+      "covered_features": [
+        "GS-016",
+        "GS-017",
+        "GS-018",
+        "GS-019",
+        "GS-020"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单第109行、任务书第398行；详细功能GS-016~020，原文定位见plan.json。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "同一 OPP-NEW-74 从方案进入成本、从整改返回方案并再测算；评审通过链接实际打开同商机 GS-08 概算。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "方案责任人赵工、参与人陈亮、计划时间、20接口范围/边界、架构、交付物及正式方案附件均回显。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "追加调研并保存方案；切换另一商机不带入表单，返回原商机恢复已保存内容；冻结后保存禁用，整改后修改架构并产生V2。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "首次方案版本 modifiedBy=赵工、submittedBy=李主任；复审后原方案和成本快照逐字段保持一致，任务变为已完成。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "客户经理只读，非协同技术人员三页均403，未知商机均404；第二商机方案为空且成本无第一商机明细。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已实际查看本轮1440×900及1280×900视口全页截图。方案表单双列正常；成本表在容器内横向滚动、操作列固定；评审两栏及历史表可读，无整页横向溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "正式3个浏览器场景全部通过；各报告 consoleErrors=[]（pageerror 与 console.error），预期业务拒绝展示提示。"
+        },
+        "business-1": {
+          "requirement": "调研、方案范围/架构/交付物与版本记录",
+          "passed": true,
+          "observation": "拟立项真实状态转换创建方案任务；UI追加客户调研，保存范围、架构、实施思路、交付物和文件，历史评审保留两个方案版本。"
+        },
+        "business-2": {
+          "requirement": "评审提交冻结版本；整改追加新版本和响应记录",
+          "passed": true,
+          "observation": "PMO提交冻结V1；技术专家提出整改并回复后修改架构，V2仍保留首轮快照及整改回复。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "追加调研并保存方案；切换另一商机不带入表单，返回原商机恢复已保存内容；冻结后保存禁用，整改后修改架构并产生V2。",
+          "expected": "PMO提交冻结V1；技术专家提出整改并回复后修改架构，V2仍保留首轮快照及整改回复。",
+          "observed": "首次方案版本 modifiedBy=赵工、submittedBy=李主任；复审后原方案和成本快照逐字段保持一致，任务变为已完成。"
+        },
+        {
+          "action": "客户经理、非协同技术人员分别访问三页，访问未知商机",
+          "expected": "只读/403/404与实体范围一致",
+          "observed": "客户经理只读，非协同技术人员三页均403，未知商机均404；第二商机方案为空且成本无第一商机明细。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0025/artifacts/r0024-fd61c1fe178e69c8118100464a56eaea996346f6.json",
+        ".pms-loop/runs/R0025/artifacts/r0024-fd61c1fe178e69c811813b725fd448b133fd33b1.json",
+        ".pms-loop/runs/R0025/artifacts/r0024-fd61c1fe178e69c8118154cd020dc505184b0748.json",
+        ".pms-loop/runs/R0025/artifacts/browser.log",
+        ".pms-loop/runs/R0025/test-domain.log"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0025/artifacts/GS-05-1440.png",
+        "1280": ".pms-loop/runs/R0025/artifacts/GS-05-1280.png"
+      }
+    },
+    "GS-06": {
+      "entry": "/opportunities/OPP-NEW-74/tech-cost",
+      "covered_features": [
+        "GS-021",
+        "GS-022",
+        "GS-023",
+        "GS-024",
+        "GS-025",
+        "GS-026"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单第110行、任务书第399行；详细功能GS-021~026，原文定位见plan.json。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "同一 OPP-NEW-74 从方案进入成本、从整改返回方案并再测算；评审通过链接实际打开同商机 GS-08 概算。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "技术可行性六类说明和风险已保存；采购行记录供应商、询价编号与有效期；人力行引用统一基准 RATE-PM-V1。外包共用统一科目与数量单价表单（源码核对，本轮UI演示人力及采购）。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "UI新增100人天和2套采购后保存；空财务意见被拒；补全意见才能发起评审；整改调整为110人天后需重新财务确认。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "人天0.144万元，100人天14.40；采购2×10×1.13=22.60；合计37.00。110人天后38.44，GS07冻结金额一致，首轮37.00不变。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "客户经理只读，非协同技术人员三页均403，未知商机均404；第二商机方案为空且成本无第一商机明细。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已实际查看本轮1440×900及1280×900视口全页截图。方案表单双列正常；成本表在容器内横向滚动、操作列固定；评审两栏及历史表可读，无整页横向溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "正式3个浏览器场景全部通过；各报告 consoleErrors=[]（pageerror 与 console.error），预期业务拒绝展示提示。"
+        },
+        "business-1": {
+          "requirement": "技术可行性、采购询价、人力/外包成本与风险假设",
+          "passed": true,
+          "observation": "技术架构、复用、定制、环境、安全、依赖与风险录入；人力基准和采购询价含税換算已验证，统一科目支持外包。"
+        },
+        "business-2": {
+          "requirement": "数量单价汇总、统一科目/成本基准、范围与测算关联",
+          "passed": true,
+          "observation": "方案架构修改后显示范围关联失效，保存新成本清空财务确认；重新核对后新评审绑定新方案及38.44万元成本快照。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "UI新增100人天和2套采购后保存；空财务意见被拒；补全意见才能发起评审；整改调整为110人天后需重新财务确认。",
+          "expected": "方案架构修改后显示范围关联失效，保存新成本清空财务确认；重新核对后新评审绑定新方案及38.44万元成本快照。",
+          "observed": "人天0.144万元，100人天14.40；采购2×10×1.13=22.60；合计37.00。110人天后38.44，GS07冻结金额一致，首轮37.00不变。"
+        },
+        {
+          "action": "客户经理、非协同技术人员分别访问三页，访问未知商机",
+          "expected": "只读/403/404与实体范围一致",
+          "observed": "客户经理只读，非协同技术人员三页均403，未知商机均404；第二商机方案为空且成本无第一商机明细。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0025/artifacts/r0024-fd61c1fe178e69c8118100464a56eaea996346f6.json",
+        ".pms-loop/runs/R0025/artifacts/r0024-fd61c1fe178e69c811813b725fd448b133fd33b1.json",
+        ".pms-loop/runs/R0025/artifacts/r0024-fd61c1fe178e69c8118154cd020dc505184b0748.json",
+        ".pms-loop/runs/R0025/artifacts/browser.log",
+        ".pms-loop/runs/R0025/test-domain.log"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0025/artifacts/GS-06-1440.png",
+        "1280": ".pms-loop/runs/R0025/artifacts/GS-06-1280.png"
+      }
+    },
+    "GS-07": {
+      "entry": "/opportunities/OPP-NEW-74/review",
+      "covered_features": [
+        "GS-027",
+        "GS-028",
+        "GS-029",
+        "GS-030",
+        "GS-031"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单第111行、任务书第400行；详细功能GS-027~031，原文定位见plan.json。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "同一 OPP-NEW-74 从方案进入成本、从整改返回方案并再测算；评审通过链接实际打开同商机 GS-08 概算。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "材料包展示来源商机、冻结方案/成本、模板、专家与轮次；两位专家独立意见2/2、整改责任人赵工及2026-09-20截止日可读。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "意见未齐全综合通过被拒；技术整改、财务通过后PMO形成整改；回复并修改后复审通过。独立分支PMO不通过，概算生成被拒。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "两轮方案/成本ID成对保留，首轮快照不变；复审通过完成方案任务。不通过保留专家原意见与双快照且没有概算草稿/版本。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "客户经理只读，非协同技术人员三页均403，未知商机均404；第二商机方案为空且成本无第一商机明细。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已实际查看本轮1440×900及1280×900视口全页截图。方案表单双列正常；成本表在容器内横向滚动、操作列固定；评审两栏及历史表可读，无整页横向溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "正式3个浏览器场景全部通过；各报告 consoleErrors=[]（pageerror 与 console.error），预期业务拒绝展示提示。"
+        },
+        "business-1": {
+          "requirement": "材料包、各专家独立意见、当前轮次与通过/整改/不通过",
+          "passed": true,
+          "observation": "真实UI发起评审冻结材料，两位专家分别提交；综合意见覆盖整改后复审、通过、不通过三种结论；旧轮次只能查看。"
+        },
+        "business-2": {
+          "requirement": "整改必填事项责任人截止日，新轮次保留原评审和方案版本",
+          "passed": true,
+          "observation": "整改事项、责任人、截止日及回复保存在首轮，新材料才能复审；领域测试验证缺整改、缺回复及仅改说明不能绕过门禁。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "意见未齐全综合通过被拒；技术整改、财务通过后PMO形成整改；回复并修改后复审通过。独立分支PMO不通过，概算生成被拒。",
+          "expected": "整改事项、责任人、截止日及回复保存在首轮，新材料才能复审；领域测试验证缺整改、缺回复及仅改说明不能绕过门禁。",
+          "observed": "两轮方案/成本ID成对保留，首轮快照不变；复审通过完成方案任务。不通过保留专家原意见与双快照且没有概算草稿/版本。"
+        },
+        {
+          "action": "客户经理、非协同技术人员分别访问三页，访问未知商机",
+          "expected": "只读/403/404与实体范围一致",
+          "observed": "客户经理只读，非协同技术人员三页均403，未知商机均404；第二商机方案为空且成本无第一商机明细。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0025/artifacts/r0024-fd61c1fe178e69c8118100464a56eaea996346f6.json",
+        ".pms-loop/runs/R0025/artifacts/r0024-fd61c1fe178e69c811813b725fd448b133fd33b1.json",
+        ".pms-loop/runs/R0025/artifacts/r0024-fd61c1fe178e69c8118154cd020dc505184b0748.json",
+        ".pms-loop/runs/R0025/artifacts/browser.log",
+        ".pms-loop/runs/R0025/test-domain.log"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0025/artifacts/GS-07-1440.png",
+        "1280": ".pms-loop/runs/R0025/artifacts/GS-07-1280.png"
+      }
+    }
+  }
+}

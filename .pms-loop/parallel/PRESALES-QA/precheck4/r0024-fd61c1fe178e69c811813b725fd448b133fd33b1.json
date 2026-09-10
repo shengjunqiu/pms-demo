@@ -1,0 +1,267 @@
+{
+  "title": "GS-05/06/07 调研、数量单价、财务核对、冻结评审、整改复审及旧快照",
+  "status": "passed",
+  "url": "http://127.0.0.1:4179/opportunities/OPP-NEW-74/estimate",
+  "consoleErrors": [],
+  "observations": {
+    "id": "OPP-NEW-74",
+    "screenshots": {
+      "solution": {
+        "1280": "/home/shengjunqiu/code/pms-demo/.pms-loop/parallel/PRESALES-QA/precheck4/GS-05-1280.png",
+        "1440": "/home/shengjunqiu/code/pms-demo/.pms-loop/parallel/PRESALES-QA/precheck4/GS-05-1440.png"
+      },
+      "cost": {
+        "1280": "/home/shengjunqiu/code/pms-demo/.pms-loop/parallel/PRESALES-QA/precheck4/GS-06-1280.png",
+        "1440": "/home/shengjunqiu/code/pms-demo/.pms-loop/parallel/PRESALES-QA/precheck4/GS-06-1440.png"
+      },
+      "corrections": {
+        "1280": "/home/shengjunqiu/code/pms-demo/.pms-loop/parallel/PRESALES-QA/precheck4/GS-07-corrections-1280.png",
+        "1440": "/home/shengjunqiu/code/pms-demo/.pms-loop/parallel/PRESALES-QA/precheck4/GS-07-corrections-1440.png"
+      },
+      "review": {
+        "1280": "/home/shengjunqiu/code/pms-demo/.pms-loop/parallel/PRESALES-QA/precheck4/GS-07-1280.png",
+        "1440": "/home/shengjunqiu/code/pms-demo/.pms-loop/parallel/PRESALES-QA/precheck4/GS-07-1440.png"
+      }
+    },
+    "firstCost": 37,
+    "secondCost": 38.44,
+    "reviewRounds": [
+      {
+        "templateSnapshot": {
+          "id": "TPL-REVIEW-2-V1",
+          "key": "TPL-REVIEW-2",
+          "version": 1,
+          "name": "方案专家评审",
+          "status": "已发布",
+          "enabled": true,
+          "effectiveDate": "2026-01-01",
+          "orgId": "all",
+          "projectType": "all",
+          "changeReason": "初始演示规则",
+          "createdBy": "集团PMO",
+          "createdAt": "2026-01-01",
+          "publishedBy": "集团PMO",
+          "publishedAt": "2026-01-01",
+          "kind": "expert-review",
+          "level": "all",
+          "rows": [
+            {
+              "id": "item-1",
+              "name": "方案合理性",
+              "phase": "评审",
+              "required": true,
+              "systemRequired": true,
+              "role": "solution-tech",
+              "timing": "提交前",
+              "weight": 1
+            },
+            {
+              "id": "item-2",
+              "name": "技术可行性",
+              "phase": "评审",
+              "required": true,
+              "systemRequired": false,
+              "role": "solution-tech",
+              "timing": "提交前",
+              "weight": 1
+            },
+            {
+              "id": "item-3",
+              "name": "成本合理性",
+              "phase": "评审",
+              "required": true,
+              "systemRequired": false,
+              "role": "finance",
+              "timing": "提交前",
+              "weight": 1
+            },
+            {
+              "id": "item-4",
+              "name": "交付风险",
+              "phase": "评审",
+              "required": true,
+              "systemRequired": false,
+              "role": "solution-tech",
+              "timing": "提交前",
+              "weight": 1
+            }
+          ]
+        },
+        "id": "REVIEW-OPP-NEW-74-1",
+        "round": 1,
+        "solutionVersionId": "SOL-OPP-NEW-74-V1",
+        "costVersionId": "TECH-OPP-NEW-74-V1",
+        "status": "整改后复审",
+        "method": "线上专家评审会",
+        "plannedDate": "2026-09-10",
+        "experts": [
+          {
+            "userId": "U-005",
+            "name": "赵工",
+            "role": "solution-tech",
+            "dimension": "方案合理性、技术可行性、交付风险"
+          },
+          {
+            "userId": "U-004",
+            "name": "刘敏",
+            "role": "finance",
+            "dimension": "成本合理性"
+          }
+        ],
+        "opinions": [
+          {
+            "userId": "U-005",
+            "by": "赵工",
+            "role": "solution-tech",
+            "dimension": "方案合理性、技术可行性、交付风险",
+            "conclusion": "整改",
+            "opinion": "方案架构师独立核对：补充接口鉴权与人力投入",
+            "attachment": "",
+            "date": "2026-09-09"
+          },
+          {
+            "userId": "U-004",
+            "by": "刘敏",
+            "role": "finance",
+            "dimension": "成本合理性",
+            "conclusion": "通过",
+            "opinion": "财务专员独立核对：方案与成本合理，同意通过",
+            "attachment": "",
+            "date": "2026-09-09"
+          }
+        ],
+        "createdAt": "2026-09-09",
+        "createdBy": "李主任",
+        "corrections": [
+          {
+            "ownerId": "U-005",
+            "dueDate": "2026-09-20",
+            "item": "补充接口鉴权设计与10人天投入",
+            "id": "CORRECTION-REVIEW-OPP-NEW-74-1-1",
+            "ownerName": "赵工",
+            "replies": [
+              {
+                "response": "已补充接口鉴权与10人天投入，申请复审",
+                "attachment": "",
+                "date": "2026-09-09",
+                "by": "赵工"
+              }
+            ]
+          }
+        ],
+        "conclusionReason": "补充鉴权设计与投入后复审",
+        "decidedAt": "2026-09-09"
+      },
+      {
+        "templateSnapshot": {
+          "id": "TPL-REVIEW-2-V1",
+          "key": "TPL-REVIEW-2",
+          "version": 1,
+          "name": "方案专家评审",
+          "status": "已发布",
+          "enabled": true,
+          "effectiveDate": "2026-01-01",
+          "orgId": "all",
+          "projectType": "all",
+          "changeReason": "初始演示规则",
+          "createdBy": "集团PMO",
+          "createdAt": "2026-01-01",
+          "publishedBy": "集团PMO",
+          "publishedAt": "2026-01-01",
+          "kind": "expert-review",
+          "level": "all",
+          "rows": [
+            {
+              "id": "item-1",
+              "name": "方案合理性",
+              "phase": "评审",
+              "required": true,
+              "systemRequired": true,
+              "role": "solution-tech",
+              "timing": "提交前",
+              "weight": 1
+            },
+            {
+              "id": "item-2",
+              "name": "技术可行性",
+              "phase": "评审",
+              "required": true,
+              "systemRequired": false,
+              "role": "solution-tech",
+              "timing": "提交前",
+              "weight": 1
+            },
+            {
+              "id": "item-3",
+              "name": "成本合理性",
+              "phase": "评审",
+              "required": true,
+              "systemRequired": false,
+              "role": "finance",
+              "timing": "提交前",
+              "weight": 1
+            },
+            {
+              "id": "item-4",
+              "name": "交付风险",
+              "phase": "评审",
+              "required": true,
+              "systemRequired": false,
+              "role": "solution-tech",
+              "timing": "提交前",
+              "weight": 1
+            }
+          ]
+        },
+        "id": "REVIEW-OPP-NEW-74-2",
+        "round": 2,
+        "solutionVersionId": "SOL-OPP-NEW-74-V2",
+        "costVersionId": "TECH-OPP-NEW-74-V2",
+        "status": "通过",
+        "method": "线上专家评审会",
+        "plannedDate": "2026-09-10",
+        "experts": [
+          {
+            "userId": "U-005",
+            "name": "赵工",
+            "role": "solution-tech",
+            "dimension": "方案合理性、技术可行性、交付风险"
+          },
+          {
+            "userId": "U-004",
+            "name": "刘敏",
+            "role": "finance",
+            "dimension": "成本合理性"
+          }
+        ],
+        "opinions": [
+          {
+            "userId": "U-005",
+            "by": "赵工",
+            "role": "solution-tech",
+            "dimension": "方案合理性、技术可行性、交付风险",
+            "conclusion": "通过",
+            "opinion": "方案架构师独立核对：方案与成本合理，同意通过",
+            "attachment": "",
+            "date": "2026-09-09"
+          },
+          {
+            "userId": "U-004",
+            "by": "刘敏",
+            "role": "finance",
+            "dimension": "成本合理性",
+            "conclusion": "通过",
+            "opinion": "财务专员独立核对：方案与成本合理，同意通过",
+            "attachment": "",
+            "date": "2026-09-09"
+          }
+        ],
+        "createdAt": "2026-09-09",
+        "createdBy": "李主任",
+        "corrections": [],
+        "conclusionReason": "两位专家一致通过，进入概算",
+        "decidedAt": "2026-09-09"
+      }
+    ]
+  }
+}

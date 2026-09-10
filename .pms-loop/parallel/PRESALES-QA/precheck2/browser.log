@@ -1,0 +1,41 @@
+[WebServer] (node:2611533) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2611611) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:2611645) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 e2e/presales.spec.ts:104:1 › GS-05/06/07 调研、数量单价、财务核对、冻结评审、整改复审及旧快照 (23.6s)
+(node:2612069) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 e2e/presales.spec.ts:194:1 › GS-05/06/07 客户经理只读、非协同技术人员403、错误商机404 (13.5s)
+  ✓  3 e2e/presales.spec.ts:220:1 › GS-07 PMO不通过结论保留双版本且不能承接概算 (19.0s)
+
+
+  1) e2e/presales.spec.ts:104:1 › GS-05/06/07 调研、数量单价、财务核对、冻结评审、整改复审及旧快照 ───────────────────────────
+
+    Error: locator.click: Error: strict mode violation: locator('.ant-select-dropdown:visible').getByText('不含税', { exact: true }) resolved to 2 elements:
+        1) <div role="option" aria-label="不含税" id="taxBasis_list_1" aria-selected="false">不含税</div> aka getByRole('option', { name: '不含税' })
+        2) <div class="ant-select-item-option-content">不含税</div> aka getByText('不含税').nth(1)
+
+    Call log:
+      - waiting for locator('.ant-select-dropdown:visible').getByText('不含税', { exact: true })
+
+
+      51 |   const input = container.getByLabel(label, { exact: true });
+      52 |   await input.focus(); await input.press('ArrowDown');
+    > 53 |   await page.locator('.ant-select-dropdown:visible').getByText(option, { exact: true }).click();
+         |                                                                                         ^
+      54 | }
+      55 | async function confirm(page: Page) {
+      56 |   await page.locator('.ant-modal-confirm:visible').getByRole('button', { name: /确\s*定/ }).click();
+        at choose (/home/shengjunqiu/code/pms-demo/e2e/presales.spec.ts:53:89)
+        at /home/shengjunqiu/code/pms-demo/e2e/presales.spec.ts:135:46
+
+    Error Context: test-results/presales-GS-05-06-07-调研、数量单价、财务核对、冻结评审、整改复审及旧快照/error-context.md
+
+  1 failed
+    e2e/presales.spec.ts:104:1 › GS-05/06/07 调研、数量单价、财务核对、冻结评审、整改复审及旧快照 ────────────────────────────
+  2 passed (1.0m)
