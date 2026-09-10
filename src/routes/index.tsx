@@ -1,3 +1,4 @@
+import { budgetRoutes } from '@/routes/modules/budget';
 import { settlementRoutes } from '@/routes/modules/settlement';
 import { opportunityRoutes } from '@/routes/modules/opportunities';
 import { ProjectManagerWorkbenchPage } from '@/pages/workbench/ProjectManagerWorkbenchPage';
@@ -38,6 +39,7 @@ export const AppRouter: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<MainLayout />}>
+        {budgetRoutes.map(route=><Route key={route.path} path={route.path} element={route.element}/>)}
         {/* 默认重定向到驾驶舱 */}
         <Route index element={<RoleHome />} />
         <Route path="/routes-manifest" element={<RoutesManifestPage />} />
@@ -76,6 +78,7 @@ export const AppRouter: React.FC = () => {
         {PAGE_MANIFEST.map((item) => {
           const relativeRoute = item.route.startsWith('/') ? item.route.slice(1) : item.route;
           // 跳过已实现的页面
+          if (budgetRoutes.some(r=>r.path===relativeRoute)) return null;
           if (settlementRoutes.some(r=>r.path===relativeRoute)) return null;
           if (opportunityRoutes.some(r=>r.path===relativeRoute)) return null;
           if (['workbench/project-manager', 'projects/:id/stage-switch', 'projects/:id/labor-cost', 'projects/:id/daily-reports', 'projects/:id/weekly-reports', 'projects/:id/deliverables', 'projects/:id/procurement', 'projects/:id/outsourcing', 'projects/:id/expenses', 'requirements-bugs', 'requirements-bugs/:id', 'issues-risks', 'issues-risks/:id', 'workbench/todos', 'projects/:id/progress', 'projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/four-calculations', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions', 'executive/decisions'].includes(relativeRoute)) {

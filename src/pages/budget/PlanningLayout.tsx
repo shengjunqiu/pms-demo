@@ -1,0 +1,8 @@
+import { Alert, Button, Descriptions, Space, Tag } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { PageHeader } from '@/components/common/PageHeader';
+import { usePlanning } from './usePlanning';
+export function PlanningHeader({title,context}:{title:string;context:ReturnType<typeof usePlanning>}){
+ const navigate=useNavigate();const {project:p,draft,frozen}=context;if(!p)return null;
+ return <><PageHeader title={title} description={`${p.id} · ${p.name}`} breadcrumbs={[{title:'首页',href:'/'},{title:p.name,href:`/projects/${p.id}`},{title}]} extra={<Button onClick={()=>navigate(-1)}>返回</Button>}/><Descriptions bordered size="small" column={3} items={[{key:'phase',label:'项目阶段',children:`${p.phase} / ${p.subPhase}`},{key:'pm',label:'项目经理',children:p.pmName},{key:'version',label:'计划版本',children:<Tag color={frozen?'blue':'orange'}>{frozen?p.currentBaselineVersion:`草稿修订 ${draft?.revision} · ${draft?.status}`}</Tag>},{key:'date',label:'批准总周期',children:`${p.plannedStartDate} ~ ${p.plannedEndDate}`},{key:'baseline',label:'生效基线',children:p.currentBaselineVersion},{key:'state',label:'合同',children:p.isUnsigned?'已立项未签':'已签订'}]}/><Space wrap style={{margin:'16px 0'}}>{[['wbs','WBS计划'],['milestones','里程碑计划'],['plan-review','计划评审']].map(([path,label])=><Button key={path} onClick={()=>navigate(`/projects/${p.id}/${path}`)}>{label}</Button>)}<Button onClick={()=>navigate('/projects/P-PLAN-001/wbs')}>进入新项目策划</Button></Space>{frozen&&<Alert style={{marginBottom:16}} showIcon type="info" message="当前计划已随基线冻结，调整须提交项目变更" description="执行完成率、实际日期由项目进度维护；本页展示计划字段。" action={<Button onClick={()=>navigate(`/project-changes/new?projectId=${p.id}`)}>进入项目变更</Button>}/>}</>;
+}
