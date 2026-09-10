@@ -8,6 +8,12 @@ import {
 import { AS_OF_DATE } from "@/mock";
 import { closeChecks } from "@/mock/operations";
 import { settlementSnapshot } from "@/mock/settlement";
+import { selectFourCalculations, selectReceipts } from "@/mock/selectors";
+import {
+  canAccessAction,
+  canAccessPage,
+  selectAccessPolicy,
+} from "@/mock/configuration-access";
 import { ARCHIVE_CATEGORIES } from "@/models/closeout";
 import type { ReceiptAction } from "@/models/receipts";
 const finance: Actor = { id: "U-004", name: "刘敏", role: "finance" };
@@ -186,6 +192,79 @@ describe("真实收款与合同计划单一实收", () => {
     expect(next.receiptRecords[0].amount).toBe(0.000001);
     expect(next.receiptRecords[0].receivedDate).toBe("2026-09-01");
   });
+  it("经营分析沿用四算建设口径，回款和运维成本不会改写结算成本", () => {
+    let s = createBusinessState();
+    const p = s.projects.find((p) => p.id === "P-006")!;
+    const calc = selectFourCalculations(p, s);
+    const snapshot = settlementSnapshot(s, p.id);
+    const receiptSummary = selectReceipts([p], s);
+    expect(snapshot.income).toBe(calc.income);
+    expect(snapshot.cost).toBe(calc.actual);
+    expect(snapshot.receipts).toBe(receiptSummary.paid);
+    expect(snapshot.receivable).toBe(receiptSummary.outstanding);
+    expect(snapshot.overdue).toBe(receiptSummary.overdue);
+    expect(
+      snapshot.subjects.map((subject) => ({
+        id: subject.subjectId,
+        actual: subject.actual,
+      })),
+    ).toEqual(
+      calc.subjects.map((subject) => ({
+        id: subject.subjectId,
+        actual: subject.actual,
+      })),
+    );
+
+    const plan = s.receiptPlans.find((plan) => plan.projectId === p.id)!;
+    const contract = s.contracts.find((contract) => contract.projectId === p.id)!;
+    const duplicated = structuredClone(s);
+    duplicated.receiptPlans.push(structuredClone(plan));
+    duplicated.contracts.push(structuredClone(contract));
+    const deDuplicated = selectReceipts([p], duplicated);
+    expect(deDuplicated.plans.filter((item) => item.id === plan.id)).toHaveLength(
+      1,
+    );
+    expect(
+      deDuplicated.contracts.filter((item) => item.id === contract.id),
+    ).toHaveLength(1);
+    expect(deDuplicated.paid).toBe(receiptSummary.paid);
+    expect(deDuplicated.outstanding).toBe(receiptSummary.outstanding);
+
+    const constructionBefore = structuredClone(selectFourCalculations(p, s));
+    s.maintenanceCosts.push({
+      ...structuredClone(s.costs.find((cost) => cost.projectId === p.id)!),
+      id: "OPS-COST-P006",
+      sourceId: "OPS-SOURCE-P006",
+      amount: 88,
+      description: "运维周期费用，不进入建设期四算",
+    });
+    expect(selectFourCalculations(p, s)).toEqual(constructionBefore);
+    expect(settlementSnapshot(s, p.id).cost).toBe(snapshot.cost);
+
+    s = transition(s, receipt(s, 100), finance);
+    expect(selectFourCalculations(p, s)).toEqual(constructionBefore);
+    expect(settlementSnapshot(s, p.id).receipts).toBe(
+      receiptSummary.paid + 100,
+    );
+  });
+  it("收款动作策略可收紧但JS08只读下钻保持可访问", () => {
+    const s = createBusinessState();
+    expect(canAccessPage(s, finance, "JS-08")).toBe(true);
+    expect(canAccessAction(s, finance, "confirm-project-receipt", "P-006")).toBe(
+      true,
+    );
+    expect(canAccessAction(s, pm, "confirm-project-receipt", "P-006")).toBe(
+      false,
+    );
+    const policy = selectAccessPolicy(s, "finance")!;
+    policy.actions = policy.actions.filter(
+      (action) => action !== "confirm-project-receipt",
+    );
+    expect(canAccessPage(s, finance, "JS-08")).toBe(true);
+    expect(canAccessAction(s, finance, "confirm-project-receipt", "P-006")).toBe(
+      false,
+    );
+  });
   it("归档及历史关闭后仍能收真实欠款，结算档案关闭和建设成本不改", () => {
     const s = createBusinessState();
     const id = "P-008";
@@ -256,8 +335,9 @@ describe("真实收款与合同计划单一实收", () => {
       requestId: "TEST-REVIEW",
       reason: "财务核算中",
     };
+    const beforeChecks = closeChecks(s, "P-006");
     const check = () =>
-      closeChecks(s, "P-006").find((c) => c.label === "合同及回款计划应收结清");
+      beforeChecks.find((c) => c.label === "合同及回款计划应收结清");
     expect(check()?.ok).toBe(false);
     const next = transition(s, receipt(s, 1023), finance);
     const c = next.contracts.find((c) => c.projectId === "P-006")!;
@@ -268,7 +348,17 @@ describe("真实收款与合同计划单一实收", () => {
         (c) => c.label === "合同及回款计划应收结清",
       )?.ok,
     ).toBe(true);
-    expect(closeChecks(next, "P-006").some((c) => !c.ok)).toBe(true);
+    const afterChecks = closeChecks(next, "P-006");
+    expect(afterChecks.some((c) => !c.ok)).toBe(true);
+    expect(
+      afterChecks
+        .filter((c) => c.label !== "合同及回款计划应收结清")
+        .map((c) => ({ label: c.label, ok: c.ok })),
+    ).toEqual(
+      beforeChecks
+        .filter((c) => c.label !== "合同及回款计划应收结清")
+        .map((c) => ({ label: c.label, ok: c.ok })),
+    );
     expect(next.constructionFreezes).toEqual(s.constructionFreezes);
     expect(next.projects).toEqual(s.projects);
   });

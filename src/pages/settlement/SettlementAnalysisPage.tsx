@@ -27,7 +27,11 @@ import { PageHeader } from "@/components/common/PageHeader";
 import { StateView } from "@/components/common/StateView";
 import { MoneyText } from "@/components/common/MoneyText";
 import { useBusinessStore } from "@/mock/business";
-import { selectFourCalculations, visibleProjects } from "@/mock/selectors";
+import {
+  selectFourCalculations,
+  selectReceipts,
+  visibleProjects,
+} from "@/mock/selectors";
 import { settlementSnapshot } from "@/mock/settlement";
 import { useAppStore } from "@/store/useAppStore";
 import { AS_OF_DATE } from "@/mock";
@@ -66,6 +70,8 @@ export function SettlementAnalysisPage({
   const [editing, setEditing] = useState(false);
   const [rows, setRows] = useState<SettlementAnalysis[]>([]);
   const [search, setSearch] = useState("");
+  const [selectedPlanId, setSelectedPlanId] = useState<string>();
+  const [selectedReceiptId, setSelectedReceiptId] = useState<string>();
   const p = data.projects.find((p) => p.id === id);
   if (!p) return <StateView type="404" />;
   if (
@@ -90,20 +96,22 @@ export function SettlementAnalysisPage({
     (currentRole === "pmo" ||
       currentRole === "finance" ||
       (currentRole === "project-manager" && currentUser.id === p.pmId));
-  const paid = sumMoney(
-    data.receiptPlans
-      .filter((r) => r.projectId === p.id)
-      .map((r) => r.paidAmount),
+  // Use the same canonical, de-duplicated contract/plan set as portfolio receipt totals.
+  const receiptSummary = selectReceipts([p], data);
+  const receiptPlans = receiptSummary.plans;
+  const paid = receiptSummary.paid;
+  const receivable = receiptSummary.outstanding;
+  const overdue = receiptSummary.overdue;
+  const selectedPlan = receiptPlans.find((r) => r.id === selectedPlanId);
+  const selectedPlanContract = receiptSummary.contracts.find(
+    (c) => c.id === selectedPlan?.contractId,
   );
-  const receivable = sumMoney(
-    data.receiptPlans
-      .filter((r) => r.projectId === p.id)
-      .map((r) => r.amount - r.paidAmount),
-  );
-  const overdue = sumMoney(
-    data.receiptPlans
-      .filter((r) => r.projectId === p.id && r.dueDate <= AS_OF_DATE)
-      .map((r) => r.amount - r.paidAmount),
+  const selectedPlanReceipts = data.receiptRecords.filter(
+    (record) =>
+      record.projectId === p.id &&
+      record.allocations.some(
+        (allocation) => allocation.receiptPlanId === selectedPlan?.id,
+      ),
   );
   const subjects = snapshot.subjects.map((s) => ({
     ...s,
@@ -483,26 +491,24 @@ export function SettlementAnalysisPage({
                         </Col>
                       </Row>
                       <p>合同回款完成率</p>
-                      <Progress
-                        percent={
-                          percentage(
-                            paid,
-                            sumMoney(
-                              data.receiptPlans
-                                .filter((r) => r.projectId === p.id)
-                                .map((r) => r.amount),
-                            ),
-                          ) ?? 0
-                        }
-                      />
+                      <Progress percent={receiptSummary.completion ?? 0} />
                       <Table
                         rowKey="id"
                         size="small"
-                        dataSource={data.receiptPlans.filter(
-                          (r) => r.projectId === p.id,
-                        )}
+                        dataSource={receiptPlans}
                         columns={[
-                          { title: "回款计划原单", dataIndex: "id" },
+                          {
+                            title: "回款计划原单",
+                            dataIndex: "id",
+                            render: (value: string) => (
+                              <Button
+                                type="link"
+                                onClick={() => setSelectedPlanId(value)}
+                              >
+                                {value}
+                              </Button>
+                            ),
+                          },
                           { title: "节点", dataIndex: "title" },
                           { title: "应收", dataIndex: "amount" },
                           { title: "已收", dataIndex: "paidAmount" },
@@ -530,7 +536,11 @@ export function SettlementAnalysisPage({
                         ]}
                       />
                     </Card>
-                    <ReceiptPanel projectId={p.id} />
+                    <ReceiptPanel
+                      projectId={p.id}
+                      selectedReceiptId={selectedReceiptId}
+                      onSelectReceipt={setSelectedReceiptId}
+                    />
                   </>
                 ),
               },
@@ -675,6 +685,105 @@ export function SettlementAnalysisPage({
           />
         </>
       )}
+      <Drawer
+        title="只读回款计划原单与收款来源"
+        width={820}
+        open={!!selectedPlan}
+        onClose={() => setSelectedPlanId(undefined)}
+      >
+        {selectedPlan && (
+          <>
+            <Descriptions
+              bordered
+              column={2}
+              items={[
+                {
+                  key: "plan",
+                  label: "回款计划原单",
+                  children: selectedPlan.id,
+                },
+                {
+                  key: "contract",
+                  label: "客户合同",
+                  children: selectedPlanContract
+                    ? `${selectedPlanContract.code} · ${selectedPlanContract.name}`
+                    : selectedPlan.contractId,
+                },
+                {
+                  key: "title",
+                  label: "回款节点",
+                  children: selectedPlan.title,
+                },
+                {
+                  key: "due",
+                  label: "到期日",
+                  children: selectedPlan.dueDate,
+                },
+                {
+                  key: "amount",
+                  label: "计划应收",
+                  children: <MoneyText value={selectedPlan.amount} />,
+                },
+                {
+                  key: "paid",
+                  label: "当前实收",
+                  children: <MoneyText value={selectedPlan.paidAmount} />,
+                },
+              ]}
+            />
+            <Alert
+              showIcon
+              type="info"
+              style={{ marginTop: 16 }}
+              message="历史导入实收与本系统新增流水分开追溯；新增流水可继续查看不可变收款原单。"
+            />
+            <Table
+              style={{ marginTop: 12 }}
+              rowKey="id"
+              size="small"
+              pagination={false}
+              dataSource={selectedPlanReceipts}
+              locale={{ emptyText: "当前节点只有历史导入实收，尚无本系统新增流水" }}
+              columns={[
+                {
+                  title: "原流水编号",
+                  render: (_, record) => (
+                    <Button
+                      type="link"
+                      onClick={() => {
+                        setSelectedPlanId(undefined);
+                        setSelectedReceiptId(record.id);
+                      }}
+                    >
+                      {record.sourceNo}
+                    </Button>
+                  ),
+                },
+                { title: "收款日期", dataIndex: "receivedDate" },
+                {
+                  title: "分配至本节点",
+                  render: (_, record) => (
+                    <MoneyText
+                      value={sumMoney(
+                        record.allocations
+                          .filter(
+                            (allocation) =>
+                              allocation.receiptPlanId === selectedPlan.id,
+                          )
+                          .map((allocation) => allocation.amount),
+                      )}
+                    />
+                  ),
+                },
+                {
+                  title: "凭据",
+                  render: (_, record) => record.evidenceFiles.join("、"),
+                },
+              ]}
+            />
+          </>
+        )}
+      </Drawer>
       <Modal
         title="维护四算差异归因"
         width={900}
@@ -770,21 +879,30 @@ export function SettlementAnalysisPage({
   );
 }
 
-function ReceiptPanel({ projectId }: { projectId: string }) {
+function ReceiptPanel({
+  projectId,
+  selectedReceiptId,
+  onSelectReceipt,
+}: {
+  projectId: string;
+  selectedReceiptId?: string;
+  onSelectReceipt: (id?: string) => void;
+}) {
   const { data, dispatch } = useBusinessStore();
   const { currentRole, currentUser } = useAppStore();
   const { canDo } = useActionAccess();
   const { message } = App.useApp();
   const [draft, setDraft] =
     useState<Omit<ReceiptAction, "type" | "projectId">>();
-  const [selected, setSelected] = useState<string>();
   const [query, setQuery] = useState("");
-  const contracts = data.contracts.filter((c) => c.projectId === projectId);
+  const project = data.projects.find((p) => p.id === projectId);
+  const receiptSummary = selectReceipts(project ? [project] : [], data);
+  const contracts = receiptSummary.contracts;
   const records = data.receiptRecords.filter((r) => r.projectId === projectId);
-  const record = records.find((r) => r.id === selected);
+  const record = records.find((r) => r.id === selectedReceiptId);
   const contract = contracts.find((c) => c.id === draft?.contractId);
-  const plans = data.receiptPlans.filter(
-    (p) => p.projectId === projectId && p.contractId === draft?.contractId,
+  const plans = receiptSummary.plans.filter(
+    (p) => p.contractId === draft?.contractId,
   );
   const total = sumMoney(draft?.allocations.map((a) => a.amount) ?? []);
   const finance =
@@ -913,7 +1031,7 @@ function ReceiptPanel({ projectId }: { projectId: string }) {
               title: "原流水编号",
               dataIndex: "sourceNo",
               render: (v, r) => (
-                <Button type="link" onClick={() => setSelected(r.id)}>
+                <Button type="link" onClick={() => onSelectReceipt(r.id)}>
                   {v}
                 </Button>
               ),
@@ -932,7 +1050,9 @@ function ReceiptPanel({ projectId }: { projectId: string }) {
             {
               title: "操作",
               render: (_, r) => (
-                <Button onClick={() => setSelected(r.id)}>查看收款原单</Button>
+                <Button onClick={() => onSelectReceipt(r.id)}>
+                  查看收款原单
+                </Button>
               ),
             },
           ]}
@@ -1145,7 +1265,7 @@ function ReceiptPanel({ projectId }: { projectId: string }) {
         title="只读收款原单与余额变化"
         width={800}
         open={!!record}
-        onClose={() => setSelected(undefined)}
+        onClose={() => onSelectReceipt(undefined)}
       >
         {record && (
           <>
