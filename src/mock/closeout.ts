@@ -228,6 +228,8 @@ export function archiveSources(
       `${base}/${a.type === "客户终验" ? "customer-acceptance" : a.type === "供应商验收" ? "supplier-acceptance" : "internal-acceptance"}?record=${a.id}`,
       { ...a, detail: state.acceptanceDetails[a.id] },
     );
+  for (const report of state.acceptanceReports.filter((r) => r.projectId === p.id))
+    add("验收资料", report.id, `项目报验 · ${report.batchNo}`, report.status, `${base}/report-acceptance`, report);
   for (const s of state.settlements.filter(
     (s) => s.projectId === p.id && s.status === "已锁定已生效",
   ))
@@ -655,6 +657,8 @@ export function applyCloseoutAction(
   } else {
     if (!pmo || !action.note.trim())
       throw new Error("PMO确认完整档案并填写归档意见");
+    if (state.managementApprovals.some((a) => a.projectId === p.id && a.status === '待审批'))
+      throw new Error('管理决策事项尚未办理，不能冻结其原业务档案');
     const failed = archiveChecks(state, p.id).filter((c) => !c.passed);
     if (failed.length)
       throw new Error(`归档缺件：${failed.map((c) => c.category).join("、")}`);

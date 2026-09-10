@@ -132,6 +132,10 @@ export function closeChecks(state: BusinessState, id: string) {
   const handover = state.operationHandovers[id];
   return [
     {
+      label: "管理决策事项已办理",
+      ok: !state.managementApprovals.some((a) => a.projectId === id && a.status === "待审批"),
+    },
+    {
       label: "财务最终结算锁定",
       ok: state.settlements.some(
         (s) => s.projectId === id && s.status === "已锁定已生效",

@@ -1,0 +1,32 @@
+{
+  "package_id": "C06",
+  "items": [
+    "JS-08",
+    "JS-13"
+  ],
+  "owner": "develop_js",
+  "integration_root": "/Users/shengjunqiu/Documents/Code/pms-demo",
+  "workdir": "/private/tmp/pms-parallel-js",
+  "branch": "pms/receipt-ui",
+  "base_commit": "59c1063",
+  "contract_commit": "59c1063",
+  "owned_paths": [
+    "src/pages/settlement/SettlementAnalysisPage.tsx",
+    "src/models/__tests__/receipts.test.ts"
+  ],
+  "shared_changes": "root only",
+  "status": "assigned",
+  "writer": "/root/develop_js",
+  "last_confirmed_at": "2026-09-10",
+  "development_dependencies": [
+    "published contract commit"
+  ],
+  "acceptance_dependencies": [
+    "root integration and current revision browser evidence"
+  ],
+  "scenarios": "Assigned in collaboration task; normal, role, immutable history and cross-domain consistency checks",
+  "fixtures": "P006 receipts / actual initiation rounds",
+  "next_action": "deliver one-way independent commit",
+  "delivery_commits": [],
+  "integration_commits": []
+}
