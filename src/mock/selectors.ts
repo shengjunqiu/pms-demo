@@ -1,3 +1,4 @@
+import { canAccessProject, type AccessState } from '@/mock/configuration-access';
 import { mockProjects, mockDepartments, mockCustomers, mockContracts, mockCostItems, mockBudgetVersions, mockEstimateVersions, mockSettlements, mockReceiptPlans, AS_OF_DATE } from '@/mock';
 import type { BusinessState } from '@/mock/business';
 import type { Project } from '@/models/types';
@@ -20,13 +21,13 @@ export function inOrganization(departmentId: string, root?: string): boolean {
   }
   return false;
 }
-export function visibleProjects(role: UserRole, projects = mockProjects): Project[] {
+export function visibleProjects(role: UserRole, projects = mockProjects, accessState?: AccessState): Project[] {
   const all = ['executive', 'pmo', 'finance', 'admin', 'market'];
   const userId = ({ executive: 'U-003', pmo: 'U-002', 'project-manager': 'U-001', market: 'U-006', finance: 'U-004', 'solution-tech': 'U-005', admin: 'U-ADMIN' })[role];
-  return projects.filter((p) => all.includes(role) || p.memberIds?.includes(userId) || (role === 'project-manager' ? p.pmId === 'U-001' : p.memberIds === undefined && inOrganization(p.departmentId, 'D-003')));
+  return projects.filter((p) => accessState ? canAccessProject(accessState, { id: userId, name: '', role }, p) : all.includes(role) || p.memberIds?.includes(userId) || (role === 'project-manager' ? p.pmId === 'U-001' : p.memberIds === undefined && inOrganization(p.departmentId, 'D-003')));
 }
-export function selectProjects(filter: ProjectFilter = {}, role: UserRole = 'executive', projects = mockProjects): Project[] {
-  return Array.from(new Map(visibleProjects(role, projects).filter((p) => {
+export function selectProjects(filter: ProjectFilter = {}, role: UserRole = 'executive', projects = mockProjects, accessState?: AccessState): Project[] {
+  return Array.from(new Map(visibleProjects(role, projects, accessState).filter((p) => {
     const customer = mockCustomers.find((c) => c.id === p.customerId);
     return inOrganization(p.departmentId, filter.org)
       && (filter.orgExact !== 'true' || p.departmentId === filter.org)

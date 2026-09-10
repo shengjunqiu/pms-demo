@@ -21,7 +21,7 @@ export function GL05ExceptionsPage() {
   const navigate = useNavigate(); const [params, setParams] = useSearchParams(); const [selected, setSelected] = useState<string>();
   const [visible, setVisible] = useState(['amount', 'org', 'phase', 'reason', 'duration', 'variance', 'owner']);
   if (!['executive', 'pmo', 'admin'].includes(role)) return <StateView type="403" />;
-  const scope = selectProjects(readProjectFilter(params), role, data.projects); const exceptions = projectExceptions(scope, data, params.get('health') === 'green');
+  const scope = selectProjects(readProjectFilter(params), role, data.projects, data); const exceptions = projectExceptions(scope, data, params.get('health') === 'green');
   const category = params.get('exception') ?? 'all';
   const rows = exceptions.filter((p) => category === 'all' || p.types.includes(category));
   const detail = exceptions.find((p) => p.id === selected);

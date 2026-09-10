@@ -18,7 +18,7 @@ export function GL06DecisionsPage() {
   const navigate = useNavigate(); const [params, setParams] = useSearchParams(); const [selected, setSelected] = useState<string>();
   const [visible, setVisible] = useState(['project', 'type', 'amount', 'impact', 'node', 'owner', 'date']);
   if (!['executive', 'pmo', 'admin'].includes(role)) return <StateView type="403" />;
-  const ids = new Set(selectProjects(readProjectFilter(params), role, data.projects).map((p) => p.id));
+  const ids = new Set(selectProjects(readProjectFilter(params), role, data.projects, data).map((p) => p.id));
   const scope = data.decisions.filter((d) => ids.has(d.projectId) && (!params.get('decisionType') || d.type === params.get('decisionType')));
   const status = params.get('decisionStatus') ?? 'pending';
   const rows = scope.filter((d) => status === 'history' ? d.status !== '待决策' : d.status === '待决策');

@@ -16,7 +16,7 @@ export function BudgetApprovalPage({ approvalId }: { approvalId?: string } = {})
   const approval = data.approvals.find((a) => a.id === (approvalId ?? id));
   if (!approval) return <StateView type="404" title="审批不存在" />;
   const project = data.projects.find((p) => p.id === approval.projectId)!;
-  if (!['project-manager','pmo','finance','executive','admin'].includes(currentRole) || !visibleProjects(currentRole, data.projects).some((p) => p.id === project.id)) return <StateView type="403" />;
+  if (!['project-manager','pmo','finance','executive','admin'].includes(currentRole) || !visibleProjects(currentRole, data.projects, data).some((p) => p.id === project.id)) return <StateView type="403" />;
   const original = data.decisions.find((d) => d.id === approval.id);
   const permitted = approval.status === '待审批' && currentRole === approval.requiredRole;
   return <><PageHeader title={approval.kind === 'change' ? '重大成本变更原审批' : '预算调整原审批'} description={`${approval.id} · ${project.name} · 审批引用提交时快照`} breadcrumbs={[{ title: '首页', href: '/' }, { title: '预算调整原审批' }]} extra={<Button onClick={() => navigate(-1)}>返回来源</Button>} />

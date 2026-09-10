@@ -15,7 +15,7 @@ export function ReportsPage({ weekly = false }: { weekly?: boolean }) {
   const [editing, setEditing] = useState(false); const [hasProgress, setHasProgress] = useState(true); const [progress, setProgress] = useState(0); const [completed, setCompleted] = useState(''); const [reason, setReason] = useState(''); const [nextPlan, setNextPlan] = useState(''); const [coordination, setCoordination] = useState(''); const [linkedIds, setLinkedIds] = useState<string[]>([]);
   const [milestoneId, setMilestoneId] = useState<string>(); const [actualDate, setActualDate] = useState(AS_OF_DATE); const [milestoneNote, setMilestoneNote] = useState('');
   const p = data.projects.find((p) => p.id === id); if (!p) return <StateView type="404" />;
-  if (!visibleProjects(currentRole, data.projects).some((p) => p.id === id)) return <StateView type="403" />;
+  if (!visibleProjects(currentRole, data.projects, data).some((p) => p.id === id)) return <StateView type="403" />;
   const pm = currentRole === 'project-manager' && p.pmId === currentUser.id && p.phase === '执行' && !data.lockedProjects.includes(p.id);
   const actor = { id: currentUser.id, name: currentUser.name, role: currentRole }; const week = currentWeek(); const snapshot = reportSnapshot(data, p.id);
   const daily = data.dailyReports.filter((r) => r.projectId === id); const weeks = data.weeklyReports.filter((r) => r.projectId === id);

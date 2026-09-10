@@ -18,12 +18,12 @@ const actions = [
 export function ProjectManagerWorkbenchPage() {
   const data = useBusinessStore((s) => s.data); const { currentUser, currentRole } = useAppStore();
   const navigate = useNavigate(); const [params, setParams] = useSearchParams();
-  const projects = visibleProjects(currentRole, data.projects);
+  const projects = visibleProjects(currentRole, data.projects, data);
   const participating = params.get('scope') === 'participating';
   const mine = projects.filter((p) => participating ? p.memberIds?.includes(currentUser.id) && p.pmId !== currentUser.id : p.pmId === currentUser.id);
   const selected = mine.find((p) => p.id === params.get('project')) ?? mine[0];
   const ids = new Set(mine.map((p) => p.id));
-  const todos = selectTodos(data, currentUser).filter((t) => ids.has(t.projectId) && !t.done).sort((a, b) => a.due.localeCompare(b.due));
+  const todos = selectTodos(data, currentUser).filter((t) => (ids.has(t.projectId ?? '') || t.sourceType === 'initiation') && !t.done).sort((a, b) => a.due.localeCompare(b.due));
   const milestones = data.milestones.filter((m) => ids.has(m.projectId) && m.status !== '已达成' && m.plannedDate <= '2026-09-16').sort((a, b) => a.plannedDate.localeCompare(b.plannedDate));
   const receipts = selectReceipts(mine, data).plans.filter((r) => r.paidAmount < r.amount && r.dueDate <= '2026-09-16');
   const acceptances = data.acceptances.filter((a) => ids.has(a.projectId) && a.status !== '已通过');
@@ -55,7 +55,7 @@ export function ProjectManagerWorkbenchPage() {
       { title: '人力预算 / 已用', width: 160, render: (_, p) => <><MoneyText value={p.calc.subjects.find((s) => s.subjectId === 'SUB-01')?.budget} /><div><MoneyText value={p.calc.subjects.find((s) => s.subjectId === 'SUB-01')?.actual} /></div></> },
     ]} /></Card>
     <Row gutter={[16, 16]}><Col span={14}><Card size="small" title="异常与待处理事项" extra={<Button type="link" onClick={() => navigate('/workbench/todos')}>全部待办</Button>}><Table rowKey="id" size="small" dataSource={todos} pagination={{ pageSize: 5, showSizeChanger: false }} columns={[
-      { title: '事项', render: (_, t) => <>{t.title}<div><Typography.Text type="secondary">{t.projectId} · {t.node}</Typography.Text></div></> },
+      { title: '事项', render: (_, t) => <>{t.title}<div><Typography.Text type="secondary">{t.projectId ?? t.sourceName} · {t.node}</Typography.Text></div></> },
       { title: '到期', width: 115, render: (_, t) => <Typography.Text type={t.due < AS_OF_DATE ? 'danger' : undefined}>{t.due}</Typography.Text> },
       { title: '操作', width: 100, render: (_, t) => <Button size="small" onClick={() => navigate(t.route)}>去办理</Button> },
     ]} /></Card></Col><Col span={10}><Card size="small" title="7天内到期与超期里程碑">{milestones.length ? milestones.slice(0, 6).map((m) => <div key={m.id} style={{ marginBottom: 12 }}><Tag color={m.plannedDate < AS_OF_DATE ? 'error' : 'warning'}>{m.plannedDate < AS_OF_DATE ? '已超期' : '即将到期'}</Tag>{m.plannedDate}<div><Button type="link" size="small" onClick={() => navigate(`/projects/${m.projectId}/progress`)}>{m.projectId} · {m.name}</Button></div></div>) : <Empty description="近期无待达成里程碑" />}</Card></Col>

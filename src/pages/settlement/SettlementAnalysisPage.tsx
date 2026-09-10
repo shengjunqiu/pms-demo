@@ -64,7 +64,7 @@ export function SettlementAnalysisPage({
     !["executive", "pmo", "finance", "project-manager", "admin"].includes(
       currentRole,
     ) ||
-    !visibleProjects(currentRole, data.projects).some((v) => v.id === id)
+    !visibleProjects(currentRole, data.projects, data).some((v) => v.id === id)
   )
     return <StateView type="403" />;
   const calc = selectFourCalculations(p, data);
@@ -961,7 +961,7 @@ function ReceiptPanel({ projectId }: { projectId: string }) {
             </Space>
             <Form.Item label="回款节点分配（万元，支持部分收款）" required>
               <Table
-                rowKey={(_, i) => String(i)}
+                rowKey="receiptPlanId"
                 pagination={false}
                 size="small"
                 dataSource={draft.allocations}

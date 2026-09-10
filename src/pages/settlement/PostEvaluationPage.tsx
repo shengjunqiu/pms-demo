@@ -44,7 +44,7 @@ export function PostEvaluationPage() {
   const [confirm, setConfirm] = useState<boolean>();
   const p = data.projects.find((p) => p.id === id);
   if (!p) return <StateView type="404" />;
-  if (!visibleProjects(currentRole, data.projects).some((p) => p.id === id))
+  if (!visibleProjects(currentRole, data.projects, data).some((p) => p.id === id))
     return <StateView type="403" />;
   const e = data.postEvaluations[p.id];
   const archive = data.projectArchives[p.id];

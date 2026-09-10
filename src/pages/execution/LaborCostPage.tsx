@@ -17,7 +17,7 @@ export function LaborCostPage() {
   const { data,dispatch }=useBusinessStore(); const { currentRole,currentUser }=useAppStore();
   const [editing,setEditing]=useState(false); const [date,setDate]=useState(AS_OF_DATE); const [task,setTask]=useState<string>(); const [hours,setHours]=useState(8); const [description,setDescription]=useState(''); const [review,setReview]=useState<boolean>(); const [opinion,setOpinion]=useState('');
   const p=data.projects.find((p)=>p.id===id); if(!p) return <StateView type="404" />;
-  if(!visibleProjects(currentRole,data.projects).some((p)=>p.id===id)) return <StateView type="403" />;
+  if(!visibleProjects(currentRole, data.projects, data).some((p)=>p.id===id)) return <StateView type="403" />;
   const pm=currentRole==='project-manager' && p.pmId===currentUser.id; const showCost=['project-manager','pmo','finance','executive','admin'].includes(currentRole);
   const member=pm || currentRole==='solution-tech' && !!p.memberIds?.includes(currentUser.id); const locked=p.phase!=='执行' || !!constructionLockReason(data, p.id) || p.status==='已终止';
   const actor={id:currentUser.id,name:currentUser.name,role:currentRole}; const a=laborAvailability(data,p.id); const tasks=data.tasks.filter((t)=>t.projectId===p.id);

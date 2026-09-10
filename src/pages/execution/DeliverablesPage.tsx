@@ -13,7 +13,7 @@ export function DeliverablesPage() {
   const { id } = useParams(); const [params, setParams] = useSearchParams(); const navigate = useNavigate(); const { message } = App.useApp(); const { data, dispatch } = useBusinessStore(); const { currentRole, currentUser } = useAppStore();
   const [operation, setOperation] = useState<Operation>(); const [filename, setFilename] = useState(''); const [note, setNote] = useState(''); const [passed, setPassed] = useState(true); const [target, setTarget] = useState(''); const [checkpoints, setCheckpoints] = useState(''); const [standard, setStandard] = useState(''); const [name, setName] = useState(''); const [phase, setPhase] = useState('客户终验'); const [due, setDue] = useState('2026-09-20');
   const p = data.projects.find((p) => p.id === id); if (!p) return <StateView type="404" />;
-  if (!visibleProjects(currentRole, data.projects).some((p) => p.id === id)) return <StateView type="403" />;
+  if (!visibleProjects(currentRole, data.projects, data).some((p) => p.id === id)) return <StateView type="403" />;
   const pm = currentRole === 'project-manager' && p.pmId === currentUser.id; const pmo = currentRole === 'pmo'; const locked = data.lockedProjects.includes(p.id) || p.phase === '已关闭';
   const materials = data.materials.filter((m) => m.projectId === p.id); const selected = materials.find((m) => m.id === params.get('document')); const plan = qualityPlan(data, p.id); const actor = { id: currentUser.id, name: currentUser.name, role: currentRole };
   const setParam = (key: string, value?: string) => { const next = new URLSearchParams(params); if (value) next.set(key, value); else next.delete(key); setParams(next); };

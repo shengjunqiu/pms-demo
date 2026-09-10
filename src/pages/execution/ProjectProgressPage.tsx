@@ -15,7 +15,7 @@ export function ProjectProgressPage() {
   const [editing, setEditing] = useState<WbsTask>(); const [percent, setPercent] = useState(0); const [start, setStart] = useState(''); const [end, setEnd] = useState(''); const [note, setNote] = useState('');
   const p = data.projects.find((p) => p.id === id);
   if (!p) return <StateView type="404" />;
-  if (!visibleProjects(currentRole, data.projects).some((v) => v.id === id)) return <StateView type="403" />;
+  if (!visibleProjects(currentRole, data.projects, data).some((v) => v.id === id)) return <StateView type="403" />;
   const tasks = data.tasks.filter((t) => t.projectId === id); const milestones = data.milestones.filter((m) => m.projectId === id);
   const current = milestones.filter((m) => m.status === '已达成').at(-1);
   const upcoming = milestones.filter((m) => m.status !== '已达成').sort((a, b) => a.plannedDate.localeCompare(b.plannedDate))[0];

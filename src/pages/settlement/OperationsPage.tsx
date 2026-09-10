@@ -40,7 +40,7 @@ export function OperationsPage() {
   const p = data.projects.find((p) => p.id === c?.projectId);
   if (!c || !p) return <StateView type="404" />;
   if (
-    !visibleProjects(currentRole, data.projects).some((v) => v.id === p.id) &&
+    !visibleProjects(currentRole, data.projects, data).some((v) => v.id === p.id) &&
     !c.teamIds.includes(currentUser.id)
   )
     return <StateView type="403" />;

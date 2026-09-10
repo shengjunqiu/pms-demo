@@ -1,4 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useBusinessStore } from '@/mock/business';
+import { canAccessPage, canAccessProject, selectAccessPolicy } from '@/mock/configuration-access';
+import { projectForTarget } from '@/mock/access';
+import { StateView } from '@/components/common/StateView';
 import { Layout, Menu, Select, Space, Typography, Tag, Button, Dropdown, Avatar, theme } from 'antd';
 import {
   DashboardOutlined,
@@ -26,6 +30,7 @@ export const MainLayout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentRole, setRole, currentUser, asOfDate } = useAppStore();
+  const { data, recordAccess } = useBusinessStore();
   const { token } = theme.useToken();
 
   const groups = [
@@ -37,20 +42,25 @@ export const MainLayout: React.FC = () => {
     { key: 'JS', label: '结算与收尾阶段', icon: <CheckCircleOutlined /> },
     { key: 'CF', label: '系统与规则配置', icon: <SettingOutlined /> },
   ];
-  const menuItems = groups.filter((group) =>
-    group.key !== 'CF' || ['admin', 'pmo', 'finance'].includes(currentRole)
-  ).map((group) => ({
+  const menuItems = groups.map((group) => ({
     ...group,
-    children: PAGE_MANIFEST.filter((page) => page.id.startsWith(group.key)).map((page) => ({
+    children: PAGE_MANIFEST.filter((page) => page.id.startsWith(group.key) && canAccessPage(data, currentUser, page.id)).map((page) => ({
       key: demoRoute(page.route), label: `${page.id} ${page.title}`,
     })),
-  }));
+  })).filter((group) => group.children.length > 0);
 
   const currentPage = PAGE_MANIFEST.find((p) => {
     if (p.route === location.pathname) return true;
     const pattern = p.route.replace(/:[a-zA-Z]+/g, '[^/]+');
     return new RegExp(`^${pattern}$`).test(location.pathname);
   });
+  const targetId = location.pathname.split('/')[2] ?? '';
+  const routeProject = projectForTarget(data, targetId);
+  const allowed = (!currentPage || canAccessPage(data, currentUser, currentPage.id)) && (!routeProject || canAccessProject(data, currentUser, routeProject));
+  const policyId = selectAccessPolicy(data, currentRole)?.id;
+  useEffect(() => {
+    recordAccess(location.pathname + location.search, allowed, currentUser);
+  }, [location.pathname, location.search, allowed, policyId, currentUser, recordAccess]);
 
   return (
     <Layout style={{ minHeight: '100vh', width: '100%' }}>
@@ -183,7 +193,7 @@ export const MainLayout: React.FC = () => {
             overflowX: 'auto',
           }}
         >
-          <Outlet />
+          {allowed ? <Outlet /> : <StateView type="403" />}
         </Content>
       </Layout>
     </Layout>

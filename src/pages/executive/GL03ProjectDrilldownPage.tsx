@@ -19,7 +19,7 @@ export function GL03ProjectDrilldownPage() {
   const [params, setParams] = useSearchParams(); const navigate = useNavigate(); const location = useLocation();
   const data = useBusinessStore((s) => s.data); const role = useAppStore((s) => s.currentRole);
   const [detail, setDetail] = useState<{ title: string; fields: [string, string][] }>();
-  const scope = selectProjects(readProjectFilter(params), role, data.projects).filter((p) =>
+  const scope = selectProjects(readProjectFilter(params), role, data.projects, data).filter((p) =>
     (!params.get('stage') || fourStage(p) === params.get('stage')) &&
     (params.get('metric') !== 'overbudget' || p.rollingCost > p.budgetAmount) &&
     (params.get('metric') !== 'unsigned' || p.isUnsigned) &&

@@ -86,7 +86,7 @@ test('P006财务收清1023万元后应收门禁解除，其他关闭条件仍待
   const dialog = await enterReceipt(page, sourceNo, '1023');
   await expect(dialog).toBeHidden();
   await expectBalance(page, '1,860.00', '0.00');
-  const planRow = page.locator('.ant-table-tbody > tr[data-row-key]').filter({ hasText: '验收结算款' });
+  const planRow = page.locator('.ant-table-tbody > tr[data-row-key]').filter({ has: page.getByRole('cell', { name: '验收结算款', exact: true }) });
   await expect(planRow).toHaveCount(1);
   await expect(planRow.locator('td').nth(3)).toHaveText('1023');
   await expect(planRow).toContainText('已收齐');
@@ -136,7 +136,7 @@ test('P006部分收款后重复流水被拒，合同余额及原流水条数保�
   await expect(duplicateDialog).toBeHidden();
   await expectBalance(page, '937.00', '923.00');
   await expect(receiptRow(page, sourceNo)).toHaveCount(1);
-  const planRow = page.locator('.ant-table-tbody > tr[data-row-key]').filter({ hasText: '验收结算款' });
+  const planRow = page.locator('.ant-table-tbody > tr[data-row-key]').filter({ has: page.getByRole('cell', { name: '验收结算款', exact: true }) });
   await expect(planRow.locator('td').nth(3)).toHaveText('100');
   await screenshots(page, 'JS08-P006-duplicate-rejected-balance-preserved');
 });

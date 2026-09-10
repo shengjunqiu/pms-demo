@@ -19,7 +19,7 @@ export function TicketDetailPage({ family }: { family: 'quality' | 'risk' }) {
   const kind = kinds.find((kind) => ticketTable(data, kind).some((t) => t.id === id));
   if (!kind) return <StateView type="404" />;
   const ticket = ticketTable(data, kind).find((t) => t.id === id)!; const p = data.projects.find((p) => p.id === ticket.projectId)!;
-  if (!visibleProjects(currentRole, data.projects).some((p) => p.id === ticket.projectId)) return <StateView type="403" />;
+  if (!visibleProjects(currentRole, data.projects, data).some((p) => p.id === ticket.projectId)) return <StateView type="403" />;
   const meta = ticketMeta(data, kind, ticket.id); const pm = currentRole === 'project-manager' && currentUser.id === p.pmId;
   const writer = ['project-manager', 'solution-tech', 'pmo'].includes(currentRole);
   const owner = meta.ownerId === currentUser.id || ticket.owner === currentUser.name;

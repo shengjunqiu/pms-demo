@@ -12,7 +12,7 @@ export function TicketsPage({ family }: { family: 'quality' | 'risk' }) {
   const { data, dispatch } = useBusinessStore(); const { currentRole, currentUser } = useAppStore(); const { message } = App.useApp();
   const [params, setParams] = useSearchParams(); const navigate = useNavigate();
   const kinds: TicketKind[] = family === 'quality' ? ['requirement', 'bug'] : ['issue', 'risk']; const base = family === 'quality' ? '/requirements-bugs' : '/issues-risks';
-  const projects = visibleProjects(currentRole, data.projects); const ids = new Set(projects.map((p) => p.id));
+  const projects = visibleProjects(currentRole, data.projects, data); const ids = new Set(projects.map((p) => p.id));
   const [open, setOpen] = useState(false); const [kind, setKind] = useState<TicketKind>(kinds[0]); const [projectId, setProjectId] = useState(params.get('projectId') ?? projects[0]?.id);
   const [title, setTitle] = useState(''); const [description, setDescription] = useState(''); const [category, setCategory] = useState(''); const [rank, setRank] = useState(''); const [owner, setOwner] = useState(currentUser.id); const [deadline, setDeadline] = useState('2026-09-20'); const [product, setProduct] = useState(''); const [impactBaseline, setImpactBaseline] = useState(false); const [probability, setProbability] = useState(3); const [impact, setImpact] = useState(3); const [measures, setMeasures] = useState('');
   const all = kinds.flatMap((kind) => ticketTable(data, kind).filter((t) => ids.has(t.projectId)).map((t) => ({ ...t, kind, meta: ticketMeta(data, kind, t.id), rank: 'priority' in t ? t.priority : 'severity' in t ? t.severity : t.level })));

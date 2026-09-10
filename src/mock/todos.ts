@@ -1,3 +1,6 @@
+import { selectInitiationTodos } from '@/mock/initiation-todos';
+import type { BusinessTodo } from '@/models/todos';
+import { canAccessPage } from '@/mock/configuration-access';
 import { dailyNeeded } from '@/mock/reports';
 import { ticketTable, ticketMeta, ticketLabels, type TicketKind } from '@/mock/tickets';
 import { AS_OF_DATE } from '@/mock';
@@ -5,9 +8,9 @@ import type { BusinessState } from '@/mock/business';
 import type { UserProfile } from '@/store/useAppStore';
 import { visibleProjects } from '@/mock/selectors';
 
-export function selectTodos(data: BusinessState, currentUser: Pick<UserProfile, 'id' | 'name' | 'role'>) {
+export function selectTodos(data: BusinessState, currentUser: Pick<UserProfile, 'id' | 'name' | 'role'>): BusinessTodo[] {
   const currentRole = currentUser.role;
-  const projects = visibleProjects(currentRole, data.projects); const ids = new Set(projects.map((p) => p.id));
+  const projects = visibleProjects(currentRole, data.projects, data); const ids = new Set(projects.map((p) => p.id));
   const deadline = (date: string) => new Date(Date.parse(date) + 3 * 86400000).toISOString().slice(0, 10);
   const approvals = data.approvals.filter((a) => ids.has(a.projectId) && a.requiredRole === currentRole).map((a) => ({ id: a.id, projectId: a.projectId, title: a.kind === 'change' ? '重大成本变更' : '预算审批', type: '预算与变更', node: a.requiredRole === 'executive' ? '集团领导' : 'PMO', status: a.status, done: a.status !== '待审批', due: deadline(data.decisions.find((d) => d.id === a.id)?.createdAt ?? AS_OF_DATE), route: `/approvals/${a.id}`, opinion: a.opinion, owner: a.requiredRole === 'executive' ? '王总' : '李主任' }));
   const confirmations = data.approvals.filter((a) => ids.has(a.projectId) && currentRole === 'pmo' && a.kind === 'budget' && a.status === '通过').map((a) => ({ id: `BASE-CONFIRM-${a.id}`, projectId: a.projectId, title: '批准预算待基线确认', type: '基线确认', node: 'PMO确认生效', status: a.baselineConfirmedAt ? '已确认' : '待确认', done: Boolean(a.baselineConfirmedAt), due: deadline(data.decisions.find((d) => d.id === a.id)?.createdAt ?? AS_OF_DATE), route: `/approvals/${a.id}`, opinion: a.opinion, owner: '李主任' }));
@@ -30,5 +33,6 @@ export function selectTodos(data: BusinessState, currentUser: Pick<UserProfile, 
   const reports = projects.filter((p) => p.pmId === currentUser.id && p.phase === '执行').map((p) => ({ id: `DAILY-${p.id}-${AS_OF_DATE}`, projectId: p.id, title: `${AS_OF_DATE} 项目日报`, type: '日报', node: '主PM填报', status: dailyNeeded(data, p.id) ? '待提交' : '已提交', done: !dailyNeeded(data, p.id), due: AS_OF_DATE, route: `/projects/${p.id}/daily-reports`, opinion: data.dailyReports.find((r) => r.projectId === p.id && r.date === AS_OF_DATE)?.completedTasks, owner: p.pmName }));
   const documents = data.materials.filter((m) => ids.has(m.projectId) && currentRole === 'pmo' && (m.status === '待审核' || (m.versions?.some((v) => v.reviewer === currentUser.name) ?? false))).map((m) => ({ id: m.id, projectId: m.projectId, title: m.name, type: '交付物审核', node: 'PMO版本审核', status: m.status, done: m.status !== '待审核', due: m.dueDate ?? AS_OF_DATE, route: `/projects/${m.projectId}/deliverables?document=${m.id}`, opinion: m.versions?.at(-1)?.opinion, owner: '李主任' }));
   const labor = data.laborEntries.filter((e) => ids.has(e.projectId) && (e.userId === currentUser.id || currentRole === 'project-manager' && projects.find((p) => p.id === e.projectId)?.pmId === currentUser.id)).map((e) => ({ id: e.id, projectId: e.projectId, title: `${e.userName} ${e.date} ${e.hours}小时`, type: '工时审核', node: '主PM审核', status: e.status, done: e.status !== '待审核', due: deadline(e.date), route: `/projects/${e.projectId}/labor-cost?entry=${e.id}`, opinion: e.opinion, owner: projects.find((p) => p.id === e.projectId)!.pmName }));
-  return [...confirmations, ...planning, ...labor, ...reports, ...documents, ...costOrders, ...approvals, ...management, ...plans, ...tasks, ...tickets];
+  const initiation = canAccessPage(data, currentUser, 'YS-03') ? selectInitiationTodos(data, currentUser) : [];
+  return [...initiation, ...confirmations, ...planning, ...labor, ...reports, ...documents, ...costOrders, ...approvals, ...management, ...plans, ...tasks, ...tickets];
 }

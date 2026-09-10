@@ -15,7 +15,7 @@ export function ManagementApprovalPage() {
   const approval = data.managementApprovals.find((a) => a.id === id);
   if (!approval) return <StateView type="404" />;
   const project = data.projects.find((p) => p.id === approval.projectId)!;
-  if (!visibleProjects(currentRole, data.projects).some((p) => p.id === project.id)) return <StateView type="403" />;
+  if (!visibleProjects(currentRole, data.projects, data).some((p) => p.id === project.id)) return <StateView type="403" />;
   const risk = data.risks.find((r) => r.id === approval.sourceId);
   const acceptance = data.acceptances.find((a) => a.id === approval.sourceId);
   const settlement = data.settlements.find((s) => s.id === approval.sourceId);

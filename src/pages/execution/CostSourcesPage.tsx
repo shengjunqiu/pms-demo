@@ -21,7 +21,7 @@ export function CostSourcesPage({ kind }: { kind: CostOrderKind }) {
   const [title, setTitle] = useState(''); const [amount, setAmount] = useState<number>(1); const [supplier, setSupplier] = useState(''); const [contractNo, setContractNo] = useState(''); const [scope, setScope] = useState(''); const [taskId, setTaskId] = useState<string>(); const [dueDate, setDueDate] = useState('2026-09-20');
   const [operation, setOperation] = useState<Operation>(); const [note, setNote] = useState(''); const [progress, setProgress] = useState(100);
   const p = data.projects.find((p) => p.id === id); if (!p) return <StateView type="404" />;
-  if (!visibleProjects(currentRole, data.projects).some((p) => p.id === id)) return <StateView type="403" />;
+  if (!visibleProjects(currentRole, data.projects, data).some((p) => p.id === id)) return <StateView type="403" />;
   const calc = selectFourCalculations(p, data); const subjects = calc.subjects.filter((s) => isCostSubject(kind, s.subjectId));
   const availability = costAvailability(data, p.id, subjectId); const pm = currentRole === 'project-manager' && currentUser.id === p.pmId; const finance = currentRole === 'finance';
   const locked = !!constructionLockReason(data, p.id) || ['已关闭', '运维'].includes(p.phase) || ['已终止', '已关闭'].includes(p.status); const canSubmit = !locked && (pm || kind === 'expense' && currentRole === 'solution-tech' && p.memberIds?.includes(currentUser.id));

@@ -21,7 +21,7 @@ export function GL01DashboardPage() {
   const navigate = useNavigate(); const [params, setParams] = useSearchParams(); const [refresh, setRefresh] = useState(0);
   const mode = params.get('demo') ?? 'normal';
   const allowed = ['executive', 'pmo', 'admin'].includes(role);
-  const scope = mode === 'empty' ? [] : selectProjects(readProjectFilter(params), role, data.projects);
+  const scope = mode === 'empty' ? [] : selectProjects(readProjectFilter(params), role, data.projects, data);
   const kpi = calculateCockpitKPIs(scope); const receipt = selectReceipts(scope, data); const exceptions = projectExceptions(scope, data);
   const calculations = scope.map((p) => selectFourCalculations(p, data)); const estimate = sumMoney(calculations.map((c) => c.estimate?.totalCost ?? 0));
   const ids = new Set(scope.map((p) => p.id)); const pending = data.decisions.filter((d) => ids.has(d.projectId) && d.status === '待决策');

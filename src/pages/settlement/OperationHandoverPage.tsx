@@ -31,7 +31,7 @@ export function OperationHandoverPage() {
   const p = data.projects.find((p) => p.id === id);
   if (!p) return <StateView type="404" />;
   if (
-    !visibleProjects(currentRole, data.projects).some((v) => v.id === id) &&
+    !visibleProjects(currentRole, data.projects, data).some((v) => v.id === id) &&
     data.operationHandovers[p.id]?.receiverId !== currentUser.id &&
     !data.operationHandovers[p.id]?.teamIds.includes(currentUser.id)
   )

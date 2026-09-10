@@ -28,7 +28,7 @@ export function ProjectClosePage() {
   const [note, setNote] = useState("");
   const p = data.projects.find((p) => p.id === id);
   if (!p) return <StateView type="404" />;
-  if (!visibleProjects(currentRole, data.projects).some((v) => v.id === id))
+  if (!visibleProjects(currentRole, data.projects, data).some((v) => v.id === id))
     return <StateView type="403" />;
   const checks = closeChecks(data, p.id);
   const closure = data.projectClosures[p.id];

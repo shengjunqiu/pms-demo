@@ -23,7 +23,7 @@ export function ProjectOverviewPage() {
   const [detail, setDetail] = useState<Detail>();
   const project = data.projects.find((p) => p.id === id);
   if (!project) return <StateView type="404" title="项目不存在" />;
-  const allowed = visibleProjects(role, data.projects);
+  const allowed = visibleProjects(role, data.projects, data);
   if (!allowed.some((p) => p.id === id)) return <StateView type="403" />;
   const p = project; const source = data.opportunities.find((o) => o.id === p.opportunityId); const calc = selectFourCalculations(p, data); const receipt = selectReceipts([p], data);
   const milestones = data.milestones.filter((m) => m.projectId === p.id);

@@ -14,7 +14,7 @@ export function PlanRequestPage({ stageEntry = false }: { stageEntry?: boolean }
   const [reason, setReason] = useState(params.get('reason') ?? ''); const [days, setDays] = useState(7); const [opinion, setOpinion] = useState(''); const [decision, setDecision] = useState<boolean>();
   const p = data.projects.find((p) => p.id === id); const request = data.planRequests.find((r) => r.id === requestId && r.projectId === id); const isNew = requestId === 'new';
   if (!p || !isNew && !request) return <StateView type="404" />;
-  if (!visibleProjects(currentRole, data.projects).some((p) => p.id === id)) return <StateView type="403" />;
+  if (!visibleProjects(currentRole, data.projects, data).some((p) => p.id === id)) return <StateView type="403" />;
   const kind = request?.kind ?? (stageEntry || params.get('kind') === 'stage' ? 'stage' : 'schedule');
   const canSubmit = currentRole === 'project-manager' && currentUser.id === p.pmId && !data.lockedProjects.includes(p.id) && p.phase === '执行';
   const canReview = request?.status === '待审批' && request.requiredRoles.some((r) => r === currentRole) && !request.reviews.some((r) => r.role === currentRole);

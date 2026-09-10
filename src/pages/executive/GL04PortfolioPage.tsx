@@ -19,7 +19,7 @@ export function GL04PortfolioPage() {
   const data = useBusinessStore((s) => s.data); const role = useAppStore((s) => s.currentRole);
   const [params, setParams] = useSearchParams(); const navigate = useNavigate();
   if (!['executive', 'pmo', 'admin'].includes(role)) return <StateView type="403" />;
-  const scope = selectProjects(readProjectFilter(params), role, data.projects);
+  const scope = selectProjects(readProjectFilter(params), role, data.projects, data);
   const dimension = dimensions.some((d) => d.value === params.get('dimension')) ? params.get('dimension')! : 'org';
   const root = params.get('org') || 'D-001';
   const groups = new Map<string, { key: string; label: string; projects: Project[]; exact?: boolean }>();

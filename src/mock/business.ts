@@ -1,3 +1,6 @@
+import { actionTarget, assertActionAccess } from './access';
+import { applyAccessConfiguration, buildAuditChanges, createAccessConfiguration, selectAccessPolicy } from './configuration-access';
+import type { AccessConfigurationAction, AccessConfigurationState, AuditEvent } from '@/models/configuration-access';
 import { applyReceiptAction } from './receipts';
 import type { ReceiptAction, ReceiptRecord } from '@/models/receipts';
 import {applyFinanceConfiguration,createFinanceConfiguration,selectConfiguredHealth,type FinanceConfigurationAction} from './configuration-finance';
@@ -65,6 +68,7 @@ export interface PlanRequest {
 }
 export interface Material extends DocumentDetails { archiveCategory?: ArchiveCategory; sourceId?: string; id: string; projectId: string; name: string; required: boolean; status: '缺失' | '待提交' | '待审核' | '通过' | '驳回' }
 export interface BusinessState {
+  accessConfiguration: AccessConfigurationState;
   receiptRecords: ReceiptRecord[];
   financeConfiguration:FinanceConfigurationState;
   unsignedProjects:Record<string,UnsignedProjectControl>; unsignedInvestmentRequests:UnsignedInvestmentRequest[]; startConfirmations:Record<string,StartConfirmation>;
@@ -89,10 +93,10 @@ export interface BusinessState {
   issues: Issue[]; risks: Risk[]; bugs: Bug[]; costs: CostItem[];
   changes: ProjectChange[]; managementApprovals: ManagementApproval[]; approvals: Approval[]; decisions: DecisionItem[]; acceptances: AcceptanceRecord[];
   materials: Material[]; lockedProjects: string[]; maintenanceCosts: CostItem[];
-  audit: { id: string; actor: string; action: string; target: string; date: string }[];
+  audit: AuditEvent[];
 }
 export function createBusinessState(): BusinessState {
-  const state: BusinessState = structuredClone({ receiptRecords:[], financeConfiguration:createFinanceConfiguration(), unsignedProjects:{}, unsignedInvestmentRequests:[], startConfirmations:{}, operationCostSources:[], operationHandovers:{}, operationCycles:[], operationEvents:[], projectClosures:{}, configuration: createConfigurationState(), templateApplications: {}, initiations: [], postEvaluations: {}, projectArchives: {}, changeRequests: [], earlyInvestmentRequests: [], earlyCosts: [], settlementRequests: [], settlementCostReviews: [], settlementCostDispositions: [], settlementAnalyses: {}, settlementForecastSnapshots: {}, estimateDrafts: {}, estimateMeta: {}, projectTeams: {}, budgetDrafts: {}, presales: {}, planningDrafts: {}, planningReviews: [], acceptanceDetails: {}, acceptanceReports: [], opportunities: mockOpportunities, opportunityMeta: {}, contracts: mockContracts, receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
+  const state: BusinessState = structuredClone({ accessConfiguration:createAccessConfiguration(), receiptRecords:[], financeConfiguration:createFinanceConfiguration(), unsignedProjects:{}, unsignedInvestmentRequests:[], startConfirmations:{}, operationCostSources:[], operationHandovers:{}, operationCycles:[], operationEvents:[], projectClosures:{}, configuration: createConfigurationState(), templateApplications: {}, initiations: [], postEvaluations: {}, projectArchives: {}, changeRequests: [], earlyInvestmentRequests: [], earlyCosts: [], settlementRequests: [], settlementCostReviews: [], settlementCostDispositions: [], settlementAnalyses: {}, settlementForecastSnapshots: {}, estimateDrafts: {}, estimateMeta: {}, projectTeams: {}, budgetDrafts: {}, presales: {}, planningDrafts: {}, planningReviews: [], acceptanceDetails: {}, acceptanceReports: [], opportunities: mockOpportunities, opportunityMeta: {}, contracts: mockContracts, receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
     estimates: mockEstimateVersions, milestones: mockMilestones, settlements: mockSettlements,
     issues: mockIssues, risks: mockRisks, bugs: mockBugs, costs: mockCostItems, approvals: [], changes: mockChanges, managementApprovals: [],
     decisions: mockDecisions, acceptances: mockAcceptances, lockedProjects: ['P-008'], maintenanceCosts: [], audit: [],
@@ -112,7 +116,7 @@ export function createBusinessState(): BusinessState {
   initOperationsFixture(state);
   return state;
 }
-export type BusinessAction = ReceiptAction | FinanceConfigurationAction | UnsignedAction | OperationsAction | ConfigurationAction | InitiationAction | CloseoutAction | ProjectChangeAction | EarlyInvestmentAction | SettlementAction | EstimateAction | TeamAction | BudgetDraftAction | PresalesAction | BudgetPlanningAction | AcceptanceAction | OpportunityAction | LaborAction | DeliverableAction | ReportAction | CostOrderAction | TicketAction
+export type BusinessAction = AccessConfigurationAction | ReceiptAction | FinanceConfigurationAction | UnsignedAction | OperationsAction | ConfigurationAction | InitiationAction | CloseoutAction | ProjectChangeAction | EarlyInvestmentAction | SettlementAction | EstimateAction | TeamAction | BudgetDraftAction | PresalesAction | BudgetPlanningAction | AcceptanceAction | OpportunityAction | LaborAction | DeliverableAction | ReportAction | CostOrderAction | TicketAction
   | { type: 'submit-budget'; projectId: string; budget: BudgetVersion; reason: string }
   | { type: 'review'; approvalId: string; approve: boolean; opinion: string }
   | { type: 'review-management'; id: string; approve: boolean; opinion: string }
@@ -137,7 +141,8 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     return value;
   };
   let target = '';
-  if (action.type === 'confirm-project-receipt') { target = applyReceiptAction(state, action, actor); }
+  if (action.type === 'access-policy-save' || action.type === 'access-policy-publish') { target = applyAccessConfiguration(state, action, actor); }
+  else if (action.type === 'confirm-project-receipt') { target = applyReceiptAction(state, action, actor); }
   else if(action.type==='finance-config-save'||action.type==='finance-config-publish'){target=applyFinanceConfiguration(state,action,actor);}
   else if (action.type==='follow-unsigned'||action.type==='request-unsigned-investment'||action.type==='confirm-project-contract'||action.type==='exit-unsigned'||action.type==='confirm-project-start') {
     target=applyUnsignedAction(state,action,actor);
@@ -356,7 +361,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     const health=selectConfiguredHealth(state,p);
     p.health = health.level; p.healthReason = health.reasons.join('；');
   }
-  state.audit.push({ id: `AUD-${state.audit.length + 1}`, actor: actor.name, action: action.type, target, date: AS_OF_DATE });
+  state.audit.push({ id: `AUD-${state.audit.length + 1}`, actor: actor.name, actorId: actor.id, actorRole: actor.role, action: action.type, target, date: AS_OF_DATE, result: '成功', ruleVersion: selectAccessPolicy(previous, actor.role)?.id, changes: buildAuditChanges(previous, state, target) });
   return state;
 }
 
@@ -401,7 +406,18 @@ export function createDemoBusinessState(): BusinessState {
   return state;
 }
 
-export const useBusinessStore = create<{ data: BusinessState; dispatch: (action: BusinessAction, actor: Actor) => void }>((set) => ({
+export const useBusinessStore = create<{ data: BusinessState; dispatch: (action: BusinessAction, actor: Actor) => void; recordAccess: (route: string, allowed: boolean, actor: Actor) => void }>((set, get) => ({
   data: createDemoBusinessState(),
-  dispatch: (action, actor) => set((state) => ({ data: transition(state.data, action, actor) })),
+  dispatch: (action, actor) => {
+    const previous = get().data;
+    try {
+      assertActionAccess(previous, action, actor);
+      set({ data: transition(previous, action, actor) });
+    } catch (error) {
+      const event: AuditEvent = { id: `AUD-${previous.audit.length + 1}`, actor: actor.name, actorId: actor.id, actorRole: actor.role, action: action.type, target: actionTarget(action), date: AS_OF_DATE, result: '拒绝', reason: error instanceof Error ? error.message : String(error), changes: [], ruleVersion: selectAccessPolicy(previous, actor.role)?.id };
+      set({ data: { ...previous, audit: [...previous.audit, event] } });
+      throw error;
+    }
+  },
+  recordAccess: (route, allowed, actor) => set(({ data }) => ({ data: { ...data, audit: [...data.audit, { id: `AUD-${data.audit.length + 1}`, actor: actor.name, actorId: actor.id, actorRole: actor.role, action: 'page-access', target: route, route, date: AS_OF_DATE, result: allowed ? '成功' : '拒绝', ruleVersion: selectAccessPolicy(data, actor.role)?.id, changes: [] }] } })),
 }));

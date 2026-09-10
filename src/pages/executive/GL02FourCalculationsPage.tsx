@@ -17,7 +17,7 @@ export function GL02FourCalculationsPage() {
   const data = useBusinessStore((s) => s.data); const role = useAppStore((s) => s.currentRole);
   const [params, setParams] = useSearchParams(); const navigate = useNavigate(); const [subject, setSubject] = useState<string>();
   if (!['executive', 'pmo', 'finance', 'admin'].includes(role)) return <StateView type="403" />;
-  const scope = selectProjects(readProjectFilter(params), role, data.projects).map((p) => ({ p, ...selectFourCalculations(p, data) }));
+  const scope = selectProjects(readProjectFilter(params), role, data.projects, data).map((p) => ({ p, ...selectFourCalculations(p, data) }));
   const settledOnly = params.get('sample') === 'settled';
   const rows = scope.filter((r) => r.estimate && r.budget && (!settledOnly || r.settlement));
   const sum = (get: (r: typeof rows[number]) => number) => sumMoney(rows.map(get));

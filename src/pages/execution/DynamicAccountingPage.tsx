@@ -28,7 +28,7 @@ export function DynamicAccountingPage() {
   const [query, setQuery] = useState('');
   const p = data.projects.find((project) => project.id === id);
   if (!p) return <StateView type="404" title="项目不存在" />;
-  if (!['executive', 'pmo', 'finance', 'project-manager', 'admin'].includes(role) || !visibleProjects(role, data.projects).some((project) => project.id === id)) return <StateView type="403" />;
+  if (!['executive', 'pmo', 'finance', 'project-manager', 'admin'].includes(role) || !visibleProjects(role, data.projects, data).some((project) => project.id === id)) return <StateView type="403" />;
   const calc = selectFourCalculations(p, data);
   if (!calc.budget) return <StateView type="empty" title="尚无生效预算" subTitle="预算审批通过后即可开展动态核算。" />;
   const subjectId = params.get('subject'); const tab = params.get('tab') ?? 'subjects';
@@ -49,7 +49,7 @@ export function DynamicAccountingPage() {
     { title: '已发生（万元）', dataIndex: 'amount', align: 'right' as const, render: (value: number) => <MoneyText value={value} /> },
   ];
   const orgRows = mockDepartments.filter((d) => d.level === 'business_group').map((org) => {
-    const rows = visibleProjects(role, data.projects).filter((project) => inOrganization(project.departmentId, org.id));
+    const rows = visibleProjects(role, data.projects, data).filter((project) => inOrganization(project.departmentId, org.id));
     return { id: org.id, name: org.name, count: rows.length, budget: sumMoney(rows.map((project) => selectFourCalculations(project, data).budget?.totalAmount ?? 0)), actual: sumMoney(rows.map((project) => project.actualCost)), rolling: sumMoney(rows.map((project) => project.rollingCost)) };
   });
   return <div>
