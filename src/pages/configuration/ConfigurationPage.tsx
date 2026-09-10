@@ -1,33 +1,1033 @@
-import { useState } from 'react';
-import { Alert, App, Button, Card, Col, Descriptions, Divider, Drawer, Form, Input, InputNumber, Row, Select, Space, Statistic, Switch, Table, Tabs, Tag } from 'antd';
-import { Link } from 'react-router-dom';
-import { useBusinessStore } from '@/mock/business';
-import { AS_OF_DATE } from '@/mock';
-import { effectiveVersions, evaluateProjectGrading, selectApprovalRule, selectTemplate, type ConfigurationAction } from '@/mock/configuration';
-import type { ApprovalRuleVersion, ConfigurationState, GradingVersion, TemplateVersion } from '@/models/configuration';
-import { ROLES, useAppStore } from '@/store/useAppStore';
-import { PageHeader } from '@/components/common/PageHeader';
-import { PAGE_MANIFEST } from '@/routes/manifest';
-type Kind=keyof ConfigurationState;
-type Version=TemplateVersion|GradingVersion|ApprovalRuleVersion;
-const kinds={templates:{page:'CF-01',title:'交付物与评估模板',description:'按项目类型、等级与阶段生成交付目录；新发布版本仅用于新实例。'},grading:{page:'CF-02',title:'项目分级与管控规则',description:'统一金额、战略与风险分级，并控制毛利、未签约投入和阶段预算释放。'},approvals:{page:'CF-03',title:'条件审批路径',description:'以金额、风险、等级和毛利匹配路径，串行节点内支持会签或签，提交后保留版本快照。'}};
-const templateKinds=[{value:'deliverable',label:'交付物目录'},{value:'assessment',label:'商机评估'},{value:'expert-review',label:'专家评审'},{value:'post-evaluation',label:'项目后评价'}];
-const businessKinds=[{value:'early-investment',label:'提前投入'},{value:'initiation',label:'立项审批'},{value:'over-estimate',label:'超概算决策'},{value:'change',label:'项目变更'},{value:'settlement',label:'项目结算'}];
-const roleOptions=ROLES.map(r=>({value:r.key,label:r.name.split(' (')[0]}));
-const levelOptions=['all','一般','重点','重大','特大型'].map(value=>({value,label:value==='all'?'全部等级':value}));
-export function ConfigurationPage({kind}:{kind:Kind}){
- const {data,dispatch}=useBusinessStore();const actor=useAppStore(s=>s.currentUser);const manage=['pmo','admin'].includes(actor.role);const {message,modal}=App.useApp();const [search,setSearch]=useState('');const [family,setFamily]=useState('all');const [selection,setSelection]=useState<string>();const [editing,setEditing]=useState<Version>();const [form]=Form.useForm();const rows:Version[]=data.configuration[kind];const active=effectiveVersions(rows);const selected=rows.find(v=>v.id===selection)??rows.at(-1)!;const [projectId,setProjectId]=useState('P-001');const project=data.projects.find(p=>p.id===projectId)??data.projects[0];
- const scopeOptions=[{value:'all',label:'全集团'},...Array.from(new Map(data.projects.map(p=>[p.departmentId,p.departmentName])).entries()).map(([value,label])=>({value,label}))];const typeOptions=[{value:'all',label:'全部类型'},...Array.from(new Set(data.projects.map(p=>p.type))).map(value=>({value,label:value}))];
- const act=(action:ConfigurationAction)=>{try{dispatch(action,actor);message.success('配置变更已记录');return true;}catch(e){message.error((e as Error).message);return false;}};
- const edit=(v:Version)=>{setEditing(v);form.setFieldsValue({...structuredClone(v),changeReason:''});};
- const save=async()=>{try{const value=await form.validateFields();if(act({type:'configuration-save',kind,sourceId:editing!.id||undefined,value:{...editing,...value}} as ConfigurationAction)){setEditing(undefined);setSelection(useBusinessStore.getState().data.configuration[kind].at(-1)!.id);}}catch{/* fields display validation */}};
- const publish=(v:Version)=>modal.confirm({title:`发布 ${v.name} V${v.version}？`,content:`${v.effectiveDate} 起${v.enabled?'启用':'停用'}此版本。历史审批、评审轮次和已生成目录保持原快照。`,onOk:()=>{act({type:'configuration-publish',kind,id:v.id});}});
- const filtered=rows.filter(v=>(!search||`${v.name} ${v.id}`.includes(search))&&(family==='all'||('kind' in v?v.kind:'businessType' in v?v.businessType:'all')===family));
- let simulation:React.ReactNode;try{if(kind==='grading'){const result=evaluateProjectGrading(data,{amount:project.contractAmount,strategic:project.level==='重大',risk:data.risks.some(r=>r.projectId===project.id&&['重大','特大'].includes(r.level))?'高风险':'一般',customerLevel:'一般客户',orgId:project.departmentId,projectType:project.type,grossMarginRate:project.contractAmount?(project.contractAmount-project.rollingCost)/project.contractAmount*100:0});simulation=<><Tag color={result.level==='重大'?'red':'blue'}>{result.level}</Tag><p>{result.reasons.join('；')}</p><small>命中 {result.ruleId}，实际项目等级保持原立项快照。</small></>;}else if(kind==='templates'){const t=selectTemplate(data,(selected as TemplateVersion).kind,project.departmentId,project.type,project.level);simulation=t?<><Tag color="blue">{t.id}</Tag><p>{t.rows.length} 个条目 · 必交 {t.rows.filter(r=>r.required).length} 项</p><p>已实例化：{data.templateApplications[project.id]?.templateVersionId??'历史目录，尚未应用配置模板'}</p><Link to={`/projects/${project.id}/deliverables`}>查看项目交付目录 →</Link></>:<Alert type="warning" message="无适用模板"/>;}else{const r=selectApprovalRule(data,{businessType:(selected as ApprovalRuleVersion).businessType,amount:project.contractAmount,risk:data.risks.some(r=>r.projectId===project.id&&['重大','特大'].includes(r.level))?'高风险':'一般',level:project.level,grossMarginRate:project.contractAmount?(project.contractAmount-project.rollingCost)/project.contractAmount*100:0,orgId:project.departmentId,projectType:project.type});simulation=<><Tag color="blue">{r.ruleId}</Tag><p>{r.reason}</p>{r.nodes.map((n,i)=><p key={i}>{i+1}. {n.name} · {n.mode==='all'?'全部通过':'任一通过'} · {n.timeoutDays}天</p>)}</>;}}catch(e){simulation=<Alert type="warning" message={(e as Error).message}/>;}
- return <><PageHeader item={PAGE_MANIFEST.find(p=>p.id===kinds[kind].page)} description={kinds[kind].description} extra={<Button type="primary" disabled={!manage} onClick={()=>edit({...selected,id:'',key:`CUSTOM-${kind.toUpperCase()}-${Date.now()}`,name:'新建配置规则'})}>新建独立规则</Button>}/><Alert showIcon type="info" message="版本化演示规则" description="编辑会另存草稿版本。发布后按生效日期、组织与项目类型选择；停用版本也需发布，且仅影响新业务提交。" style={{marginBottom:16}}/><Row gutter={16} style={{marginBottom:16}}><Col span={8}><Card size="small"><Statistic title="配置历史版本" value={rows.length}/></Card></Col><Col span={8}><Card size="small"><Statistic title="当前生效规则" value={active.length}/></Card></Col><Col span={8}><Card size="small"><Statistic title="待发布草稿" value={rows.filter(v=>v.status==='草稿').length}/></Card></Col></Row>
- <Row gutter={16}><Col span={15}><Card size="small" title={kinds[kind].title} extra={<Input.Search aria-label="搜索配置" placeholder="名称 / 版本编码" allowClear onSearch={setSearch} style={{width:220}}/>}>{kind!=='grading'&&<Tabs activeKey={family} onChange={setFamily} items={[{key:'all',label:'全部'},...(kind==='templates'?templateKinds:businessKinds).map(v=>({key:v.value,label:v.label}))]}/>}<Table size="small" rowKey="id" dataSource={[...filtered].reverse()} pagination={{pageSize:6}} onRow={v=>({onClick:()=>setSelection(v.id),style:{cursor:'pointer',background:v.id===selected.id?'#e6f4ff':undefined}})} columns={[{title:'规则 / 版本',render:(_,v)=><><strong>{v.name}</strong><div style={{fontSize:12,color:'#8c8c8c'}}>{v.id}</div></>},{title:'适用范围',render:(_,v)=><>{scopeOptions.find(x=>x.value===v.orgId)?.label??v.orgId}<br/>{v.projectType==='all'?'全部类型':v.projectType}</>},{title:'状态 / 生效',render:(_,v)=><><Tag color={v.status==='草稿'?'orange':active.some(a=>a.id===v.id)?'green':'default'}>{v.status==='草稿'?'草稿':active.some(a=>a.id===v.id)?'生效':v.effectiveDate>AS_OF_DATE?'待生效':v.enabled?'历史':'停用'}</Tag><div>{v.effectiveDate}</div></>},{title:'操作',width:135,render:(_,v)=><Space wrap><Button type="link" size="small" disabled={!manage} onClick={e=>{e.stopPropagation();edit(v);}}>另存新版本</Button>{v.status==='草稿'&&<Button type="link" size="small" disabled={!manage} onClick={e=>{e.stopPropagation();publish(v);}}>发布</Button>}</Space>} ]}/></Card><Card size="small" title={`${selected.name} · V${selected.version}`} style={{marginTop:16}}><Descriptions size="small" column={2} items={[{key:'enabled',label:'配置启停',children:selected.enabled?'启用':'停用'},{key:'scope',label:'适用等级',children:'level' in selected?selected.level==='all'?'全部等级':selected.level:'规则自动评定'},{key:'author',label:'创建人',children:`${selected.createdBy} · ${selected.createdAt}`},{key:'publish',label:'发布人',children:selected.publishedBy?`${selected.publishedBy} · ${selected.publishedAt}`:'尚未发布'},{key:'reason',label:'修改原因',children:selected.changeReason,span:2}]}/><Divider style={{margin:'12px 0'}}/>{kind==='templates'?<Table size="small" rowKey="id" pagination={false} dataSource={(selected as TemplateVersion).rows} columns={[{title:'材料 / 评估项',dataIndex:'name'},{title:'阶段',dataIndex:'phase'},{title:'必交',render:(_,r)=><Tag color={r.required?'red':'default'}>{r.systemRequired?'系统必交':r.required?'必交':'选交'}</Tag>},{title:'责任角色',render:(_,r)=>roleOptions.find(x=>x.value===r.role)?.label},{title:'提交时点',dataIndex:'timing'},{title:'权重',dataIndex:'weight'}]}/>:kind==='grading'?<GradingDetail value={selected as GradingVersion}/>:<Table title={()=>`优先级 ${(selected as ApprovalRuleVersion).priority} · 金额≥${(selected as ApprovalRuleVersion).minimumAmount}万元 · 风险 ${(selected as ApprovalRuleVersion).risk} · 毛利率低于 ${(selected as ApprovalRuleVersion).belowMargin??'不限'}`} size="small" rowKey="name" pagination={false} dataSource={(selected as ApprovalRuleVersion).nodes} columns={[{title:'串行节点',render:(_,n,i)=>`${i+1}. ${n.name}`},{title:'审批角色',render:(_,n)=>n.roles.map(r=>roleOptions.find(x=>x.value===r)?.label).join('、')},{title:'通过方式',render:(_,n)=>n.mode==='all'?'会签：全通过':'或签：任一通过'},{title:'处理时限',render:(_,n)=>`${n.timeoutDays}天`} ]}/>}</Card></Col><Col span={9}><Card size="small" title="适用性试算 · 实际项目上下文"><Select aria-label="配置试算项目" showSearch optionFilterProp="label" style={{width:'100%'}} value={project.id} onChange={setProjectId} options={data.projects.map(p=>({value:p.id,label:`${p.code} ${p.name}`}))}/><p>{project.departmentName} · {project.type} · 合同 {project.contractAmount.toFixed(2)} 万元</p>{simulation}</Card><Card size="small" title="业务使用与历史追溯" style={{marginTop:16}}>{kind==='templates'?<><p>交付物模板在立项或项目目录中生成实例，记录来源版本；已存在的材料与审核版本保留。</p><p>商机六维权重和专家评审维度在新轮次使用并冻结模板快照；后评价模板待结算业务集成。</p></>:kind==='grading'?<><p>商机初评轮次记录评分与毛利阈值；提前投入记录累计额度和期限；阶段申请记录释放比例。</p><Link to="/opportunities">到商机发起新业务 →</Link><p><Link to={`/projects/${project.id}/stage-switch`}>查看阶段切换 →</Link></p></>:<><p>提前投入已执行串行节点及会签/或签，按节点角色去重留痕。新提交匹配当前规则；历史审批沿用提交快照。</p><Link to="/early-investments">查看提前投入审批 →</Link><p>立项、预算等消费方通过统一选择器接入；历史默认审批保持原规则。</p></>}</Card></Col></Row>
- <Drawer width={880} open={!!editing} title={`另存新版本 · ${editing?.name??''}`} onClose={()=>setEditing(undefined)} extra={<Button type="primary" onClick={save}>保存草稿版本</Button>} destroyOnClose><Form form={form} layout="vertical"><Form.Item name="key" label="规则编码" rules={[{required:true,whitespace:true}]}><Input disabled={!!editing?.id}/></Form.Item><Row gutter={16}><Col span={16}><Form.Item name="name" label="配置名称" rules={[{required:true,whitespace:true}]}><Input/></Form.Item></Col><Col span={8}><Form.Item name="enabled" label="发布后状态" valuePropName="checked"><Switch checkedChildren="启用" unCheckedChildren="停用"/></Form.Item></Col><Col span={8}><Form.Item name="effectiveDate" label="生效日期" rules={[{required:true}]}><Input type="date"/></Form.Item></Col><Col span={8}><Form.Item name="orgId" label="适用组织" rules={[{required:true}]}><Select options={scopeOptions}/></Form.Item></Col><Col span={8}><Form.Item name="projectType" label="适用项目类型" rules={[{required:true}]}><Select options={typeOptions}/></Form.Item></Col></Row><Form.Item name="changeReason" label="修改原因" rules={[{required:true,whitespace:true}]}><Input.TextArea rows={2}/></Form.Item>{kind==='templates'?<><Form.Item name="level" label="适用等级"><Select options={levelOptions}/></Form.Item><Alert type="info" message="系统必交项保留名称与必交性；新增项可设置阶段、责任和时点。"/><Form.List name="rows">{(fields,{add,remove})=><>{fields.map(f=><Card key={f.key} size="small" style={{marginTop:12}} extra={<Button danger size="small" disabled={(editing as TemplateVersion)?.rows[f.name]?.systemRequired} onClick={()=>remove(f.name)}>删除条目</Button>}><Form.Item name={[f.name,'id']} hidden><Input/></Form.Item><Form.Item name={[f.name,'systemRequired']} hidden valuePropName="checked"><Switch/></Form.Item><Row gutter={12}><Col span={10}><Form.Item name={[f.name,'name']} label="条目名称" rules={[{required:true}]}><Input disabled={(editing as TemplateVersion)?.rows[f.name]?.systemRequired}/></Form.Item></Col><Col span={7}><Form.Item name={[f.name,'phase']} label="适用阶段" rules={[{required:true}]}><Input/></Form.Item></Col><Col span={7}><Form.Item name={[f.name,'role']} label="责任角色"><Select options={roleOptions}/></Form.Item></Col><Col span={10}><Form.Item name={[f.name,'timing']} label="提交时点" rules={[{required:true}]}><Input/></Form.Item></Col><Col span={7}><Form.Item name={[f.name,'required']} label="是否必交" valuePropName="checked"><Switch disabled={(editing as TemplateVersion)?.rows[f.name]?.systemRequired}/></Form.Item></Col><Col span={7}><Form.Item name={[f.name,'weight']} label="评估权重"><InputNumber min={0}/></Form.Item></Col></Row></Card>)}<Button style={{marginTop:12}} onClick={()=>add({id:`custom-${Date.now()}`,name:'',phase:'实施',role:'project-manager',required:false,systemRequired:false,timing:'阶段结束前',weight:0})}>添加模板条目</Button></>}</Form.List></>:kind==='grading'?<GradingFields/>:<><Row gutter={12}><Col span={8}><Form.Item name="businessType" label="业务类型"><Select options={businessKinds}/></Form.Item></Col><Col span={8}><Form.Item name="priority" label="匹配优先级（高优先）"><InputNumber min={0}/></Form.Item></Col><Col span={8}><Form.Item name="minimumAmount" label="金额下限（万元）"><InputNumber min={0}/></Form.Item></Col><Col span={8}><Form.Item name="risk" label="风险条件"><Select options={['all','一般','高风险'].map(value=>({value,label:value==='all'?'不限风险':value}))}/></Form.Item></Col><Col span={8}><Form.Item name="level" label="项目等级"><Select options={levelOptions}/></Form.Item></Col><Col span={8}><Form.Item name="belowMargin" label="毛利率低于（可空）"><InputNumber min={0} max={100}/></Form.Item></Col></Row><Alert type="info" message="节点按顺序串行推进；会签任一驳回即结束，或签全部驳回才结束。每个角色每节点仅提交一次。"/><Form.List name="nodes">{(fields,{add,remove})=><>{fields.map(f=><Card key={f.key} title={`第 ${f.name+1} 节点`} size="small" style={{marginTop:12}} extra={<Button danger size="small" onClick={()=>remove(f.name)}>删除节点</Button>}><Row gutter={12}><Col span={12}><Form.Item name={[f.name,'name']} label="节点名称" rules={[{required:true}]}><Input/></Form.Item></Col><Col span={12}><Form.Item name={[f.name,'roles']} label="审批角色" rules={[{required:true,type:'array',min:1}]}><Select mode="multiple" options={roleOptions}/></Form.Item></Col><Col span={12}><Form.Item name={[f.name,'mode']} label="通过方式"><Select options={[{value:'all',label:'会签：全部通过'},{value:'any',label:'或签：任一通过'}]}/></Form.Item></Col><Col span={12}><Form.Item name={[f.name,'timeoutDays']} label="处理时限（天）"><InputNumber min={1}/></Form.Item></Col></Row></Card>)}<Button style={{marginTop:12}} onClick={()=>add({name:'新增审批节点',roles:['pmo'],mode:'all',timeoutDays:3})}>追加串行节点</Button></>}</Form.List></>}</Form></Drawer></>;
+import { useActionAccess } from "@/hooks/useActionAccess";
+import { visibleProjects } from "@/mock/selectors";
+import { useState } from "react";
+import {
+  Alert,
+  App,
+  Button,
+  Card,
+  Col,
+  Descriptions,
+  Divider,
+  Drawer,
+  Form,
+  Input,
+  InputNumber,
+  Row,
+  Select,
+  Space,
+  Statistic,
+  Switch,
+  Table,
+  Tabs,
+  Tag,
+} from "antd";
+import { Link } from "react-router-dom";
+import { useBusinessStore } from "@/mock/business";
+import { AS_OF_DATE } from "@/mock";
+import {
+  effectiveVersions,
+  evaluateProjectGrading,
+  selectApprovalRule,
+  selectTemplate,
+  type ConfigurationAction,
+} from "@/mock/configuration";
+import type {
+  ApprovalRuleVersion,
+  ConfigurationState,
+  GradingVersion,
+  TemplateVersion,
+} from "@/models/configuration";
+import { ROLES, useAppStore } from "@/store/useAppStore";
+import { PageHeader } from "@/components/common/PageHeader";
+import { PAGE_MANIFEST } from "@/routes/manifest";
+type Kind = keyof ConfigurationState;
+type Version = TemplateVersion | GradingVersion | ApprovalRuleVersion;
+const kinds = {
+  templates: {
+    page: "CF-01",
+    title: "交付物与评估模板",
+    description: "按项目类型、等级与阶段生成交付目录；新发布版本仅用于新实例。",
+  },
+  grading: {
+    page: "CF-02",
+    title: "项目分级与管控规则",
+    description:
+      "统一金额、战略与风险分级，并控制毛利、未签约投入和阶段预算释放。",
+  },
+  approvals: {
+    page: "CF-03",
+    title: "条件审批路径",
+    description:
+      "以金额、风险、等级和毛利匹配路径，串行节点内支持会签或签，提交后保留版本快照。",
+  },
+};
+const templateKinds = [
+  { value: "deliverable", label: "交付物目录" },
+  { value: "assessment", label: "商机评估" },
+  { value: "expert-review", label: "专家评审" },
+  { value: "post-evaluation", label: "项目后评价" },
+];
+const businessKinds = [
+  { value: "early-investment", label: "提前投入" },
+  { value: "initiation", label: "立项审批" },
+  { value: "over-estimate", label: "超概算决策" },
+  { value: "change", label: "项目变更" },
+  { value: "settlement", label: "项目结算" },
+];
+const roleOptions = ROLES.map((r) => ({
+  value: r.key,
+  label: r.name.split(" (")[0],
+}));
+const levelOptions = ["all", "一般", "重点", "重大", "特大型"].map((value) => ({
+  value,
+  label: value === "all" ? "全部等级" : value,
+}));
+export function ConfigurationPage({ kind }: { kind: Kind }) {
+  const { data, dispatch } = useBusinessStore();
+  const actor = useAppStore((s) => s.currentUser);
+  const manage = ["pmo", "admin"].includes(actor.role);
+  const { canDo } = useActionAccess();
+  const canSave = manage && canDo("configuration-save");
+  const canPublish = (v: Version) =>
+    manage && v.status === "草稿" && canDo("configuration-publish", v.id);
+  const { message, modal } = App.useApp();
+  const [search, setSearch] = useState("");
+  const [family, setFamily] = useState("all");
+  const [selection, setSelection] = useState<string>();
+  const [editing, setEditing] = useState<Version>();
+  const [form] = Form.useForm();
+  const rows: Version[] = data.configuration[kind];
+  const active = effectiveVersions(rows);
+  const selected = rows.find((v) => v.id === selection) ?? rows.at(-1)!;
+  const [projectId, setProjectId] = useState("P-001");
+  const visible = visibleProjects(actor.role, data.projects, data);
+  const project = visible.find((p) => p.id === projectId);
+  const scopeOptions = [
+    { value: "all", label: "全集团" },
+    ...Array.from(
+      new Map(
+        data.projects.map((p) => [p.departmentId, p.departmentName]),
+      ).entries(),
+    ).map(([value, label]) => ({ value, label })),
+  ];
+  const typeOptions = [
+    { value: "all", label: "全部类型" },
+    ...Array.from(new Set(data.projects.map((p) => p.type))).map((value) => ({
+      value,
+      label: value,
+    })),
+  ];
+  const act = (action: ConfigurationAction) => {
+    if (!canDo(action.type, "id" in action ? action.id : undefined))
+      return false;
+    try {
+      dispatch(action, useAppStore.getState().currentUser);
+      message.success("配置变更已记录");
+      return true;
+    } catch (e) {
+      message.error((e as Error).message);
+      return false;
+    }
+  };
+  const edit = (v: Version) => {
+    if (!manage || !canDo("configuration-save")) return;
+    setEditing(v);
+    form.setFieldsValue({ ...structuredClone(v), changeReason: "" });
+  };
+  const save = async () => {
+    if (!manage || !canDo("configuration-save")) return;
+    try {
+      const value = await form.validateFields();
+      if (!canDo("configuration-save")) return;
+      if (
+        act({
+          type: "configuration-save",
+          kind,
+          sourceId: editing!.id || undefined,
+          value: { ...editing, ...value },
+        } as ConfigurationAction)
+      ) {
+        setEditing(undefined);
+        setSelection(
+          useBusinessStore.getState().data.configuration[kind].at(-1)!.id,
+        );
+      }
+    } catch {
+      /* fields display validation */
+    }
+  };
+  const publish = (v: Version) => {
+    if (!canPublish(v)) return;
+    modal.confirm({
+      title: `发布 ${v.name} V${v.version}？`,
+      content: `${v.effectiveDate} 起${v.enabled ? "启用" : "停用"}此版本。历史审批、评审轮次和已生成目录保持原快照。`,
+      okButtonProps: { disabled: !canPublish(v) },
+      onOk: () => {
+        if (!canDo("configuration-publish", v.id))
+          return Promise.reject(new Error("当前策略禁止发布配置"));
+        act({ type: "configuration-publish", kind, id: v.id });
+      },
+    });
+  };
+  const filtered = rows.filter(
+    (v) =>
+      (!search || `${v.name} ${v.id}`.includes(search)) &&
+      (family === "all" ||
+        ("kind" in v
+          ? v.kind
+          : "businessType" in v
+            ? v.businessType
+            : "all") === family),
+  );
+  let simulation: React.ReactNode;
+  try {
+    if (!project) {
+      simulation = (
+        <Alert type="info" message="请选择当前权限范围内的项目进行试算" />
+      );
+    } else if (kind === "grading") {
+      const result = evaluateProjectGrading(data, {
+        amount: project.contractAmount,
+        strategic: project.level === "重大",
+        risk: data.risks.some(
+          (r) =>
+            r.projectId === project.id && ["重大", "特大"].includes(r.level),
+        )
+          ? "高风险"
+          : "一般",
+        customerLevel: "一般客户",
+        orgId: project.departmentId,
+        projectType: project.type,
+        grossMarginRate: project.contractAmount
+          ? ((project.contractAmount - project.rollingCost) /
+              project.contractAmount) *
+            100
+          : 0,
+      });
+      simulation = (
+        <>
+          <Tag color={result.level === "重大" ? "red" : "blue"}>
+            {result.level}
+          </Tag>
+          <p>{result.reasons.join("；")}</p>
+          <small>命中 {result.ruleId}，实际项目等级保持原立项快照。</small>
+        </>
+      );
+    } else if (kind === "templates") {
+      const t = selectTemplate(
+        data,
+        (selected as TemplateVersion).kind,
+        project.departmentId,
+        project.type,
+        project.level,
+      );
+      simulation = t ? (
+        <>
+          <Tag color="blue">{t.id}</Tag>
+          <p>
+            {t.rows.length} 个条目 · 必交{" "}
+            {t.rows.filter((r) => r.required).length} 项
+          </p>
+          <p>
+            已实例化：
+            {data.templateApplications[project.id]?.templateVersionId ??
+              "历史目录，尚未应用配置模板"}
+          </p>
+          <Link to={`/projects/${project.id}/deliverables`}>
+            查看项目交付目录 →
+          </Link>
+        </>
+      ) : (
+        <Alert type="warning" message="无适用模板" />
+      );
+    } else {
+      const r = selectApprovalRule(data, {
+        businessType: (selected as ApprovalRuleVersion).businessType,
+        amount: project.contractAmount,
+        risk: data.risks.some(
+          (r) =>
+            r.projectId === project.id && ["重大", "特大"].includes(r.level),
+        )
+          ? "高风险"
+          : "一般",
+        level: project.level,
+        grossMarginRate: project.contractAmount
+          ? ((project.contractAmount - project.rollingCost) /
+              project.contractAmount) *
+            100
+          : 0,
+        orgId: project.departmentId,
+        projectType: project.type,
+      });
+      simulation = (
+        <>
+          <Tag color="blue">{r.ruleId}</Tag>
+          <p>{r.reason}</p>
+          {r.nodes.map((n, i) => (
+            <p key={i}>
+              {i + 1}. {n.name} · {n.mode === "all" ? "全部通过" : "任一通过"} ·{" "}
+              {n.timeoutDays}天
+            </p>
+          ))}
+        </>
+      );
+    }
+  } catch (e) {
+    simulation = <Alert type="warning" message={(e as Error).message} />;
+  }
+  return (
+    <>
+      <PageHeader
+        item={PAGE_MANIFEST.find((p) => p.id === kinds[kind].page)}
+        description={kinds[kind].description}
+        extra={
+          <Button
+            type="primary"
+            disabled={!canSave}
+            onClick={() =>
+              edit({
+                ...selected,
+                id: "",
+                key: `CUSTOM-${kind.toUpperCase()}-${Date.now()}`,
+                name: "新建配置规则",
+              })
+            }
+          >
+            新建独立规则
+          </Button>
+        }
+      />
+      <Alert
+        showIcon
+        type="info"
+        message="版本化演示规则"
+        description="编辑会另存草稿版本。发布后按生效日期、组织与项目类型选择；停用版本也需发布，且仅影响新业务提交。"
+        style={{ marginBottom: 16 }}
+      />
+      <Row gutter={16} style={{ marginBottom: 16 }}>
+        <Col span={8}>
+          <Card size="small">
+            <Statistic title="配置历史版本" value={rows.length} />
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card size="small">
+            <Statistic title="当前生效规则" value={active.length} />
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card size="small">
+            <Statistic
+              title="待发布草稿"
+              value={rows.filter((v) => v.status === "草稿").length}
+            />
+          </Card>
+        </Col>
+      </Row>
+      <Row gutter={16}>
+        <Col span={15}>
+          <Card
+            size="small"
+            title={kinds[kind].title}
+            extra={
+              <Input.Search
+                aria-label="搜索配置"
+                placeholder="名称 / 版本编码"
+                allowClear
+                onSearch={setSearch}
+                style={{ width: 220 }}
+              />
+            }
+          >
+            {kind !== "grading" && (
+              <Tabs
+                activeKey={family}
+                onChange={setFamily}
+                items={[
+                  { key: "all", label: "全部" },
+                  ...(kind === "templates" ? templateKinds : businessKinds).map(
+                    (v) => ({ key: v.value, label: v.label }),
+                  ),
+                ]}
+              />
+            )}
+            <Table
+              size="small"
+              rowKey="id"
+              dataSource={[...filtered].reverse()}
+              pagination={{ pageSize: 6 }}
+              onRow={(v) => ({
+                onClick: () => setSelection(v.id),
+                style: {
+                  cursor: "pointer",
+                  background: v.id === selected.id ? "#e6f4ff" : undefined,
+                },
+              })}
+              columns={[
+                {
+                  title: "规则 / 版本",
+                  render: (_, v) => (
+                    <>
+                      <strong>{v.name}</strong>
+                      <div style={{ fontSize: 12, color: "#8c8c8c" }}>
+                        {v.id}
+                      </div>
+                    </>
+                  ),
+                },
+                {
+                  title: "适用范围",
+                  render: (_, v) => (
+                    <>
+                      {scopeOptions.find((x) => x.value === v.orgId)?.label ??
+                        v.orgId}
+                      <br />
+                      {v.projectType === "all" ? "全部类型" : v.projectType}
+                    </>
+                  ),
+                },
+                {
+                  title: "状态 / 生效",
+                  render: (_, v) => (
+                    <>
+                      <Tag
+                        color={
+                          v.status === "草稿"
+                            ? "orange"
+                            : active.some((a) => a.id === v.id)
+                              ? "green"
+                              : "default"
+                        }
+                      >
+                        {v.status === "草稿"
+                          ? "草稿"
+                          : active.some((a) => a.id === v.id)
+                            ? "生效"
+                            : v.effectiveDate > AS_OF_DATE
+                              ? "待生效"
+                              : v.enabled
+                                ? "历史"
+                                : "停用"}
+                      </Tag>
+                      <div>{v.effectiveDate}</div>
+                    </>
+                  ),
+                },
+                {
+                  title: "操作",
+                  width: 135,
+                  render: (_, v) => (
+                    <Space wrap>
+                      <Button
+                        type="link"
+                        size="small"
+                        disabled={!canSave}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          edit(v);
+                        }}
+                      >
+                        另存新版本
+                      </Button>
+                      {v.status === "草稿" && (
+                        <Button
+                          type="link"
+                          size="small"
+                          disabled={!canPublish(v)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            publish(v);
+                          }}
+                        >
+                          发布
+                        </Button>
+                      )}
+                    </Space>
+                  ),
+                },
+              ]}
+            />
+          </Card>
+          <Card
+            size="small"
+            title={`${selected.name} · V${selected.version}`}
+            style={{ marginTop: 16 }}
+          >
+            <Descriptions
+              size="small"
+              column={2}
+              items={[
+                {
+                  key: "enabled",
+                  label: "配置启停",
+                  children: selected.enabled ? "启用" : "停用",
+                },
+                {
+                  key: "scope",
+                  label: "适用等级",
+                  children:
+                    "level" in selected
+                      ? selected.level === "all"
+                        ? "全部等级"
+                        : selected.level
+                      : "规则自动评定",
+                },
+                {
+                  key: "author",
+                  label: "创建人",
+                  children: `${selected.createdBy} · ${selected.createdAt}`,
+                },
+                {
+                  key: "publish",
+                  label: "发布人",
+                  children: selected.publishedBy
+                    ? `${selected.publishedBy} · ${selected.publishedAt}`
+                    : "尚未发布",
+                },
+                {
+                  key: "reason",
+                  label: "修改原因",
+                  children: selected.changeReason,
+                  span: 2,
+                },
+              ]}
+            />
+            <Divider style={{ margin: "12px 0" }} />
+            {kind === "templates" ? (
+              <Table
+                size="small"
+                rowKey="id"
+                pagination={false}
+                dataSource={(selected as TemplateVersion).rows}
+                columns={[
+                  { title: "材料 / 评估项", dataIndex: "name" },
+                  { title: "阶段", dataIndex: "phase" },
+                  {
+                    title: "必交",
+                    render: (_, r) => (
+                      <Tag color={r.required ? "red" : "default"}>
+                        {r.systemRequired
+                          ? "系统必交"
+                          : r.required
+                            ? "必交"
+                            : "选交"}
+                      </Tag>
+                    ),
+                  },
+                  {
+                    title: "责任角色",
+                    render: (_, r) =>
+                      roleOptions.find((x) => x.value === r.role)?.label,
+                  },
+                  { title: "提交时点", dataIndex: "timing" },
+                  { title: "权重", dataIndex: "weight" },
+                ]}
+              />
+            ) : kind === "grading" ? (
+              <GradingDetail value={selected as GradingVersion} />
+            ) : (
+              <Table
+                title={() =>
+                  `优先级 ${(selected as ApprovalRuleVersion).priority} · 金额≥${(selected as ApprovalRuleVersion).minimumAmount}万元 · 风险 ${(selected as ApprovalRuleVersion).risk} · 毛利率低于 ${(selected as ApprovalRuleVersion).belowMargin ?? "不限"}`
+                }
+                size="small"
+                rowKey="name"
+                pagination={false}
+                dataSource={(selected as ApprovalRuleVersion).nodes}
+                columns={[
+                  {
+                    title: "串行节点",
+                    render: (_, n, i) => `${i + 1}. ${n.name}`,
+                  },
+                  {
+                    title: "审批角色",
+                    render: (_, n) =>
+                      n.roles
+                        .map(
+                          (r) => roleOptions.find((x) => x.value === r)?.label,
+                        )
+                        .join("、"),
+                  },
+                  {
+                    title: "通过方式",
+                    render: (_, n) =>
+                      n.mode === "all" ? "会签：全通过" : "或签：任一通过",
+                  },
+                  { title: "处理时限", render: (_, n) => `${n.timeoutDays}天` },
+                ]}
+              />
+            )}
+          </Card>
+        </Col>
+        <Col span={9}>
+          <Card size="small" title="适用性试算 · 实际项目上下文">
+            <Select
+              aria-label="配置试算项目"
+              showSearch
+              optionFilterProp="label"
+              style={{ width: "100%" }}
+              value={project?.id}
+              onChange={setProjectId}
+              options={visible.map((p) => ({
+                value: p.id,
+                label: `${p.code} ${p.name}`,
+              }))}
+            />
+            {project && (
+              <p>
+                {project.departmentName} · {project.type} · 合同{" "}
+                {project.contractAmount.toFixed(2)} 万元
+              </p>
+            )}
+            {simulation}
+          </Card>
+          <Card
+            size="small"
+            title="业务使用与历史追溯"
+            style={{ marginTop: 16 }}
+          >
+            {kind === "templates" ? (
+              <>
+                <p>
+                  交付物模板在立项或项目目录中生成实例，记录来源版本；已存在的材料与审核版本保留。
+                </p>
+                <p>
+                  商机六维权重和专家评审维度在新轮次使用并冻结模板快照；后评价模板待结算业务集成。
+                </p>
+              </>
+            ) : kind === "grading" ? (
+              <>
+                <p>
+                  商机初评轮次记录评分与毛利阈值；提前投入记录累计额度和期限；阶段申请记录释放比例。
+                </p>
+                <Link to="/opportunities">到商机发起新业务 →</Link>
+                <p>
+                  {project && (
+                    <Link to={`/projects/${project.id}/stage-switch`}>
+                      查看阶段切换 →
+                    </Link>
+                  )}
+                </p>
+              </>
+            ) : (
+              <>
+                <p>
+                  提前投入已执行串行节点及会签/或签，按节点角色去重留痕。新提交匹配当前规则；历史审批沿用提交快照。
+                </p>
+                <Link to="/early-investments">查看提前投入审批 →</Link>
+                <p>
+                  立项、预算等消费方通过统一选择器接入；历史默认审批保持原规则。
+                </p>
+              </>
+            )}
+          </Card>
+        </Col>
+      </Row>
+      <Drawer
+        width={880}
+        open={!!editing}
+        title={`另存新版本 · ${editing?.name ?? ""}`}
+        onClose={() => setEditing(undefined)}
+        extra={
+          <Button type="primary" disabled={!canSave} onClick={save}>
+            保存草稿版本
+          </Button>
+        }
+        destroyOnClose
+      >
+        <Form form={form} layout="vertical" disabled={!canSave}>
+          <Form.Item
+            name="key"
+            label="规则编码"
+            rules={[{ required: true, whitespace: true }]}
+          >
+            <Input disabled={!canSave || !!editing?.id} />
+          </Form.Item>
+          <Row gutter={16}>
+            <Col span={16}>
+              <Form.Item
+                name="name"
+                label="配置名称"
+                rules={[{ required: true, whitespace: true }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name="enabled"
+                label="发布后状态"
+                valuePropName="checked"
+              >
+                <Switch checkedChildren="启用" unCheckedChildren="停用" />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name="effectiveDate"
+                label="生效日期"
+                rules={[{ required: true }]}
+              >
+                <Input type="date" />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name="orgId"
+                label="适用组织"
+                rules={[{ required: true }]}
+              >
+                <Select options={scopeOptions} />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name="projectType"
+                label="适用项目类型"
+                rules={[{ required: true }]}
+              >
+                <Select options={typeOptions} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Form.Item
+            name="changeReason"
+            label="修改原因"
+            rules={[{ required: true, whitespace: true }]}
+          >
+            <Input.TextArea rows={2} />
+          </Form.Item>
+          {kind === "templates" ? (
+            <>
+              <Form.Item name="level" label="适用等级">
+                <Select options={levelOptions} />
+              </Form.Item>
+              <Alert
+                type="info"
+                message="系统必交项保留名称与必交性；新增项可设置阶段、责任和时点。"
+              />
+              <Form.List name="rows">
+                {(fields, { add, remove }) => (
+                  <>
+                    {fields.map((f) => (
+                      <Card
+                        key={f.key}
+                        size="small"
+                        style={{ marginTop: 12 }}
+                        extra={
+                          <Button
+                            danger
+                            size="small"
+                            disabled={
+                              !canSave ||
+                              (editing as TemplateVersion)?.rows[f.name]
+                                ?.systemRequired
+                            }
+                            onClick={() => remove(f.name)}
+                          >
+                            删除条目
+                          </Button>
+                        }
+                      >
+                        <Form.Item name={[f.name, "id"]} hidden>
+                          <Input />
+                        </Form.Item>
+                        <Form.Item
+                          name={[f.name, "systemRequired"]}
+                          hidden
+                          valuePropName="checked"
+                        >
+                          <Switch />
+                        </Form.Item>
+                        <Row gutter={12}>
+                          <Col span={10}>
+                            <Form.Item
+                              name={[f.name, "name"]}
+                              label="条目名称"
+                              rules={[{ required: true }]}
+                            >
+                              <Input
+                                disabled={
+                                  !canSave ||
+                                  (editing as TemplateVersion)?.rows[f.name]
+                                    ?.systemRequired
+                                }
+                              />
+                            </Form.Item>
+                          </Col>
+                          <Col span={7}>
+                            <Form.Item
+                              name={[f.name, "phase"]}
+                              label="适用阶段"
+                              rules={[{ required: true }]}
+                            >
+                              <Input />
+                            </Form.Item>
+                          </Col>
+                          <Col span={7}>
+                            <Form.Item name={[f.name, "role"]} label="责任角色">
+                              <Select options={roleOptions} />
+                            </Form.Item>
+                          </Col>
+                          <Col span={10}>
+                            <Form.Item
+                              name={[f.name, "timing"]}
+                              label="提交时点"
+                              rules={[{ required: true }]}
+                            >
+                              <Input />
+                            </Form.Item>
+                          </Col>
+                          <Col span={7}>
+                            <Form.Item
+                              name={[f.name, "required"]}
+                              label="是否必交"
+                              valuePropName="checked"
+                            >
+                              <Switch
+                                disabled={
+                                  !canSave ||
+                                  (editing as TemplateVersion)?.rows[f.name]
+                                    ?.systemRequired
+                                }
+                              />
+                            </Form.Item>
+                          </Col>
+                          <Col span={7}>
+                            <Form.Item
+                              name={[f.name, "weight"]}
+                              label="评估权重"
+                            >
+                              <InputNumber min={0} />
+                            </Form.Item>
+                          </Col>
+                        </Row>
+                      </Card>
+                    ))}
+                    <Button
+                      style={{ marginTop: 12 }}
+                      disabled={!canSave}
+                      onClick={() =>
+                        add({
+                          id: `custom-${Date.now()}`,
+                          name: "",
+                          phase: "实施",
+                          role: "project-manager",
+                          required: false,
+                          systemRequired: false,
+                          timing: "阶段结束前",
+                          weight: 0,
+                        })
+                      }
+                    >
+                      添加模板条目
+                    </Button>
+                  </>
+                )}
+              </Form.List>
+            </>
+          ) : kind === "grading" ? (
+            <GradingFields />
+          ) : (
+            <>
+              <Row gutter={12}>
+                <Col span={8}>
+                  <Form.Item name="businessType" label="业务类型">
+                    <Select options={businessKinds} />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item name="priority" label="匹配优先级（高优先）">
+                    <InputNumber min={0} />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item name="minimumAmount" label="金额下限（万元）">
+                    <InputNumber min={0} />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item name="risk" label="风险条件">
+                    <Select
+                      options={["all", "一般", "高风险"].map((value) => ({
+                        value,
+                        label: value === "all" ? "不限风险" : value,
+                      }))}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item name="level" label="项目等级">
+                    <Select options={levelOptions} />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item name="belowMargin" label="毛利率低于（可空）">
+                    <InputNumber min={0} max={100} />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Alert
+                type="info"
+                message="节点按顺序串行推进；会签任一驳回即结束，或签全部驳回才结束。每个角色每节点仅提交一次。"
+              />
+              <Form.List name="nodes">
+                {(fields, { add, remove }) => (
+                  <>
+                    {fields.map((f) => (
+                      <Card
+                        key={f.key}
+                        title={`第 ${f.name + 1} 节点`}
+                        size="small"
+                        style={{ marginTop: 12 }}
+                        extra={
+                          <Button
+                            danger
+                            size="small"
+                            disabled={!canSave}
+                            onClick={() => remove(f.name)}
+                          >
+                            删除节点
+                          </Button>
+                        }
+                      >
+                        <Row gutter={12}>
+                          <Col span={12}>
+                            <Form.Item
+                              name={[f.name, "name"]}
+                              label="节点名称"
+                              rules={[{ required: true }]}
+                            >
+                              <Input />
+                            </Form.Item>
+                          </Col>
+                          <Col span={12}>
+                            <Form.Item
+                              name={[f.name, "roles"]}
+                              label="审批角色"
+                              rules={[
+                                { required: true, type: "array", min: 1 },
+                              ]}
+                            >
+                              <Select mode="multiple" options={roleOptions} />
+                            </Form.Item>
+                          </Col>
+                          <Col span={12}>
+                            <Form.Item name={[f.name, "mode"]} label="通过方式">
+                              <Select
+                                options={[
+                                  { value: "all", label: "会签：全部通过" },
+                                  { value: "any", label: "或签：任一通过" },
+                                ]}
+                              />
+                            </Form.Item>
+                          </Col>
+                          <Col span={12}>
+                            <Form.Item
+                              name={[f.name, "timeoutDays"]}
+                              label="处理时限（天）"
+                            >
+                              <InputNumber min={1} />
+                            </Form.Item>
+                          </Col>
+                        </Row>
+                      </Card>
+                    ))}
+                    <Button
+                      style={{ marginTop: 12 }}
+                      disabled={!canSave}
+                      onClick={() =>
+                        add({
+                          name: "新增审批节点",
+                          roles: ["pmo"],
+                          mode: "all",
+                          timeoutDays: 3,
+                        })
+                      }
+                    >
+                      追加串行节点
+                    </Button>
+                  </>
+                )}
+              </Form.List>
+            </>
+          )}
+        </Form>
+      </Drawer>
+    </>
+  );
 }
-const gradingNumbers=[['superAmount','特大型项目金额下限（万元）'],['majorAmount','重大项目金额下限（万元）'],['keyAmount','重点项目金额下限（万元）'],['minimumMargin','最低毛利率（%）'],['minimumAssessmentScore','初评最低分'],['unsignedRatio','未签约累计额度比例（0–1）'],['unsignedDays','未签约投入最大天数'],['unsignedWarningDays','投入到期提前预警天数'],['stageReleasePercent','阶段通过释放比例（%）']] as const;
-function GradingFields(){return <><Row gutter={16}>{gradingNumbers.map(([name,label])=><Col span={12} key={name}><Form.Item name={name} label={label} rules={[{required:true}]}><InputNumber style={{width:'100%'}} min={0} max={name==='unsignedRatio'?1:undefined}/></Form.Item></Col>)}</Row><Space size={24}><Form.Item name="strategicMajor" label="战略项目升为重大" valuePropName="checked"><Switch/></Form.Item><Form.Item name="highRiskMajor" label="高风险升为重大" valuePropName="checked"><Switch/></Form.Item><Form.Item name="strategicCustomerMajor" label="战略客户升为重大" valuePropName="checked"><Switch/></Form.Item></Space></>;}
-function GradingDetail({value}:{value:GradingVersion}){return <><Descriptions size="small" column={2} items={gradingNumbers.map(([key,label])=>({key,label,children:value[key]}))}/><Space wrap>{value.strategicMajor&&<Tag>战略项目升重大</Tag>}{value.highRiskMajor&&<Tag>高风险升重大</Tag>}{value.strategicCustomerMajor&&<Tag>战略客户升重大</Tag>}</Space></>;}
+const gradingNumbers = [
+  ["superAmount", "特大型项目金额下限（万元）"],
+  ["majorAmount", "重大项目金额下限（万元）"],
+  ["keyAmount", "重点项目金额下限（万元）"],
+  ["minimumMargin", "最低毛利率（%）"],
+  ["minimumAssessmentScore", "初评最低分"],
+  ["unsignedRatio", "未签约累计额度比例（0–1）"],
+  ["unsignedDays", "未签约投入最大天数"],
+  ["unsignedWarningDays", "投入到期提前预警天数"],
+  ["stageReleasePercent", "阶段通过释放比例（%）"],
+] as const;
+function GradingFields() {
+  return (
+    <>
+      <Row gutter={16}>
+        {gradingNumbers.map(([name, label]) => (
+          <Col span={12} key={name}>
+            <Form.Item name={name} label={label} rules={[{ required: true }]}>
+              <InputNumber
+                style={{ width: "100%" }}
+                min={0}
+                max={name === "unsignedRatio" ? 1 : undefined}
+              />
+            </Form.Item>
+          </Col>
+        ))}
+      </Row>
+      <Space size={24}>
+        <Form.Item
+          name="strategicMajor"
+          label="战略项目升为重大"
+          valuePropName="checked"
+        >
+          <Switch />
+        </Form.Item>
+        <Form.Item
+          name="highRiskMajor"
+          label="高风险升为重大"
+          valuePropName="checked"
+        >
+          <Switch />
+        </Form.Item>
+        <Form.Item
+          name="strategicCustomerMajor"
+          label="战略客户升为重大"
+          valuePropName="checked"
+        >
+          <Switch />
+        </Form.Item>
+      </Space>
+    </>
+  );
+}
+function GradingDetail({ value }: { value: GradingVersion }) {
+  return (
+    <>
+      <Descriptions
+        size="small"
+        column={2}
+        items={gradingNumbers.map(([key, label]) => ({
+          key,
+          label,
+          children: value[key],
+        }))}
+      />
+      <Space wrap>
+        {value.strategicMajor && <Tag>战略项目升重大</Tag>}
+        {value.highRiskMajor && <Tag>高风险升重大</Tag>}
+        {value.strategicCustomerMajor && <Tag>战略客户升重大</Tag>}
+      </Space>
+    </>
+  );
+}

@@ -1,26 +1,798 @@
-import { canViewSensitiveField } from '@/mock/configuration-access';
-import { marginReason } from '@/utils/sensitive';
-import { useState } from 'react';
-import { Alert,App,Button,Card,Checkbox,Col,Descriptions,Input,InputNumber,Modal,Row,Select,Space,Table,Tabs,Tag,Timeline } from 'antd';
-import {useNavigate,useSearchParams} from 'react-router-dom';
-import {useBusinessStore} from '@/mock/business';
-import {useAppStore} from '@/store/useAppStore';
-import {visibleProjects} from '@/mock/selectors';
-import {defaultChangeInput,proposeChange,CHANGE_RULE} from '@/mock/changes';
-import type {ChangeInput} from '@/models/changes';
-import {PageHeader} from '@/components/common/PageHeader';
-import {StateView} from '@/components/common/StateView';
-export function ChangeFormPage(){
- const {data,dispatch}=useBusinessStore(),{currentRole,currentUser}=useAppStore(),navigate=useNavigate(),{message}=App.useApp();const [params,setParams]=useSearchParams();const request=data.changeRequests.find(r=>r.id===params.get('changeId'));const projectId=request?.projectId??params.get('projectId')??'P-001';const p=data.projects.find(p=>p.id===projectId);const [local,setLocal]=useState<{projectId:string;input:ChangeInput}>();const [opinion,setOpinion]=useState('');const [decision,setDecision]=useState<boolean>();const [assessmentArea,setAssessmentArea]=useState<'技术'|'财务'|'市场'>('技术');const [filename,setFilename]=useState('');
- if(params.get('changeId')&&!request||!p)return <StateView type="404"/>;if(!visibleProjects(currentRole, data.projects, data).some(x=>x.id===p.id)&&!(currentRole==='solution-tech'&&request&&['影响评估中','待分级'].includes(request.status)))return <StateView type="403"/>;
- const actor={id:currentUser.id,name:currentUser.name,role:currentRole};const input=local?.projectId===p.id?local.input:request?.input??defaultChangeInput(data,p.id);const canEdit=currentRole==='project-manager'&&currentUser.id===p.pmId&&(!request||['草稿','驳回'].includes(request.status));const update=(patch:Partial<ChangeInput>)=>setLocal({projectId:p.id,input:{...input,...patch}});
- const showMargin=!!canViewSensitiveField(data,{role:currentRole},'margin');
- let proposal:ReturnType<typeof proposeChange>|undefined,error='';try{proposal=request&&!canEdit?{original:request.original,proposed:request.proposed,budget:request.proposedBudget,reasons:request.ruleReasons}:proposeChange(data,p.id,input);}catch(e){error=(e as Error).message;}
- const run=(action:Parameters<typeof dispatch>[0])=>{try{dispatch(action,actor);message.success('原变更事项状态已更新');return true;}catch(e){message.error((e as Error).message);return false;}};
- const save=()=>{if(run({type:'save-project-change',projectId:p.id,id:request?.id,input})){const latest=useBusinessStore.getState().data.changeRequests.at(-1)!;setParams({changeId:request?.id??latest.id});setLocal(undefined);return true;}return false;};
- const base=proposal?.original,proposed=proposal?.budget;const adjustments=base?data.budgets.find(b=>b.projectId===p.id&&b.version===base.version)?.items??data.budgets.find(b=>b.projectId===p.id&&b.status==='已生效')?.items??[]:[];
- return <><PageHeader title="HS-15 项目变更申请" description={`${request?.id??'新变更'} · ${p.id} · ${p.name}`} breadcrumbs={[{title:'首页',href:'/'},{title:'项目变更',href:'/project-changes'},{title:'变更申请与评审'}]} extra={<Space><Button onClick={()=>navigate(`/project-changes?projectId=${p.id}`)}>返回台账</Button>{canEdit&&<Button onClick={save}>保存草稿</Button>}{request?.status==='草稿'&&<Button type="primary" disabled={!canEdit||!!local} onClick={()=>Modal.confirm({title:'提交变更影响评估',content:'提交后锁定本轮提议，技术、财务和市场分别评估，再由PMO分级。',onOk:()=>run({type:'submit-project-change',id:request.id})})}>提交评估</Button>}</Space>}/><Space wrap style={{marginBottom:16}}><Tag color="blue">{request?.status??'草稿'}</Tag><Tag>{request?.requiredRole==='executive'?'集团领导 / PMC':'PMO路径'}</Tag><Select style={{width:350}} disabled={!!request} value={p.id} showSearch optionFilterProp="label" options={visibleProjects(currentRole, data.projects, data).filter(x=>data.baselines.some(b=>b.projectId===x.id&&b.status==='已生效')).map(x=>({value:x.id,label:`${x.id} ${x.name}`}))} onChange={id=>{setParams({projectId:id});setLocal(undefined);}}/><Button onClick={()=>navigate(`/projects/${p.id}/baseline`)}>查看原基线</Button></Space>{error&&<Alert type="error" message={error}/>}<Alert style={{marginBottom:16}} showIcon type={proposal?.reasons.length?'warning':'info'} message={proposal?.reasons.length?marginReason(proposal.reasons.join('；'),showMargin):'按演示规则属于较小影响变更，仍须完成专业评估和PMO分级'} description={`${CHANGE_RULE.version}：成本绝对影响≥${CHANGE_RULE.largeCost}万元、工期≥${CHANGE_RULE.largeShiftDays}天、毛利率<${CHANGE_RULE.minGrossMarginPercent}%或重大风险，进入PMC；禁止普通审批绕过。`}/>
- <Row gutter={16}><Col span={17}><Card title="变更内容与客户依据" size="small"><Row gutter={16}><Col span={16}><label>变更标题<Input disabled={!canEdit} value={input.title} onChange={e=>update({title:e.target.value})}/></label></Col><Col span={8}><label>变更类型<Select style={{width:'100%'}} disabled={!canEdit} value={input.type} onChange={type=>update({type})} options={['范围变更','工期变更','成本变更','资源变更','合同变更','综合重大变更'].map(value=>({value,label:value}))}/></label></Col><Col span={24}><label>原因与内容<Input.TextArea disabled={!canEdit} value={input.reason} onChange={e=>update({reason:e.target.value})}/></label></Col><Col span={12}><label>客户依据 / 签证<Input.TextArea disabled={!canEdit} value={input.customerBasis} onChange={e=>update({customerBasis:e.target.value})}/></label></Col><Col span={12}><label>合同依据<Input.TextArea disabled={!canEdit} value={input.contractBasis} onChange={e=>update({contractBasis:e.target.value})}/></label></Col></Row><Tabs items={[{key:'scope',label:'范围与进度',children:<><label>目标范围<Input.TextArea rows={3} disabled={!canEdit} value={input.scope} onChange={e=>update({scope:e.target.value})}/></label><Space style={{marginTop:12}}><label>未完成计划顺延天数<InputNumber min={-365} max={365} disabled={!canEdit} value={input.shiftDays} onChange={v=>update({shiftDays:v??0})}/></label><Select disabled={!canEdit} value={input.urgency} onChange={urgency=>update({urgency})} options={['一般','紧急'].map(value=>({value,label:value}))}/></Space><p>已完成任务和已达成里程碑保留原计划日期；实际完成率、日期、成本不随本申请修改。</p><Input disabled={!canEdit} placeholder="新增范围工作包（可选）" value={input.newWorkPackage} onChange={e=>update({newWorkPackage:e.target.value})}/><Select style={{width:'100%',marginTop:8}} disabled={!canEdit} value={input.newTaskOwnerId} onChange={newTaskOwnerId=>update({newTaskOwnerId})} options={(data.projectTeams[p.id]?.members??[]).filter(m=>m.active).map(m=>({value:m.userId,label:`新增工作包责任人：${m.name}`}))}/></>},{key:'budget',label:'预算与收入影响',children:<><label>变更后预计收入（万元）<InputNumber disabled={!canEdit} min={0} precision={2} value={input.proposedIncome} onChange={v=>update({proposedIncome:v??0})}/></label><Table rowKey="subjectId" size="small" pagination={false} dataSource={adjustments} columns={[{title:'科目',dataIndex:'subjectName'},{title:'原预算万元',dataIndex:'amount'},{title:'本次核增/核减万元',render:(_,i)=><InputNumber disabled={!canEdit} precision={2} value={input.adjustments[i.subjectId]??0} onChange={v=>update({adjustments:{...input.adjustments,[i.subjectId]:v??0}})}/>},{title:'变更后万元',render:(_,i)=>(i.amount+(input.adjustments[i.subjectId]??0)).toFixed(2)}]}/></>},{key:'resource',label:'资源与供应影响',children:<><Table rowKey="userId" size="small" pagination={false} dataSource={proposal?.proposed.resources??[]} columns={[{title:'资源',dataIndex:'name'},{title:'岗位',dataIndex:'role'},{title:'变更后计划工时',render:(_,r)=><InputNumber min={1} disabled={!canEdit} value={input.resourceHours[r.userId]??r.plannedHours} onChange={v=>update({resourceHours:{...input.resourceHours,[r.userId]:v??1}})}/>} ]}/><label>采购影响<Input.TextArea disabled={!canEdit} value={input.procurementImpact} onChange={e=>update({procurementImpact:e.target.value})}/></label><label>外包影响<Input.TextArea disabled={!canEdit} value={input.outsourceImpact} onChange={e=>update({outsourceImpact:e.target.value})}/></label></>},{key:'risk',label:'风险与附件',children:<><Checkbox disabled={!canEdit} checked={input.majorRisk} onChange={e=>update({majorRisk:e.target.checked})}>涉及重大风险</Checkbox><Input.TextArea rows={3} disabled={!canEdit} placeholder="风险影响与应对" value={input.risk} onChange={e=>update({risk:e.target.value})}/><Space.Compact style={{width:'100%',margin:'12px 0'}}><Input disabled={!canEdit} placeholder="附件文件名（前端模拟登记，如客户签证.pdf）" value={filename} onChange={e=>setFilename(e.target.value)}/><Button disabled={!canEdit} onClick={()=>{if(!/\.(pdf|docx|xlsx|png|jpg)$/i.test(filename)){message.error('支持PDF、Word、Excel和图片文件名');return;}update({attachments:[...new Set([...input.attachments,filename])]});setFilename('');}}>登记附件</Button></Space.Compact>{input.attachments.map(name=><Tag key={name} closable={canEdit} onClose={()=>update({attachments:input.attachments.filter(x=>x!==name)})}>{name}</Tag>)}</>} ]}/></Card>
- <Card title="变更前后对比 · 同一口径" size="small" style={{marginTop:16}}><Table rowKey="name" size="small" pagination={false} dataSource={[{name:'范围',before:base?.scopeDesc,after:proposal?.proposed.scope},{name:'计划验收日期',before:base?.plannedEndDate,after:proposal?.proposed.plannedEndDate},{name:'预算万元',before:base?.budgetAmount,after:proposed?.totalAmount},{name:'预计毛利万元',before:showMargin?((p.revenueAmount??p.contractAmount)-(base?.budgetAmount??0)).toFixed(2):'已隐藏',after:showMargin?(input.proposedIncome-(proposed?.totalAmount??0)).toFixed(2):'已隐藏'}]} columns={[{title:'维度',dataIndex:'name'},{title:`原基线 ${base?.version??''}`,dataIndex:'before'},{title:'变更后提议',dataIndex:'after'}]}/></Card></Col>
- <Col span={7}><Card title="专业影响评估与审批" size="small"><Timeline items={(request?.assessments??[]).map(a=>({children:<><b>{a.area} · {a.actor}</b><p>{a.date} · {a.opinion}</p></>}))}/>{request&&['影响评估中','待分级'].includes(request.status)&&<><Select style={{width:'100%'}} value={assessmentArea} onChange={setAssessmentArea} options={['技术','财务','市场'].map(value=>({value,label:`${value}专业评估`}))}/><p>意见须明确范围、工期、成本、资源、供应与合同影响。</p></>}<Input.TextArea aria-label="变更处理意见" rows={4} value={opinion} onChange={e=>setOpinion(e.target.value)} placeholder="评估 / 分级 / 审批意见"/><Space direction="vertical" style={{width:'100%',marginTop:12}}>{request&&['影响评估中','待分级'].includes(request.status)&&<Button block disabled={currentRole!==({'技术':'solution-tech','财务':'finance','市场':'market'}[assessmentArea])} onClick={()=>run({type:'assess-project-change',id:request.id,area:assessmentArea,opinion})}>提交专业评估</Button>}{request?.status==='待分级'&&<Button block disabled={currentRole!=='pmo'} onClick={()=>run({type:'classify-project-change',id:request.id,opinion})}>PMO确认分级</Button>}{request?.status==='待审批'&&<Button type="primary" block disabled={currentRole!==request.requiredRole} onClick={()=>setDecision(true)}>通过并追加新基线</Button>}{request&&!['草稿','通过','驳回'].includes(request.status)&&<Button danger block disabled={!['pmo','executive'].includes(currentRole)} onClick={()=>setDecision(false)}>否决 / 退回补充</Button>}</Space>{request?.opinion&&<p>{request.reviewedBy}：{request.opinion}</p>}{request?.sourceApprovalId&&<Button onClick={()=>navigate(`/approvals/${request.sourceApprovalId}`)}>查看已办原审批</Button>}</Card><Card title="版本与留痕" size="small" style={{marginTop:16}}><Descriptions column={1} items={[{key:'revision',label:'申请修订',children:request?.revision??'未保存'},{key:'source',label:'来源基线',children:request?.original.id??base?.id},{key:'actor',label:'提交人',children:request?.submittedBy??currentUser.name},{key:'classified',label:'分级人',children:request?.classifiedBy??'待分级'}]}/>{request?.history?.map(h=><p key={h.revision}>修订{h.revision}：{h.status}，{h.opinion}</p>)}</Card></Col></Row><Modal title={decision?'确认批准并生成新基线':'确认退回，保留当前生效基线'} open={decision!==undefined} onCancel={()=>setDecision(undefined)} onOk={()=>{if(request&&run({type:'review-project-change',id:request.id,approve:decision!,opinion}))setDecision(undefined);}}><p>{input.title}</p><p>审批意见：{opinion||'请先填写处理意见'}</p><p>原版本 {base?.version}，申请成本影响 {((proposed?.totalAmount??0)-(base?.budgetAmount??0)).toFixed(2)}万元。</p></Modal></>;
+import { useActionAccess } from "@/hooks/useActionAccess";
+import { canViewSensitiveField } from "@/mock/configuration-access";
+import { marginReason } from "@/utils/sensitive";
+import { useState } from "react";
+import {
+  Alert,
+  App,
+  Button,
+  Card,
+  Checkbox,
+  Col,
+  Descriptions,
+  Input,
+  InputNumber,
+  Modal,
+  Row,
+  Select,
+  Space,
+  Table,
+  Tabs,
+  Tag,
+  Timeline,
+} from "antd";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useBusinessStore } from "@/mock/business";
+import { useAppStore } from "@/store/useAppStore";
+import { visibleProjects } from "@/mock/selectors";
+import { defaultChangeInput, proposeChange, CHANGE_RULE } from "@/mock/changes";
+import type { ChangeInput } from "@/models/changes";
+import { PageHeader } from "@/components/common/PageHeader";
+import { StateView } from "@/components/common/StateView";
+export function ChangeFormPage() {
+  const { data, dispatch } = useBusinessStore(),
+    { currentRole, currentUser } = useAppStore(),
+    navigate = useNavigate(),
+    { message, modal } = App.useApp();
+  const { canDo } = useActionAccess();
+  const [params, setParams] = useSearchParams();
+  const request = data.changeRequests.find(
+    (r) => r.id === params.get("changeId"),
+  );
+  const projectId = request?.projectId ?? params.get("projectId") ?? "P-001";
+  const p = data.projects.find((p) => p.id === projectId);
+  const [local, setLocal] = useState<{
+    projectId: string;
+    input: ChangeInput;
+  }>();
+  const [opinion, setOpinion] = useState("");
+  const [decision, setDecision] = useState<boolean>();
+  const [assessmentArea, setAssessmentArea] = useState<
+    "技术" | "财务" | "市场"
+  >("技术");
+  const [filename, setFilename] = useState("");
+  if ((params.get("changeId") && !request) || !p)
+    return <StateView type="404" />;
+  if (
+    !visibleProjects(currentRole, data.projects, data).some(
+      (x) => x.id === p.id,
+    ) &&
+    !(
+      currentRole === "solution-tech" &&
+      request &&
+      ["影响评估中", "待分级"].includes(request.status)
+    )
+  )
+    return <StateView type="403" />;
+  const input =
+    local?.projectId === p.id
+      ? local.input
+      : (request?.input ?? defaultChangeInput(data, p.id));
+  const editableState =
+    currentRole === "project-manager" &&
+    currentUser.id === p.pmId &&
+    (!request || ["草稿", "驳回"].includes(request.status));
+  const canEdit =
+    editableState && canDo("save-project-change", request?.id ?? p.id);
+  const canSubmit =
+    editableState &&
+    request?.status === "草稿" &&
+    !local &&
+    canDo("submit-project-change", request.id);
+  const canSelectAssessment =
+    !!request &&
+    ["影响评估中", "待分级"].includes(request.status) &&
+    ["solution-tech", "finance", "market"].includes(currentRole) &&
+    canDo("assess-project-change", request.id);
+  const canAssess =
+    canSelectAssessment &&
+    currentRole ===
+      { 技术: "solution-tech", 财务: "finance", 市场: "market" }[
+        assessmentArea
+      ];
+  const canClassify =
+    request?.status === "待分级" &&
+    currentRole === "pmo" &&
+    canDo("classify-project-change", request.id);
+  const canApprove =
+    request?.status === "待审批" &&
+    currentRole === request.requiredRole &&
+    canDo("review-project-change", request.id);
+  const canReject =
+    !!request &&
+    !["草稿", "通过", "驳回"].includes(request.status) &&
+    ["pmo", "executive"].includes(currentRole) &&
+    canDo("review-project-change", request.id);
+  const canDecide =
+    decision === true ? canApprove : decision === false ? canReject : false;
+  const update = (patch: Partial<ChangeInput>) => {
+    if (!editableState || !canDo("save-project-change", request?.id ?? p.id))
+      return;
+    setLocal({ projectId: p.id, input: { ...input, ...patch } });
+  };
+  const showMargin = !!canViewSensitiveField(
+    data,
+    { role: currentRole },
+    "margin",
+  );
+  let proposal: ReturnType<typeof proposeChange> | undefined,
+    error = "";
+  try {
+    proposal =
+      request && !canEdit
+        ? {
+            original: request.original,
+            proposed: request.proposed,
+            budget: request.proposedBudget,
+            reasons: request.ruleReasons,
+          }
+        : proposeChange(data, p.id, input);
+  } catch (e) {
+    error = (e as Error).message;
+  }
+  const run = (action: Parameters<typeof dispatch>[0]) => {
+    if (!canDo(action.type, "id" in action && action.id ? action.id : p.id))
+      return false;
+    try {
+      dispatch(action, useAppStore.getState().currentUser);
+      message.success("原变更事项状态已更新");
+      return true;
+    } catch (e) {
+      message.error((e as Error).message);
+      return false;
+    }
+  };
+  const save = () => {
+    if (!editableState || !canDo("save-project-change", request?.id ?? p.id))
+      return false;
+    if (
+      run({
+        type: "save-project-change",
+        projectId: p.id,
+        id: request?.id,
+        input,
+      })
+    ) {
+      const latest = useBusinessStore.getState().data.changeRequests.at(-1)!;
+      setParams({ changeId: request?.id ?? latest.id });
+      setLocal(undefined);
+      return true;
+    }
+    return false;
+  };
+  const base = proposal?.original,
+    proposed = proposal?.budget;
+  const adjustments = base
+    ? (data.budgets.find(
+        (b) => b.projectId === p.id && b.version === base.version,
+      )?.items ??
+      data.budgets.find((b) => b.projectId === p.id && b.status === "已生效")
+        ?.items ??
+      [])
+    : [];
+  return (
+    <>
+      <PageHeader
+        title="HS-15 项目变更申请"
+        description={`${request?.id ?? "新变更"} · ${p.id} · ${p.name}`}
+        breadcrumbs={[
+          { title: "首页", href: "/" },
+          { title: "项目变更", href: "/project-changes" },
+          { title: "变更申请与评审" },
+        ]}
+        extra={
+          <Space>
+            <Button
+              onClick={() => navigate(`/project-changes?projectId=${p.id}`)}
+            >
+              返回台账
+            </Button>
+            {editableState && (
+              <Button disabled={!canEdit} onClick={save}>
+                保存草稿
+              </Button>
+            )}
+            {request?.status === "草稿" && (
+              <Button
+                type="primary"
+                disabled={!canSubmit}
+                onClick={() =>
+                  modal.confirm({
+                    title: "提交变更影响评估",
+                    content:
+                      "提交后锁定本轮提议，技术、财务和市场分别评估，再由PMO分级。",
+                    okButtonProps: { disabled: !canSubmit },
+                    onOk: () => {
+                      if (!canDo("submit-project-change", request.id))
+                        return Promise.reject(
+                          new Error("当前策略禁止提交变更"),
+                        );
+                      return run({
+                        type: "submit-project-change",
+                        id: request.id,
+                      });
+                    },
+                  })
+                }
+              >
+                提交评估
+              </Button>
+            )}
+          </Space>
+        }
+      />
+      <Space wrap style={{ marginBottom: 16 }}>
+        <Tag color="blue">{request?.status ?? "草稿"}</Tag>
+        <Tag>
+          {request?.requiredRole === "executive" ? "集团领导 / PMC" : "PMO路径"}
+        </Tag>
+        <Select
+          style={{ width: 350 }}
+          disabled={!!request}
+          value={p.id}
+          showSearch
+          optionFilterProp="label"
+          options={visibleProjects(currentRole, data.projects, data)
+            .filter((x) =>
+              data.baselines.some(
+                (b) => b.projectId === x.id && b.status === "已生效",
+              ),
+            )
+            .map((x) => ({ value: x.id, label: `${x.id} ${x.name}` }))}
+          onChange={(id) => {
+            setParams({ projectId: id });
+            setLocal(undefined);
+          }}
+        />
+        <Button onClick={() => navigate(`/projects/${p.id}/baseline`)}>
+          查看原基线
+        </Button>
+      </Space>
+      {error && <Alert type="error" message={error} />}
+      <Alert
+        style={{ marginBottom: 16 }}
+        showIcon
+        type={proposal?.reasons.length ? "warning" : "info"}
+        message={
+          proposal?.reasons.length
+            ? marginReason(proposal.reasons.join("；"), showMargin)
+            : "按演示规则属于较小影响变更，仍须完成专业评估和PMO分级"
+        }
+        description={`${CHANGE_RULE.version}：成本绝对影响≥${CHANGE_RULE.largeCost}万元、工期≥${CHANGE_RULE.largeShiftDays}天、毛利率<${CHANGE_RULE.minGrossMarginPercent}%或重大风险，进入PMC；禁止普通审批绕过。`}
+      />
+      <Row gutter={16}>
+        <Col span={17}>
+          <Card title="变更内容与客户依据" size="small">
+            <Row gutter={16}>
+              <Col span={16}>
+                <label>
+                  变更标题
+                  <Input
+                    disabled={!canEdit}
+                    value={input.title}
+                    onChange={(e) => update({ title: e.target.value })}
+                  />
+                </label>
+              </Col>
+              <Col span={8}>
+                <label>
+                  变更类型
+                  <Select
+                    style={{ width: "100%" }}
+                    disabled={!canEdit}
+                    value={input.type}
+                    onChange={(type) => update({ type })}
+                    options={[
+                      "范围变更",
+                      "工期变更",
+                      "成本变更",
+                      "资源变更",
+                      "合同变更",
+                      "综合重大变更",
+                    ].map((value) => ({ value, label: value }))}
+                  />
+                </label>
+              </Col>
+              <Col span={24}>
+                <label>
+                  原因与内容
+                  <Input.TextArea
+                    disabled={!canEdit}
+                    value={input.reason}
+                    onChange={(e) => update({ reason: e.target.value })}
+                  />
+                </label>
+              </Col>
+              <Col span={12}>
+                <label>
+                  客户依据 / 签证
+                  <Input.TextArea
+                    disabled={!canEdit}
+                    value={input.customerBasis}
+                    onChange={(e) => update({ customerBasis: e.target.value })}
+                  />
+                </label>
+              </Col>
+              <Col span={12}>
+                <label>
+                  合同依据
+                  <Input.TextArea
+                    disabled={!canEdit}
+                    value={input.contractBasis}
+                    onChange={(e) => update({ contractBasis: e.target.value })}
+                  />
+                </label>
+              </Col>
+            </Row>
+            <Tabs
+              items={[
+                {
+                  key: "scope",
+                  label: "范围与进度",
+                  children: (
+                    <>
+                      <label>
+                        目标范围
+                        <Input.TextArea
+                          rows={3}
+                          disabled={!canEdit}
+                          value={input.scope}
+                          onChange={(e) => update({ scope: e.target.value })}
+                        />
+                      </label>
+                      <Space style={{ marginTop: 12 }}>
+                        <label>
+                          未完成计划顺延天数
+                          <InputNumber
+                            min={-365}
+                            max={365}
+                            disabled={!canEdit}
+                            value={input.shiftDays}
+                            onChange={(v) => update({ shiftDays: v ?? 0 })}
+                          />
+                        </label>
+                        <Select
+                          disabled={!canEdit}
+                          value={input.urgency}
+                          onChange={(urgency) => update({ urgency })}
+                          options={["一般", "紧急"].map((value) => ({
+                            value,
+                            label: value,
+                          }))}
+                        />
+                      </Space>
+                      <p>
+                        已完成任务和已达成里程碑保留原计划日期；实际完成率、日期、成本不随本申请修改。
+                      </p>
+                      <Input
+                        disabled={!canEdit}
+                        placeholder="新增范围工作包（可选）"
+                        value={input.newWorkPackage}
+                        onChange={(e) =>
+                          update({ newWorkPackage: e.target.value })
+                        }
+                      />
+                      <Select
+                        style={{ width: "100%", marginTop: 8 }}
+                        disabled={!canEdit}
+                        value={input.newTaskOwnerId}
+                        onChange={(newTaskOwnerId) =>
+                          update({ newTaskOwnerId })
+                        }
+                        options={(data.projectTeams[p.id]?.members ?? [])
+                          .filter((m) => m.active)
+                          .map((m) => ({
+                            value: m.userId,
+                            label: `新增工作包责任人：${m.name}`,
+                          }))}
+                      />
+                    </>
+                  ),
+                },
+                {
+                  key: "budget",
+                  label: "预算与收入影响",
+                  children: (
+                    <>
+                      <label>
+                        变更后预计收入（万元）
+                        <InputNumber
+                          disabled={!canEdit}
+                          min={0}
+                          precision={2}
+                          value={input.proposedIncome}
+                          onChange={(v) => update({ proposedIncome: v ?? 0 })}
+                        />
+                      </label>
+                      <Table
+                        rowKey="subjectId"
+                        size="small"
+                        pagination={false}
+                        dataSource={adjustments}
+                        columns={[
+                          { title: "科目", dataIndex: "subjectName" },
+                          { title: "原预算万元", dataIndex: "amount" },
+                          {
+                            title: "本次核增/核减万元",
+                            render: (_, i) => (
+                              <InputNumber
+                                disabled={!canEdit}
+                                precision={2}
+                                value={input.adjustments[i.subjectId] ?? 0}
+                                onChange={(v) =>
+                                  update({
+                                    adjustments: {
+                                      ...input.adjustments,
+                                      [i.subjectId]: v ?? 0,
+                                    },
+                                  })
+                                }
+                              />
+                            ),
+                          },
+                          {
+                            title: "变更后万元",
+                            render: (_, i) =>
+                              (
+                                i.amount + (input.adjustments[i.subjectId] ?? 0)
+                              ).toFixed(2),
+                          },
+                        ]}
+                      />
+                    </>
+                  ),
+                },
+                {
+                  key: "resource",
+                  label: "资源与供应影响",
+                  children: (
+                    <>
+                      <Table
+                        rowKey="userId"
+                        size="small"
+                        pagination={false}
+                        dataSource={proposal?.proposed.resources ?? []}
+                        columns={[
+                          { title: "资源", dataIndex: "name" },
+                          { title: "岗位", dataIndex: "role" },
+                          {
+                            title: "变更后计划工时",
+                            render: (_, r) => (
+                              <InputNumber
+                                min={1}
+                                disabled={!canEdit}
+                                value={
+                                  input.resourceHours[r.userId] ??
+                                  r.plannedHours
+                                }
+                                onChange={(v) =>
+                                  update({
+                                    resourceHours: {
+                                      ...input.resourceHours,
+                                      [r.userId]: v ?? 1,
+                                    },
+                                  })
+                                }
+                              />
+                            ),
+                          },
+                        ]}
+                      />
+                      <label>
+                        采购影响
+                        <Input.TextArea
+                          disabled={!canEdit}
+                          value={input.procurementImpact}
+                          onChange={(e) =>
+                            update({ procurementImpact: e.target.value })
+                          }
+                        />
+                      </label>
+                      <label>
+                        外包影响
+                        <Input.TextArea
+                          disabled={!canEdit}
+                          value={input.outsourceImpact}
+                          onChange={(e) =>
+                            update({ outsourceImpact: e.target.value })
+                          }
+                        />
+                      </label>
+                    </>
+                  ),
+                },
+                {
+                  key: "risk",
+                  label: "风险与附件",
+                  children: (
+                    <>
+                      <Checkbox
+                        disabled={!canEdit}
+                        checked={input.majorRisk}
+                        onChange={(e) =>
+                          update({ majorRisk: e.target.checked })
+                        }
+                      >
+                        涉及重大风险
+                      </Checkbox>
+                      <Input.TextArea
+                        rows={3}
+                        disabled={!canEdit}
+                        placeholder="风险影响与应对"
+                        value={input.risk}
+                        onChange={(e) => update({ risk: e.target.value })}
+                      />
+                      <Space.Compact
+                        style={{ width: "100%", margin: "12px 0" }}
+                      >
+                        <Input
+                          disabled={!canEdit}
+                          placeholder="附件文件名（前端模拟登记，如客户签证.pdf）"
+                          value={filename}
+                          onChange={(e) => setFilename(e.target.value)}
+                        />
+                        <Button
+                          disabled={!canEdit}
+                          onClick={() => {
+                            if (!/\.(pdf|docx|xlsx|png|jpg)$/i.test(filename)) {
+                              message.error("支持PDF、Word、Excel和图片文件名");
+                              return;
+                            }
+                            update({
+                              attachments: [
+                                ...new Set([...input.attachments, filename]),
+                              ],
+                            });
+                            setFilename("");
+                          }}
+                        >
+                          登记附件
+                        </Button>
+                      </Space.Compact>
+                      {input.attachments.map((name) => (
+                        <Tag
+                          key={name}
+                          closable={canEdit}
+                          onClose={() =>
+                            update({
+                              attachments: input.attachments.filter(
+                                (x) => x !== name,
+                              ),
+                            })
+                          }
+                        >
+                          {name}
+                        </Tag>
+                      ))}
+                    </>
+                  ),
+                },
+              ]}
+            />
+          </Card>
+          <Card
+            title="变更前后对比 · 同一口径"
+            size="small"
+            style={{ marginTop: 16 }}
+          >
+            <Table
+              rowKey="name"
+              size="small"
+              pagination={false}
+              dataSource={[
+                {
+                  name: "范围",
+                  before: base?.scopeDesc,
+                  after: proposal?.proposed.scope,
+                },
+                {
+                  name: "计划验收日期",
+                  before: base?.plannedEndDate,
+                  after: proposal?.proposed.plannedEndDate,
+                },
+                {
+                  name: "预算万元",
+                  before: base?.budgetAmount,
+                  after: proposed?.totalAmount,
+                },
+                {
+                  name: "预计毛利万元",
+                  before: showMargin
+                    ? (
+                        (p.revenueAmount ?? p.contractAmount) -
+                        (base?.budgetAmount ?? 0)
+                      ).toFixed(2)
+                    : "已隐藏",
+                  after: showMargin
+                    ? (
+                        input.proposedIncome - (proposed?.totalAmount ?? 0)
+                      ).toFixed(2)
+                    : "已隐藏",
+                },
+              ]}
+              columns={[
+                { title: "维度", dataIndex: "name" },
+                { title: `原基线 ${base?.version ?? ""}`, dataIndex: "before" },
+                { title: "变更后提议", dataIndex: "after" },
+              ]}
+            />
+          </Card>
+        </Col>
+        <Col span={7}>
+          <Card title="专业影响评估与审批" size="small">
+            <Timeline
+              items={(request?.assessments ?? []).map((a) => ({
+                children: (
+                  <>
+                    <b>
+                      {a.area} · {a.actor}
+                    </b>
+                    <p>
+                      {a.date} · {a.opinion}
+                    </p>
+                  </>
+                ),
+              }))}
+            />
+            {request && ["影响评估中", "待分级"].includes(request.status) && (
+              <>
+                <Select
+                  style={{ width: "100%" }}
+                  disabled={!canSelectAssessment}
+                  value={assessmentArea}
+                  onChange={setAssessmentArea}
+                  options={["技术", "财务", "市场"].map((value) => ({
+                    value,
+                    label: `${value}专业评估`,
+                  }))}
+                />
+                <p>意见须明确范围、工期、成本、资源、供应与合同影响。</p>
+              </>
+            )}
+            <Input.TextArea
+              aria-label="变更处理意见"
+              disabled={!(canAssess || canClassify || canApprove || canReject)}
+              rows={4}
+              value={opinion}
+              onChange={(e) => setOpinion(e.target.value)}
+              placeholder="评估 / 分级 / 审批意见"
+            />
+            <Space
+              direction="vertical"
+              style={{ width: "100%", marginTop: 12 }}
+            >
+              {request && ["影响评估中", "待分级"].includes(request.status) && (
+                <Button
+                  block
+                  disabled={!canAssess}
+                  onClick={() =>
+                    run({
+                      type: "assess-project-change",
+                      id: request.id,
+                      area: assessmentArea,
+                      opinion,
+                    })
+                  }
+                >
+                  提交专业评估
+                </Button>
+              )}
+              {request?.status === "待分级" && (
+                <Button
+                  block
+                  disabled={!canClassify}
+                  onClick={() =>
+                    run({
+                      type: "classify-project-change",
+                      id: request.id,
+                      opinion,
+                    })
+                  }
+                >
+                  PMO确认分级
+                </Button>
+              )}
+              {request?.status === "待审批" && (
+                <Button
+                  type="primary"
+                  block
+                  disabled={!canApprove}
+                  onClick={() => setDecision(true)}
+                >
+                  通过并追加新基线
+                </Button>
+              )}
+              {request &&
+                !["草稿", "通过", "驳回"].includes(request.status) && (
+                  <Button
+                    danger
+                    block
+                    disabled={!canReject}
+                    onClick={() => setDecision(false)}
+                  >
+                    否决 / 退回补充
+                  </Button>
+                )}
+            </Space>
+            {request?.opinion && (
+              <p>
+                {request.reviewedBy}：{request.opinion}
+              </p>
+            )}
+            {request?.sourceApprovalId && (
+              <Button
+                onClick={() =>
+                  navigate(`/approvals/${request.sourceApprovalId}`)
+                }
+              >
+                查看已办原审批
+              </Button>
+            )}
+          </Card>
+          <Card title="版本与留痕" size="small" style={{ marginTop: 16 }}>
+            <Descriptions
+              column={1}
+              items={[
+                {
+                  key: "revision",
+                  label: "申请修订",
+                  children: request?.revision ?? "未保存",
+                },
+                {
+                  key: "source",
+                  label: "来源基线",
+                  children: request?.original.id ?? base?.id,
+                },
+                {
+                  key: "actor",
+                  label: "提交人",
+                  children: request?.submittedBy ?? currentUser.name,
+                },
+                {
+                  key: "classified",
+                  label: "分级人",
+                  children: request?.classifiedBy ?? "待分级",
+                },
+              ]}
+            />
+            {request?.history?.map((h) => (
+              <p key={h.revision}>
+                修订{h.revision}：{h.status}，{h.opinion}
+              </p>
+            ))}
+          </Card>
+        </Col>
+      </Row>
+      <Modal
+        title={decision ? "确认批准并生成新基线" : "确认退回，保留当前生效基线"}
+        open={decision !== undefined}
+        okButtonProps={{ disabled: !canDecide }}
+        onCancel={() => setDecision(undefined)}
+        onOk={() => {
+          if (!canDecide || !canDo("review-project-change", request?.id))
+            return;
+          if (
+            request &&
+            run({
+              type: "review-project-change",
+              id: request.id,
+              approve: decision!,
+              opinion,
+            })
+          )
+            setDecision(undefined);
+        }}
+      >
+        <p>{input.title}</p>
+        <p>审批意见：{opinion || "请先填写处理意见"}</p>
+        <p>
+          原版本 {base?.version}，申请成本影响{" "}
+          {((proposed?.totalAmount ?? 0) - (base?.budgetAmount ?? 0)).toFixed(
+            2,
+          )}
+          万元。
+        </p>
+      </Modal>
+    </>
+  );
 }
