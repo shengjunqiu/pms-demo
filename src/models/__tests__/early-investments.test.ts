@@ -1,6 +1,6 @@
 import { describe,expect,it } from 'vitest';
 import { createBusinessState,transition,type Actor } from '@/mock/business-domain';
-import { inheritEarlyCosts } from '@/mock/early-investments';
+import { earlyInvestmentWarnings, inheritEarlyCosts } from '@/mock/early-investments';
 import type { EarlyInvestmentInput } from '@/models/early-investments';
 const market:Actor={id:'U-006',name:'陈亮',role:'market'},pmo:Actor={id:'U-002',name:'李主任',role:'pmo'},finance:Actor={id:'U-004',name:'刘敏',role:'finance'},executive:Actor={id:'U-003',name:'王总',role:'executive'};
 function fixture(){const state=createBusinessState();const o=state.opportunities.at(-1)!;o.status='拟立项';o.estimatedAmount=2000;o.earlyInvestmentQuota=0;o.earlyInvestmentUsed=0;o.expectedSignDate='2026-10-15';const id=o.id;const input:EarlyInvestmentInput={reason:'客户技术验证需要提前资源',amount:100,resourceTypes:['人力','采购'],department:'智慧城市业务群',people:['U-005'],startDate:'2026-09-01',endDate:'2026-09-30',signPlanDate:'2026-10-15',signPlan:'完成合同会签',riskLevel:'一般',risks:'签约存在延后风险',exitPlan:'未签时停止投入并复盘',estimateId:state.estimates.find(e=>e.opportunityId===id&&e.isFrozen)!.id};return {state,id,input};}
@@ -11,5 +11,21 @@ describe('立项前投入额度与成本继承',()=>{
  it('多个待审申请批准时再次校验累计上限，驳回保持原额度',()=>{const f=fixture();let state=transition(f.state,{type:'save-early-investment',id:f.id,input:{...f.input,amount:150},submit:true},market);state=transition(state,{type:'save-early-investment',id:f.id,input:{...f.input,amount:150},submit:true},market);state=transition(state,{type:'review-early-investment',id:f.id,requestId:'EARLY-1',approve:true,opinion:'批准'},executive);expect(()=>transition(state,{type:'review-early-investment',id:f.id,requestId:'EARLY-2',approve:true,opinion:'重复批准'},executive)).toThrow('10%');state=transition(state,{type:'review-early-investment',id:f.id,requestId:'EARLY-2',approve:false,opinion:'额度不足，驳回'},executive);expect(state.opportunities.at(-1)?.earlyInvestmentQuota).toBe(150);});
  it('财务登记按申请额度、来源单据去重，超额/超期/暂缓/签约逾期被拦截',()=>{const f=approved();const action={type:'record-early-cost' as const,id:f.id,requestId:f.requestId,sourceId:'VOUCHER-PRE-1',subjectId:'SUB-01',amount:30,occurredDate:'2026-09-09',description:'客户验证人力'};let state=transition(f.state,action,finance);expect(state.opportunities.at(-1)?.earlyInvestmentUsed).toBe(30);expect(()=>transition(state,action,finance)).toThrow('重复');expect(()=>transition(state,{...action,sourceId:'VOUCHER-PRE-2',amount:71},finance)).toThrow('剩余额度');state.earlyInvestmentRequests[0].endDate='2026-09-08';expect(()=>transition(state,{...action,sourceId:'VOUCHER-PRE-2'},finance)).toThrow('有效期');state=structuredClone(f.state);state.opportunities.at(-1)!.status='暂缓';expect(()=>transition(state,action,finance)).toThrow('暂缓');state=structuredClone(f.state);state.opportunities.at(-1)!.expectedSignDate='2026-09-08';expect(()=>transition(state,action,finance)).toThrow('逾期');});
  it('前期成本逐sourceId继承一次、金额守恒且保留来源商机',()=>{const f=approved();const state=transition(f.state,{type:'record-early-cost',id:f.id,requestId:f.requestId,sourceId:'VOUCHER-PRE-1',subjectId:'SUB-03',amount:20,occurredDate:'2026-09-09',description:'技术验证设备'},finance);state.projects.push({...structuredClone(state.projects[0]),id:'P-NEW',opportunityId:f.id,actualCost:0,committedCost:0,forecastRemainingCost:0});expect(inheritEarlyCosts(state,f.id,'P-NEW')).toBe(20);expect(inheritEarlyCosts(state,f.id,'P-NEW')).toBe(0);expect(state.costs.filter(c=>c.sourceId==='VOUCHER-PRE-1')).toHaveLength(1);expect(state.projects.at(-1)?.actualCost).toBe(20);expect(state.projects.at(-1)?.rollingCost).toBe(20);expect(state.earlyCosts[0].opportunityId).toBe(f.id);expect(state.earlyCosts[0].projectId).toBe('P-NEW');expect(state.opportunities.at(-1)?.earlyInvestmentUsed).toBe(20);});
+ it('投入临期提醒使用申请提交时分级配置，后续发布不回算旧申请',()=>{
+  const f=fixture();
+  const admin:Actor={id:'U-ADMIN',name:'系统管理员',role:'admin'};
+  const current=f.state.configuration.grading[0];
+  let state=transition(f.state,{type:'configuration-save',kind:'grading',sourceId:current.id,value:{...current,unsignedWarningDays:30,changeReason:'提前30天提醒投入到期'}},admin);
+  const configuredId=state.configuration.grading.at(-1)!.id;
+  state=transition(state,{type:'configuration-publish',kind:'grading',id:configuredId},admin);
+  state=transition(state,{type:'save-early-investment',id:f.id,input:f.input,submit:true},market);
+  state=transition(state,{type:'review-early-investment',id:f.id,requestId:state.earlyInvestmentRequests[0].id,approve:true,opinion:'确认30天提醒规则'},pmo);
+  expect(earlyInvestmentWarnings(state,f.id)).toContain('投入有效期临近');
+  const published=state.configuration.grading.find(v=>v.id===configuredId)!;
+  state=transition(state,{type:'configuration-save',kind:'grading',sourceId:published.id,value:{...published,unsignedWarningDays:1,changeReason:'新申请改为1天提醒'}},admin);
+  state=transition(state,{type:'configuration-publish',kind:'grading',id:state.configuration.grading.at(-1)!.id},admin);
+  expect(state.earlyInvestmentRequests[0].gradingSnapshot?.unsignedWarningDays).toBe(30);
+  expect(earlyInvestmentWarnings(state,f.id)).toContain('投入有效期临近');
+ });
  it('旧导入早期汇总没有来源明细，不虚构追加到项目流水',()=>{const state=createBusinessState();const p=state.projects[0];const before=structuredClone(state.costs);expect(inheritEarlyCosts(state,p.opportunityId!,p.id)).toBe(0);expect(state.costs).toEqual(before);});
 });
