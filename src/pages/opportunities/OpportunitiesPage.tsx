@@ -1,3 +1,4 @@
+import { useActionAccess } from '@/hooks/useActionAccess';
 import { useState } from 'react';
 import { Alert, Button, Card, Col, DatePicker, Form, Input, InputNumber, Row, Select, Space, Statistic, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
@@ -14,6 +15,7 @@ import { PAGE_MANIFEST } from '@/routes/manifest';
 import { OpportunityActions } from './OpportunityActions';
 import { sumMoney } from '@/utils/money';
 export function OpportunitiesPage() {
+ const {canDo}=useActionAccess();
   const {data}=useBusinessStore(); const actor=useAppStore(s=>s.currentUser); const navigate=useNavigate(); const [params,setParams]=useSearchParams(); const [more,setMore]=useState(false); const [form]=Form.useForm();
   const [visible,setVisible]=useState(['customer','owner','department','sign','assessment','estimate','investment','follow']);
   const accessible=data.opportunities.filter(o=>canViewOpportunity(data,o,actor));
@@ -32,7 +34,7 @@ export function OpportunitiesPage() {
     {title:'操作',key:'actions',width:300,fixed:'right',render:(_,o)=><OpportunityActions opportunity={o} compact/>},
   ];
   const due=accessible.filter(o=>o.status==='暂缓'&&(opportunityMeta(data,o).pauses.at(-1)?.reviewDate??'9999-12-31')<='2026-09-16');
-  return <><PageHeader item={PAGE_MANIFEST.find(p=>p.id==='GS-01')} breadcrumbs={[{title:'商机与概算'},{title:'商机台账'}]} description="预计金额与已签合同分开管理；按当前角色可见范围汇总，金额单位：万元。" extra={actor.role==='market'&&<Button type="primary" onClick={()=>navigate('/opportunities/new')}>新建商机</Button>}/>
+  return <><PageHeader item={PAGE_MANIFEST.find(p=>p.id==='GS-01')} breadcrumbs={[{title:'商机与概算'},{title:'商机台账'}]} description="预计金额与已签合同分开管理；按当前角色可见范围汇总，金额单位：万元。" extra={actor.role==='market'&&<Button type="primary" disabled={!canDo('save-opportunity')} onClick={()=>navigate('/opportunities/new')}>新建商机</Button>}/>
     <Row gutter={16} style={{marginBottom:16}}>{[{title:'当前筛选商机',value:rows.length,suffix:'个'},{title:'预计项目总额',value:sumMoney(rows.map(o=>o.estimatedAmount)),precision:2,suffix:'万'},{title:'拟立项',value:rows.filter(o=>o.status==='拟立项').length,suffix:'个'},{title:'初评待补充',value:rows.filter(o=>opportunityMeta(data,o).assessments.at(-1)?.status==='评估中'&&assessmentSummary(o,opportunityMeta(data,o)).missing.length).length,suffix:'个'}].map(x=><Col span={6} key={x.title}><Card size="small"><Statistic {...x}/></Card></Col>)}</Row>
     {due.length>0&&<Alert style={{marginBottom:16}} type="warning" showIcon message={`未来7日需复评 ${due.length} 个商机`} description={<Space wrap>{due.map(o=><Link key={o.id} to={`/opportunities/${o.id}/evaluation`}>{o.name} · {opportunityMeta(data,o).pauses.at(-1)?.ownerName}</Link>)}</Space>}/>}
     <Card size="small" style={{marginBottom:16}}><Form form={form} layout="vertical" initialValues={Object.fromEntries(params)} onFinish={v=>{const next=new URLSearchParams();for(const [k,value]of Object.entries(v)){if(k==='dates'&&Array.isArray(value)){if(value[0])next.set('start',value[0].format('YYYY-MM-DD'));if(value[1])next.set('end',value[1].format('YYYY-MM-DD'));}else if(value!==undefined&&value!==null&&value!=='')next.set(k,String(value));}setParams(next);}}><Row gutter={16}>

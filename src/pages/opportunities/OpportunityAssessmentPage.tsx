@@ -1,3 +1,4 @@
+import { useActionAccess } from '@/hooks/useActionAccess';
 import { canViewSensitiveField } from "@/mock/configuration-access";
 import { useState } from "react";
 import {
@@ -38,6 +39,7 @@ import { MoneyText } from "@/components/common/MoneyText";
 import { PAGE_MANIFEST } from "@/routes/manifest";
 import { OpportunityActions } from "./OpportunityActions";
 export function OpportunityAssessmentPage() {
+ const {canDo}=useActionAccess();
   const { id } = useParams();
   const { data, dispatch } = useBusinessStore();
   const actor = useAppStore((s) => s.currentUser);
@@ -65,6 +67,8 @@ export function OpportunityAssessmentPage() {
   });
   const history = round?.id !== latest?.id;
   const manage = canManageOpportunity(data, o, actor);
+  const canConclude=manage&&!history&&round?.status==='评估中'&&canDo('conclude-opportunity',o.id);
+  const canSaveDimension=!history&&round?.status==='评估中'&&canDo('save-opportunity-dimension',o.id);
   const hiddenOpinion = (key: AssessmentDimension) =>
     !viewMargin &&
     (key === "margin" ||
@@ -89,6 +93,7 @@ export function OpportunityAssessmentPage() {
       return;
     }
     modal.confirm({
+      okButtonProps:{disabled:!canConclude},
       title: `确认${conclusion === "拟立项" ? "转为拟立项" : "继续跟进"}？`,
       content:
         "本轮专业意见与综合结果将形成只读历史快照。拟立项后锁定关键商机信息，并自动生成方案调研任务。",
@@ -257,6 +262,7 @@ export function OpportunityAssessmentPage() {
                         <Button
                           size="small"
                           disabled={
+                            !canSaveDimension ||
                             history ||
                             round.status !== "评估中" ||
                             actor.role !== d.role ||
@@ -368,7 +374,7 @@ export function OpportunityAssessmentPage() {
               manage &&
               round && (
                 <>
-                  <Form layout="vertical" style={{ marginTop: 16 }}>
+                  <Form layout="vertical" disabled={!canConclude} style={{ marginTop: 16 }}>
                     <Form.Item required label="综合决策原因">
                       <Input.TextArea
                         rows={4}
@@ -381,13 +387,13 @@ export function OpportunityAssessmentPage() {
                   <Space wrap>
                     <Button
                       type="primary"
-                      disabled={summary.missing.length > 0}
+                      disabled={!canConclude || summary.missing.length > 0}
                       onClick={() => conclude("拟立项")}
                     >
                       确认拟立项
                     </Button>
                     <Button
-                      disabled={summary.complete < 6}
+                      disabled={!canConclude || summary.complete < 6}
                       onClick={() => conclude("跟进中")}
                     >
                       继续跟进
@@ -428,6 +434,7 @@ export function OpportunityAssessmentPage() {
       <Modal
         title={`填写${DIMENSIONS.find((d) => d.key === dimension)?.name ?? ""}专业意见`}
         open={!!dimension}
+        okButtonProps={{disabled:!canSaveDimension||!dimension||DIMENSIONS.find(d=>d.key===dimension)?.role!==actor.role||hiddenOpinion(dimension)}}
         onCancel={() => setDimension(undefined)}
         okText="保存本专业意见"
         onOk={async () => {
@@ -457,7 +464,7 @@ export function OpportunityAssessmentPage() {
           }
         }}
       >
-        <Form form={form} layout="vertical">
+        <Form form={form} layout="vertical" disabled={!canSaveDimension||!dimension||DIMENSIONS.find(d=>d.key===dimension)?.role!==actor.role||hiddenOpinion(dimension)}>
           <Form.Item
             name="score"
             label="评分（0–100）"
