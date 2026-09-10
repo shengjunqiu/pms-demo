@@ -3,7 +3,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { useBusinessStore } from '@/mock/business';
-import { canManageOpportunity, opportunityLocked, opportunityMeta } from '@/mock/opportunities';
+import { canManageOpportunity, canViewOpportunity, opportunityLocked, opportunityMeta } from '@/mock/opportunities';
 import type { OpportunityInput } from '@/models/opportunities';
 import { useAppStore } from '@/store/useAppStore';
 import { mockCustomers, mockDepartments, mockUsers } from '@/mock';
@@ -20,7 +20,9 @@ export function OpportunityFormPage() {
     const v = await form.validateFields(submit?undefined:['name','customerId','departmentId','ownerId','estimatedAmount','winRate']);
     const fields = {...form.getFieldsValue(),...v}; const input:OpportunityInput = {...fields,expectedSignDate:fields.expectedSignDate?.format('YYYY-MM-DD')??'',estimatedAmount:fields.estimatedAmount??0,attachments:(fields.files??[]).map((f:{name:string})=>f.name),collaborators:fields.collaborators??[],source:fields.source??'',description:fields.description??'',competition:fields.competition??'',businessLine:fields.businessLine??'',region:fields.region??'',projectType:fields.projectType??''};
     const duplicates = data.opportunities.filter(x=>x.id!==id&&x.customerId===input.customerId&&(x.name.includes(input.name.trim())||input.name.includes(x.name)));
-    modal.confirm({title:duplicates.length?'发现相似商机，仍要保存？':submit?'提交商机至待评估？':'保存商机草稿？',content:duplicates.length?duplicates.map(x=>`${x.code} · ${x.name}`).join('；'):submit?'提交后可发起跨专业初步评估。':'保存后生成唯一商机编号，可继续补充资料。',onOk:()=>{try { dispatch({type:'save-opportunity',id,input,submit,duplicateConfirmed:duplicates.length>0},actor); const nextId=id??useBusinessStore.getState().data.opportunities.at(-1)!.id; message.success(submit?'商机已提交':'草稿已保存'); navigate(`/opportunities/${nextId}`); }catch(e){message.error((e as Error).message);return Promise.reject(e);} }});
+    const visibleDuplicates = duplicates.filter(x=>canViewOpportunity(data,x,actor));
+    const duplicateDescription = [...visibleDuplicates.map(x=>`${x.code} · ${x.name}`), ...(visibleDuplicates.length<duplicates.length?['另有相似商机不在当前查看范围内，请联系主办部门核实。']:[])].join('；');
+    modal.confirm({title:duplicates.length?'发现相似商机，仍要保存？':submit?'提交商机至待评估？':'保存商机草稿？',content:duplicates.length?duplicateDescription:submit?'提交后可发起跨专业初步评估。':'保存后生成唯一商机编号，可继续补充资料。',onOk:()=>{try { dispatch({type:'save-opportunity',id,input,submit,duplicateConfirmed:duplicates.length>0},actor); const nextId=id??useBusinessStore.getState().data.opportunities.at(-1)!.id; message.success(submit?'商机已提交':'草稿已保存'); navigate(`/opportunities/${nextId}`); }catch(e){message.error((e as Error).message);return Promise.reject(e);} }});
   }catch(e){if(e instanceof Error)message.error(e.message);} };
   return <><PageHeader item={PAGE_MANIFEST.find(p=>p.id==='GS-02')} title={id?'商机编辑':'新建商机'} breadcrumbs={[{title:'商机台账',href:'/opportunities'},{title:id?'商机编辑':'新建商机'}]} description="明确客户、经营责任与业务需求，形成后续初评的统一输入。" extra={<Button onClick={()=>navigate(o?`/opportunities/${o.id}`:'/opportunities')}>返回</Button>}/>
     {locked&&<Alert style={{marginBottom:16}} type="warning" showIcon message="商机已冻结或进入评估，基础输入只读" description="请保留当前评审输入；后续范围变化通过重新评估或项目变更处理。"/>}

@@ -30,7 +30,7 @@ import {
   initiationSource,
   initiationPrerequisites,
 } from "@/mock/initiation";
-import { canManageOpportunity } from "@/mock/opportunities";
+import { canManageOpportunity, canViewOpportunity } from "@/mock/opportunities";
 import type { InitiationInput } from "@/models/initiation";
 import { StateView } from "@/components/common/StateView";
 import {
@@ -53,9 +53,12 @@ export function InitiationApplyPage() {
   const [form] = Form.useForm();
   const app = data.initiations.find((a) => a.id === query.get("id"));
   const [selected, setSelected] = useState(
-    query.get("opportunityId") ?? app?.input.opportunityId ?? "",
+    app?.input.opportunityId ?? query.get("opportunityId") ?? "",
   );
-  const o = data.opportunities.find((o) => o.id === selected);
+  const selectedOpportunity = data.opportunities.find((o) => o.id === selected);
+  const o = selectedOpportunity && canViewOpportunity(data, selectedOpportunity, actor)
+    ? selectedOpportunity
+    : undefined;
   const input =
     app?.input ?? (o ? defaultInitiationInput(data, o.id) : undefined);
   const source =
@@ -93,6 +96,8 @@ export function InitiationApplyPage() {
   if (app && !canViewInitiation(data, app, actor))
     return <StateView type="403" />;
   if (query.get("id") && !app) return <StateView type="404" />;
+  if (selectedOpportunity && !o) return <StateView type="403" />;
+  if (selected && !selectedOpportunity) return <StateView type="404" />;
   const hiddenInput = Object.fromEntries(
     Object.entries(input ?? {}).filter(
       ([, value]) =>
@@ -145,7 +150,8 @@ export function InitiationApplyPage() {
           }}
           options={data.opportunities
             .filter(
-              (x) => canManageOpportunity(data, x, actor) || x.id === selected,
+              (x) => canViewOpportunity(data, x, actor) &&
+                (canManageOpportunity(data, x, actor) || x.id === selected),
             )
             .map((x) => ({
               value: x.id,
