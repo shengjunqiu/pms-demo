@@ -18,7 +18,8 @@ for (const width of [1440, 1280]) test(`首批页面可见性和布局 ${width}`
   for (const [id, path, name] of pages) {
     if (name !== current) { await role(page, name); current = name; }
     await navigate(page, path);
-    await expect(page.locator('h4').first()).toBeVisible();
+    const titles: Record<string, string> = { GS01: '商机台账', GS02: '新建商机', GS03: '福建省晋江市岸海防综合治理平台商机', GS04: '初步评估', YS06: 'YS-06', YS07: 'YS-07', YS08: 'YS-08', JS01: 'JS-01', JS02: 'JS-02', JS03: 'JS-03', JS04: 'JS-04' };
+    await expect(page.locator('h4').first()).toContainText(titles[id]);
     await expect(page.getByText('403', { exact: true })).toHaveCount(0);
     await expect(page.getByText('404', { exact: true })).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), id).toBe(true);
@@ -33,7 +34,7 @@ test('商机提交和重新打开保留同一份业务记录', async ({ page }) 
   await navigate(page, '/opportunities/new');
   await page.getByLabel('商机名称', { exact: true }).fill('浏览器验证园区协同项目');
   await page.getByLabel('客户', { exact: true }).click();
-  await page.locator('.ant-select-item-option').first().click();
+  await page.locator('.ant-select-dropdown:visible .ant-select-item-option').first().click();
   await page.getByLabel('预计项目金额（万元）', { exact: true }).fill('1000');
   await page.getByLabel('业务背景、建设目标与主要需求', { exact: true }).fill('统一园区设备台账、巡检计划与运维工单，明确交付范围。');
   await page.getByRole('button', { name: '提交商机', exact: true }).click();
