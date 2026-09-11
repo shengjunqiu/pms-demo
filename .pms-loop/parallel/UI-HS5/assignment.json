@@ -21,7 +21,7 @@
   "acceptance_dependencies": [],
   "acceptance_ready": true,
   "acceptance_group": "UI-HS5",
-  "status": "integrated_pending_acceptance",
+  "status": "accepted",
   "last_confirmed_at": "2026-09-11",
   "acceptance_checklist": [
     "工程检查",
@@ -31,7 +31,7 @@
   ],
   "scenarios": "按/tmp/pms-ui-changes-preparation.md",
   "fixtures": "真实UI评估审批，不直接伪造通过状态",
-  "next_action": "R50正式工程与浏览器验收",
+  "next_action": "已由协调者在R0050完成正式工程、浏览器与双宽验收",
   "delivery_commit": "acdad9d0e45b53854ff0869d7df2d31f7430fb3d",
   "integration_commit": "b871081"
 }

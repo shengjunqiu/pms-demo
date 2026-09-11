@@ -1,0 +1,15 @@
+[WebServer] (node:71064) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:71085) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:71113) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/ui-changes.spec.ts:81:3 › 正常变更：真实三方评估、分级、审批与基线追加 (34.4s)
+  ✓  2 e2e/ui-changes.spec.ts:81:3 › 重大变更：真实三方评估、分级、审批与基线追加 (30.7s)
+  ✓  3 e2e/ui-changes.spec.ts:137:1 › 历史待审否决、补充再提，前轮依据与意见可追溯 (17.0s)
+  ✓  4 e2e/ui-changes.spec.ts:158:1 › 筛选和同项目申请隔离，三类原单与只读权限 (21.4s)
+
+  4 passed (1.8m)

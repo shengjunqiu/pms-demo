@@ -2,7 +2,7 @@
   "schema_version": 1,
   "catalog_sha256": "afabe9c27b289a2aa00a72d116be344fdbb01683443388e367536a99feb1f05e",
   "status": "in_progress",
-  "active": "R0050",
+  "active": null,
   "completion_revision": null,
   "created_at": "2026-09-09T14:33:07+00:00",
   "items": {
@@ -179,11 +179,11 @@
       "round": "R0049"
     },
     "HS-14": {
-      "status": "active",
+      "status": "done",
       "round": "R0050"
     },
     "HS-15": {
-      "status": "active",
+      "status": "done",
       "round": "R0050"
     },
     "HS-16": {
@@ -1697,12 +1697,32 @@
         "HS-15"
       ],
       "started_at": "2026-09-10T21:54:22+00:00",
-      "status": "awaiting_evidence",
+      "status": "accepted",
       "checks": {
         "typecheck": "pass",
         "lint": "pass",
         "build": "pass",
         "test:domain": "pass"
+      },
+      "accepted_at": "2026-09-11T02:29:33+00:00",
+      "revision": "7c1c2b25fe6f607c9aa01972d95326e24c7738ed3d658f366a14ca323774e189",
+      "proof": {
+        ".pms-loop/runs/R0050/test-domain.log": "6fe2dea1bdea28702dd9bbbdb96d18fa351a77aa19093da3f3c57618dc376898",
+        ".pms-loop/runs/R0050/typecheck.log": "0cbb735b6f0f0beb07e73868e143e2a41ee87411e874d273088e1adceeb7efe0",
+        ".pms-loop/runs/R0050/lint.log": "257e04ddd8733fd59f16ff528f593b88c1fe59f044ef033b555c85568c03f33d",
+        ".pms-loop/runs/R0050/build.log": "11b6d65770362454154c666b0354d99eab0d4a040ce6950b6eb1a255aa76c06e",
+        ".pms-loop/runs/R0050/browser-ui-changes.log": "890834919e30056d8e7f6bf46ea82dbb0924d6379aa103486990cb85c8cacb68",
+        ".pms-loop/runs/R0050/browser-ui-changes.exit.json": "1c80802932e12b02b6912c004475fb97be11d45916034379ee13f55a77209e35",
+        ".pms-loop/runs/R0050/artifacts/r0024-2f89aba8930e4b3d3860265e949d804def70d71a.json": "3fba39cbf35c1fc396368f325695426b1c8b9a09c237aab288aecd56aade33c9",
+        ".pms-loop/runs/R0050/artifacts/UI-HS14-filtered-1440.png": "a6f152d684f084fff0379085b26a75b70b842d599aae548117b62874d7e4a673",
+        ".pms-loop/runs/R0050/artifacts/UI-HS14-filtered-1280.png": "38b844b619da366165af9d3c4b419786a5ba7d9c49069fdc65080f0a593e01e9",
+        ".pms-loop/runs/R0050/artifacts/r0024-2f89aba8930e4b3d38604634b5942267592a329c.json": "7a66e27b29faf9f7271bb50df0558410496ee0fa5a65abf976c3f568e93fc9d6",
+        ".pms-loop/runs/R0050/artifacts/r0024-2f89aba8930e4b3d3860a3d6739fa78d7661b2e7.json": "455da1657f23527ea396db47bb44f113ad74655b5406d923f212b9e8405a2e20",
+        ".pms-loop/runs/R0050/artifacts/r0024-2f89aba8930e4b3d38606ae7654f1ee1e85d82ba.json": "82f64e6e965bf2e306647f53c7a1f9dbb6dbdf7fb80556d4a674e0a08e9bec4a",
+        ".pms-loop/runs/R0050/artifacts/UI-HS15-重大-review-1440.png": "fedd377ec9a8ea9052a3785fbfc24c7093438b9333205171090602f157674e97",
+        ".pms-loop/runs/R0050/artifacts/UI-HS15-重大-review-1280.png": "6456f1d606e3266864398f67922bbb5dfd26198f840512a242376928f46a6cd0",
+        ".pms-loop/runs/R0050/checks.json": "9c6d1671d7b99d78449759eae9bfd7fb6b3be610d6a21e555884db02fb42087c",
+        ".pms-loop/runs/R0050/evidence.json": "5d77d38a649720759a3d9c7c7a8ee8b37b13f5a902b9caec24fa43644d690a4e"
       }
     }
   ],

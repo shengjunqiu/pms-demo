@@ -34,10 +34,11 @@ function ChangeFormContent() {
     const [filename, setFilename] = useState("");
     if ((params.get("changeId") && !request) || !p)
         return <StateView type="404"/>;
+    const canViewProfessionalAssessment = !!request &&
+        ["solution-tech", "finance", "market"].includes(currentRole) &&
+        ["影响评估中", "待分级"].includes(request.status);
     if (!visibleProjects(currentRole, data.projects, data).some((x) => x.id === p.id) &&
-        !(currentRole === "solution-tech" &&
-            request &&
-            ["影响评估中", "待分级"].includes(request.status)))
+        !canViewProfessionalAssessment)
         return <StateView type="403"/>;
     const input = local?.projectId === p.id
         ? local.input
@@ -263,7 +264,7 @@ function ChangeFormContent() {
               <Col span={16}>
                 <label>
                   变更标题
-                  <Input disabled={!canEdit} value={input.title} onChange={(e) => update({ title: e.target.value })}/>
+                  <Input aria-label="变更标题" disabled={!canEdit} value={input.title} onChange={(e) => update({ title: e.target.value })}/>
                 </label>
               </Col>
               <Col span={8}>
@@ -282,19 +283,19 @@ function ChangeFormContent() {
               <Col span={24}>
                 <label>
                   原因与内容
-                  <Input.TextArea disabled={!canEdit} value={input.reason} onChange={(e) => update({ reason: e.target.value })}/>
+                  <Input.TextArea aria-label="原因与内容" disabled={!canEdit} value={input.reason} onChange={(e) => update({ reason: e.target.value })}/>
                 </label>
               </Col>
               <Col span={12}>
                 <label>
                   客户依据 / 签证
-                  <Input.TextArea disabled={!canEdit} value={input.customerBasis} onChange={(e) => update({ customerBasis: e.target.value })}/>
+                  <Input.TextArea aria-label="客户依据 / 签证" disabled={!canEdit} value={input.customerBasis} onChange={(e) => update({ customerBasis: e.target.value })}/>
                 </label>
               </Col>
               <Col span={12}>
                 <label>
                   合同依据
-                  <Input.TextArea disabled={!canEdit} value={input.contractBasis} onChange={(e) => update({ contractBasis: e.target.value })}/>
+                  <Input.TextArea aria-label="合同依据" disabled={!canEdit} value={input.contractBasis} onChange={(e) => update({ contractBasis: e.target.value })}/>
                 </label>
               </Col>
             </Row>
@@ -305,12 +306,12 @@ function ChangeFormContent() {
                 children: (<>
                       <label>
                         目标范围
-                        <Input.TextArea rows={3} disabled={!canEdit} value={input.scope} onChange={(e) => update({ scope: e.target.value })}/>
+                        <Input.TextArea aria-label="目标范围" rows={3} disabled={!canEdit} value={input.scope} onChange={(e) => update({ scope: e.target.value })}/>
                       </label>
                       <Space style={{ marginTop: 12 }}>
                         <label>
                           未完成计划顺延天数
-                          <InputNumber min={-365} max={365} disabled={!canEdit} value={input.shiftDays} onChange={(v) => update({ shiftDays: v ?? 0 })}/>
+                          <InputNumber aria-label="未完成计划顺延天数" min={-365} max={365} disabled={!canEdit} value={input.shiftDays} onChange={(v) => update({ shiftDays: v ?? 0 })}/>
                         </label>
                         <Select aria-label="变更紧急程度" disabled={!canEdit} value={input.urgency} onChange={(urgency) => update({ urgency })} options={["一般", "紧急"].map((value) => ({
                         value,
@@ -376,11 +377,11 @@ function ChangeFormContent() {
                     ]}/>
                       <label>
                         采购影响
-                        <Input.TextArea disabled={!canEdit} value={input.procurementImpact} onChange={(e) => update({ procurementImpact: e.target.value })}/>
+                        <Input.TextArea aria-label="采购影响" disabled={!canEdit} value={input.procurementImpact} onChange={(e) => update({ procurementImpact: e.target.value })}/>
                       </label>
                       <label>
                         外包影响
-                        <Input.TextArea disabled={!canEdit} value={input.outsourceImpact} onChange={(e) => update({ outsourceImpact: e.target.value })}/>
+                        <Input.TextArea aria-label="外包影响" disabled={!canEdit} value={input.outsourceImpact} onChange={(e) => update({ outsourceImpact: e.target.value })}/>
                       </label>
                     </>),
             },
