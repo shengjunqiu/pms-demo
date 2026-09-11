@@ -21,7 +21,6 @@ import { formatPercent, percentage, sumMoney } from '@/utils/money';
 import { readProjectFilter } from '@/utils/project-query';
 import { PageHeader } from '@/components/common/PageHeader';
 import { ProjectFilters } from '@/components/common/ProjectFilters';
-import { AnalysisTools } from '@/components/common/AnalysisTools';
 import { MoneyText } from '@/components/common/MoneyText';
 import { StateView } from '@/components/common/StateView';
 import { MetricStatCard } from '@/components/common/MetricStatCard';
@@ -88,26 +87,229 @@ export function GL01DashboardPage() {
       </Col>
     ))}</Row>
     {!!scope.length && <>
-      <Row gutter={[16, 16]} className="pms-focus-row"><Col span={14}><Card size="small" title={`重点异常项目（${exceptions.length}）`} extra={<Button type="link" onClick={() => exception()}>全部异常</Button>}><Table rowKey="id" size="small" pagination={false} dataSource={[...exceptions].sort((a, b) => (b.health === 'red' ? 1 : 0) - (a.health === 'red' ? 1 : 0) || b.calc.variance - a.calc.variance).slice(0, 3)} columns={[{ title: '项目', width: '43%', render: (_, p) => <Button type="link" style={{ whiteSpace: 'normal', textAlign: 'left' }} onClick={() => goProject(p.id)}>{p.name}</Button> }, { title: '原因', dataIndex: 'healthReason', render:(value:string)=>marginReason(value,!!canViewMargin) }]} /></Card></Col><Col span={10}><Card size="small" title={`待决策（${pending.length}）`} extra={<Button type="link" onClick={() => navigate(`/executive/decisions?${query()}`)}>全部事项</Button>}>
-        {pending.slice(0, 2).map((d) => <div key={d.id} className="pms-decision"><div className="pms-decision-title">{d.projectName}</div><div><Tag>{d.type}</Tag>影响 <MoneyText value={d.impactAmount} signed /></div><Typography.Text type="secondary">{d.level} · 提交于 {d.createdAt}</Typography.Text><div><Button type="link" onClick={() => navigate(`${d.targetRoute}?${query()}`)}>查看原审批</Button></div></div>)}{!pending.length && <Empty description="当前范围无待决策事项" />}
-      </Card></Col></Row>
+      <Row gutter={[16, 16]} className="pms-focus-row" style={{ marginBottom: 16 }}>
+        <Col span={14}>
+          <Card
+            size="small"
+            title={
+              <Space size={8}>
+                <span style={{ fontWeight: 600 }}>重点异常项目</span>
+                <Tag color={exceptions.length > 0 ? 'error' : 'default'} style={{ margin: 0, borderRadius: 10 }}>
+                  {exceptions.length}
+                </Tag>
+              </Space>
+            }
+            extra={<Button type="link" onClick={() => exception()}>全部异常</Button>}
+          >
+            <Table
+              rowKey="id"
+              size="small"
+              pagination={false}
+              dataSource={[...exceptions].sort((a, b) => (b.health === 'red' ? 1 : 0) - (a.health === 'red' ? 1 : 0) || b.calc.variance - a.calc.variance).slice(0, 3)}
+              columns={[
+                {
+                  title: '项目',
+                  width: '40%',
+                  render: (_, p) => (
+                    <Button type="link" style={{ padding: 0, height: 'auto', whiteSpace: 'normal', textAlign: 'left', fontWeight: 500 }} onClick={() => goProject(p.id)}>
+                      {p.name}
+                    </Button>
+                  ),
+                },
+                {
+                  title: '原因',
+                  dataIndex: 'healthReason',
+                  render: (value: string) => marginReason(value, !!canViewMargin),
+                },
+              ]}
+            />
+          </Card>
+        </Col>
+        <Col span={10}>
+          <Card
+            size="small"
+            title={
+              <Space size={8}>
+                <span style={{ fontWeight: 600 }}>待决策事项</span>
+                <Tag color={pending.length > 0 ? 'warning' : 'default'} style={{ margin: 0, borderRadius: 10 }}>
+                  {pending.length}
+                </Tag>
+              </Space>
+            }
+            extra={<Button type="link" onClick={() => navigate(`/executive/decisions?${query()}`)}>全部事项</Button>}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {pending.slice(0, 2).map((d) => (
+                <div
+                  key={d.id}
+                  style={{
+                    padding: '10px 12px',
+                    background: '#fafbfc',
+                    border: '1px solid #f1f5f9',
+                    borderRadius: 8,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 6,
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                    <div style={{ fontWeight: 600, fontSize: 13, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {d.projectName}
+                    </div>
+                    <Tag color="orange" style={{ margin: 0, fontSize: 11, lineHeight: '18px', padding: '0 6px' }}>
+                      {d.type}
+                    </Tag>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 12 }}>
+                    <span style={{ color: '#64748b' }}>
+                      影响：<MoneyText value={d.impactAmount} signed />
+                    </span>
+                    <span style={{ color: '#94a3b8' }}>{d.level}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px dashed #e2e8f0', paddingTop: 6, marginTop: 2 }}>
+                    <Typography.Text type="secondary" style={{ fontSize: 11 }}>
+                      提交于 {d.createdAt}
+                    </Typography.Text>
+                    <Button type="link" size="small" style={{ padding: 0, height: 'auto', fontSize: 12 }} onClick={() => navigate(`${d.targetRoute}?${query()}`)}>
+                      查看原审批 →
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              {!pending.length && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="当前范围无待决策事项" style={{ margin: '12px 0' }} />}
+            </div>
+          </Card>
+        </Col>
+      </Row>
     </>}
-    <Space wrap size={[20, 8]} style={{ marginBottom: 16 }}><span>预计项目收入 <MoneyText value={kpi.totalRevenue} /></span><span>冻结概算 <MoneyText value={estimate} /></span><span>预算毛利 {canViewMargin ? <MoneyText value={sumMoney([kpi.totalRevenue, -kpi.totalBudgetAmount])} /> : '已隐藏'}</span><span>预测毛利率 {canViewMargin ? formatPercent(kpi.weightedGrossMarginRate) : '已隐藏'}</span><span>毛利偏差 {canViewMargin ? <MoneyText value={-kpi.totalCostVariance} signed /> : '已隐藏'}</span><span>已收 <MoneyText value={receipt.paid} /></span><Button type="link" onClick={() => exception({ exception: 'receipt' })}>逾期 <MoneyText value={receipt.overdue} /></Button></Space>
-    <Space wrap style={{ marginBottom: 16 }}>{[{ label: '在建', rows: scope.filter((p) => p.phase === '执行'), metric: 'construction' }, { label: '未签立项', rows: scope.filter((p) => p.isUnsigned), metric: 'unsigned' }, { label: '验收收尾', rows: scope.filter((p) => p.phase === '收尾'), metric: 'closing' }, { label: '运维', rows: scope.filter((p) => p.isMaintenance), metric: 'maintenance' }].map((group) => <Button key={group.label} disabled={!group.rows.length} onClick={() => drill({ metric: group.metric })}>{group.label} {group.rows.length} 个 · <MoneyText value={sumMoney(group.rows.map((p) => p.revenueAmount ?? p.contractAmount))} /></Button>)}</Space>
-    <details className="pms-analysis-options">
-      <summary>指标口径与常用视图</summary>
-      <div style={{ paddingTop: 12 }}><AnalysisTools storageKey="pms-dashboard-views" params={params} onChange={setParams} />
-    <Space wrap style={{ marginBottom: 12 }}><Typography.Text type="secondary">口径：项目规模含未签与运维；签约额排除未签；毛利按预计项目收入减滚动成本；回款完成率=到期计划实收/到期应收。</Typography.Text></Space>
-      </div>
-    </details>
+    <Card size="small" style={{ marginBottom: 16, background: '#fafbfc' }}>
+      <Space align="center" size={16} wrap>
+        <Typography.Text type="secondary" style={{ fontSize: 13, fontWeight: 500 }}>
+          阶段快速穿透：
+        </Typography.Text>
+        <Space size={8} wrap>
+          {[
+            { label: '在建项目', rows: scope.filter((p) => p.phase === '执行'), metric: 'construction', color: 'blue' },
+            { label: '未签立项', rows: scope.filter((p) => p.isUnsigned), metric: 'unsigned', color: 'orange' },
+            { label: '验收收尾', rows: scope.filter((p) => p.phase === '收尾'), metric: 'closing', color: 'cyan' },
+            { label: '运维期', rows: scope.filter((p) => p.isMaintenance), metric: 'maintenance', color: 'purple' },
+          ].map((group) => {
+            const count = group.rows.length;
+            const totalAmount = sumMoney(group.rows.map((p) => p.revenueAmount ?? p.contractAmount));
+            return (
+              <Tag.CheckableTag
+                key={group.label}
+                checked={false}
+                onChange={() => count && drill({ metric: group.metric })}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: 6,
+                  fontSize: 13,
+                  border: '1px solid #d9d9d9',
+                  background: count ? '#fff' : '#f5f5f5',
+                  cursor: count ? 'pointer' : 'not-allowed',
+                  opacity: count ? 1 : 0.6,
+                }}
+              >
+                <span>{group.label}</span>
+                <span style={{ marginLeft: 6, fontWeight: 600, color: '#1677ff' }}>{count}</span>
+                <span style={{ margin: '0 4px', color: '#bfbfbf' }}>·</span>
+                <MoneyText value={totalAmount} />
+              </Tag.CheckableTag>
+            );
+          })}
+        </Space>
+      </Space>
+    </Card>
     {!scope.length ? <Empty description="当前筛选无项目，请调整条件" /> : <>
-      <Row gutter={16} style={{ marginBottom: 16 }}><Col span={12}><Card size="small" title="四阶段项目分布 · 预计项目金额"><Table rowKey="stage" size="small" pagination={false} dataSource={stages} columns={[{ title: '四算阶段', render: (_, r) => <Button type="link" disabled={!r.count} onClick={() => drill({ stage: r.stage })}>{r.stage}</Button> }, { title: '数量', dataIndex: 'count' }, { title: '金额（万元）', dataIndex: 'amount', render: (v: number) => <MoneyText value={v} /> }]} /></Card></Col>
-      <Col span={12}><Card size="small" title="项目健康度 · 最严重因素优先">{health.map((h) => <Row key={h.key} align="middle" gutter={8}><Col span={6}><Button type="link" disabled={!h.count} onClick={() => exception({ health: h.key })}>{h.name} {h.count}</Button></Col><Col span={18}><Progress percent={percentage(h.count, scope.length) ?? 0} format={(v) => `${v?.toFixed(1)}%`} strokeColor={h.color} size="small" /></Col></Row>)}<Typography.Text type="secondary">关注/预警/高风险共 {health.filter((h) => h.key !== 'green').reduce((n, h) => n + h.count, 0)} 项；点击查看原始原因。</Typography.Text></Card></Col></Row>
+      <Row gutter={16} style={{ marginBottom: 16 }}>
+        <Col span={12}>
+          <Card size="small" title="四阶段项目分布 · 预计项目金额">
+            <Table
+              rowKey="stage"
+              size="small"
+              pagination={false}
+              dataSource={stages}
+              columns={[
+                { title: '四算阶段', render: (_, r) => <Button type="link" disabled={!r.count} onClick={() => drill({ stage: r.stage })}>{r.stage}</Button> },
+                { title: '数量', dataIndex: 'count' },
+                { title: '金额（万元）', dataIndex: 'amount', render: (v: number) => <MoneyText value={v} /> },
+              ]}
+            />
+          </Card>
+        </Col>
+        <Col span={12}>
+          <Card
+            size="small"
+            title="项目健康度分布"
+            extra={
+              <Button type="link" style={{ padding: 0 }} onClick={() => exception()}>
+                查看异常原因 →
+              </Button>
+            }
+          >
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 14 }}>
+              {health.map((h) => (
+                <div
+                  key={h.key}
+                  onClick={() => h.count && exception({ health: h.key })}
+                  style={{
+                    padding: '10px 8px',
+                    borderRadius: 8,
+                    background: '#fafbfc',
+                    border: `1px solid ${h.count ? '#e2e8f0' : '#f1f5f9'}`,
+                    textAlign: 'center',
+                    cursor: h.count ? 'pointer' : 'default',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 4 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: h.color }} />
+                    <span style={{ fontSize: 13, fontWeight: 500, color: '#334155' }}>{h.name}</span>
+                  </div>
+                  <div style={{ fontSize: 18, fontWeight: 700, fontFamily: 'var(--pms-font-mono)', color: h.color }}>
+                    {h.count}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>
+                    {percentage(h.count, scope.length)?.toFixed(1) ?? 0}%
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', height: 8, borderRadius: 4, overflow: 'hidden', background: '#f1f5f9', marginBottom: 10 }}>
+              {health.map((h) => {
+                const pct = percentage(h.count, scope.length) ?? 0;
+                if (!pct) return null;
+                return (
+                  <div
+                    key={h.key}
+                    style={{
+                      width: `${pct}%`,
+                      background: h.color,
+                      height: '100%',
+                    }}
+                    title={`${h.name}: ${h.count}个 (${pct.toFixed(1)}%)`}
+                  />
+                );
+              })}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, color: '#64748b' }}>
+              <span>
+                异常项目（关注/预警/高风险）：
+                <strong style={{ color: '#cf1322', marginLeft: 4 }}>
+                  {health.filter((h) => h.key !== 'green').reduce((n, h) => n + h.count, 0)}
+                </strong> 项
+              </span>
+              <span style={{ color: '#94a3b8', fontSize: 11 }}>最严重因素优先判定</span>
+            </div>
+          </Card>
+        </Col>
+      </Row>
       <Card size="small" title="经营与执行分析" extra={<Button type="link" onClick={() => drill()}>查看全部项目</Button>}><Tabs activeKey={analysis} onChange={(key) => { const next = new URLSearchParams(params); next.set('analysis', key); setParams(next, { replace: true }); }} items={[['progress', '进度'], ['cost', '成本'], ['margin', '毛利'], ['receipt', '回款'], ['four', '四算']].map(([key, label]) => ({ key, label }))} /><Table rowKey="id" size="small" dataSource={rows} pagination={{ pageSize: 5, showSizeChanger: false }} columns={[{ title: '项目', width: 300, render: (_, p) => <Button type="link" style={{ whiteSpace: 'normal', textAlign: 'left' }} onClick={() => goProject(p.id)}>{p.name}</Button> }, ...selectedColumns]} /></Card>
 
     </>}
   </>;
-  return <><PageHeader title="GL-01 项目经营驾驶舱" description={`集团经营规模、四算、健康异常与待决策 · 更新至 ${AS_OF_DATE} 18:30 · 金额单位：万元`} breadcrumbs={[{ title: '首页', href: '/' }]} extra={<Space>{allowed && <Popover trigger="click" placement="bottomRight" title="演示场景" content={<Radio.Group value={mode} onChange={(e) => { const next = new URLSearchParams(params); next.set('demo', e.target.value); setParams(next); }} options={[{ value: 'normal', label: '正常' }, { value: 'delayed', label: '部分数据延迟' }, { value: 'empty', label: '无数据' }, { value: 'denied', label: '无权限' }, { value: 'loading', label: '计算中' }, { value: 'changed', label: '口径变更' }]} />}><Button>演示场景</Button></Popover>}<Button onClick={() => setRefresh((n) => n + 1)}>刷新数据{refresh ? `（已刷新${refresh}次）` : ''}</Button></Space>} />
+  return <><PageHeader title="GL-01 项目看板" description={`集团经营规模、四算、健康异常与待决策 · 更新至 ${AS_OF_DATE} 18:30 · 金额单位：万元`} breadcrumbs={[{ title: '首页', href: '/' }]} extra={<Space>{allowed && <Popover trigger="click" placement="bottomRight" title="演示场景" content={<Radio.Group value={mode} onChange={(e) => { const next = new URLSearchParams(params); next.set('demo', e.target.value); setParams(next); }} options={[{ value: 'normal', label: '正常' }, { value: 'delayed', label: '部分数据延迟' }, { value: 'empty', label: '无数据' }, { value: 'denied', label: '无权限' }, { value: 'loading', label: '计算中' }, { value: 'changed', label: '口径变更' }]} />}><Button>演示场景</Button></Popover>}<Button onClick={() => setRefresh((n) => n + 1)}>刷新数据{refresh ? `（已刷新${refresh}次）` : ''}</Button></Space>} />
     {mode === 'delayed' && <Alert showIcon type="warning" style={{ marginBottom: 16 }} message="演示：采购来源同步延迟，暂使用最近已确认快照" description="采购快照截至2026-09-08 18:30，其他来源截至2026-09-09 18:30；不把未确认金额加入已发生成本。" />}
     {mode === 'changed' && <Alert showIcon type="info" style={{ marginBottom: 16 }} message="演示口径公告：回款完成率按到期计划计算" description="分母为到期应收，不再使用合同总额。合同余额、到期应收和逾期分别展示，历史预算与结算快照不回写。" />}
     {!allowed || mode === 'denied' ? <StateView type="403" /> : mode === 'loading' ? <StateView type="loading" /> : content}

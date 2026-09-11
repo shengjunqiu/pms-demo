@@ -1442,7 +1442,7 @@ export const PAGE_MANIFEST: RouteItem[] = [
   },
   {
     "id": "GL-01",
-    "title": "项目经营驾驶舱",
+    "title": "项目看板",
     "route": "/executive/dashboard",
     "kind": "工作台/分析",
     "roles": "管理层、PMO",
@@ -1481,7 +1481,7 @@ export const PAGE_MANIFEST: RouteItem[] = [
   },
   {
     "id": "GL-02",
-    "title": "四算经营专题",
+    "title": "四算分析",
     "route": "/executive/four-calculations",
     "kind": "专题分析",
     "roles": "管理层、PMO、财务",
@@ -1581,7 +1581,7 @@ export const PAGE_MANIFEST: RouteItem[] = [
   },
   {
     "id": "GL-06",
-    "title": "领导待决策事项",
+    "title": "待决策事项",
     "route": "/executive/decisions",
     "kind": "工作台/列表",
     "roles": "管理层、PMO",

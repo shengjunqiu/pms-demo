@@ -38,15 +38,15 @@ export const MainLayout: React.FC = () => {
   const navSections = [
     {
       sectionKey: 'workspace',
-      sectionTitle: '工作台与驾驶舱',
+      sectionTitle: '工作台与看板',
       groups: [
         { key: 'WK', label: '工作台与待办', icon: <AppstoreOutlined /> },
-        { key: 'GL', label: '领导经营驾驶舱', icon: <DashboardOutlined /> },
+        { key: 'GL', label: '项目经营看板', icon: <DashboardOutlined /> },
       ],
     },
     {
       sectionKey: 'lifecycle',
-      sectionTitle: '四算全生命周期',
+      sectionTitle: '项目全生命周期',
       groups: [
         { key: 'GS', label: '商机与概算阶段', icon: <DollarOutlined /> },
         { key: 'YS', label: '预算与立项阶段', icon: <ProjectOutlined /> },
@@ -77,7 +77,7 @@ export const MainLayout: React.FC = () => {
 
       section.groups.forEach((group) => {
         const groupPages = PAGE_MANIFEST.filter(
-          (page) => page.id.startsWith(group.key) && canAccessPage(data, currentUser, page.id)
+          (page) => page.id.startsWith(group.key) && page.id !== 'GL-04' && page.id !== 'GS-03' && canAccessPage(data, currentUser, page.id)
         );
 
         // 支持通过页面ID、标题或路由搜索

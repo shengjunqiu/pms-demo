@@ -4,7 +4,7 @@ export const pmsTheme: ThemeConfig = {
   token: {
     colorPrimary: '#1d4ed8', // 国际深邃海蓝 (blue-700)
     colorPrimaryHover: '#2563eb',
-    colorSuccess: '#059669', // 翡翠绿 (emerald-600)
+    colorSuccess: '#10b981', // 柔和翡翠绿 (emerald-500)
     colorWarning: '#d97706', // 琥珀黄 (amber-600)
     colorError: '#e11d48',   // 浆果玫红 (rose-600)
     colorInfo: '#1d4ed8',

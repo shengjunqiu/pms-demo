@@ -253,12 +253,12 @@ kbd,
   overflow-x: auto;
 }
 .ant-table-wrapper .ant-table-thead > tr > th {
-  background: linear-gradient(180deg, #fbfcfe 0%, #f1f5f9 100%) !important;
-  border-bottom: 1px solid #cbd5e1 !important;
+  background: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
   font-weight: 600 !important;
   font-size: 12px;
-  color: #334155;
-  letter-spacing: 0.02em;
+  color: #475569;
+  letter-spacing: 0.01em;
   padding-top: 10px !important;
   padding-bottom: 10px !important;
   text-transform: none;

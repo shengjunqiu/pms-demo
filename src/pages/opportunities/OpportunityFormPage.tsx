@@ -21,8 +21,8 @@ export function OpportunityFormPage() {
   const locked = (!!o && (opportunityLocked(data,o)||m?.assessments.at(-1)?.status==='评估中'))||!canDo('save-opportunity',id);
   const save = async(submit:boolean) => { try {
     if(locked)throw new Error('当前商机或动作权限为只读');
-    const v = await form.validateFields(submit?undefined:['name','customerId','departmentId','ownerId','estimatedAmount','winRate']);
-    const fields = {...form.getFieldsValue(),...v}; const input:OpportunityInput = {...fields,expectedSignDate:fields.expectedSignDate?.format('YYYY-MM-DD')??'',estimatedAmount:fields.estimatedAmount??0,attachments:(fields.files??[]).map((f:{name:string})=>f.name),collaborators:fields.collaborators??[],source:fields.source??'',description:fields.description??'',competition:fields.competition??'',businessLine:fields.businessLine??'',region:fields.region??'',projectType:fields.projectType??''};
+    const v = await form.validateFields(submit?undefined:['name','customerId','departmentId','ownerId','estimatedAmount']);
+    const fields = {...form.getFieldsValue(),...v}; const input:OpportunityInput = {...fields,winRate:fields.winRate??50,expectedSignDate:fields.expectedSignDate?.format('YYYY-MM-DD')??'',estimatedAmount:fields.estimatedAmount??0,attachments:(fields.files??[]).map((f:{name:string})=>f.name),collaborators:fields.collaborators??[],source:fields.source??'',description:fields.description??'',competition:fields.competition??'',businessLine:fields.businessLine??'',region:fields.region??'',projectType:fields.projectType??''};
     const duplicates = data.opportunities.filter(x=>x.id!==id&&x.customerId===input.customerId&&(x.name.includes(input.name.trim())||input.name.includes(x.name)));
     const visibleDuplicates = duplicates.filter(x=>canViewOpportunity(data,x,actor));
     const duplicateDescription = [...visibleDuplicates.map(x=>`${x.code} · ${x.name}`), ...(visibleDuplicates.length<duplicates.length?['另有相似商机不在当前查看范围内，请联系主办部门核实。']:[])].join('；');
@@ -44,9 +44,8 @@ export function OpportunityFormPage() {
       <PageSection title="2. 商务预期" description="预计金额与签约时间用于跟踪机会成熟度，不计入已签合同。"><Row gutter={24}>
         <Col span={8}><Form.Item name="estimatedAmount" label="预计项目金额（万元）" rules={[{required:true},{type:'number',min:0}]}><InputNumber min={0} precision={2} style={{width:'100%'}}/></Form.Item></Col>
         <Col span={8}><Form.Item name="expectedSignDate" label="预计签约日期"><DatePicker style={{width:'100%'}}/></Form.Item></Col>
-        <Col span={8}><Form.Item name="winRate" label="赢单概率（%）" rules={[{required:true},{type:'number',min:0,max:100}]}><InputNumber min={0} max={100} style={{width:'100%'}}/></Form.Item></Col>
         <Col span={8}><Form.Item name="region" label="区域"><Select allowClear options={Array.from(new Set(mockCustomers.map(c=>c.region))).map(value=>({value,label:value}))}/></Form.Item></Col>
-        <Col span={16}><Form.Item name="competition" label="竞争情况"><Input.TextArea rows={2}/></Form.Item></Col>
+        <Col span={24}><Form.Item name="competition" label="竞争情况"><Input.TextArea rows={2}/></Form.Item></Col>
       </Row></PageSection>
       <PageSection title="3. 背景、需求与材料" description="补充建设目标与需求，供各专业开展初步评估。"><Form.Item name="description" label="业务背景、建设目标与主要需求" rules={[{required:true,whitespace:true}]}><Input.TextArea rows={4} maxLength={2000} showCount/></Form.Item><Form.Item name="files" label="客户需求 / 招标材料" valuePropName="fileList" getValueFromEvent={e=>e.fileList} extra="前端演示仅记录文件名，不上传服务器。"><Upload beforeUpload={()=>false} maxCount={8}><Button icon={<UploadOutlined/>}>选择附件</Button></Upload></Form.Item></PageSection>
       <div className="pms-form-actions"><span style={{color:"#64748b",marginRight:"auto"}}>草稿可继续补充；提交后进入待评估。</span><Space><Button onClick={()=>save(false)}>保存草稿</Button><Button type="primary" onClick={()=>save(true)}>提交商机</Button><Button disabled={false} onClick={()=>navigate(o?`/opportunities/${o.id}`:'/opportunities')}>取消</Button></Space></div>

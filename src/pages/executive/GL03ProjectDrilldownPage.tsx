@@ -88,7 +88,7 @@ export function GL03ProjectDrilldownPage() {
       { key: 'customer', label: '客户', children: p.customerName }, { key: 'pm', label: '项目经理', children: p.pmName }, { key: 'dept', label: '责任部门', children: p.departmentName },
       { key: 'director', label: '项目总监（演示任命）', children: mockDepartments.find((d) => d.id === mockDepartments.find((d) => d.id === p.departmentId)?.parentId)?.leader ?? '王总' },
       { key: 'phase', label: '生命周期', children: `${fourStage(p)} · ${p.subPhase}` }, { key: 'health', label: '健康度', children: <Tag color={colors[p.health]}>{names[p.health]}</Tag> },
-    ]} /><Alert showIcon type={p.health === 'red' ? 'error' : p.health === 'green' ? 'success' : 'warning'} message={healthReason(p.healthReason)} /></Card>
+    ]} /><Alert showIcon type={p.health === 'red' ? 'error' : p.health === 'green' ? 'success' : 'warning'} message={healthReason(p.healthReason)} style={{ paddingTop: 8, paddingBottom: 8 }} /></Card>
     <Row gutter={16} style={{ marginBottom: 16 }}>{[
       { label: '冻结概算', value: calc.estimate?.totalCost, icon: <ProjectOutlined /> },
       { label: '有效预算', value: calc.budget?.totalAmount, icon: <FundOutlined /> },
