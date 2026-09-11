@@ -29,14 +29,22 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
     <div className="pms-page-header">
       {breadcrumbs && breadcrumbs.length > 0 && (
         <Breadcrumb
-          style={{ marginBottom: 8 }}
-          items={breadcrumbs.map((b) => ({ title: b.href ? <Link to={b.href}>{b.title}</Link> : b.title }))}
+          style={{ marginBottom: 10, fontSize: 12 }}
+          items={breadcrumbs.map((b) => ({
+            title: b.href ? (
+              <Link to={b.href} className="text-slate-500 hover:text-blue-600 transition-colors">
+                {b.title}
+              </Link>
+            ) : (
+              <span className="text-slate-700 font-medium">{b.title}</span>
+            ),
+          }))}
         />
       )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
         <div>
           <Space size={8} align="center">
-            <Title level={4} style={{ margin: 0 }}>
+            <Title level={4} style={{ margin: 0, fontWeight: 700, letterSpacing: '-0.3px' }}>
               {displayTitle}
             </Title>
             {tags?.map((t, i) => (
@@ -44,12 +52,12 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             ))}
           </Space>
           {displayDesc && (
-            <Paragraph type="secondary" style={{ margin: '6px 0 0', fontSize: 13 }}>
+            <Paragraph type="secondary" style={{ margin: '6px 0 0', fontSize: 13, lineHeight: 1.6 }}>
               {displayDesc}
             </Paragraph>
           )}
         </div>
-        {extra && <div>{extra}</div>}
+        {extra && <div className="flex items-center gap-2 flex-wrap">{extra}</div>}
       </div>
     </div>
   );

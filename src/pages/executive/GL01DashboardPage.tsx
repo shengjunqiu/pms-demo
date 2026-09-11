@@ -65,7 +65,7 @@ export function GL01DashboardPage() {
       currentStage="all"
       className="mb-4"
     />
-    <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>{[
+    <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>{[
       { label: '在管项目', value: String(scope.length), unit: '个', icon: <ProjectOutlined />, action: () => drill(), statusText: '当前筛选范围', statusType: 'info' as const },
       { label: '已签合同总额', value: receipt.signed, icon: <DollarOutlined />, action: () => drill({ metric: 'signed' }) },
       { label: '有效预算', value: kpi.totalBudgetAmount, icon: <FundOutlined />, action: () => drill() },

@@ -48,7 +48,7 @@ export function InitiationHeader({ app, title }: { app?: InitiationApplication; 
 
 export function SourceSummary({ source, compact = false }: { source: InitiationSource; compact?: boolean }) {
   const { go } = useInitiationNavigation(); const text = useInitiationText();
-  const content = <>
+  const inner = <>
     <Descriptions bordered size="small" column={3} items={[
       { key: 'o', label: '来源商机', children: <Button type="link" onClick={() => go(`/opportunities/${source.opportunity.id}`)}>{source.opportunity.id}</Button> },
       { key: 's', label: '已评审方案', children: source.solutionVersionId }, { key: 'r', label: '专家评审', children: source.expertReviewId },
@@ -57,7 +57,18 @@ export function SourceSummary({ source, compact = false }: { source: InitiationS
     <Alert style={{ margin: '12px 0' }} type="info" showIcon message={`本轮固定上游版本；${source.earlyCostSources.length} 笔具备唯一来源的成本将在通过后继承。历史汇总不补造成本明细。`} />
     <Table size="small" pagination={false} rowKey={(opinion) => `${opinion.dimension}-${opinion.by}`}  dataSource={source.expertOpinions} columns={[{ title: '专家', dataIndex: 'by' }, { title: '维度', dataIndex: 'dimension' }, { title: '结论', dataIndex: 'conclusion' }, { title: '意见', dataIndex: 'opinion', render: (value: string) => text(value) }]} />
   </>;
-  return compact ? <details style={{ marginTop: 12 }}><summary style={{ cursor: 'pointer', color: '#475569', padding: '8px 0' }}>来源版本与专家意见 · {source.estimate.id} · 前期投入 <MoneyText value={source.earlyCostTotal} /> 万元</summary><div style={{ paddingTop: 12 }}>{content}</div></details> : content;
+  return compact ? (
+    <details style={{ marginTop: 12 }}>
+      <summary style={{ cursor: 'pointer', color: '#475569', padding: '8px 0' }}>
+        来源版本与专家意见 · {source.estimate.id} · 前期投入 <MoneyText value={source.earlyCostTotal} /> 万元
+      </summary>
+      <div style={{ paddingTop: 12 }}>{inner}</div>
+    </details>
+  ) : (
+    <PageSection title="来源版本与专家意见" description={`绑定商机 ${source.opportunity.id} 与冻结概算 ${source.estimate.id}`}>
+      {inner}
+    </PageSection>
+  );
 }
 
 export function InitiationHistory({ app }: { app: InitiationApplication }) {

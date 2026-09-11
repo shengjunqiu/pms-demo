@@ -7,9 +7,8 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useBusinessStore } from '@/mock/business';
 import { useAppStore } from '@/store/useAppStore';
 import { fourStage, selectFourCalculations, selectReceipts, visibleProjects } from '@/mock/selectors';
-import { mockUsers, mockProcurements, mockOutsources, mockDepartments, AS_OF_DATE } from '@/mock';
+import { mockUsers, mockProcurements, mockOutsources, mockDepartments } from '@/mock';
 import { formatPercent } from '@/utils/money';
-import { PageHeader } from '@/components/common/PageHeader';
 import { StateView } from '@/components/common/StateView';
 import { ProjectQualityPanel } from '@/components/common/ProjectQualityPanel';
 import { MoneyText } from '@/components/common/MoneyText';
@@ -140,18 +139,75 @@ export function ProjectOverviewPage() {
   ];
   const activeGroup = groups.find((group) => group.tabs.includes(currentTab)) ?? groups[0];
   const activeTab = tabs.some((tab) => tab.key === currentTab) ? currentTab : 'overview';
-  return <div><PageHeader title={p.name} description={`${p.code} · ${p.departmentName} · 更新至 ${AS_OF_DATE}${role === 'executive' ? ' · 管理视角：只读' : ''}`} tags={[<HealthBadge key="health" status={healthNames[p.health]} />]} breadcrumbs={[{ title: '首页', href: '/' }, { title: '项目详情' }]} extra={<Space><Select aria-label="切换项目" value={p.id} style={{ width: 250 }} options={allowed.map((row) => ({ value: row.id, label: `${row.id} ${row.name}` }))} onChange={(value) => navigate(`/projects/${value}?${params}`)} /><Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>返回</Button></Space>} />
-    <Card size="small" className="pms-project-summary">
-      <Descriptions column={3} size="small" items={summaryItems.filter((item) => ['customer', 'pm', 'date', 'income', 'actual', 'margin'].includes(item.key))} />
-      <Alert showIcon type={p.health === 'red' ? 'error' : p.health === 'green' ? 'success' : 'warning'} message={marginReason(p.healthReason, showMargin)} />
-      <details className="pms-project-meta">
-        <summary>更多项目信息 · 来源、组织与合同</summary>
-        <Descriptions style={{ marginTop: 12 }} column={3} size="small" items={summaryItems.filter((item) => !['customer', 'pm', 'date', 'income', 'actual', 'margin', 'status', 'phase', 'contract'].includes(item.key))} />
+  return <div>
+    {/* 顶部 Hero 实体卡片 */}
+    <div className="bg-white border border-slate-200 rounded-xl p-5 mb-4 shadow-2xs">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+        <div className="flex items-start gap-3.5">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-lg shadow-sm flex-shrink-0">
+            {p.name.slice(0, 2)}
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2 mb-1.5">
+              <span className="font-mono text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-semibold">{p.code}</span>
+              <h1 className="text-lg font-bold text-slate-900 m-0 tracking-tight">{p.name}</h1>
+              <HealthBadge status={healthNames[p.health]} />
+              <BusinessStageBadge stage={p.phase} />
+              <DeliveryStageBadge stage={p.subPhase} />
+              {p.isUnsigned ? <Tag color="warning" className="m-0">未签约立项</Tag> : <Tag color="success" className="m-0">已签约</Tag>}
+            </div>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
+              <span>客户: <strong className="text-slate-700 font-medium">{p.customerName}</strong></span>
+              <span>•</span>
+              <span>主责部门: <strong className="text-slate-700 font-medium">{p.departmentName}</strong></span>
+              <span>•</span>
+              <span>主项目经理: <strong className="text-slate-700 font-medium">{p.pmName}</strong></span>
+              <span>•</span>
+              <span>计划交付: <strong className="text-slate-700 font-medium">{p.plannedEndDate}</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 self-start lg:self-center">
+          <Select
+            aria-label="切换项目"
+            value={p.id}
+            style={{ width: 230 }}
+            options={allowed.map((row) => ({ value: row.id, label: `${row.id} ${row.name}` }))}
+            onChange={(value) => navigate(`/projects/${value}?${params}`)}
+          />
+          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>返回</Button>
+        </div>
+      </div>
+
+      {/* 实体状态与异常提示 */}
+      <div className="mt-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+        <div className="flex-1">
+          <Alert
+            showIcon
+            type={p.health === 'red' ? 'error' : p.health === 'green' ? 'success' : 'warning'}
+            message={<span className="text-xs font-medium">{marginReason(p.healthReason, showMargin)}</span>}
+            className="py-1 px-3 rounded-lg border-0"
+          />
+        </div>
+        <div className="flex items-center gap-4 text-xs text-slate-500 flex-shrink-0">
+          <span>预计收入: <strong className="text-slate-800 text-sm font-semibold"><MoneyText value={calc.income} /></strong> 万元</span>
+          <span>已发生成本: <strong className="text-slate-800 text-sm font-semibold"><MoneyText value={calc.actual} /></strong> 万元</span>
+          <span>预测毛利率: <strong className="text-blue-600 text-sm font-semibold">{showMargin ? formatPercent(calc.grossMarginRate) : '已隐藏'}</strong></span>
+        </div>
+      </div>
+
+      <details className="pms-project-meta pt-2 mt-2 border-t border-slate-100">
+        <summary className="text-xs text-slate-400 cursor-pointer hover:text-slate-600">更多项目元数据（来源商机、总监、签约金额等）</summary>
+        <Descriptions style={{ marginTop: 10 }} column={3} size="small" items={summaryItems.filter((item) => !['customer', 'pm', 'date', 'income', 'actual', 'margin', 'status', 'phase', 'contract'].includes(item.key))} />
       </details>
-    </Card>
-    <div className="pms-project-lifecycle"><Space size={8}><BusinessStageBadge stage={p.phase} /><DeliveryStageBadge stage={p.subPhase} />{p.isUnsigned ? <Tag color="warning">已立项未签约</Tag> : <Tag color="success">已签约</Tag>}</Space>
-    <Steps size="small" style={{ flex: 1, minWidth: 420 }} current={['概算', '预算', '核算', '结算及运维'].indexOf(fourStage(p))} items={['概算', '预算', '核算', '结算及运维'].map((title) => ({ title }))} />
     </div>
+
+    <div className="pms-project-lifecycle bg-white p-3.5 border border-slate-200 rounded-lg mb-4 flex items-center justify-between">
+      <div className="text-xs font-semibold text-slate-700 mr-4 flex-shrink-0">四算生命周期进展:</div>
+      <Steps size="small" style={{ flex: 1, minWidth: 420 }} current={['概算', '预算', '核算', '结算及运维'].indexOf(fourStage(p))} items={['概算', '预算', '核算', '结算及运维'].map((title) => ({ title }))} />
+    </div>
+
     <div className="pms-project-tabs">
       <Tabs className="pms-project-groups" activeKey={activeGroup.key} onChange={(key) => selectTab(groups.find((group) => group.key === key)!.tabs[0])} items={groups.map(({ key, label }) => ({ key, label }))} />
       <Tabs size="small" type="card" activeKey={activeTab} onChange={selectTab} items={tabs.filter((tab) => activeGroup.tabs.includes(tab.key))} />

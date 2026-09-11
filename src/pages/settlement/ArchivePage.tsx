@@ -275,21 +275,25 @@ export function ArchivePage() {
             label: "归档目录与来源",
             children: (
               <>
-                <Space style={{ marginBottom: 12 }}>
-                  <Select
-                    aria-label="归档分类查询"
-                    allowClear
-                    placeholder="全部分类"
-                    style={{ width: 200 }}
-                    value={params.get("category") ?? undefined}
-                    onChange={(v) => setParam("category", v)}
-                    options={ARCHIVE_CATEGORIES.map((value) => ({
-                      value,
-                      label: value,
-                    }))}
-                  />
-                  <Button onClick={() => setParams({})}>重置查询</Button>
-                </Space>
+                <div className="pms-toolbar mb-3">
+                  <Space wrap size={[8, 12]}>
+                    <Select
+                      aria-label="归档分类查询"
+                      allowClear
+                      placeholder="按归档分类查询"
+                      style={{ width: 220 }}
+                      value={params.get("category") ?? undefined}
+                      onChange={(v) => setParam("category", v)}
+                      options={ARCHIVE_CATEGORIES.map((value) => ({
+                        value,
+                        label: value,
+                      }))}
+                    />
+                    {params.get("category") && (
+                      <Button onClick={() => setParams({})}>重置查询</Button>
+                    )}
+                  </Space>
+                </div>
                 <Table
                   rowKey="category"
                   size="small"

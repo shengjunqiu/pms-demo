@@ -1,4 +1,4 @@
-import { Button, Card, Col, Dropdown, Empty, Progress, Row, Select, Table, Tabs, Tag, Typography } from 'antd';
+import { Button, Card, Col, Dropdown, Empty, Progress, Row, Select, Space, Table, Tabs, Tag, Typography } from 'antd';
 import {
   ProjectOutlined,
   CarryOutOutlined,
@@ -88,6 +88,21 @@ export function ProjectManagerWorkbenchPage() {
       { title: '预算 / 已用成本', width: 170, render: (_, p) => <><MoneyText value={p.calc.budget?.totalAmount} /><div><MoneyText value={p.calc.actual} /></div></> },
       { title: '预计预算结余', width: 175, render: (_, p) => <><MoneyText value={p.calc.budget ? -p.calc.variance : null} signed /><div><Button size="small" type="link" onClick={() => navigate(`/projects/${p.id}/dynamic-accounting`)}>查看动态核算</Button></div></> },
       { title: '人力预算 / 已用', width: 160, render: (_, p) => <><MoneyText value={p.calc.subjects.find((s) => s.subjectId === 'SUB-01')?.budget} /><div><MoneyText value={p.calc.subjects.find((s) => s.subjectId === 'SUB-01')?.actual} /></div></> },
+      {
+        title: '操作',
+        fixed: 'right',
+        width: 130,
+        render: (_, p) => (
+          <Space size={4}>
+            <Button size="small" type="link" onClick={() => navigate(`/projects/${p.id}`)}>
+              总览
+            </Button>
+            <Button size="small" type="link" onClick={() => navigate(`/projects/${p.id}/progress`)}>
+              进度
+            </Button>
+          </Space>
+        ),
+      },
     ]} /></Card>
     <Row gutter={[16, 16]}>
     <Col span={12}><Card size="small" title="待验收与整改">{acceptances.length ? acceptances.slice(0, 5).map((a) => <p key={a.id}><Tag color={a.status === '整改中' ? 'warning' : 'blue'}>{a.status}</Tag><Button type="link" onClick={() => navigate(`/projects/${a.projectId}/${a.type === '内部初验' ? 'internal-acceptance' : a.type === '供应商验收' ? 'supplier-acceptance' : 'customer-acceptance'}`)}>{a.projectId} · {a.type} · 第{a.round}轮</Button></p>) : <Empty description="暂无待处理验收" />}</Card></Col>

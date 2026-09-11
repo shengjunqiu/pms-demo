@@ -70,17 +70,21 @@ export const StateView: React.FC<StateViewProps> = ({
   }
 
   return (
-    <Result
-      icon={<InboxOutlined style={{ color: '#bfbfbf' }} />}
-      title={title || '暂无数据'}
-      subTitle={subTitle || '当前筛选条件下没有匹配的数据记录'}
-      extra={
-        actionText && (
-          <Button type="primary" onClick={onAction}>
-            {actionText}
-          </Button>
-        )
-      }
-    />
+    <div className="py-12 flex flex-col items-center justify-center text-center">
+      <div className="w-14 h-14 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 mb-3 shadow-2xs">
+        <InboxOutlined style={{ fontSize: 28 }} />
+      </div>
+      <div className="text-sm font-semibold text-slate-800 mb-1">
+        {title || '暂无数据记录'}
+      </div>
+      <div className="text-xs text-slate-500 max-w-sm mb-4">
+        {subTitle || '当前筛选条件下没有匹配的数据记录，您可以调整筛选条件或重置查看全部'}
+      </div>
+      {actionText && (
+        <Button type="primary" size="small" onClick={onAction}>
+          {actionText}
+        </Button>
+      )}
+    </div>
   );
 };

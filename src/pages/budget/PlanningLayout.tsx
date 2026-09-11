@@ -25,6 +25,17 @@ export function PlanningHeader({ title, context }: { title: string; context: Ret
         { key: 'budget', label: '预算编制' }, { key: 'estimate-budget', label: '概算对比' }, { key: 'budget/review', label: '预算审批' }, { key: 'baseline', label: '项目基线' },
       ]} />
     </div>
-    {frozen && <Alert style={{ marginBottom: 16 }} showIcon type="info" message="当前计划已随基线冻结，调整须提交项目变更" description="执行完成率、实际日期由项目进度维护；本页展示计划字段。" action={<Button onClick={() => navigate(`/project-changes/new?projectId=${p.id}`)}>进入项目变更</Button>} />}
+    {frozen && (
+      <div className="mb-4">
+        <Alert
+          showIcon
+          type="info"
+          className="rounded-lg border-blue-200/80 bg-blue-50/50"
+          message="当前计划已随基线冻结，调整须提交项目变更"
+          description="执行完成率、实际日期由项目进度维护；本页展示计划字段。"
+          action={<Button type="primary" size="small" onClick={() => navigate(`/project-changes/new?projectId=${p.id}`)}>进入项目变更</Button>}
+        />
+      </div>
+    )}
   </>;
 }

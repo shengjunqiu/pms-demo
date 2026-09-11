@@ -89,7 +89,7 @@ export const FourCalculationsPipeline: React.FC<FourCalculationsPipelineProps> =
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 relative">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
         {stages.map((stage, idx) => (
           <div
             key={stage.key}
