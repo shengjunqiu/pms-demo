@@ -3,9 +3,9 @@
 <!-- pms-loop:begin -->
 ## Loop 当前进度
 
-已验收：**64 / 72 页面**
+已验收：**51 / 72 页面**
 
-状态：`in_progress`；更新时间：2026-09-11T02:29:33+00:00
+状态：`in_progress`；更新时间：2026-09-11T02:34:20+00:00
 
 | 模块 | 已验收 | 待办/活动/阻塞 |
 |---|---:|---|
@@ -13,9 +13,9 @@
 | GS | 11/11 | 无 |
 | YS | 15/15 | 无 |
 | HS | 17/17 | 无 |
-| JS | 5/13 | JS-01(pending)、JS-02(pending)、JS-03(pending)、JS-04(pending)、JS-05(pending)、JS-06(pending)、JS-07(pending)、JS-08(pending) |
+| JS | 0/13 | JS-01(pending)、JS-02(pending)、JS-03(pending)、JS-04(pending)、JS-05(pending)、JS-06(pending)、JS-07(pending)、JS-08(pending)、JS-09(pending)、JS-10(pending)、JS-11(pending)、JS-12(pending)、JS-13(pending) |
 | GL | 6/6 | 无 |
-| CF | 8/8 | 无 |
+| CF | 0/8 | CF-01(pending)、CF-02(pending)、CF-03(pending)、CF-04(pending)、CF-05(pending)、CF-06(pending)、CF-07(pending)、CF-08(pending) |
 
 公共能力：FND-01=done；FND-02=done
 
@@ -36,7 +36,6 @@
 
 ### 假设、已知问题与恢复说明
 
-- 2026-09-10T21:08:16+00:00：R0047报告交付三页验收，新UI40/72。当前c011aa03工程235领域及3浏览器全部通过exit0，三页六双宽及表单/快照/版本/质量图查看。修复1280摘要金额重叠、测试隐藏drawer close定位，旧失败日志保留。继续HS3 663c577集成并补PlanRequest来源筛选；HS4 fe6bf2b+df55d7e已交付。
 - 2026-09-10T21:08:59+00:00：reopen FINAL, HS-14, HS-15: 继续全页面UI改造：变更台账与申请评估审批对比，保留基线和专业权限。
 - 2026-09-10T21:13:10+00:00：R0048首浏览器三例均在新建责任人选择器失败：AntD showSearch aria-label同时出现在Select容器和combobox，getByLabel严格模式匹配2项。修测试统一按.ant-select[aria-label]容器操作及断言，业务尚未被验证，不计通过；同轮重查。
 - 2026-09-10T21:17:49+00:00：R0048复跑暴露测试新增可见按钮断言误用确定而实际为提交责任人，修正；另一次长表单下拉在滚动中脱离，新增事项Modal限制body65vh并固定footer，Select先滚到可见再打开并对可搜索项输入定位。先浏览器调试全五例，修复完成再正式check和当前源码验证。
@@ -46,6 +45,7 @@
 - 2026-09-10T21:37:03+00:00：reopen FINAL, JS-01, JS-02, JS-03, JS-04: 继续全页面UI改造：内部供应商客户验收与报验当前办理、准备条件和版本清晰。
 - 2026-09-10T21:46:15+00:00：R0049成本五页验收，新UI49/72。7b451b07工程235领域及7浏览器4.5min exit0，五页十张双宽查看；真实采购外包费用/工时一次入账及承诺互斥、预测不变，三权限回归通过。setsid nohup参数化 /tmp/pms-run-tests.py ROUND LABEL specs...稳定完成，等exit.json。继续HS5 93987a5+acdad9d需root旧审批返回筛选和originalIncome快照；JS1 a931440独立开发5owned文件含旧两e2e。
 - 2026-09-10T21:53:50+00:00：reopen FINAL, JS-05, JS-06, JS-07, JS-08: 继续全部UI改造：结算申请流程、四算与经营成果和实际收款。
+- 2026-09-11T02:34:20+00:00：reopen CF-01, CF-02, CF-03, CF-04, CF-05, CF-06, CF-07, CF-08, FINAL, JS-09, JS-10, JS-11, JS-12, JS-13: 继续完成全页面UI改造：收尾运维归档与配置页统一新设计并重新验收
 
 完整任务状态、历史和证据索引见 `.pms-loop/state.json`。
 <!-- pms-loop:end -->
