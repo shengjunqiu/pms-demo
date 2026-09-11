@@ -6,7 +6,8 @@ import {applyFinanceConfiguration,createFinanceConfiguration,selectConfiguredHea
 import type {FinanceConfigurationState} from '@/models/configuration-finance';
 import {applyUnsignedAction,approveUnsignedInvestment,type UnsignedAction} from './unsigned';
 import type {UnsignedProjectControl,UnsignedInvestmentRequest,StartConfirmation} from '@/models/unsigned';
-import {applyInitiationAction,type InitiationAction} from './initiation';
+import { applyInitiationAction, defaultInitiationInput, INITIATION_SIGNATURES, type InitiationAction } from './initiation';
+import { opportunityMeta } from './opportunities';
 import type {InitiationApplication} from '@/models/initiation';
 import { applyConfigurationAction, createConfigurationState, type ConfigurationAction } from '@/mock/configuration';
 import type { ConfigurationState } from '@/models/configuration';
@@ -401,6 +402,169 @@ function buildDemoBusinessState(): BusinessState {
     const p = state.projects.find((p) => p.id === item.projectId)!;
     state.decisions.push({ id: item.id, projectId: p.id, projectName: p.name, type: item.type, title: item.reason, impactAmount: item.impactAmount, level: '高管审批', status: '待决策', targetRoute: `/management-approvals/${item.id}`, createdAt: '2026-09-05' });
   }
+
+  // Seed initiation applications for demonstration across different review stages
+  const initActors = {
+    market: { id: 'U-006', name: '陈亮', role: 'market' as const },
+    pmo: { id: 'U-002', name: '李主任', role: 'pmo' as const },
+    tech: { id: 'U-005', name: '赵工', role: 'solution-tech' as const },
+    finance: { id: 'U-004', name: '刘敏', role: 'finance' as const },
+    pm: { id: 'U-001', name: '张伟', role: 'project-manager' as const },
+  };
+
+  const setupInitOpportunity = (oppId: string, amount: number) => {
+    const opp = state.opportunities.find((o) => o.id === oppId);
+    if (!opp) return;
+    opp.status = '拟立项';
+    opp.estimatedAmount = amount;
+    state.opportunityMeta[oppId] = opportunityMeta(state, opp);
+    state.opportunityMeta[oppId].solutionTask = {
+      id: `ST-${oppId}`,
+      opportunityId: oppId,
+      assessmentId: `AR-${oppId}`,
+      ownerId: initActors.tech.id,
+      ownerName: initActors.tech.name,
+      status: '已完成',
+      createdAt: '2026-08-01',
+      dueDate: '2026-08-20',
+    };
+    state.presales[oppId] = {
+      solutionVersions: [{
+        id: `SOL-${oppId}`,
+        version: 1,
+        submittedAt: '2026-08-20',
+        submittedBy: initActors.tech.name,
+        customerSituation: '数字化转型与智能化升级建设需求',
+        goals: '构建统一业务数据协同平台',
+        scope: '平台核心架构及20个标准化业务接口',
+        boundaries: '不包含历史非结构化数据清洗',
+        architecture: '云原生微服务架构',
+        implementation: '分期迭代实施交付',
+        deliverables: '软件部署包、设计文档及操作手册',
+        dependencies: '客户网络环境与业务接口开放',
+        assumptions: '硬件服务器按期到位',
+        ownerId: initActors.tech.id,
+        participants: [],
+        startDate: '2026-09-01',
+        endDate: '2026-12-31',
+        attachments: ['系统方案设计书.pdf'],
+        changeReason: '',
+      }],
+      costVersions: [],
+      research: [],
+      reviews: [{
+        id: `REV-${oppId}`,
+        round: 1,
+        solutionVersionId: `SOL-${oppId}`,
+        costVersionId: `COST-${oppId}`,
+        status: '通过',
+        method: '专家会',
+        plannedDate: '2026-08-25',
+        experts: [],
+        opinions: [],
+        createdAt: '2026-08-25',
+        createdBy: initActors.pmo.name,
+        corrections: [],
+      }],
+    };
+    state.estimates.push({
+      ...structuredClone(state.estimates[0]),
+      id: `EST-${oppId}`,
+      opportunityId: oppId,
+      isFrozen: true,
+      totalIncome: amount,
+      totalCost: amount * 0.6,
+      grossMargin: amount * 0.4,
+      grossMarginRate: 40,
+    });
+    state.estimateMeta[`EST-${oppId}`] = {
+      reviewId: `REV-${oppId}`,
+      solutionVersionId: `SOL-${oppId}`,
+      costVersionId: `COST-${oppId}`,
+      income: amount,
+      incomeTaxRate: 0,
+      incomeTaxBasis: '不含税',
+      lines: [],
+      changeReason: '已评审版本',
+      assumptions: '硬件环境按期提供',
+      riskReserveNote: '已计提风险准备金',
+      responsibleDepartment: '智慧城市交付部',
+      createdBy: initActors.tech.name,
+      createdAt: '2026-08-25',
+      frozenBy: initActors.pmo.name,
+      frozenAt: '2026-08-25',
+      freezeOpinion: '同意冻结概算版本',
+    };
+    opp.currentEstimateVersionId = `EST-${oppId}`;
+  };
+
+  // 1. INI-001 (待风险评估 / 待分级阶段)
+  setupInitOpportunity('OPP-066', 1500);
+  state = transition(state, {
+    type: 'save-initiation',
+    input: {
+      ...defaultInitiationInput(state, 'OPP-066'),
+      necessity: '推进海州市数字化转型一期建设',
+      scope: '数据协同平台与15个标准业务接口',
+      customerNeeds: '完成系统部署上线及部门培训',
+      recommendation: '建议评定为重点项目',
+      region: '华东',
+      attachments: ['立项申请书.pdf'],
+    },
+  }, initActors.market);
+  state = transition(state, { type: 'submit-initiation', id: 'INIT-1' }, initActors.market);
+
+  // 2. INI-002 (重大 / PMC决策会 / 待决策阶段)
+  setupInitOpportunity('OPP-068', 2600);
+  state = transition(state, {
+    type: 'save-initiation',
+    input: {
+      ...defaultInitiationInput(state, 'OPP-068'),
+      necessity: '打造企业级大数据中台与运营协同底座',
+      scope: '大数据中台架构及12个微服务模块',
+      customerNeeds: '按期交付并提供高可靠运维支持',
+      recommendation: '重点战略项目',
+      region: '华南',
+      strategic: true,
+      attachments: ['项目建议书.pdf', '技术方案.pdf'],
+    },
+  }, initActors.market);
+  state = transition(state, { type: 'submit-initiation', id: 'INIT-2' }, initActors.market);
+  state = transition(state, {
+    type: 'assess-initiation-risk',
+    id: 'INIT-2',
+    risks: [
+      { id: 'RISK-01', domain: '技术', description: '数据源接口协议异构风险', sourceId: 'REV-OPP-068', sourceRoute: '/opportunities/OPP-068/review', probability: 3, impact: 3, mitigation: '建立适配转换适配器', ownerId: initActors.tech.id },
+      { id: 'RISK-02', domain: '交付', description: '定制化开发周期偏紧', sourceId: 'AR-OPP-068', sourceRoute: '/opportunities/OPP-068/evaluation', probability: 3, impact: 4, mitigation: '分批敏捷迭代发布', ownerId: initActors.pm.id },
+    ],
+    level: '中',
+    explanation: '已逐项核验技术与交付方案，总体风险可控，建议设置里程碑质量门禁',
+  }, initActors.pmo);
+  state = transition(state, { type: 'classify-initiation', id: 'INIT-2', level: '重大', reason: '项目金额大且属于战略重点项目，定为重大级别' }, initActors.pmo);
+
+  // 3. INI-003 (一般 / 线上会签 / 已完成会签 / 待PMO决策)
+  setupInitOpportunity('OPP-069', 800);
+  state = transition(state, {
+    type: 'save-initiation',
+    input: {
+      ...defaultInitiationInput(state, 'OPP-069'),
+      necessity: '园区综合能效监控与设备物联升级',
+      scope: '能效采集终端接入与可视化看板',
+      customerNeeds: '实现园区能耗实时监控与智能告警',
+      recommendation: '一般项目',
+      region: '华东',
+      attachments: ['物联方案.pdf'],
+    },
+  }, initActors.market);
+  state = transition(state, { type: 'submit-initiation', id: 'INIT-3' }, initActors.market);
+  state = transition(state, { type: 'assess-initiation-risk', id: 'INIT-3', risks: [], level: '低', explanation: '成熟物联标准化方案，交付风险低' }, initActors.pmo);
+  state = transition(state, { type: 'classify-initiation', id: 'INIT-3', level: '一般', reason: '金额适中且方案成熟' }, initActors.pmo);
+  for (const node of INITIATION_SIGNATURES) {
+    const actorRole = node.role as 'pmo' | 'finance' | 'solution-tech' | 'project-manager';
+    const actor = ({ pmo: initActors.pmo, finance: initActors.finance, 'solution-tech': initActors.tech, 'project-manager': initActors.pm })[actorRole];
+    state = transition(state, { type: 'sign-initiation', id: 'INIT-3', node: node.node, conclusion: '同意', opinion: `${node.node}签署同意` }, actor);
+  }
+
   return state;
 }
 

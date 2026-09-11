@@ -7,9 +7,10 @@ export const ROLE_HOME: Record<UserRole, string> = {
   admin: '/settings/permissions',
 };
 
-/** Use the route's entity type, so issue and opportunity links never receive project IDs. */
+/** Use the route's entity type, so issue, initiation and opportunity links never receive wrong project IDs. */
 export function demoRoute(route: string): string {
   const id = route.startsWith('/opportunities/') ? 'OPP-001'
+    : route.startsWith('/initiation/') ? 'INIT-1'
     : route.startsWith('/issues-risks/') ? 'ISSUE-0003'
     : route.startsWith('/requirements-bugs/') ? 'REQ-0001'
     : route.startsWith('/operations/') ? 'OPS-007'

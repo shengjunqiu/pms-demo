@@ -6,12 +6,14 @@ import {
   Button,
   Card,
   Checkbox,
+  Col,
   Descriptions,
   Drawer,
   Empty,
   Form,
   Input,
   Modal,
+  Row,
   Select,
   Space,
   Table,
@@ -21,6 +23,8 @@ import {
 } from "antd";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { PageHeader } from "@/components/common/PageHeader";
+import { MetricStatCard } from "@/components/common/MetricStatCard";
+import { PageSection, PageToolbar } from "@/components/common/PageSection";
 import { StateView } from "@/components/common/StateView";
 import { useBusinessStore } from "@/mock/business";
 import {
@@ -236,6 +240,9 @@ export function AcceptancePage({ kind }: { kind: AcceptanceType }) {
       : r.status === "待验收" && !acceptanceDetail(data, r).submitted
         ? "准备中"
         : r.status;
+  const passedRows = rows.filter((r) => r.status === "已通过").length;
+  const correctingRows = rows.filter((r) => r.status === "整改中").length;
+  const pendingRows = rows.length - passedRows - correctingRows;
   return (
     <>
       <PageHeader
@@ -263,7 +270,7 @@ export function AcceptancePage({ kind }: { kind: AcceptanceType }) {
           </Space>
         }
       />
-      <Space wrap style={{ marginBottom: 16 }}>
+      <PageToolbar>
         {(Object.keys(acceptancePaths) as AcceptanceType[]).map((k) => (
           <Button
             key={k}
@@ -279,7 +286,7 @@ export function AcceptancePage({ kind }: { kind: AcceptanceType }) {
         <Button onClick={() => navigate(`/projects/${p.id}/settlement/apply`)}>
           项目结算申请
         </Button>
-      </Space>
+      </PageToolbar>
       <Alert
         style={{ marginBottom: 16 }}
         showIcon
@@ -295,8 +302,14 @@ export function AcceptancePage({ kind }: { kind: AcceptanceType }) {
             : undefined
         }
       />
+      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+        <Col xs={12} xl={6}><MetricStatCard title="验收轮次" value={rows.length} unit="项" statusType="info" /></Col>
+        <Col xs={12} xl={6}><MetricStatCard title="当前待办理" value={pendingRows} unit="项" statusText={pendingRows ? "需跟进" : "已清零"} statusType={pendingRows ? "warning" : "healthy"} /></Col>
+        <Col xs={12} xl={6}><MetricStatCard title="整改中" value={correctingRows} unit="项" statusType={correctingRows ? "danger" : "healthy"} /></Col>
+        <Col xs={12} xl={6}><MetricStatCard title="准入条件" value={`${conditions.filter((c) => c.passed).length}/${conditions.length}`} unit="项" statusText={conditions.every((c) => c.passed) ? "已满足" : "有阻断"} statusType={conditions.every((c) => c.passed) ? "healthy" : "warning"} /></Col>
+      </Row>
       {kind === "客户终验" && (
-        <Card size="small" title="合同验收计量" style={{ marginBottom: 16 }}>
+        <PageSection title="合同验收计量" description="报验金额只取财务确认原单，避免与验收轮次重复累计。">
           {data.contracts
             .filter((c) => c.projectId === p.id)
             .map((c) => (
@@ -315,7 +328,7 @@ export function AcceptancePage({ kind }: { kind: AcceptanceType }) {
                 </Button>
               </p>
             ))}
-        </Card>
+        </PageSection>
       )}
       <Tabs
         defaultActiveKey="rounds"
@@ -324,7 +337,7 @@ export function AcceptancePage({ kind }: { kind: AcceptanceType }) {
             key: "rounds",
             label: `验收轮次（${rows.length}）`,
             children: (
-              <Card size="small">
+              <PageSection title="验收记录" description="按编号、范围与状态定位当前轮次和历史结果。">
                 <Space wrap style={{ marginBottom: 12 }}>
                   <Input
                     aria-label="验收查询"
@@ -433,14 +446,14 @@ export function AcceptancePage({ kind }: { kind: AcceptanceType }) {
                     ]}
                   />
                 )}
-              </Card>
+              </PageSection>
             ),
           },
           {
             key: "conditions",
             label: `准备清单（${conditions.filter((c) => c.passed).length}/${conditions.length}）`,
             children: (
-              <Card size="small" title="验收准入条件与补齐入口">
+              <PageSection title="验收准入条件与补齐入口" description="未满足项直接提供原业务补齐入口。">
                 <Table
                   rowKey="name"
                   size="small"
@@ -469,7 +482,7 @@ export function AcceptancePage({ kind }: { kind: AcceptanceType }) {
                     },
                   ]}
                 />
-              </Card>
+              </PageSection>
             ),
           },
           ...(kind === "供应商验收"

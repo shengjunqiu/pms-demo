@@ -5,9 +5,11 @@ import {
   App,
   Button,
   Card,
+  Col,
   Descriptions,
   Form,
   Input,
+  Row,
   Select,
   Space,
   Switch,
@@ -15,6 +17,7 @@ import {
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { PageHeader } from "@/components/common/PageHeader";
+import { MetricStatCard } from "@/components/common/MetricStatCard";
 import { StateView } from "@/components/common/StateView";
 import { useBusinessStore } from "@/mock/business";
 import { mockUsers, AS_OF_DATE } from "@/mock";
@@ -102,6 +105,37 @@ export function OperationHandoverPage() {
           </Button>
         }
       />
+      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="移交状态"
+            value={h ? h.status : "未发起"}
+            statusType={h?.status === "已接收" ? "healthy" : h ? "warning" : "info"}
+          />
+        </Col>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="运维周期"
+            value={cycles.length}
+            unit="个"
+            statusType={cycles.length > 0 ? "healthy" : "info"}
+          />
+        </Col>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="接收责任人"
+            value={h?.receiverId ? mockUsers.find((u) => u.id === h.receiverId)?.name ?? h.receiverId : "未指定"}
+            statusType="info"
+          />
+        </Col>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="前置档案"
+            value={data.projectArchives[p.id] ? "已归档" : "未归档"}
+            statusType={data.projectArchives[p.id] ? "healthy" : "danger"}
+          />
+        </Col>
+      </Row>
       <Alert
         showIcon
         type="info"

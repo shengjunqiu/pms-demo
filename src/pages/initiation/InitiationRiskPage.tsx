@@ -17,7 +17,22 @@ export function InitiationRiskPage() {
   const [risks, setRisks] = useState<InitiationRisk[]>(structuredClone(round?.risks ?? []));
   const [level, setLevel] = useState<'低' | '中' | '高'>(round?.riskLevel ?? riskScore(risks)); const [explanation, setExplanation] = useState(round?.riskExplanation ?? '');
   const { message } = App.useApp(); const { go } = useInitiationNavigation();
-  if (!app) return <StateView type="404" />; if (!canViewInitiation(data, app, actor)) return <StateView type="403" />;
+  if (!app) {
+    return (
+      <StateView
+        type="empty"
+        title="暂无指定立项申请"
+        subTitle={
+          id
+            ? `未找到单号为「${id}」的立项申请单。您可以前往立项评审工作台选择已有申请，或从商机发起新立项。`
+            : "请先在立项评审工作台选择目标申请，或从商机发起新立项申请。"
+        }
+        actionText="前往立项评审工作台"
+        onAction={() => go("/initiation/review")}
+      />
+    );
+  }
+  if (!canViewInitiation(data, app, actor)) return <StateView type="403" />;
   if (!round) return <><InitiationHeader app={app} title="综合风险报告" /><Alert message="请先提交立项申请" /></>;
   const editable = canDo('assess-initiation-risk', app.id) && actor.role === 'pmo' && ['待风险评估', '待分级'].includes(round.status);
   const patch = (id: string, value: Partial<InitiationRisk>) => setRisks((rows) => rows.map((r) => r.id === id ? { ...r, ...value } : r));

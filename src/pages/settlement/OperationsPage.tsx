@@ -5,20 +5,23 @@ import {
   App,
   Button,
   Card,
+  Col,
   Descriptions,
   Form,
   Input,
   InputNumber,
   Modal,
+  Row,
   Select,
   Space,
-  Statistic,
   Table,
   Tabs,
   Tag,
 } from "antd";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { PageHeader } from "@/components/common/PageHeader";
+import { MetricStatCard } from "@/components/common/MetricStatCard";
+import { PageSection } from "@/components/common/PageSection";
 import { StateView } from "@/components/common/StateView";
 import { useBusinessStore } from "@/mock/business";
 import { mockUsers, AS_OF_DATE } from "@/mock";
@@ -219,12 +222,45 @@ export function OperationsPage() {
           </Space>
         }
       />
+      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="周期状态"
+            value={c.status}
+            statusType={c.status === "服务中" ? "healthy" : c.status === "退出中" ? "warning" : "info"}
+          />
+        </Col>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="本期运维费用"
+            value={costs.reduce((s, c) => s + c.amount, 0)}
+            statusType="info"
+          />
+        </Col>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="未解决问题/风险"
+            value={events.filter((e) => e.status === "未解决").length}
+            unit="项"
+            statusType={events.filter((e) => e.status === "未解决").length > 0 ? "danger" : "healthy"}
+          />
+        </Col>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="服务记录"
+            value={events.length}
+            unit="条"
+            statusType="info"
+          />
+        </Col>
+      </Row>
       <Alert
         showIcon
         type="info"
+        style={{ marginBottom: 16 }}
         message="建设期结算与运维账独立。续期创建新的不重叠周期；退出保留服务记录、问题处理、权限回收与移交凭据。"
       />
-      <Card style={{ marginTop: 16 }}>
+      <PageSection title="运维周期概况" description="服务合同、SLA规范、响应周期与服务团队人员。" className="mb-4">
         <Descriptions
           bordered
           items={[
@@ -269,19 +305,7 @@ export function OperationsPage() {
             },
           ]}
         />
-        <Space style={{ marginTop: 16 }} size={48}>
-          <Statistic
-            title="本期运维费用（万元）"
-            value={costs.reduce((s, c) => s + c.amount, 0)}
-            precision={2}
-          />
-          <Statistic
-            title="未解决问题 / 风险"
-            value={events.filter((e) => e.status === "未解决").length}
-          />
-          <Statistic title="服务记录" value={events.length} />
-        </Space>
-      </Card>
+      </PageSection>
       {orphan.length > 0 && (
         <Alert
           type="warning"

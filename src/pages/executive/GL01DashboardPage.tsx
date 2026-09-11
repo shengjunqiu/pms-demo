@@ -25,6 +25,7 @@ import { AnalysisTools } from '@/components/common/AnalysisTools';
 import { MoneyText } from '@/components/common/MoneyText';
 import { StateView } from '@/components/common/StateView';
 import { MetricStatCard } from '@/components/common/MetricStatCard';
+import { FourCalculationsPipeline } from '@/components/common/FourCalculationsPipeline';
 
 const healths = [{ key: 'green', name: '健康', color: '#52c41a' }, { key: 'yellow', name: '关注', color: '#d4a017' }, { key: 'orange', name: '预警', color: '#fa8c16' }, { key: 'red', name: '高风险', color: '#cf1322' }];
 export function GL01DashboardPage() {
@@ -54,6 +55,16 @@ export function GL01DashboardPage() {
   const selectedColumns = columnsByTab[analysis as keyof typeof columnsByTab] ?? columnsByTab.cost;
   const content = <>
     <ProjectFilters compact params={params} onChange={setParams} />
+    <FourCalculationsPipeline
+      metrics={{
+        estimate: estimate,
+        budget: kpi.totalBudgetAmount,
+        actual: kpi.totalActualCost,
+        settlement: sumMoney(calculations.map((c) => c.settlement?.finalCost ?? 0)),
+      }}
+      currentStage="all"
+      className="mb-4"
+    />
     <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>{[
       { label: '在管项目', value: String(scope.length), unit: '个', icon: <ProjectOutlined />, action: () => drill(), statusText: '当前筛选范围', statusType: 'info' as const },
       { label: '已签合同总额', value: receipt.signed, icon: <DollarOutlined />, action: () => drill({ metric: 'signed' }) },

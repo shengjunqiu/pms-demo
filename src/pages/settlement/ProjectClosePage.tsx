@@ -4,16 +4,19 @@ import {
   Alert,
   App,
   Button,
-  Card,
+  Col,
   Descriptions,
   Input,
   Modal,
+  Row,
   Space,
   Table,
   Tag,
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { PageHeader } from "@/components/common/PageHeader";
+import { MetricStatCard } from "@/components/common/MetricStatCard";
+import { PageSection } from "@/components/common/PageSection";
 import { StateView } from "@/components/common/StateView";
 import { useBusinessStore } from "@/mock/business";
 import { selectReceipts, visibleProjects } from "@/mock/selectors";
@@ -87,9 +90,42 @@ export function ProjectClosePage() {
           </Button>
         }
       />
+      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="关闭状态"
+            value={closure || history ? "已正式关闭" : "准备关闭中"}
+            statusType={closure || history ? "healthy" : "warning"}
+          />
+        </Col>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="关闭门禁达成"
+            value={`${checks.filter((c) => c.ok).length}/${checks.length}`}
+            unit="项"
+            statusType={failed.length === 0 ? "healthy" : "danger"}
+          />
+        </Col>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="待办阻断项"
+            value={failed.length}
+            unit="项"
+            statusType={failed.length === 0 ? "healthy" : "danger"}
+          />
+        </Col>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="应收结清"
+            value={receiptSummary.outstanding === 0 ? "已结清" : `剩 ${receiptSummary.outstanding} 万元`}
+            statusType={receiptSummary.outstanding === 0 ? "healthy" : "warning"}
+          />
+        </Col>
+      </Row>
       <Alert
         type={closure ? "success" : history ? "warning" : "info"}
         showIcon
+        style={{ marginBottom: 16 }}
         message={
           closure
             ? "项目正式关闭，关闭快照和历史业务只读。"
@@ -98,7 +134,7 @@ export function ProjectClosePage() {
               : "最终结算不会自动关闭项目。需完成评价、归档、收款和运维退出，再由PMO确认。"
         }
       />
-      <Card title="真实关闭门禁" style={{ marginTop: 16 }}>
+      <PageSection title="真实关闭门禁" description="核验结算锁定、后评价、归档确认、收款结清与运维退出全项条件。" className="mb-4">
         <Table
           rowKey="label"
           pagination={false}
@@ -124,12 +160,8 @@ export function ProjectClosePage() {
             },
           ]}
         />
-      </Card>
-      <Card title="合同应收与回款计划" style={{ marginTop: 16 }}>
-        <Alert
-          type="info"
-          message="关闭页只核对原合同与实际回款计划，不在此确认收款或减免应收。"
-        />
+      </PageSection>
+      <PageSection title="合同应收与回款计划" description="关闭页只核对原合同与实际回款计划，不在此确认收款或减免应收。" className="mb-4">
         <Table
           rowKey="id"
           dataSource={receiptSummary.contracts}
@@ -142,6 +174,7 @@ export function ProjectClosePage() {
         />
         <Table
           rowKey="id"
+          style={{ marginTop: 16 }}
           dataSource={receiptSummary.plans}
           columns={[
             { title: "回款节点", dataIndex: "title" },
@@ -150,9 +183,9 @@ export function ProjectClosePage() {
             { title: "已收金额", dataIndex: "paidAmount" },
           ]}
         />
-      </Card>
+      </PageSection>
       {closure && (
-        <Card title="不可变关闭快照" style={{ marginTop: 16 }}>
+        <PageSection title="不可变关闭快照" description="记录关闭确认人、归档与结算原单编号及关联运维周期。" className="mb-4">
           <Descriptions
             bordered
             column={2}
@@ -186,7 +219,7 @@ export function ProjectClosePage() {
               { key: "note", label: "关闭意见", children: closure.note },
             ]}
           />
-        </Card>
+        </PageSection>
       )}
       <Modal
         title="确认关闭项目"

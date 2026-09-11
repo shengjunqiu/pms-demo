@@ -134,7 +134,7 @@ test('P006客户整改创建复验轮次，签署证明经PMO确认后分税点�
   const reportRow = page.locator('.ant-table-tbody > tr').filter({ hasText: batch });
   await expect(reportRow).toContainText('待确认');
   await expect(reportRow).toContainText('6% / 0%');
-  const totals = page.locator('.ant-card').filter({ has: page.getByText('客户合同与累计报验', { exact: true }) }).locator('.ant-table-tbody > tr').first();
+  const totals = page.locator('section, .ant-card').filter({ has: page.getByText('客户合同与累计报验', { exact: true }) }).locator('.ant-table-tbody > tr').first();
   await expect(totals.locator('td').nth(2)).toHaveText('0');
   await expect(totals.locator('td').nth(3)).toHaveText('200');
   await screenshots(page, 'JS04-P006-awaiting-finance');

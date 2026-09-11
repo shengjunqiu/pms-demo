@@ -5,11 +5,13 @@ import {
   App,
   Button,
   Card,
+  Col,
   Descriptions,
   Form,
   Input,
   InputNumber,
   Modal,
+  Row,
   Select,
   Space,
   Table,
@@ -19,6 +21,8 @@ import {
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { PageHeader } from "@/components/common/PageHeader";
+import { MetricStatCard } from "@/components/common/MetricStatCard";
+import { PageSection } from "@/components/common/PageSection";
 import { StateView } from "@/components/common/StateView";
 import { MoneyText } from "@/components/common/MoneyText";
 import { useBusinessStore } from "@/mock/business";
@@ -181,6 +185,36 @@ export function PostEvaluationPage() {
           </Space>
         }
       />
+      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="后评价状态"
+            value={e ? e.status : "未发起"}
+            statusType={archive ? "healthy" : e?.status === "已完成" ? "healthy" : "warning"}
+          />
+        </Col>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="结算收入"
+            value={e ? e.snapshot.income : 0}
+            statusType="info"
+          />
+        </Col>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="结算成本"
+            value={e ? e.snapshot.cost : 0}
+            statusType="info"
+          />
+        </Col>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="模板加权分"
+            value={viewEvaluation && templateResult?.score !== null && templateResult?.score !== undefined ? `${templateResult.score.toFixed(1)} 分` : "—"}
+            statusType={templateResult?.score ? "healthy" : "info"}
+          />
+        </Col>
+      </Row>
       <Alert
         type={archive ? "success" : settled ? "info" : "warning"}
         showIcon
@@ -196,10 +230,10 @@ export function PostEvaluationPage() {
       />
       {e ? (
         <>
-          <Card
+          <PageSection
             title="评价依据 · 发起时项目快照"
-            size="small"
-            style={{ marginBottom: 16 }}
+            description="保留发起后评价时的冻结结算单、生效基线与验收交付数据。"
+            className="mb-4"
           >
             <Descriptions
               bordered
@@ -259,7 +293,7 @@ export function PostEvaluationPage() {
                 },
               ]}
             />
-          </Card>
+          </PageSection>
           <Tabs
             items={[
               {

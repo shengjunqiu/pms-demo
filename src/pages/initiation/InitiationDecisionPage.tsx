@@ -34,12 +34,14 @@ import {
   InitiationHeader,
   InitiationHistory,
   SourceSummary,
+  useInitiationNavigation,
 } from "./InitiationShared";
 export function InitiationDecisionPage() {
  const {canDo}=useActionAccess();
   const { id } = useParams();
   const { data, dispatch } = useBusinessStore();
   const actor = useAppStore((s) => s.currentUser);
+  const { go } = useInitiationNavigation();
   const viewMargin = canViewSensitiveField(data, actor, "margin");
   const hiddenMargin = "毛利字段无查看权限";
   const displayText = (value?: string) =>
@@ -81,7 +83,21 @@ export function InitiationDecisionPage() {
   const [costDisposition, setCostDisposition] = useState("");
   const [trackingOwnerId, setTrackingOwnerId] = useState("");
   const { message, modal } = App.useApp();
-  if (!app) return <StateView type="404" />;
+  if (!app) {
+    return (
+      <StateView
+        type="empty"
+        title="暂无指定立项申请"
+        subTitle={
+          id
+            ? `未找到单号为「${id}」的立项决策申请单。您可以前往立项评审工作台查看待决策项目。`
+            : "请先在立项评审工作台选择目标申请进行评审决策。"
+        }
+        actionText="前往立项评审工作台"
+        onAction={() => go("/initiation/review")}
+      />
+    );
+  }
   if (!canViewInitiation(data, app, actor)) return <StateView type="403" />;
   if (!round)
     return (

@@ -16,7 +16,6 @@ import {
   Row,
   Select,
   Space,
-  Statistic,
   Switch,
   Table,
   Tabs,
@@ -40,6 +39,7 @@ import type {
 } from "@/models/configuration";
 import { ROLES, useAppStore } from "@/store/useAppStore";
 import { PageHeader } from "@/components/common/PageHeader";
+import { MetricStatCard } from "@/components/common/MetricStatCard";
 import { PAGE_MANIFEST } from "@/routes/manifest";
 type Kind = keyof ConfigurationState;
 type Version = TemplateVersion | GradingVersion | ApprovalRuleVersion;
@@ -305,24 +305,20 @@ export function ConfigurationPage({ kind }: { kind: Kind }) {
         description="编辑会另存草稿版本。发布后按生效日期、组织与项目类型选择；停用版本也需发布，且仅影响新业务提交。"
         style={{ marginBottom: 16 }}
       />
-      <Row gutter={16} style={{ marginBottom: 16 }}>
-        <Col span={8}>
-          <Card size="small">
-            <Statistic title="配置历史版本" value={rows.length} />
-          </Card>
+      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+        <Col xs={12} xl={8}>
+          <MetricStatCard title="配置历史版本" value={rows.length} unit="个" statusType="info" />
         </Col>
-        <Col span={8}>
-          <Card size="small">
-            <Statistic title="当前生效规则" value={active.length} />
-          </Card>
+        <Col xs={12} xl={8}>
+          <MetricStatCard title="当前生效规则" value={active.length} unit="个" statusType="healthy" />
         </Col>
-        <Col span={8}>
-          <Card size="small">
-            <Statistic
-              title="待发布草稿"
-              value={rows.filter((v) => v.status === "草稿").length}
-            />
-          </Card>
+        <Col xs={12} xl={8}>
+          <MetricStatCard
+            title="待发布草稿"
+            value={rows.filter((v) => v.status === "草稿").length}
+            unit="个"
+            statusType={rows.filter((v) => v.status === "草稿").length > 0 ? "warning" : "healthy"}
+          />
         </Col>
       </Row>
       <Row gutter={16}>

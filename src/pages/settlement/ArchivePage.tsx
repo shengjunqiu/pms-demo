@@ -5,11 +5,13 @@ import {
   App,
   Button,
   Card,
+  Col,
   Descriptions,
   Drawer,
   Form,
   Input,
   Modal,
+  Row,
   Select,
   Space,
   Table,
@@ -18,6 +20,8 @@ import {
 } from "antd";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { PageHeader } from "@/components/common/PageHeader";
+import { MetricStatCard } from "@/components/common/MetricStatCard";
+import { PageSection } from "@/components/common/PageSection";
 import { StateView } from "@/components/common/StateView";
 import { useBusinessStore } from "@/mock/business";
 import { visibleProjects } from "@/mock/selectors";
@@ -175,7 +179,43 @@ export function ArchivePage() {
             : "方案、立项、合同、测试质量、验收和结算须有审核通过的正式文件。原业务数据或补档容器不代替原文件，历史缺失不会自动标为齐全。"
         }
       />
-      <Card size="small" title="归档基本信息" style={{ marginBottom: 16 }}>
+      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="归档状态"
+            value={archive ? "已确认归档" : "归档准备中"}
+            statusType={archive ? "healthy" : "warning"}
+          />
+        </Col>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="分类完整性"
+            value={archive ? "14/14" : `${checks.filter((c) => c.passed).length}/14`}
+            unit="类"
+            statusType={archive || checks.every((c) => c.passed) ? "healthy" : "warning"}
+          />
+        </Col>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="正式文件"
+            value={archive?.materials.length ?? materials.filter((m) => m.status === "通过" && m.versions?.length).length}
+            unit="份"
+            statusType="info"
+          />
+        </Col>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="前置结算"
+            value={settled ? "已锁定" : "未结算"}
+            statusType={settled ? "healthy" : "danger"}
+          />
+        </Col>
+      </Row>
+      <PageSection
+        title="归档基本信息"
+        description="14类归档目录齐全、所有材料审核通过且完成冻结结算后方可确认归档。"
+        className="mb-4"
+      >
         <Descriptions
           column={3}
           size="small"
@@ -214,7 +254,7 @@ export function ArchivePage() {
             },
           ]}
         />
-        <Space>
+        <Space style={{ marginTop: 16 }}>
           <Button onClick={() => navigate(`/projects/${p.id}/post-evaluation`)}>
             补齐后评价
           </Button>
@@ -227,7 +267,7 @@ export function ArchivePage() {
             项目关闭条件
           </Button>
         </Space>
-      </Card>
+      </PageSection>
       <Tabs
         items={[
           {

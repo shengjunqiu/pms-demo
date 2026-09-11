@@ -1,0 +1,27 @@
+{
+  "package_id": "UI-CF2",
+  "items": ["CF-05", "CF-06", "CF-07", "CF-08"],
+  "owner": "coordinator-serial",
+  "writer": "",
+  "integration_root": "/Users/shengjunqiu/Documents/Code/pms-demo",
+  "workdir": "/Users/shengjunqiu/Documents/Code/pms-demo",
+  "branch": "main",
+  "base_commit": "5df3b57",
+  "contract_commit": "5df3b57",
+  "owned_paths": [
+    "src/pages/configuration/FinanceConfigurationPage.tsx",
+    "src/pages/configuration/PermissionsPage.tsx",
+    "src/pages/configuration/AuditLogPage.tsx"
+  ],
+  "shared_changes": ["统一成本基准、预警规则、权限策略与操作审计日志UI"],
+  "development_dependencies": [],
+  "acceptance_dependencies": ["协调者集成后正式验收"],
+  "acceptance_ready": false,
+  "acceptance_group": "UI-CF2",
+  "status": "assigned",
+  "last_confirmed_at": "2026-09-11",
+  "acceptance_checklist": ["工程检查", "成本基准/预警规则/权限配置/操作审计", "双宽与权限", "正式accept"],
+  "scenarios": "基准配置与预警、权限策略展示与审计日志筛选脱敏",
+  "fixtures": "现有配置与审计数据模型",
+  "next_action": "等待UI-CF1完成后串行实施并进行全量回归验收"
+}

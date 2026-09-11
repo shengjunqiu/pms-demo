@@ -1,0 +1,26 @@
+{
+  "package_id": "UI-CF1",
+  "items": ["CF-01", "CF-02", "CF-03", "CF-04"],
+  "owner": "coordinator-serial",
+  "writer": "",
+  "integration_root": "/Users/shengjunqiu/Documents/Code/pms-demo",
+  "workdir": "/Users/shengjunqiu/Documents/Code/pms-demo",
+  "branch": "main",
+  "base_commit": "5df3b57",
+  "contract_commit": "5df3b57",
+  "owned_paths": [
+    "src/pages/configuration/ConfigurationPage.tsx",
+    "src/pages/configuration/FinanceConfigurationPage.tsx"
+  ],
+  "shared_changes": ["统一配置中心灰工作区、指标卡与分级规则/审批/交付物/科目配置UI"],
+  "development_dependencies": [],
+  "acceptance_dependencies": ["协调者集成后正式验收"],
+  "acceptance_ready": false,
+  "acceptance_group": "UI-CF1",
+  "status": "assigned",
+  "last_confirmed_at": "2026-09-11",
+  "acceptance_checklist": ["工程检查", "交付物模板/分级规则/审批规则/科目配置", "双宽与权限", "正式accept"],
+  "scenarios": "规则配置展示、切换分级与审批门禁配置、科目结构",
+  "fixtures": "现有配置数据模型与store",
+  "next_action": "等待前序结算页面UI改造完成后串行实施"
+}

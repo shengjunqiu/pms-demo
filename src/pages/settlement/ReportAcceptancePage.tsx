@@ -4,13 +4,14 @@ import {
   Alert,
   App,
   Button,
-  Card,
+  Col,
   Descriptions,
   Drawer,
   Form,
   Input,
   InputNumber,
   Modal,
+  Row,
   Select,
   Space,
   Table,
@@ -18,6 +19,8 @@ import {
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { PageHeader } from "@/components/common/PageHeader";
+import { MetricStatCard } from "@/components/common/MetricStatCard";
+import { PageSection } from "@/components/common/PageSection";
 import { StateView } from "@/components/common/StateView";
 import { useBusinessStore } from "@/mock/business";
 import { confirmedReportedAmount, reportAmount } from "@/mock/acceptance";
@@ -109,6 +112,10 @@ export function ReportAcceptancePage() {
   };
   const formatted = (value: number) =>
     value.toLocaleString("zh-CN", { maximumFractionDigits: 6 });
+  const contractTotal = sumMoney(contracts.map((item) => item.amount));
+  const confirmedTotal = sumMoney(rows.filter((item) => item.status === "已确认").map(reportAmount));
+  const pendingTotal = sumMoney(rows.filter((item) => item.status === "待确认").map(reportAmount));
+  const availableTotal = sumMoney([contractTotal, -confirmedTotal, -pendingTotal]);
   return (
     <>
       <PageHeader
@@ -141,11 +148,13 @@ export function ReportAcceptancePage() {
         type="info"
         message="演示规则 RPT-1：同合同批次唯一；累计报验只汇总财务已确认原单，待确认金额占用可报额度。验收金额通过报验单计量，不重复叠加验收轮次金额。"
       />
-      <Card
-        size="small"
-        title="客户合同与累计报验"
-        style={{ marginBottom: 16 }}
-      >
+      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+        <Col xs={12} xl={6}><MetricStatCard title="合同金额" value={contractTotal} /></Col>
+        <Col xs={12} xl={6}><MetricStatCard title="已确认报验" value={confirmedTotal} statusType="healthy" /></Col>
+        <Col xs={12} xl={6}><MetricStatCard title="待确认占用" value={pendingTotal} statusType={pendingTotal ? "warning" : "info"} /></Col>
+        <Col xs={12} xl={6}><MetricStatCard title="剩余可报" value={availableTotal} statusType={availableTotal < 0 ? "danger" : "info"} /></Col>
+      </Row>
+      <PageSection title="客户合同与累计报验" description="按合同汇总已确认、待确认占用与剩余可提交额度。">
         <Table
           rowKey="id"
           size="small"
@@ -206,8 +215,8 @@ export function ReportAcceptancePage() {
             },
           ]}
         />
-      </Card>
-      <Card size="small" title="报验记录">
+      </PageSection>
+      <PageSection title="报验记录" description="按批次追踪草稿、财务待确认、退回与已确认状态。">
         <Space style={{ marginBottom: 12 }}>
           <Input
             aria-label="报验查询"
@@ -275,7 +284,7 @@ export function ReportAcceptancePage() {
             },
           ]}
         />
-      </Card>
+      </PageSection>
       <Drawer
         width={760}
         title="报验原单"

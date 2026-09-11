@@ -12,7 +12,8 @@ export const pmsTheme: ThemeConfig = {
     colorBorder: '#e2e8f0',   // slate-200
     borderRadius: 8,          // rounded-lg
     fontSize: 14,
-    fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'`,
+    fontFamily: `Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif`,
+    fontFamilyCode: `"JetBrains Mono", "SF Mono", Consolas, Menlo, monospace`,
   },
   components: {
     Layout: {
@@ -30,15 +31,16 @@ export const pmsTheme: ThemeConfig = {
     },
     Table: {
       headerBg: '#f8fafc',
-      headerColor: '#475569',
+      headerColor: '#334155',
       rowHoverBg: '#f1f5f9',
       borderColor: '#e2e8f0',
       fontSize: 13,
+      headerSplitColor: '#e2e8f0',
     },
     Card: {
       headerHeight: 48,
       colorBorderSecondary: '#e2e8f0',
-      borderRadiusLG: 12,
+      borderRadiusLG: 10,
     },
     Button: {
       borderRadius: 6,

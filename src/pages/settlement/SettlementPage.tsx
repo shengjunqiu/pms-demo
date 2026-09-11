@@ -6,12 +6,14 @@ import {
   App,
   Button,
   Card,
+  Col,
   Descriptions,
   Drawer,
   Form,
   Input,
   InputNumber,
   Modal,
+  Row,
   Select,
   Space,
   Steps,
@@ -21,6 +23,8 @@ import {
 } from "antd";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { PageHeader } from "@/components/common/PageHeader";
+import { MetricStatCard } from "@/components/common/MetricStatCard";
+import { PageSection, PageToolbar } from "@/components/common/PageSection";
 import { StateView } from "@/components/common/StateView";
 import { MoneyText } from "@/components/common/MoneyText";
 import { useBusinessStore } from "@/mock/business";
@@ -207,7 +211,7 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
           </Space>
         }
       />
-      <Space wrap style={{ marginBottom: 16 }}>
+      <PageToolbar>
         <Button
           onClick={() => navigate(`/projects/${p.id}/customer-acceptance`)}
         >
@@ -222,7 +226,7 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
         <Button onClick={() => navigate(`/projects/${p.id}/post-evaluation`)}>
           项目后评价
         </Button>
-      </Space>
+      </PageToolbar>
       <Alert
         showIcon
         type={frozen ? "warning" : "info"}
@@ -233,9 +237,15 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
         }
         description="材料退回只补充附件，建设金额继续冻结；财务明确退回金额调整才解除临时冻结。重新提交生成新版本，原数据快照保留。结算通过后项目仍处于收尾，后评价、归档及运维/关闭另行办理。"
       />
+      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+        <Col xs={12} xl={6}><MetricStatCard title="合同收入" value={snapshot.income} /></Col>
+        <Col xs={12} xl={6}><MetricStatCard title="实际建设成本" value={snapshot.cost} statusType="info" /></Col>
+        <Col xs={12} xl={6}><MetricStatCard title="建设毛利率" value={viewMargin && snapshot.income > 0 ? `${(((snapshot.income - snapshot.cost) / snapshot.income) * 100).toFixed(1)}%` : "已脱敏"} statusType="healthy" /></Col>
+        <Col xs={12} xl={6}><MetricStatCard title="结算状态" value={request?.status ?? (final ? "已锁定" : "待发起")} statusType={frozen ? "warning" : "healthy"} /></Col>
+      </Row>
       {apply && (
         <>
-          <Card title="发起条件检查" size="small" style={{ marginBottom: 16 }}>
+          <PageSection title="发起条件检查" description="全面核对终验、未决流水与成本闭环条件。" className="mb-4">
             <Table
               rowKey="name"
               size="small"
@@ -266,14 +276,15 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
                 },
               ]}
             />
-          </Card>
-          <Card
+          </PageSection>
+          <PageSection
             title={`待处理成本原单（${pending.length}）`}
-            size="small"
-            style={{ marginBottom: 16 }}
+            description="历史导入待审单逐条财务核对；已有凭证须金额一致且唯一绑定。"
+            className="mb-4"
           >
             <Alert
               type="info"
+              style={{ marginBottom: 12 }}
               message="历史导入待审单逐条财务核对；已有凭证须金额一致且唯一绑定。动态工时/采购外包费用须到原单审核入账。取消不发生必须保存原始取消依据。"
             />
             <Table
@@ -323,11 +334,11 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
                 },
               ]}
             />
-          </Card>
-          <Card
+          </PageSection>
+          <PageSection
             title="承诺与剩余预测逐科目处置"
-            size="small"
-            style={{ marginBottom: 16 }}
+            description="实际发生：未决余额等额转实际，滚动总额不增加。原有成本流水不被覆盖。"
+            className="mb-4"
           >
             <Table
               rowKey="subjectId"
@@ -374,21 +385,21 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
                 },
               ]}
             />
-            <p>
+            <p style={{ marginTop: 8 }}>
               实际发生：未决余额等额转实际，滚动总额不增加。取消不发生：只减少未决余额，保存取消依据。原有成本流水不被覆盖。
             </p>
-          </Card>
+          </PageSection>
         </>
       )}
-      <Card
+      <PageSection
         title="结算取数与来源快照"
-        size="small"
+        description="锁定或审核取数依据，可穿透合同、成本与回款明细。"
         extra={
           <Button onClick={() => setShowSources(true)}>
             穿透合同、成本与回款
           </Button>
         }
-        style={{ marginBottom: 16 }}
+        className="mb-4"
       >
         <Descriptions
           bordered
@@ -457,8 +468,8 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
             { key: "basis", label: "取数日期", children: snapshot.capturedAt },
           ]}
         />
-      </Card>
-      <Card size="small" title="结算版本与流程" style={{ marginBottom: 16 }}>
+      </PageSection>
+      <PageSection title="结算版本与流程" description="按版本追踪审批流转、意见留痕与各节点审核动作。" className="mb-4">
         <Select
           style={{ width: "100%", marginBottom: 16 }}
           value={request?.id}
@@ -572,10 +583,10 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
               : "完成条件检查后编制申请，草稿不冻结金额。"}
           </p>
         )}
-      </Card>
+      </PageSection>
       {(data.settlementCostReviews.some((r) => r.projectId === p.id) ||
         data.settlementCostDispositions.some((r) => r.projectId === p.id)) && (
-        <Card size="small" title="未决成本处置依据">
+        <PageSection title="未决成本处置依据" description="记录所有已核销或取消不发生明细，保持原始凭证与审计留痕。" className="mb-4">
           <Table
             rowKey="id"
             size="small"
@@ -611,7 +622,7 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
               },
             ]}
           />
-        </Card>
+        </PageSection>
       )}
       <Modal
         width={720}

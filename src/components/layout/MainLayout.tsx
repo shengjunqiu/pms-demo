@@ -178,19 +178,19 @@ export const MainLayout: React.FC = () => {
 
           <Space size={16} align="center">
             <Text type="secondary" style={{ fontSize: 12 }}>数据截至 {asOfDate}</Text>
-            <Space size={4} align="center">
-              <Text type="secondary" style={{ fontSize: 12 }}>角色:</Text>
+            <Space size={6} align="center">
+              <Text type="secondary" style={{ fontSize: 12, whiteSpace: 'nowrap' }}>角色:</Text>
               <Select
                 value={currentRole}
                 aria-label="模拟身份"
                 onChange={(val) => { setRole(val as UserRole); navigate(ROLE_HOME[val as UserRole]); }}
-                style={{ width: 160 }}
-                size="small"
+                style={{ minWidth: 210 }}
+                popupMatchSelectWidth={false}
                 options={ROLES.map((r) => ({
                   value: r.key,
                   label: (
-                    <Space size={4}>
-                      <UserOutlined />
+                    <Space size={6} align="center">
+                      <UserOutlined style={{ color: '#2563eb', fontSize: 12 }} />
                       <span>{r.name}</span>
                     </Space>
                   ),

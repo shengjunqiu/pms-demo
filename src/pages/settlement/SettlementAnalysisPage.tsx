@@ -17,13 +17,14 @@ import {
   Row,
   Select,
   Space,
-  Statistic,
   Table,
   Tag,
   Tabs,
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { PageHeader } from "@/components/common/PageHeader";
+import { MetricStatCard } from "@/components/common/MetricStatCard";
+import { PageSection } from "@/components/common/PageSection";
 import { StateView } from "@/components/common/StateView";
 import { MoneyText } from "@/components/common/MoneyText";
 import { useBusinessStore } from "@/mock/business";
@@ -178,54 +179,42 @@ export function SettlementAnalysisPage({
         }
         description="四算与建设毛利使用统一含税收入/成本口径，财务确认税费单列展示，不再次从建设毛利扣除；运维成本独立核算。回款为演示日实时数据，结算申请保留提交日回款快照。"
       />
-      <Row gutter={16} style={{ marginBottom: 16 }}>
-        <Col span={6}>
-          <Card size="small">
-            <Statistic
-              title={final ? "结算收入（万元）" : "合同收入（万元）"}
-              value={income}
-              precision={2}
-            />
-          </Card>
+      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title={final ? "结算收入" : "合同收入"}
+            value={income}
+            statusType="info"
+          />
         </Col>
-        <Col span={6}>
-          <Card size="small">
-            <Statistic
-              title={final ? "冻结建设成本（万元）" : "当前建设成本（万元）"}
-              value={cost}
-              precision={2}
-            />
-          </Card>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title={final ? "冻结建设成本" : "当前建设成本"}
+            value={cost}
+            statusType="info"
+          />
         </Col>
-        <Col span={6}>
-          <Card size="small">
-            <Statistic
-              title={final ? "结算毛利（万元）" : "当前测算毛利（万元）"}
-              value={showMargin ? income - cost : "已隐藏"}
-              precision={2}
-              valueStyle={{
-                color: showMargin && income - cost < 0 ? "#cf1322" : "#1677ff",
-              }}
-            />
-          </Card>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title={final ? "结算毛利" : "当前测算毛利"}
+            value={showMargin ? income - cost : "已隐藏"}
+            statusType={showMargin && income - cost < 0 ? "danger" : "healthy"}
+          />
         </Col>
-        <Col span={6}>
-          <Card size="small">
-            <Statistic
-              title="毛利率"
-              value={showMargin ? (rate ?? "—") : "已隐藏"}
-              precision={1}
-              suffix={!showMargin || rate === null ? "" : "%"}
-            />
-          </Card>
+        <Col xs={12} xl={6}>
+          <MetricStatCard
+            title="毛利率"
+            value={showMargin && rate !== null ? `${rate.toFixed(1)}%` : "已脱敏"}
+            statusType="healthy"
+          />
         </Col>
       </Row>
       {!result ? (
         <>
-          <Card
+          <PageSection
             title="成本、收入与毛利的四算总览"
-            size="small"
-            style={{ marginBottom: 16 }}
+            description="横向对齐立项概算、执行预算、最后滚动与冻结结算全周期数据。"
+            className="mb-4"
           >
             <Table
               rowKey="name"
@@ -299,11 +288,11 @@ export function SettlementAnalysisPage({
                 },
               ]}
             />
-          </Card>
-          <Card
+          </PageSection>
+          <PageSection
             title="科目差异、责任阶段与变更来源"
-            size="small"
-            style={{ marginBottom: 16 }}
+            description="按成本科目穿透预算到结算偏差，追溯归因与关联变更原单。"
+            className="mb-4"
           >
             <Space style={{ marginBottom: 12 }}>
               <Input
@@ -428,11 +417,11 @@ export function SettlementAnalysisPage({
                 },
               ]}
             />
-            <p>
+            <p style={{ marginTop: 8 }}>
               差异为后阶段减前阶段；正数表示成本增加。演示规则：金额差异≥100万元或相对预算≥10%的科目必须填写分类、责任阶段及依据。
             </p>
-          </Card>
-          <Card title="项目变更来源" size="small">
+          </PageSection>
+          <PageSection title="项目变更来源" description="追溯结算成本变动的输入来源与审批状态。" className="mb-4">
             <Table
               rowKey="id"
               size="small"
@@ -455,7 +444,7 @@ export function SettlementAnalysisPage({
                 { title: "成本影响（万元）", dataIndex: "costImpact" },
               ]}
             />
-          </Card>
+          </PageSection>
         </>
       ) : (
         <>
@@ -465,90 +454,90 @@ export function SettlementAnalysisPage({
                 key: "cash",
                 label: "回款与资金占用",
                 children: (
-                  <>
-                    <Card size="small">
-                      <Row gutter={16}>
-                        <Col span={8}>
-                          <Statistic
-                            title="已回款（万元）"
-                            value={paid}
-                            precision={2}
-                          />
-                        </Col>
-                        <Col span={8}>
-                          <Statistic
-                            title="待回款（万元）"
-                            value={receivable}
-                            precision={2}
-                          />
-                        </Col>
-                        <Col span={8}>
-                          <Statistic
-                            title="逾期回款（万元）"
-                            value={overdue}
-                            precision={2}
-                          />
-                        </Col>
-                      </Row>
-                      <p>合同回款完成率</p>
+                  <PageSection title="回款与资金占用" description="按合同计划节点追踪已收、未收与逾期款项。">
+                    <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+                      <Col span={8}>
+                        <MetricStatCard
+                          title="已回款"
+                          value={paid}
+                          statusType="healthy"
+                        />
+                      </Col>
+                      <Col span={8}>
+                        <MetricStatCard
+                          title="待回款"
+                          value={receivable}
+                          statusType="info"
+                        />
+                      </Col>
+                      <Col span={8}>
+                        <MetricStatCard
+                          title="逾期回款"
+                          value={overdue}
+                          statusType={overdue > 0 ? "danger" : "healthy"}
+                        />
+                      </Col>
+                    </Row>
+                    <div style={{ marginBottom: 16 }}>
+                      <div style={{ marginBottom: 4, fontWeight: 500 }}>合同回款完成率</div>
                       <Progress percent={receiptSummary.completion ?? 0} />
-                      <Table
-                        rowKey="id"
-                        size="small"
-                        dataSource={receiptPlans}
-                        columns={[
-                          {
-                            title: "回款计划原单",
-                            dataIndex: "id",
-                            render: (value: string) => (
-                              <Button
-                                type="link"
-                                onClick={() => setSelectedPlanId(value)}
-                              >
-                                {value}
-                              </Button>
-                            ),
-                          },
-                          { title: "节点", dataIndex: "title" },
-                          { title: "应收", dataIndex: "amount" },
-                          { title: "已收", dataIndex: "paidAmount" },
-                          { title: "到期日", dataIndex: "dueDate" },
-                          {
-                            title: "状态",
-                            render: (_, r) => (
-                              <Tag
-                                color={
-                                  r.paidAmount >= r.amount
-                                    ? "success"
-                                    : r.dueDate <= AS_OF_DATE
-                                      ? "error"
-                                      : "processing"
-                                }
-                              >
-                                {r.paidAmount >= r.amount
-                                  ? "已收齐"
+                    </div>
+                    <Table
+                      rowKey="id"
+                      size="small"
+                      dataSource={receiptPlans}
+                      columns={[
+                        {
+                          title: "回款计划原单",
+                          dataIndex: "id",
+                          render: (value: string) => (
+                            <Button
+                              type="link"
+                              onClick={() => setSelectedPlanId(value)}
+                            >
+                              {value}
+                            </Button>
+                          ),
+                        },
+                        { title: "节点", dataIndex: "title" },
+                        { title: "应收", dataIndex: "amount" },
+                        { title: "已收", dataIndex: "paidAmount" },
+                        { title: "到期日", dataIndex: "dueDate" },
+                        {
+                          title: "状态",
+                          render: (_, r) => (
+                            <Tag
+                              color={
+                                r.paidAmount >= r.amount
+                                  ? "success"
                                   : r.dueDate <= AS_OF_DATE
-                                    ? "逾期"
-                                    : "未到期"}
-                              </Tag>
-                            ),
-                          },
-                        ]}
-                      />
-                    </Card>
+                                    ? "error"
+                                    : "processing"
+                              }
+                            >
+                              {r.paidAmount >= r.amount
+                                ? "已收齐"
+                                : r.dueDate <= AS_OF_DATE
+                                  ? "逾期"
+                                  : "未到期"}
+                            </Tag>
+                          ),
+                        },
+                      ]}
+                    />
                     <ReceiptPanel
                       projectId={p.id}
                       selectedReceiptId={selectedReceiptId}
                       onSelectReceipt={setSelectedReceiptId}
                     />
-                  </>
+                  </PageSection>
                 ),
               },
               {
                 key: "performance",
                 label: "交付与经营表现",
                 children: (
-                  <Card size="small">
+                  <PageSection title="交付与经营表现" description="总结项目起止周期、成本偏差、开票及经营指标。">
                     <Descriptions
                       bordered
                       column={2}
@@ -678,7 +667,7 @@ export function SettlementAnalysisPage({
                         项目关闭条件
                       </Button>
                     </Space>
-                  </Card>
+                  </PageSection>
                 ),
               },
             ]}
