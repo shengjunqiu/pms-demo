@@ -7,14 +7,14 @@
   "workdir": "/private/tmp/pms-ui-settlement-r2",
   "branch": "pms/ui-settlement-r2",
   "base_commit": "e00dca4",
-  "contract_commit": "e00dca4",
+  "contract_commit": "ccfb97b",
   "owned_paths": [
     "src/pages/settlement/SettlementPage.tsx",
     "src/pages/settlement/SettlementAnalysisPage.tsx",
     "e2e/ui-settlement.spec.ts",
     "e2e/receipts.spec.ts"
   ],
-  "shared_changes": [],
+  "shared_changes": ["ccfb97b: MainLayout统一JS/CF工作区外壳；开发分支已单向同步为0be550e"],
   "development_dependencies": [],
   "acceptance_dependencies": ["协调者集成后正式验收"],
   "acceptance_ready": false,

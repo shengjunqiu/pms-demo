@@ -7,7 +7,7 @@
   "workdir": "/private/tmp/pms-ui-acceptance-r2",
   "branch": "pms/ui-acceptance-r2",
   "base_commit": "e00dca4",
-  "contract_commit": "e00dca4",
+  "contract_commit": "ccfb97b",
   "owned_paths": [
     "src/pages/settlement/AcceptancePage.tsx",
     "src/pages/settlement/ReportAcceptancePage.tsx",
@@ -15,7 +15,7 @@
     "e2e/internal-supplier-acceptance.spec.ts",
     "e2e/settlement.spec.ts"
   ],
-  "shared_changes": [],
+  "shared_changes": ["ccfb97b: MainLayout统一JS/CF工作区外壳；开发分支已单向同步为3b7d360"],
   "development_dependencies": [],
   "acceptance_dependencies": ["协调者集成后正式验收"],
   "acceptance_ready": false,
