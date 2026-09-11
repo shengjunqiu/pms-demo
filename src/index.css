@@ -310,29 +310,39 @@ kbd,
 .pms-record-summary .ant-descriptions-item-label { color: #64748b; }
 
 /* 侧边栏精致悬浮滚动条与菜单项质感 */
+.pms-sider,
 .pms-sider .ant-layout-sider-children {
   display: flex !important;
   flex-direction: column !important;
-  height: 100% !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
   overflow: hidden !important;
 }
 
 .pms-sider-scroll {
   flex: 1 1 0% !important;
   min-height: 0 !important;
-  overflow-y: auto !important;
+  max-height: calc(100vh - 120px) !important;
+  overflow-y: scroll !important;
   overflow-x: hidden !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent !important;
+  overscroll-behavior: contain !important;
 }
 
 .pms-sider-scroll::-webkit-scrollbar {
-  width: 5px;
+  width: 6px !important;
+  display: block !important;
+}
+.pms-sider-scroll::-webkit-scrollbar-track {
+  background: transparent !important;
 }
 .pms-sider-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.25) !important;
+  border-radius: 4px !important;
 }
 .pms-sider-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.5) !important;
 }
 
 /* 侧边栏搜索框样式精致化 */
