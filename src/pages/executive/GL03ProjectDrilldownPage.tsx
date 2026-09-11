@@ -4,7 +4,6 @@ import { Alert, Button, Card, Col, Descriptions, Drawer, Empty, Row, Space, Tabl
 import {
   ArrowLeftOutlined,
   ProjectOutlined,
-  DollarOutlined,
   FundOutlined,
   LineChartOutlined,
   CheckCircleOutlined,
@@ -12,7 +11,7 @@ import {
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { mockDepartments, AS_OF_DATE } from '@/mock';
 import { useBusinessStore } from '@/mock/business';
-import { fourStage, selectFourCalculations, selectProjects, selectReceipts } from '@/mock/selectors';
+import { fourStage, selectFourCalculations, selectProjects } from '@/mock/selectors';
 import { useAppStore } from '@/store/useAppStore';
 import { PageSection } from '@/components/common/PageSection';
 import { PageHeader } from '@/components/common/PageHeader';
@@ -22,9 +21,9 @@ import { MetricStatCard } from '@/components/common/MetricStatCard';
 import { HealthBadge } from '@/components/common/Badges';
 import { readProjectFilter } from '@/utils/project-query';
 import { MoneyText } from '@/components/common/MoneyText';
-import { percentage, formatPercent, sumMoney } from '@/utils/money';
+import { percentage, formatPercent } from '@/utils/money';
 
-const names = { green: '健康', yellow: '关注', orange: '预警', red: '高风险' };
+const names = { green: '健康', yellow: '需关注', orange: '预警', red: '高风险' };
 const colors = { green: 'success', yellow: 'gold', orange: 'orange', red: 'error' };
 export function GL03ProjectDrilldownPage() {
   const [params, setParams] = useSearchParams(); const navigate = useNavigate(); const location = useLocation();
@@ -50,27 +49,8 @@ export function GL03ProjectDrilldownPage() {
   };
   const header = <PageHeader title="GL-03 项目穿透分析" description={`组织与指标 → 项目 → 原始记录 · 数据更新至 ${AS_OF_DATE} · 金额单位：万元 · 管理视角只读`} breadcrumbs={[{ title: '首页', href: '/' }, { title: '项目穿透分析' }]} extra={<Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>返回上一级</Button>} />;
   if (project && !scope.some((p) => p.id === project.id)) return <>{header}<Alert type="warning" showIcon message="项目不在当前筛选范围内" description="保留上一级组织、健康度和时间条件，返回清单重新选择。" action={<Button onClick={() => view({ projectId: undefined })}>返回筛选清单</Button>} /></>;
-  const receipts = selectReceipts(scope, data);
-  const totalBudget = sumMoney(scope.map((p) => p.budgetAmount)); const totalRolling = sumMoney(scope.map((p) => p.rollingCost));
   const list = <>{header}<ProjectFilters compact params={params} onChange={setParams} />
     {(params.get('metric') || params.get('stage')) && <Alert style={{ marginBottom: 16 }} message={`继承指标：${(({ overbudget: '预测超预算', unsigned: '未签项目', signed: '已签约项目', construction: '在建项目', closing: '验收收尾', maintenance: '运维项目' } as Record<string, string>)[params.get('metric') ?? ''] ?? '全部')}；阶段：${params.get('stage') ?? '全部'}`} type="info" />}
-    <Row gutter={16} style={{ marginBottom: 16 }}>{[
-      { label: '项目数量', value: String(scope.length), unit: '个', icon: <ProjectOutlined />, statusText: '在管项目', statusType: 'healthy' as const },
-      { label: '已签合同金额', value: receipts.signed, icon: <DollarOutlined />, statusText: '合同总计', statusType: 'healthy' as const },
-      { label: '有效预算合计', value: totalBudget, icon: <FundOutlined />, statusText: '生效基准', statusType: 'healthy' as const },
-      { label: '滚动预测合计', value: totalRolling, icon: <LineChartOutlined />, statusText: totalRolling > totalBudget ? '总预测超支' : '成本受控', statusType: totalRolling > totalBudget ? ('danger' as const) : ('healthy' as const) },
-    ].map((m) => (
-      <Col span={6} key={m.label}>
-        <MetricStatCard
-          title={m.label}
-          value={m.value}
-          unit={m.unit ?? '万元'}
-          icon={m.icon}
-          statusText={m.statusText}
-          statusType={m.statusType}
-        />
-      </Col>
-    ))}</Row>
     <PageSection title="筛选项目清单" description="点击项目查看四算摘要、异常原因与责任链"><Table rowKey="id" size="small" dataSource={scope} scroll={{ x: 1250 }} pagination={{ current: Number(params.get('page')) || 1, pageSize: 10, showSizeChanger: false, showTotal: (n) => `共 ${n} 个项目`, }} onChange={(pagination, _, sorter, extra) => { const sort = Array.isArray(sorter) ? sorter[0] : sorter; view({ page: String(extra.action === 'sort' ? 1 : pagination.current ?? 1), sort: sort.order ? String(sort.columnKey) : undefined, order: sort.order ?? undefined }); }} columns={[
       { title: '项目', width: 260, fixed: 'left', render: (_, p) => <><Button type="link" style={{ padding: 0, whiteSpace: 'normal', textAlign: 'left' }} onClick={() => view({ projectId: p.id })}>{p.name}</Button><div><Typography.Text type="secondary">{p.id} · {p.customerName}</Typography.Text></div></> },
       { title: '责任部门 / PM', width: 160, render: (_, p) => <>{p.departmentName}<div>{p.pmName}</div></> },

@@ -17,7 +17,7 @@ import { MetricStatCard } from '@/components/common/MetricStatCard';
 
 type Detail = { title: string; fields: { label: string; value: string }[] };
 const { Text } = Typography;
-const healthNames = { green: '健康', yellow: '关注', orange: '预警', red: '高风险' };
+const healthNames = { green: '健康', yellow: '需关注', orange: '预警', red: '高风险' };
 
 export function ProjectOverviewPage() {
   const { id } = useParams(); const navigate = useNavigate(); const [params, setParams] = useSearchParams();

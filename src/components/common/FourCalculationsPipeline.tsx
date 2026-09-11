@@ -66,7 +66,7 @@ export const FourCalculationsPipeline: React.FC<FourCalculationsPipelineProps> =
     },
     {
       key: 'settlement',
-      name: '决算阶段',
+      name: '结算阶段',
       subtitle: '最终经营结果',
       value: settlement,
       highlight: currentStage === '结算' || currentStage === '收尾',
@@ -79,9 +79,6 @@ export const FourCalculationsPipeline: React.FC<FourCalculationsPipelineProps> =
       <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2.5">
         <div className="flex items-center gap-2">
           <span className="font-semibold text-slate-800 text-sm tracking-tight">四算全生命周期贯通看板</span>
-          <span className="text-[11px] text-slate-500 bg-slate-100/90 ring-1 ring-inset ring-slate-200/80 px-2 py-0.5 rounded-full font-medium">
-            全流程守恒对比
-          </span>
         </div>
         <div className="text-xs text-slate-500">
           {currentStage === 'all' ? (

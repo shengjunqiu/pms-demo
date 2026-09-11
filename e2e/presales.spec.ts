@@ -237,7 +237,7 @@ test('GS-07 PMO不通过结论保留双版本且不能承接概算', async ({ pa
       lines: [{ id: 'REJECTION-L1', subjectId: 'SUB-01', name: '接口开发', scope: '门户与接口', quantity: 100, unit: '人天', unitPrice: 0,
         taxRate: 0, taxBasis: '含税', basis: '两人50天', risk: '接口延期', laborUserId: 'U-005', laborGrade: '高级研发' }],
     } }, tech);
-    state = b.transition(state, { type: 'presales-finance-check', id: target, opinion: '人力基准已核对，关注接口延期' }, finance);
+    state = b.transition(state, { type: 'presales-finance-check', id: target, opinion: '人力基准已核对，需关注接口延期' }, finance);
     state = b.transition(state, { type: 'presales-submit-review', id: target, method: '线上专家评审会', plannedDate: '2026-09-10', expertIds: ['U-005', 'U-004'] }, pmo);
     const reviewId = state.presales[target].reviews.at(-1)!.id;
     state = b.transition(state, { type: 'presales-expert-opinion', id: target, reviewId, conclusion: '不通过', opinion: '第三方明确不开放接口，关键前提不成立', attachment: '接口函.pdf' }, tech);

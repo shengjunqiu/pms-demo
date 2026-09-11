@@ -44,7 +44,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   healthStatuses = [
     { label: '全部健康状态', value: 'all' },
     { label: '健康/正常', value: '正常' },
-    { label: '重点关注', value: '关注' },
+    { label: '需重点关注', value: '需关注' },
     { label: '重大风险', value: '重大' },
   ],
   selectedBusinessStage = 'all',

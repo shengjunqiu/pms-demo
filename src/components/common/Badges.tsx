@@ -47,8 +47,8 @@ export const DeliveryStageBadge: React.FC<{ stage?: DeliveryStage; className?: s
   );
 };
 
-// 3. 健康状态标签 (正常运行 / 重点关注 / 重大风险)
-export type HealthStatus = '健康' | '正常' | '正常运行' | '关注' | '预警' | '重点关注' | '严重' | '风险' | '重大风险' | string;
+// 3. 健康状态标签 (正常运行 / 需重点关注 / 重大风险)
+export type HealthStatus = '健康' | '正常' | '正常运行' | '需关注' | '预警' | '需重点关注' | '严重' | '风险' | '重大风险' | string;
 
 export const HealthBadge: React.FC<{ status?: HealthStatus; label?: string; className?: string }> = ({
   status = '正常',

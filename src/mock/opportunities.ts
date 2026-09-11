@@ -37,7 +37,7 @@ export function assessmentSummary(o: Opportunity, m: OpportunityMeta) {
   if (Object.values(opinions).some(v => v.conclusion === '不可行')) missing.push('存在专业不可行项');
   if (score !== null && score < rule.minimumScore) missing.push(`综合评分低于${rule.minimumScore}分`);
   if (cost !== undefined && (marginRate === null || marginRate < rule.minimumMargin)) missing.push(`预估毛利率低于${rule.minimumMargin}%`);
-  const riskLevel = Object.values(opinions).some(v => v.conclusion === '不可行' || v.score < OPPORTUNITY_RULE.lowScore) ? '高风险' : missing.length || Object.values(opinions).some(v => v.conclusion === '有条件可行') ? '关注' : '正常';
+  const riskLevel = Object.values(opinions).some(v => v.conclusion === '不可行' || v.score < OPPORTUNITY_RULE.lowScore) ? '高风险' : missing.length || Object.values(opinions).some(v => v.conclusion === '有条件可行') ? '需关注' : '正常';
   return { rule, round, score, cost, margin, marginRate: cost === undefined ? null : marginRate, missing, riskLevel, suggestion: missing.length ? '暂缓' : '拟立项', complete: complete.length };
 }
 export function initiationMissing(state: BusinessState, o: Opportunity) {

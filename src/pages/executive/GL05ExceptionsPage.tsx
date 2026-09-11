@@ -17,7 +17,7 @@ import { HealthBadge } from '@/components/common/Badges';
 import { readProjectFilter } from '@/utils/project-query';
 import { MoneyText } from '@/components/common/MoneyText';
 
-const names = { green: '健康', yellow: '关注', orange: '预警', red: '高风险' };
+const names = { green: '健康', yellow: '需关注', orange: '预警', red: '高风险' };
 type ExceptionRow = ReturnType<typeof projectExceptions>[number];
 export function GL05ExceptionsPage() {
   const data = useBusinessStore((s) => s.data); const role = useAppStore((s) => s.currentRole); const showMargin=!!canViewSensitiveField(data,{role},'margin');
@@ -47,9 +47,9 @@ export function GL05ExceptionsPage() {
     <details style={{ margin: '12px 0' }}><summary style={{ cursor: 'pointer', color: '#475569' }}>常用视图、列设置与导出</summary><div style={{ paddingTop: 12 }}><AnalysisTools storageKey="pms-exception-views" params={params} onChange={setParams} columns={columns.filter((c) => !['project', 'action'].includes(String(c.key))).map((c) => ({ value: String(c.key), label: String(c.title) }))} visible={visible} onColumns={setVisible} exportRows={[
       ['项目编号', '项目名称', '组织', '健康度', '成本偏差（万元）', '毛利偏差（万元）', '原因'], ...rows.map((p) => [p.id, p.name, p.departmentName, names[p.health], p.calc.variance.toFixed(2), showMargin?p.marginVariance.toFixed(2):'已隐藏', marginReason(p.healthReason,showMargin)]),
     ]} /></div></details>
-    <PageSection title="异常关注概览" description="项目可同时命中多类异常；先定位原因，再进入原始业务记录">
+    <PageSection title="异常需关注概览" description="项目可同时命中多类异常；先定位原因，再进入原始业务记录">
       <Space size={24} wrap><span>当前清单 <strong>{rows.length}</strong> 个项目</span><span>高风险 <strong style={{ color: '#dc2626' }}>{rows.filter((p) => p.health === 'red').length}</strong> 个</span><span>存在到期未收 <strong>{rows.filter((p) => p.overdueReceipt > 0).length}</strong> 个</span></Space>
-      <details style={{ marginTop: 12 }}><summary style={{ cursor: 'pointer' }}>健康规则与观测口径</summary>    <Alert type="info" showIcon style={{ marginBottom: 12 }} message="演示规则 DEMO-1：超预算>0为关注，≥5%为预警，≥15%为高风险；最严重因素决定健康度。" description="异常按当前来源数据复算；首次观测使用2026-09-01监控快照，不等同于业务发生时间。回款异常仅统计已到期且未收计划，不将合同余额全部视为逾期。" />
+      <details style={{ marginTop: 12 }}><summary style={{ cursor: 'pointer' }}>健康规则与观测口径</summary>    <Alert type="info" showIcon style={{ marginBottom: 12 }} message="演示规则 DEMO-1：超预算>0为需关注，≥5%为预警，≥15%为高风险；最严重因素决定健康度。" description="异常按当前来源数据复算；首次观测使用2026-09-01监控快照，不等同于业务发生时间。回款异常仅统计已到期且未收计划，不将合同余额全部视为逾期。" />
 </details>
     </PageSection>
     {params.get('health') === 'green' && <Alert style={{ marginBottom: 12 }} type="success" message={`当前查看${scope.length}个健康项目，未命中异常；其他异常分类为空。`} />}

@@ -95,7 +95,7 @@ test('UI GL04 组合维度、收入占比与上下级穿透', async ({ page }) =
 
 test('UI GL05 异常分类、收纳列与责任链原记录', async ({ page }) => {
   await navigate(page, '/executive/exceptions');
-  await expect(page.getByRole('heading', { name: '异常关注概览' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '异常需关注概览' })).toBeVisible();
   await capture(page, 'GL05');
   await page.getByRole('tab', { name: /高风险/ }).click();
   await expect(page).toHaveURL(/exception=red/);

@@ -23,7 +23,7 @@ import { sumMoney, formatPercent, percentage } from '@/utils/money';
 import type { Project } from '@/models/types';
 
 const dimensions = [{ value: 'org', label: '组织层级' }, { value: 'region', label: '区域' }, { value: 'type', label: '项目类型' }, { value: 'level', label: '项目等级' }, { value: 'industry', label: '行业' }, { value: 'customer', label: '客户' }, { value: 'stage', label: '四算阶段' }, { value: 'health', label: '健康度' }];
-const healthNames: Record<string, string> = { green: '健康', yellow: '关注', orange: '预警', red: '高风险' };
+const healthNames: Record<string, string> = { green: '健康', yellow: '需关注', orange: '预警', red: '高风险' };
 export function GL04PortfolioPage() {
   const data = useBusinessStore((s) => s.data); const role = useAppStore((s) => s.currentRole);
   const showMargin = canViewSensitiveField(data, { role }, 'margin');
@@ -94,7 +94,7 @@ export function GL04PortfolioPage() {
       { title: '项目数', width: 85, dataIndex: 'count' }, { title: '预计收入 / 占比', width: 150, render: (_, r) => <><MoneyText value={r.income} /><div>{formatPercent(percentage(r.income, total.income))}</div></> },
       { title: '已签合同', width: 125, render: (_, r) => <MoneyText value={r.receipts.signed} /> }, { title: '滚动成本', width: 125, render: (_, r) => <MoneyText value={r.rolling} /> },
       { title: '预测毛利 / 比率', width: 150, render: (_, r) => showMargin ? <><MoneyText value={r.gross} /><div>{formatPercent(r.rate)}</div></> : '已隐藏' },
-      { title: '健康 / 关注 / 预警 / 高风险', width: 210, render: (_, r) => `${r.green} / ${r.yellow} / ${r.orange} / ${r.red}` },
+      { title: '健康 / 需关注 / 预警 / 高风险', width: 210, render: (_, r) => `${r.green} / ${r.yellow} / ${r.orange} / ${r.red}` },
       { title: '到期应收 / 实收率', width: 150, render: (_, r) => <><MoneyText value={r.receipts.due} /><div>{formatPercent(r.receipts.dueCompletion)}</div></> },
       { title: '已收 / 逾期', width: 150, render: (_, r) => <><MoneyText value={r.receipts.paid} /><div><MoneyText value={r.receipts.overdue} /></div></> },
       { title: '下钻', width: 150, fixed: 'right', render: (_, r) => <Space direction="vertical"><Button size="small" onClick={() => drill(r)}>查看{r.count}个项目</Button>{dimension === 'org' && !r.exact && <Button size="small" onClick={() => drill(r, true)}>进入下级组织</Button>}</Space> },

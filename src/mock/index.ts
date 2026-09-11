@@ -150,7 +150,7 @@ const projectSeeds: Project[] = [
     level: '特大型',
     phase: '执行',
     subPhase: '开发实施',
-    status: '关注',
+    status: '需关注',
     health: 'yellow',
     healthReason: '滚动成本偏差+4.86%，存在2项重大技术风险',
     isUnsigned: false,
@@ -321,7 +321,7 @@ const projectSeeds: Project[] = [
     level: '重点',
     phase: '收尾',
     subPhase: '客户终验',
-    status: '关注',
+    status: '需关注',
     health: 'yellow',
     healthReason: '终验整改清单待客户复验确认',
     isUnsigned: false,
@@ -431,7 +431,7 @@ const projectSeeds: Project[] = [
     const prjLevel: '特大型' | '重大' | '重点' | '一般' = num % 4 === 0 ? '特大型' : num % 3 === 0 ? '重大' : '重点';
     const prjPhase: '立项' | '执行' | '收尾' | '运维' = isMaintenance ? '运维' : isUnsigned ? '立项' : num % 5 === 0 ? '收尾' : '执行';
     const prjSubPhase: 'WBS编制' | '开发实施' | '客户终验' | '质保运维' = isMaintenance ? '质保运维' : isUnsigned ? 'WBS编制' : num % 5 === 0 ? '客户终验' : '开发实施';
-    const prjStatus: '正常进行' | '关注' | '预警' | '高风险' = health === 'red' ? '高风险' : health === 'orange' ? '预警' : health === 'yellow' ? '关注' : '正常进行';
+    const prjStatus: '正常进行' | '需关注' | '预警' | '高风险' = health === 'red' ? '高风险' : health === 'orange' ? '预警' : health === 'yellow' ? '需关注' : '正常进行';
 
     return {
       id,
@@ -628,7 +628,7 @@ export const mockWeeklyReports: WeeklyReport[] = Array.from({ length: 110 }).map
     reporter: p.pmName,
     progressSummary: `当前累计完工比例${p.progressRate}%，详见项目有效计划`,
     costStatus: p.costVariance > 0 ? `滚动成本高于预算${p.costVariance}万元` : '滚动成本未超过预算',
-    riskSummary: '关注第三方接口响应延迟风险',
+    riskSummary: '需关注第三方接口响应延迟风险',
     nextWeekPlan: '启动系统集成压力测试并组织专家初验评审',
   };
 });

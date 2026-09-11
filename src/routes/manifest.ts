@@ -1580,7 +1580,7 @@ export const PAGE_MANIFEST: RouteItem[] = [
     ]
   },
   {
-    "id": "GL-06",
+    "id": "WK-03",
     "title": "待决策事项",
     "route": "/executive/decisions",
     "kind": "工作台/列表",

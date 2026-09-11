@@ -18,7 +18,7 @@ import { CostTrendChart } from '@/components/common/CostTrendChart';
 import type { CostItem } from '@/models/types';
 
 const { Text } = Typography;
-const healthNames = { green: '健康', yellow: '关注', orange: '预警', red: '高风险' };
+const healthNames = { green: '健康', yellow: '需关注', orange: '预警', red: '高风险' };
 const healthColors = { green: 'success', yellow: 'gold', orange: 'orange', red: 'error' };
 
 export function DynamicAccountingPage() {

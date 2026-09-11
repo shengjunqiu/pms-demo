@@ -1,19 +1,18 @@
 import { marginReason } from '@/utils/sensitive';
 import { canViewSensitiveField } from '@/mock/configuration-access';
 import { useState } from 'react';
-import { Alert, Button, Card, Col, Empty, Popover, Progress, Radio, Row, Space, Table, Tabs, Tag, Typography } from 'antd';
+import { Alert, Button, Card, Col, Empty, Popover, Radio, Row, Space, Table, Tag, Typography } from 'antd';
 import {
   ProjectOutlined,
   DollarOutlined,
   SafetyCertificateOutlined,
-  FundOutlined,
   LineChartOutlined,
   AuditOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AS_OF_DATE } from '@/mock';
 import { useBusinessStore } from '@/mock/business';
-import { fourStage, selectFourCalculations, selectProjects, selectReceipts } from '@/mock/selectors';
+import { selectFourCalculations, selectProjects, selectReceipts } from '@/mock/selectors';
 import { projectExceptions } from '@/mock/exceptions';
 import { useAppStore } from '@/store/useAppStore';
 import { calculateCockpitKPIs } from '@/utils/calculator';
@@ -26,7 +25,7 @@ import { StateView } from '@/components/common/StateView';
 import { MetricStatCard } from '@/components/common/MetricStatCard';
 import { FourCalculationsPipeline } from '@/components/common/FourCalculationsPipeline';
 
-const healths = [{ key: 'green', name: '健康', color: '#52c41a' }, { key: 'yellow', name: '关注', color: '#d4a017' }, { key: 'orange', name: '预警', color: '#fa8c16' }, { key: 'red', name: '高风险', color: '#cf1322' }];
+const healths = [{ key: 'green', name: '健康', color: '#52c41a' }, { key: 'yellow', name: '需关注', color: '#d4a017' }, { key: 'orange', name: '预警', color: '#fa8c16' }, { key: 'red', name: '高风险', color: '#cf1322' }];
 export function GL01DashboardPage() {
   const data = useBusinessStore((s) => s.data); const role = useAppStore((s) => s.currentRole); const canViewMargin = canViewSensitiveField(data, { role }, 'margin');
   const navigate = useNavigate(); const [params, setParams] = useSearchParams(); const [refresh, setRefresh] = useState(0);
@@ -36,22 +35,11 @@ export function GL01DashboardPage() {
   const kpi = calculateCockpitKPIs(scope); const receipt = selectReceipts(scope, data); const exceptions = projectExceptions(scope, data);
   const calculations = scope.map((p) => selectFourCalculations(p, data)); const estimate = sumMoney(calculations.map((c) => c.estimate?.totalCost ?? 0));
   const ids = new Set(scope.map((p) => p.id)); const pending = data.decisions.filter((d) => ids.has(d.projectId) && d.status === '待决策');
-  const query = (values: Record<string, string> = {}) => { const next = new URLSearchParams(params); next.delete('demo'); next.delete('analysis'); Object.entries(values).forEach(([k, v]) => next.set(k, v)); return next; };
+  const query = (values: Record<string, string> = {}) => { const next = new URLSearchParams(params); next.delete('demo'); Object.entries(values).forEach(([k, v]) => next.set(k, v)); return next; };
   const drill = (values: Record<string, string> = {}) => navigate(`/executive/project-drilldown?${query(values)}`);
   const exception = (values: Record<string, string> = {}) => navigate(`/executive/exceptions?${query(values)}`);
   const goProject = (id: string) => drill({ projectId: id });
-  const stages = ['概算', '预算', '核算', '结算及运维'].map((stage) => { const rows = scope.filter((p) => fourStage(p) === stage); return { stage, count: rows.length, amount: sumMoney(rows.map((p) => p.revenueAmount ?? p.contractAmount)) }; });
   const health = healths.map((h) => ({ ...h, count: scope.filter((p) => p.health === h.key).length }));
-  const analysis = params.get('analysis') ?? 'cost';
-  const rows = scope.map((p) => { const c = selectFourCalculations(p, data); const r = selectReceipts([p], data); const warning = exceptions.find((e) => e.id === p.id); return { ...p, estimateCost: c.estimate?.totalCost, gross: c.grossMargin, grossRate: c.grossMarginRate, due: r.due, overdue: r.overdue, paid: r.paid, delay: warning?.delayDays ?? 0, settled: c.settlement?.finalCost }; });
-  const columnsByTab = {
-    progress: [{ title: '完成进度', dataIndex: 'progressRate', render: (v: number) => <Progress percent={v} size="small" /> }, { title: '最长里程碑逾期', dataIndex: 'delay', render: (v: number) => `${v} 天` }, { title: '计划验收日', dataIndex: 'plannedEndDate' }],
-    cost: [{ title: '有效预算', dataIndex: 'budgetAmount', render: (v: number) => <MoneyText value={v} /> }, { title: '已发生', dataIndex: 'actualCost', render: (v: number) => <MoneyText value={v} /> }, { title: '滚动预测', dataIndex: 'rollingCost', render: (v: number) => <MoneyText value={v} /> }, { title: '偏差', dataIndex: 'costVariance', render: (v: number) => <MoneyText value={v} signed /> }],
-    margin: [{ title: '预计收入', dataIndex: 'revenueAmount', render: (v: number) => <MoneyText value={v} /> }, { title: '预测毛利', dataIndex: 'gross', render: (v: number) => canViewMargin ? <MoneyText value={v} /> : '已隐藏' }, { title: '预测毛利率', dataIndex: 'grossRate', render: (v: number | null) => canViewMargin ? formatPercent(v) : '已隐藏' }],
-    receipt: [{ title: '到期应收', dataIndex: 'due', render: (v: number) => <MoneyText value={v} /> }, { title: '已回款', dataIndex: 'paid', render: (v: number) => <MoneyText value={v} /> }, { title: '到期未收', dataIndex: 'overdue', render: (v: number) => <MoneyText value={v} /> }],
-    four: [{ title: '冻结概算', dataIndex: 'estimateCost', render: (v?: number) => <MoneyText value={v} /> }, { title: '有效预算', dataIndex: 'budgetAmount', render: (v: number) => <MoneyText value={v} /> }, { title: '滚动核算', dataIndex: 'rollingCost', render: (v: number) => <MoneyText value={v} /> }, { title: '冻结结算', dataIndex: 'settled', render: (v?: number) => <MoneyText value={v} /> }],
-  };
-  const selectedColumns = columnsByTab[analysis as keyof typeof columnsByTab] ?? columnsByTab.cost;
   const content = <>
     <ProjectFilters compact params={params} onChange={setParams} />
     <FourCalculationsPipeline
@@ -67,10 +55,8 @@ export function GL01DashboardPage() {
     <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>{[
       { label: '在管项目', value: String(scope.length), unit: '个', icon: <ProjectOutlined />, action: () => drill(), statusText: '当前筛选范围', statusType: 'info' as const },
       { label: '已签合同总额', value: receipt.signed, icon: <DollarOutlined />, action: () => drill({ metric: 'signed' }) },
-      { label: '有效预算', value: kpi.totalBudgetAmount, icon: <FundOutlined />, action: () => drill() },
       { label: '实时滚动成本', value: kpi.totalRollingCost, icon: <LineChartOutlined />, action: () => drill() },
       { label: '预测毛利', value: !canViewMargin ? '已隐藏' : kpi.totalGrossMargin, icon: <LineChartOutlined />, action: () => drill() },
-      { label: '已发生成本', value: kpi.totalActualCost, icon: <DollarOutlined />, action: () => drill() },
       { label: '到期应收', value: receipt.due, icon: <AuditOutlined />, action: () => drill({ metric: 'signed' }) },
       { label: '回款完成率', value: formatPercent(receipt.dueCompletion), unit: '', icon: <SafetyCertificateOutlined />, action: () => drill({ metric: 'signed' }) },
     ].map((m) => (
@@ -192,7 +178,6 @@ export function GL01DashboardPage() {
             { label: '在建项目', rows: scope.filter((p) => p.phase === '执行'), metric: 'construction', color: 'blue' },
             { label: '未签立项', rows: scope.filter((p) => p.isUnsigned), metric: 'unsigned', color: 'orange' },
             { label: '验收收尾', rows: scope.filter((p) => p.phase === '收尾'), metric: 'closing', color: 'cyan' },
-            { label: '运维期', rows: scope.filter((p) => p.isMaintenance), metric: 'maintenance', color: 'purple' },
           ].map((group) => {
             const count = group.rows.length;
             const totalAmount = sumMoney(group.rows.map((p) => p.revenueAmount ?? p.contractAmount));
@@ -223,22 +208,7 @@ export function GL01DashboardPage() {
     </Card>
     {!scope.length ? <Empty description="当前筛选无项目，请调整条件" /> : <>
       <Row gutter={16} style={{ marginBottom: 16 }}>
-        <Col span={12}>
-          <Card size="small" title="四阶段项目分布 · 预计项目金额">
-            <Table
-              rowKey="stage"
-              size="small"
-              pagination={false}
-              dataSource={stages}
-              columns={[
-                { title: '四算阶段', render: (_, r) => <Button type="link" disabled={!r.count} onClick={() => drill({ stage: r.stage })}>{r.stage}</Button> },
-                { title: '数量', dataIndex: 'count' },
-                { title: '金额（万元）', dataIndex: 'amount', render: (v: number) => <MoneyText value={v} /> },
-              ]}
-            />
-          </Card>
-        </Col>
-        <Col span={12}>
+        <Col span={24}>
           <Card
             size="small"
             title="项目健康度分布"
@@ -295,7 +265,7 @@ export function GL01DashboardPage() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, color: '#64748b' }}>
               <span>
-                异常项目（关注/预警/高风险）：
+                异常项目（需关注/预警/高风险）：
                 <strong style={{ color: '#cf1322', marginLeft: 4 }}>
                   {health.filter((h) => h.key !== 'green').reduce((n, h) => n + h.count, 0)}
                 </strong> 项
@@ -305,7 +275,6 @@ export function GL01DashboardPage() {
           </Card>
         </Col>
       </Row>
-      <Card size="small" title="经营与执行分析" extra={<Button type="link" onClick={() => drill()}>查看全部项目</Button>}><Tabs activeKey={analysis} onChange={(key) => { const next = new URLSearchParams(params); next.set('analysis', key); setParams(next, { replace: true }); }} items={[['progress', '进度'], ['cost', '成本'], ['margin', '毛利'], ['receipt', '回款'], ['four', '四算']].map(([key, label]) => ({ key, label }))} /><Table rowKey="id" size="small" dataSource={rows} pagination={{ pageSize: 5, showSizeChanger: false }} columns={[{ title: '项目', width: 300, render: (_, p) => <Button type="link" style={{ whiteSpace: 'normal', textAlign: 'left' }} onClick={() => goProject(p.id)}>{p.name}</Button> }, ...selectedColumns]} /></Card>
 
     </>}
   </>;

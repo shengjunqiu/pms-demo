@@ -22,7 +22,7 @@ export function ProjectFilters({ params, onChange, compact = false }: { params: 
     { key: 'industry', label: '行业', options: options(mockCustomers.map((c) => c.industry)) },
     { key: 'customer', label: '客户', options: mockCustomers.map((c) => ({ value: c.id, label: c.name })) },
     { key: 'pm', label: '项目经理', options: Array.from(new Map(mockProjects.map((p) => [p.pmId, { value: p.pmId, label: p.pmName }])).values()) },
-    { key: 'health', label: '健康度', options: ['green', 'yellow', 'orange', 'red'].map((value, i) => ({ value, label: ['健康', '关注', '预警', '高风险'][i] })) },
+    { key: 'health', label: '健康度', options: ['green', 'yellow', 'orange', 'red'].map((value, i) => ({ value, label: ['健康', '需关注', '预警', '高风险'][i] })) },
   ];
   const primary = compact ? selects.filter((s) => ['org', 'health'].includes(s.key)) : selects;
   const secondary = selects.filter((s) => !['org', 'health'].includes(s.key));

@@ -92,7 +92,7 @@ export interface Project {
   level: '特大型' | '重大' | '重点' | '一般';
   phase: '商机' | '立项' | '执行' | '收尾' | '运维' | '已关闭';
   subPhase: '初步评估' | '方案评审' | '立项评审' | 'WBS编制' | '开发实施' | '系统联调' | '试运行' | '内部初验' | '客户终验' | '项目结算' | '质保运维';
-  status: '正常进行' | '关注' | '预警' | '高风险' | '已结算' | '已终止' | '已关闭';
+  status: '正常进行' | '需关注' | '预警' | '高风险' | '已结算' | '已终止' | '已关闭';
   health: 'green' | 'yellow' | 'orange' | 'red';
   healthReason: string;
   isUnsigned: boolean; // 是否未签立项

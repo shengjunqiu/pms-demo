@@ -22,7 +22,7 @@ import { PAGE_MANIFEST } from '@/routes/manifest';
 
 // Phase 2: GL 领导经营驾驶舱系列
 import { GL01DashboardPage } from '@/pages/executive/GL01DashboardPage';
-import { GL02FourCalculationsPage } from '@/pages/executive/GL02FourCalculationsPage';
+// import { GL02FourCalculationsPage } from '@/pages/executive/GL02FourCalculationsPage';
 import { GL03ProjectDrilldownPage } from '@/pages/executive/GL03ProjectDrilldownPage';
 import { GL04PortfolioPage } from '@/pages/executive/GL04PortfolioPage';
 import { GL05ExceptionsPage } from '@/pages/executive/GL05ExceptionsPage';
@@ -36,6 +36,7 @@ import { TodosPage } from '@/pages/workbench/TodosPage';
 import { ProjectProgressPage } from '@/pages/execution/ProjectProgressPage';
 import { PlanRequestPage } from '@/pages/approvals/PlanRequestPage';
 import { ProjectOverviewPage } from '@/pages/execution/ProjectOverviewPage';
+import { ProjectLedgerPage } from '@/pages/projects/ProjectLedgerPage';
 
 function RoleHome() { const role = useAppStore((s) => s.currentRole); return <Navigate to={ROLE_HOME[role]} replace />; }
 
@@ -55,7 +56,7 @@ export const AppRouter: React.FC = () => {
         {opportunityRoutes.map(r=><Route key={r.path} path={r.path} element={r.element}/>)}
         {/* Phase 2: GL 驾驶舱与专题分析 */}
         <Route path="executive/dashboard" element={<GL01DashboardPage />} />
-        <Route path="executive/four-calculations" element={<GL02FourCalculationsPage />} />
+        {/* <Route path="executive/four-calculations" element={<GL02FourCalculationsPage />} /> */}
         <Route path="executive/project-drilldown" element={<GL03ProjectDrilldownPage />} />
         <Route path="executive/portfolio" element={<GL04PortfolioPage />} />
         <Route path="executive/decisions" element={<GL06DecisionsPage />} />
@@ -77,6 +78,7 @@ export const AppRouter: React.FC = () => {
         <Route path="issues-risks/:id" element={<TicketDetailPage family="risk" />} />
         <Route path="workbench/project-manager" element={<ProjectManagerWorkbenchPage />} />
         <Route path="workbench/todos" element={<TodosPage />} />
+        <Route path="projects" element={<ProjectLedgerPage />} />
         <Route path="projects/:id/progress" element={<ProjectProgressPage />} />
         <Route path="projects/:id/plan-requests/:requestId" element={<PlanRequestPage />} />
         <Route path="projects/:id" element={<ProjectOverviewPage />} />
@@ -93,7 +95,7 @@ export const AppRouter: React.FC = () => {
           if (budgetRoutes.some(r=>r.path===relativeRoute)) return null;
           if (settlementRoutes.some(r=>r.path===relativeRoute)) return null;
           if (opportunityRoutes.some(r=>r.path===relativeRoute)) return null;
-          if (['workbench/project-manager', 'projects/:id/stage-switch', 'projects/:id/labor-cost', 'projects/:id/daily-reports', 'projects/:id/weekly-reports', 'projects/:id/deliverables', 'projects/:id/procurement', 'projects/:id/outsourcing', 'projects/:id/expenses', 'requirements-bugs', 'requirements-bugs/:id', 'issues-risks', 'issues-risks/:id', 'workbench/todos', 'projects/:id/progress', 'projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/four-calculations', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions', 'executive/decisions'].includes(relativeRoute)) {
+          if (['workbench/project-manager', 'projects/:id/stage-switch', 'projects/:id/labor-cost', 'projects/:id/daily-reports', 'projects/:id/weekly-reports', 'projects/:id/deliverables', 'projects/:id/procurement', 'projects/:id/outsourcing', 'projects/:id/expenses', 'requirements-bugs', 'requirements-bugs/:id', 'issues-risks', 'issues-risks/:id', 'workbench/todos', 'projects/:id/progress', 'projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions', 'executive/decisions'].includes(relativeRoute)) {
             return null;
           }
           return (

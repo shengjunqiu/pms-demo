@@ -41,7 +41,7 @@ export function GL06DecisionsPage() {
       { title: '发起时间 / 等待', key: 'date', width: 130, render: (_, d) => <>{d.createdAt}<div>{d.status === '待决策' ? `${Math.max(0, Math.floor((Date.parse(AS_OF_DATE) - Date.parse(d.createdAt)) / 86400000))} 天` : '已处理'}</div></> },
       { title: '建议动作', key: 'action', width: 200, fixed: 'right' as const, render: (_, d) => <Space direction="vertical"><Button size="small" type="primary" ghost onClick={() => original(d.id)}>{d.status === '待决策' ? '进入原审批' : '查看审批记录'}</Button><Button size="small" onClick={() => navigate(`/projects/${d.projectId}?${params}`)}>查看项目全景</Button></Space> },
     ];
-  return <><PageHeader title="GL-06 领导待决策事项" description={`聚合原业务审批 · 更新至 ${AS_OF_DATE} · 金额单位：万元`} breadcrumbs={[{ title: '首页', href: '/' }, { title: '待决策事项' }]} extra={<Button onClick={() => navigate(-1)}>返回上一级</Button>} />
+  return <><PageHeader title="WK-03 领导待决策事项" description={`聚合原业务审批 · 更新至 ${AS_OF_DATE} · 金额单位：万元`} breadcrumbs={[{ title: '首页', href: '/' }, { title: '待决策事项' }]} extra={<Button onClick={() => navigate(-1)}>返回上一级</Button>} />
     <ProjectFilters compact params={params} onChange={setParams} />
     <PageSection title="决策处理概览" description="先查看影响与责任人，再进入原审批处理">
       <Space size={32} wrap><div>待决策事项 <strong style={{ fontSize: 24, marginLeft: 8 }}>{pending.length}</strong> 项</div><div>涉及项目 <strong style={{ fontSize: 24, marginLeft: 8 }}>{new Set(pending.map((d) => d.projectId)).size}</strong> 个</div><div>最长等待 <strong style={{ fontSize: 24, marginLeft: 8, color: '#b45309' }}>{longestWait}</strong> 天</div></Space>

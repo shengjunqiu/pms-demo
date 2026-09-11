@@ -4,26 +4,41 @@ import { canAccessPage, canAccessProject, selectAccessPolicy } from '@/mock/conf
 import { projectForTarget } from '@/mock/access';
 import { StateView } from '@/components/common/StateView';
 import { GlobalSearchModal } from '@/components/common/GlobalSearchModal';
-import { Layout, Menu, Select, Space, Typography, Dropdown, Avatar, Input } from 'antd';
+import { Layout, Menu, Select, Space, Typography, Dropdown, Avatar, Input, type MenuProps } from 'antd';
 import {
   DashboardOutlined,
   ProjectOutlined,
-  ScheduleOutlined,
-  DollarOutlined,
   SettingOutlined,
   UserOutlined,
   AppstoreOutlined,
-  CheckCircleOutlined,
   SearchOutlined,
   CloseCircleFilled,
 } from '@ant-design/icons';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAppStore, ROLES, UserRole } from '@/store/useAppStore';
-import { demoRoute, ROLE_HOME } from '@/routes/navigation';
-import { PAGE_MANIFEST } from '@/routes/manifest';
+import { GLOBAL_NAV_SECTIONS, globalNavKey, ROLE_HOME, type GlobalNavEntry } from '@/routes/navigation';
+import { PAGE_MANIFEST, PAGE_MAP } from '@/routes/manifest';
+import { ProjectWorkspaceNav } from '@/components/layout/ProjectWorkspaceNav';
 
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
+
+const NAV_ICONS = {
+  workspace: <AppstoreOutlined />,
+  business: <ProjectOutlined />,
+  executive: <DashboardOutlined />,
+  settings: <SettingOutlined />,
+};
+
+function resolveNavEntry(entry: GlobalNavEntry) {
+  const page = entry.pageId ? PAGE_MAP.get(entry.pageId) : undefined;
+  return {
+    page,
+    route: entry.route ?? page?.route,
+    label: entry.label ?? page?.title,
+    permissionPageId: entry.permissionPageId ?? entry.pageId,
+  };
+}
 
 export const MainLayout: React.FC = () => {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -32,86 +47,43 @@ export const MainLayout: React.FC = () => {
   const navigate = useNavigate();
   const { currentRole, setRole, currentUser, asOfDate } = useAppStore();
   const { data, recordAccess } = useBusinessStore();
-  const [openGroups, setOpenGroups] = useState<string[]>(['WK']);
+  const [openGroups, setOpenGroups] = useState<string[]>(['workspace']);
 
-  // 三大业务逻辑分区与流转次序（纯中文，无英文字母与数字序号）
-  const navSections = [
-    {
-      sectionKey: 'workspace',
-      sectionTitle: '工作台与看板',
-      groups: [
-        { key: 'WK', label: '工作台与待办', icon: <AppstoreOutlined /> },
-        { key: 'GL', label: '项目经营看板', icon: <DashboardOutlined /> },
-      ],
-    },
-    {
-      sectionKey: 'lifecycle',
-      sectionTitle: '项目全生命周期',
-      groups: [
-        { key: 'GS', label: '商机与概算阶段', icon: <DollarOutlined /> },
-        { key: 'YS', label: '预算与立项阶段', icon: <ProjectOutlined /> },
-        { key: 'HS', label: '核算与执行阶段', icon: <ScheduleOutlined /> },
-        { key: 'JS', label: '结算与收尾阶段', icon: <CheckCircleOutlined /> },
-      ],
-    },
-    {
-      sectionKey: 'system',
-      sectionTitle: '系统设置与管理',
-      groups: [
-        { key: 'CF', label: '系统与规则配置', icon: <SettingOutlined /> },
-      ],
-    },
-  ];
-
-  // 扁平化的所有 groups
-  const allGroups = useMemo(() => navSections.flatMap((s) => s.groups), []);
-
+  const allGroups = useMemo(() => GLOBAL_NAV_SECTIONS.flatMap((section) => section.groups), []);
   const normalizedKeyword = menuSearch.trim().toLowerCase();
 
-  // 根据当前权限与搜索过滤计算菜单项
+  // 全局菜单只展示无对象上下文也能成立的工作台、台账、分析和配置入口。
   const menuItems = useMemo(() => {
-    const items: any[] = [];
+    const items: MenuProps['items'] = [];
 
-    navSections.forEach((section) => {
-      const sectionGroupItems: any[] = [];
+    GLOBAL_NAV_SECTIONS.forEach((section) => {
+      const sectionGroupItems: NonNullable<MenuProps['items']> = [];
 
       section.groups.forEach((group) => {
-        const groupPages = PAGE_MANIFEST.filter(
-          (page) => page.id.startsWith(group.key) && page.id !== 'GL-04' && page.id !== 'GS-03' && canAccessPage(data, currentUser, page.id)
-        );
+        const entries = group.entries
+          .map(resolveNavEntry)
+          .filter((entry) => entry.route && entry.label && (!entry.permissionPageId || canAccessPage(data, currentUser, entry.permissionPageId)))
+          .filter((entry) => !normalizedKeyword || [entry.page?.id, entry.label, entry.route]
+            .filter(Boolean)
+            .some((value) => value!.toLowerCase().includes(normalizedKeyword)));
 
-        // 支持通过页面ID、标题或路由搜索
-        const filteredPages = normalizedKeyword
-          ? groupPages.filter(
-              (p) =>
-                p.id.toLowerCase().includes(normalizedKeyword) ||
-                p.title.toLowerCase().includes(normalizedKeyword) ||
-                p.route.toLowerCase().includes(normalizedKeyword)
-            )
-          : groupPages;
-
-        if (filteredPages.length > 0) {
-          const children = filteredPages.map((page) => ({
-            key: demoRoute(page.route),
-            label: page.title,
-          }));
-
+        if (entries.length > 0) {
           sectionGroupItems.push({
             key: group.key,
-            icon: group.icon,
+            icon: NAV_ICONS[group.icon],
             label: group.label,
-            children,
+            children: entries.map((entry) => ({ key: entry.route!, label: entry.label! })),
           });
         }
       });
 
       if (sectionGroupItems.length > 0) {
         items.push({
-          key: `divider-${section.sectionKey}`,
+          key: `divider-${section.key}`,
           type: 'group',
           label: (
             <div className="text-xs font-semibold text-slate-400/90 tracking-normal px-2 pt-3 pb-1.5 select-none">
-              {section.sectionTitle}
+              {section.title}
             </div>
           ),
           children: sectionGroupItems,
@@ -120,7 +92,7 @@ export const MainLayout: React.FC = () => {
     });
 
     return items;
-  }, [navSections, data, currentUser, normalizedKeyword]);
+  }, [data, currentUser, normalizedKeyword]);
 
   const currentPage = PAGE_MANIFEST.find((p) => {
     if (p.route === location.pathname) return true;
@@ -129,8 +101,11 @@ export const MainLayout: React.FC = () => {
   });
   const targetId = location.pathname.split('/')[2] ?? '';
   const routeProject = projectForTarget(data, targetId);
+  const queryProjectId = new URLSearchParams(location.search).get('projectId');
+  const workspaceProjectId = location.pathname.match(/^\/projects\/([^/]+)/)?.[1] ?? queryProjectId ?? undefined;
   const allowed = (!currentPage || canAccessPage(data, currentUser, currentPage.id)) && (!routeProject || canAccessProject(data, currentUser, routeProject));
-  const activeGroup = currentPage?.id.split('-')[0];
+  const selectedGlobalKey = globalNavKey(location.pathname);
+  const activeGroup = allGroups.find((group) => group.entries.some((entry) => resolveNavEntry(entry).route === selectedGlobalKey))?.key;
   const isWorkspace = !!currentPage && ['WK', 'GL', 'GS', 'YS', 'HS', 'JS', 'CF'].includes(currentPage.id.split('-')[0])
     || /^\/projects\/[^/]+\/plan-requests\/[^/]+$/.test(location.pathname);
 
@@ -153,17 +128,15 @@ export const MainLayout: React.FC = () => {
   useEffect(() => {
     if (normalizedKeyword) {
       const matchedGroupKeys = allGroups
-        .filter((g) =>
-          PAGE_MANIFEST.some(
-            (p) =>
-              p.id.startsWith(g.key) &&
-              canAccessPage(data, currentUser, p.id) &&
-              (p.id.toLowerCase().includes(normalizedKeyword) ||
-                p.title.toLowerCase().includes(normalizedKeyword) ||
-                p.route.toLowerCase().includes(normalizedKeyword))
-          )
-        )
-        .map((g) => g.key);
+        .filter((group) => group.entries.some((entry) => {
+          const resolved = resolveNavEntry(entry);
+          return resolved.route && resolved.label &&
+            (!resolved.permissionPageId || canAccessPage(data, currentUser, resolved.permissionPageId)) &&
+            [resolved.page?.id, resolved.label, resolved.route]
+              .filter(Boolean)
+              .some((value) => value!.toLowerCase().includes(normalizedKeyword));
+        }))
+        .map((group) => group.key);
       setOpenGroups(matchedGroupKeys);
     } else if (activeGroup) {
       setOpenGroups([activeGroup]);
@@ -249,7 +222,7 @@ export const MainLayout: React.FC = () => {
           <Menu
             theme="dark"
             mode="inline"
-            selectedKeys={[currentPage ? demoRoute(currentPage.route) : location.pathname]}
+            selectedKeys={[selectedGlobalKey]}
             openKeys={openGroups}
             onOpenChange={handleOpenChange}
             items={menuItems}
@@ -348,6 +321,8 @@ export const MainLayout: React.FC = () => {
             </Dropdown>
           </Space>
         </Header>
+
+        {allowed && workspaceProjectId && <ProjectWorkspaceNav projectId={workspaceProjectId} />}
 
         <Content
           className={isWorkspace ? 'pms-workspace' : 'pms-content'}
