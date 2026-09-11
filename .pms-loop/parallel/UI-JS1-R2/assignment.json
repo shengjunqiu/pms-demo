@@ -1,12 +1,12 @@
 {
   "package_id": "UI-JS1-R2",
   "items": ["JS-01", "JS-02", "JS-03", "JS-04"],
-  "owner": "subagent:ui-js1-r2",
-  "writer": "subagent:ui-js1-r2",
+  "owner": "coordinator-serial",
+  "writer": "coordinator-serial",
   "integration_root": "/Users/shengjunqiu/Documents/Code/pms-demo",
-  "workdir": "/private/tmp/pms-ui-acceptance-r2",
-  "branch": "pms/ui-acceptance-r2",
-  "base_commit": "e00dca4",
+  "workdir": "/Users/shengjunqiu/Documents/Code/pms-demo",
+  "branch": "main",
+  "base_commit": "93d3ebf",
   "contract_commit": "ccfb97b",
   "owned_paths": [
     "src/pages/settlement/AcceptancePage.tsx",
@@ -20,10 +20,10 @@
   "acceptance_dependencies": ["协调者集成后正式验收"],
   "acceptance_ready": false,
   "acceptance_group": "UI-JS1-R2",
-  "status": "blocked",
+  "status": "in_progress",
   "last_confirmed_at": "2026-09-11",
   "acceptance_checklist": ["工程检查", "内部/供应商/客户验收与报验真实流程", "双宽与权限", "正式accept"],
   "scenarios": "P-006整改复验与客户验收；P-001正常验收/报验；无供应商不适用；权限与历史轮次",
   "fixtures": "只用现有统一BusinessState和真实transition，不伪造完成状态",
-  "next_action": "子agent运行环境缺少Pi宿主依赖；重启会话修复后恢复，或经用户明确授权改为当前主agent串行实施"
+  "next_action": "用户已授权当前主agent串行实施；完成四页改造、自检并提交"
 }

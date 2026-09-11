@@ -1,12 +1,12 @@
 {
   "package_id": "UI-JS2-R2",
   "items": ["JS-05", "JS-06", "JS-07", "JS-08"],
-  "owner": "subagent:ui-js2-r2",
-  "writer": "subagent:ui-js2-r2",
+  "owner": "coordinator-serial",
+  "writer": "",
   "integration_root": "/Users/shengjunqiu/Documents/Code/pms-demo",
-  "workdir": "/private/tmp/pms-ui-settlement-r2",
-  "branch": "pms/ui-settlement-r2",
-  "base_commit": "e00dca4",
+  "workdir": "/Users/shengjunqiu/Documents/Code/pms-demo",
+  "branch": "main",
+  "base_commit": "93d3ebf",
   "contract_commit": "ccfb97b",
   "owned_paths": [
     "src/pages/settlement/SettlementPage.tsx",
@@ -19,10 +19,10 @@
   "acceptance_dependencies": ["协调者集成后正式验收"],
   "acceptance_ready": false,
   "acceptance_group": "UI-JS2-R2",
-  "status": "blocked",
+  "status": "assigned",
   "last_confirmed_at": "2026-09-11",
   "acceptance_checklist": ["工程检查", "结算正常与退回、四算及收款真实流程", "双宽与权限", "正式accept"],
   "scenarios": "P-008已结算只读；P-006结算条件；财务复核退回与收款",
   "fixtures": "只用现有统一BusinessState和真实transition，不伪造完成状态",
-  "next_action": "子agent运行环境缺少Pi宿主依赖；重启会话修复后恢复，或经用户明确授权改为当前主agent串行实施"
+  "next_action": "等待UI-JS1-R2正式验收后由当前主agent串行实施"
 }
