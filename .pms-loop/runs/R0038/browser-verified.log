@@ -1,0 +1,18 @@
+
+> pms-demo@1.0.0 test:e2e /home/shengjunqiu/code/pms-demo
+> playwright test e2e/ui-planning.spec.ts e2e/first-batch.spec.ts:94
+
+[WebServer] (node:2826917) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2826931) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:2826954) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/first-batch.spec.ts:94:1 › 策划计划经PMO评审、预算审批与独立基线确认 (35.0s)
+  ✓  2 e2e/ui-planning.spec.ts:30:1 › UI 计划：范围保存、任务编辑、里程碑导航与评审提交快照 (19.5s)
+  ✓  3 e2e/ui-planning.spec.ts:64:1 › UI 计划：旧深链保持项目与冻结基线只读 (8.1s)
+
+  3 passed (1.1m)

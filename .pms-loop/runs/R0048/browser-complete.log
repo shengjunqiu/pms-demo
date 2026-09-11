@@ -1,0 +1,20 @@
+
+> pms-demo@1.0.0 test:e2e /home/shengjunqiu/code/pms-demo
+> playwright test e2e/ui-tickets.spec.ts
+
+[WebServer] (node:2953624) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2953638) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:2953660) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/ui-tickets.spec.ts:106:1 › 需求真实闭环：反馈、解决、发起人退回与最终关闭，台账保留筛选 (34.1s)
+  ✓  2 e2e/ui-tickets.spec.ts:141:1 › BUG真实闭环：从BUG页签登记、转办、修复与发起人复测 (22.2s)
+  ✓  3 e2e/ui-tickets.spec.ts:162:1 › 风险与问题真实闭环：5×4评分、PMO督办、风险转问题及主PM关闭 (33.6s)
+  ✓  4 e2e/ui-tickets.spec.ts:205:1 › 需求影响基线：阻断解决、真实计划申请和PMO批准后再闭环 (29.7s)
+  ✓  5 e2e/ui-tickets.spec.ts:249:1 › 筛选与隔离：旧project链接、分页返回、类型和项目草稿重置、空态及角色权限 (31.7s)
+
+  5 passed (2.6m)

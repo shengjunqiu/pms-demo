@@ -1,0 +1,242 @@
+{
+  "schema_version": 1,
+  "round": "R0038",
+  "revision": "20aa89061b193af546aeee2bd40924b5fbfa43b391a610c0a57384e08d0ea80d",
+  "items": {
+    "YS-06": {
+      "entry": "/projects/P-PLAN-001/wbs",
+      "covered_features": [
+        "YS-022",
+        "YS-023",
+        "YS-024",
+        "YS-025",
+        "YS-026",
+        "YS-027"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单第121行、任务书第415行及详细功能清单YS-022~030；对照原业务范围保留字段、版本、权限与动作。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "统一计划工作区三页签与当前URL同步，三条旧P-001深链仍可到达；变更入口携带projectId=P-001。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "P-PLAN-001福建园区设备运维协同平台，主PM张建国、批准周期2026-09-09至12-31；范围、工作包、责任人、计划日期、160小时、前置任务及甘特保留。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "保存范围后修订增加；编辑原任务说明保留日期依赖。Excel导入错误日期/自依赖时替换按钮禁用；载入合法样例后出现1平台交付。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "范围与计划修订在里程碑、计划评审中一致；PMO整改后重提形成第2轮，通过预算审批并确认基线后WBS新增按钮禁用。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "真实浏览器逐页验证未知项目404、客户经理403（states.json）；P-001已冻结只读；暂无评审/整改使用空态。本地同步数据无新增异步网络加载。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已查看最终1440×900及1280×900截图；项目摘要、内容和动作层次清晰，无整页横向溢出。修复workspace负margin导致的8px主容器滚动/标题裁切；宽表仅内部横滚。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "最终三项浏览器用例及额外状态检查consoleErrors为空；共享布局8项UI回归通过，无页面错误。"
+        },
+        "business-1": {
+          "requirement": "多级WBS树和甘特、依赖、任务人日期工时里程碑",
+          "passed": true,
+          "observation": "工作包树、计划日期/责任人/工时/依赖与局部横滚甘特均呈现；合法Excel样例替换后真实显示1平台交付。"
+        },
+        "business-2": {
+          "requirement": "拒绝循环依赖；模拟导入校验；冻结计划引导变更",
+          "passed": true,
+          "observation": "错误导入包含结束早于开始和自身前置任务，被禁用替换；已生效P-001及新确认基线项目不能直接编辑，进入变更携带项目。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "以项目经理及PMO执行当前页主要编辑、导航、提交和基线闭环",
+          "expected": "保留原业务结果、版本与项目上下文，冻结后不允许直接修改",
+          "observed": "保存范围后修订增加；编辑原任务说明保留日期依赖。Excel导入错误日期/自依赖时替换按钮禁用；载入合法样例后出现1平台交付。 范围与计划修订在里程碑、计划评审中一致；PMO整改后重提形成第2轮，通过预算审批并确认基线后WBS新增按钮禁用。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0038/browser-verified.log",
+        ".pms-loop/runs/R0038/layout-precheck.log",
+        ".pms-loop/runs/R0038/artifacts/states.json",
+        ".pms-loop/runs/R0038/artifacts/ui-planning-b336656137e49d70a27a7024530e4a17ac29854d.json",
+        ".pms-loop/runs/R0038/artifacts/ui-planning-b336656137e49d70a27a726e4c8ee8d2f6f2bffd.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0038/artifacts/YS06-1440.png",
+        "1280": ".pms-loop/runs/R0038/artifacts/YS06-1280.png"
+      }
+    },
+    "YS-07": {
+      "entry": "/projects/P-PLAN-001/milestones",
+      "covered_features": [
+        "YS-028",
+        "YS-029",
+        "YS-030"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单第122行、任务书第416行及详细功能清单YS-022~030；对照原业务范围保留字段、版本、权限与动作。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "统一计划工作区三页签与当前URL同步，三条旧P-001深链仍可到达；变更入口携带projectId=P-001。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "左侧交付时间线，右侧5个关键节点、责任人、计划/实际、达成条件和必交材料；尚未签合同说明、到期未达成红色原因保留。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "统一计划页签切换保留P-PLAN-001；标准模板与裁剪规则可展开；补充节点打开达成条件表单，取消不新增；编辑启动条件后显示新条件。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "WBS修订3在里程碑头部一致；评审后返回仍选中里程碑；评审中和已冻结基线补充节点均不可用。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "真实浏览器逐页验证未知项目404、客户经理403（states.json）；P-001已冻结只读；暂无评审/整改使用空态。本地同步数据无新增异步网络加载。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已查看最终1440×900及1280×900截图；项目摘要、内容和动作层次清晰，无整页横向溢出。修复workspace负margin导致的8px主容器滚动/标题裁切；宽表仅内部横滚。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "最终三项浏览器用例及额外状态检查consoleErrors为空；共享布局8项UI回归通过，无页面错误。"
+        },
+        "business-1": {
+          "requirement": "合同/计划/实际日期、关键里程碑、交付物与达成条件",
+          "passed": true,
+          "observation": "合同要求验收及计划/实际节点、关键标识、材料和条件同时保留；首屏到期未达成说明实施计划，可查进度阻断。"
+        },
+        "business-2": {
+          "requirement": "临期超期原因可查，冻结里程碑不能直接删除改写",
+          "passed": true,
+          "observation": "真实修改启动达成条件并在列表可见；冻结P-001及新基线项目禁止新增/删改，旧深链仍正确进入本项目。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "以项目经理及PMO执行当前页主要编辑、导航、提交和基线闭环",
+          "expected": "保留原业务结果、版本与项目上下文，冻结后不允许直接修改",
+          "observed": "统一计划页签切换保留P-PLAN-001；标准模板与裁剪规则可展开；补充节点打开达成条件表单，取消不新增；编辑启动条件后显示新条件。 WBS修订3在里程碑头部一致；评审后返回仍选中里程碑；评审中和已冻结基线补充节点均不可用。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0038/browser-verified.log",
+        ".pms-loop/runs/R0038/layout-precheck.log",
+        ".pms-loop/runs/R0038/artifacts/states.json",
+        ".pms-loop/runs/R0038/artifacts/ui-planning-b336656137e49d70a27a7024530e4a17ac29854d.json",
+        ".pms-loop/runs/R0038/artifacts/ui-planning-b336656137e49d70a27a726e4c8ee8d2f6f2bffd.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0038/artifacts/YS07-1440.png",
+        "1280": ".pms-loop/runs/R0038/artifacts/YS07-1280.png"
+      }
+    },
+    "YS-08": {
+      "entry": "/projects/P-PLAN-001/plan-review",
+      "covered_features": [
+        "YS-030"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单第123行、任务书第417行及详细功能清单YS-022~030；对照原业务范围保留字段、版本、权限与动作。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "统一计划工作区三页签与当前URL同步，三条旧P-001深链仍可到达；变更入口携带projectId=P-001。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "项目/版本摘要、四阶段步骤、提交版本材料快照和WBS/里程碑/资源页签；右侧完整性校验、提交/评审操作及历史；暂无整改项/评审历史显示真实空态。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "当前完整性通过后提交进入评审中，重复提交禁用；PMO录入整改意见与事项，PM回复后重提第2轮，PMO通过后可进入预算。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "整改轮保留原意见与材料，重提生成第二轮；预算审批通过仍需PMO独立确认基线，确认前尚无生效基线，确认后计划冻结。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "真实浏览器逐页验证未知项目404、客户经理403（states.json）；P-001已冻结只读；暂无评审/整改使用空态。本地同步数据无新增异步网络加载。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已查看最终1440×900及1280×900截图；项目摘要、内容和动作层次清晰，无整页横向溢出。修复workspace负margin导致的8px主容器滚动/标题裁切；宽表仅内部横滚。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "最终三项浏览器用例及额外状态检查consoleErrors为空；共享布局8项UI回归通过，无页面错误。"
+        },
+        "business-1": {
+          "requirement": "WBS里程碑资源材料、评审意见与整改",
+          "passed": true,
+          "observation": "材料区含提交版本WBS、5里程碑和2名团队资源；整改真实填写事项/回复并形成历史，旧版本保留。"
+        },
+        "business-2": {
+          "requirement": "通过才允许正式基线，退回保留材料版本和整改轨迹",
+          "passed": true,
+          "observation": "计划通过后出现进入预算编制；预算审批前不可PMO确认基线，通过后独立确认才冻结；两轮评审及整改轨迹保留。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "以项目经理及PMO执行当前页主要编辑、导航、提交和基线闭环",
+          "expected": "保留原业务结果、版本与项目上下文，冻结后不允许直接修改",
+          "observed": "当前完整性通过后提交进入评审中，重复提交禁用；PMO录入整改意见与事项，PM回复后重提第2轮，PMO通过后可进入预算。 整改轮保留原意见与材料，重提生成第二轮；预算审批通过仍需PMO独立确认基线，确认前尚无生效基线，确认后计划冻结。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0038/browser-verified.log",
+        ".pms-loop/runs/R0038/layout-precheck.log",
+        ".pms-loop/runs/R0038/artifacts/states.json",
+        ".pms-loop/runs/R0038/artifacts/ui-planning-b336656137e49d70a27a7024530e4a17ac29854d.json",
+        ".pms-loop/runs/R0038/artifacts/ui-planning-b336656137e49d70a27a726e4c8ee8d2f6f2bffd.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0038/artifacts/YS08-1440.png",
+        "1280": ".pms-loop/runs/R0038/artifacts/YS08-1280.png"
+      }
+    }
+  }
+}

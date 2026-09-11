@@ -1,0 +1,56 @@
+{
+  "status": "passed",
+  "appointments": [
+    {
+      "id": "APPOINT-P-PLAN-001-1",
+      "userId": "U-001",
+      "name": "张建国",
+      "status": "已接受",
+      "nominatedAt": "2026-09-09",
+      "nominatedBy": "PMO",
+      "respondedAt": "2026-09-09",
+      "opinion": "原立项任命接收记录"
+    },
+    {
+      "id": "APPOINT-P-PLAN-001-2",
+      "userId": "U-001",
+      "name": "张建国",
+      "status": "已拒绝",
+      "nominatedAt": "2026-09-09",
+      "nominatedBy": "李主任",
+      "opinion": "本轮交接资料待补，退回后重新任命",
+      "respondedAt": "2026-09-09"
+    },
+    {
+      "id": "APPOINT-P-PLAN-001-3",
+      "userId": "U-001",
+      "name": "张建国",
+      "status": "已接受",
+      "nominatedAt": "2026-09-09",
+      "nominatedBy": "李主任",
+      "opinion": "确认承担本项目主PM职责",
+      "respondedAt": "2026-09-09"
+    }
+  ],
+  "member": {
+    "userId": "U-005",
+    "name": "赵工",
+    "role": "交付成员",
+    "departmentId": "D-005",
+    "active": false,
+    "startDate": "2026-09-09",
+    "endDate": "2026-09-09",
+    "allocation": 100,
+    "plannedHours": 160,
+    "keyPosition": false
+  },
+  "historyUnchanged": true,
+  "states": [
+    "team",
+    "budget",
+    "estimate-budget",
+    "budget/review",
+    "baseline"
+  ],
+  "errors": []
+}

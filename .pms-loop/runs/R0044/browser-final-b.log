@@ -1,0 +1,18 @@
+
+> pms-demo@1.0.0 test:e2e /home/shengjunqiu/code/pms-demo
+> playwright test e2e/ui-initiation.spec.ts --grep 'YS04 UI六|YS04/01|YS权限'
+
+[WebServer] (node:2895328) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2895360) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:2895383) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/ui-initiation.spec.ts:233:1 › YS04 UI六专业独立会签与正式配置审批 (33.9s)
+  ✓  2 e2e/ui-initiation.spec.ts:255:1 › YS04/01 UI整改退回、回复重提与原版保留 (23.3s)
+  ✓  3 e2e/ui-initiation.spec.ts:282:1 › YS权限 UI只读、敏感意见隐藏与未知申请 (12.8s)
+
+  3 passed (1.2m)

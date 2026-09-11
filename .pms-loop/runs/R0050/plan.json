@@ -1,0 +1,111 @@
+{
+  "round": "R0050",
+  "items": [
+    {
+      "id": "HS-14",
+      "title": "项目变更台账",
+      "route": "/project-changes",
+      "kind": "台账",
+      "roles": "项目经理、项目主办部门、PMO",
+      "phase": 6,
+      "feature_ids": [
+        "HS-066",
+        "HS-067",
+        "HS-068",
+        "HS-069",
+        "HS-070",
+        "HS-071",
+        "HS-072",
+        "HS-073"
+      ],
+      "upstream_feature_scope": "范围/计划/预算等变更",
+      "source_lines": {
+        "pages": 144,
+        "brief": 443
+      },
+      "criteria": [
+        "范围进度成本资源等变更列表、级别影响状态",
+        "进入申请/材料/对比/原审批，能追踪引起偏差的变更"
+      ]
+    },
+    {
+      "id": "HS-15",
+      "title": "项目变更申请",
+      "route": "/project-changes/new",
+      "kind": "表单",
+      "roles": "项目经理/项目主办部门",
+      "phase": 6,
+      "feature_ids": [
+        "HS-066",
+        "HS-067",
+        "HS-068",
+        "HS-069",
+        "HS-070",
+        "HS-071",
+        "HS-072",
+        "HS-073"
+      ],
+      "upstream_feature_scope": "变更影响评估与审批",
+      "source_lines": {
+        "pages": 145,
+        "brief": 444
+      },
+      "criteria": [
+        "原目标基线对比与范围进度成本毛利资源合同影响",
+        "分级审批通过追加统一基线版本，退回保持原版"
+      ]
+    }
+  ],
+  "sources": {
+    "prd": {
+      "path": "docs/项目管理平台PRD_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "6dac675ca22237b7fa59129eccc466a9e242d20f948c0b68e958a7227bb2bd1b"
+    },
+    "features": {
+      "path": "docs/项目管理平台详细功能清单_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "fabfac73b480ccaf01aa831ae3c5d0a6485e33fff80f517468b2b6c52829ddfb"
+    },
+    "pages": {
+      "path": "docs/项目管理平台页面清单与原型设计说明_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "db1c548b5f5ef025eb90fef06422e132f003665fc7e6156dd706b7f095c994dc"
+    },
+    "brief": {
+      "path": "docs/项目管理平台高保真原型_AgentLoop开发任务书_V1.0.md",
+      "sha256": "286f917d5edc99a4a0c7da97515a3d6308cae7395fb287bbcd1846de60045b43"
+    }
+  },
+  "feature_references": {
+    "HS-066": {
+      "title": "变更申请",
+      "line": 332
+    },
+    "HS-067": {
+      "title": "影响评估",
+      "line": 333
+    },
+    "HS-068": {
+      "title": "变更分级",
+      "line": 334
+    },
+    "HS-069": {
+      "title": "PMO审批",
+      "line": 335
+    },
+    "HS-070": {
+      "title": "决策会/PMC审议",
+      "line": 336
+    },
+    "HS-071": {
+      "title": "基线更新",
+      "line": 337
+    },
+    "HS-072": {
+      "title": "预算变更",
+      "line": 338
+    },
+    "HS-073": {
+      "title": "变更对比",
+      "line": 339
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "title": "UI GL06 待决策摘要、历史切换与原审批",
+  "status": "passed",
+  "url": "http://127.0.0.1:4179/executive/decisions?decisionStatus=history&decisionType=%E8%B6%85%E6%A6%82%E7%AE%97%E5%AE%A1%E6%89%B9",
+  "consoleErrors": []
+}

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "catalog_sha256": "afabe9c27b289a2aa00a72d116be344fdbb01683443388e367536a99feb1f05e",
   "status": "in_progress",
-  "active": null,
+  "active": "R0050",
   "completion_revision": null,
   "created_at": "2026-09-09T14:33:07+00:00",
   "items": {
@@ -179,12 +179,12 @@
       "round": "R0049"
     },
     "HS-14": {
-      "status": "pending",
-      "reason": "继续全页面UI改造：变更台账与申请评估审批对比，保留基线和专业权限。"
+      "status": "active",
+      "round": "R0050"
     },
     "HS-15": {
-      "status": "pending",
-      "reason": "继续全页面UI改造：变更台账与申请评估审批对比，保留基线和专业权限。"
+      "status": "active",
+      "round": "R0050"
     },
     "HS-16": {
       "status": "done",
@@ -1688,6 +1688,21 @@
         ".pms-loop/runs/R0049/artifacts/UI-HS13-1280.png": "babbe5526a8333312d7d832395670e963e1b8e07c731d04cf257a04f63b5710f",
         ".pms-loop/runs/R0049/checks.json": "33b45ed6d86d0c071d495ace6f2117be645f425ff7c2f655a4657c2d73b4b488",
         ".pms-loop/runs/R0049/evidence.json": "4e52c13ed301104af45bb82edc925b08959f006f94a1f79e30d0fc74b6135089"
+      }
+    },
+    {
+      "id": "R0050",
+      "items": [
+        "HS-14",
+        "HS-15"
+      ],
+      "started_at": "2026-09-10T21:54:22+00:00",
+      "status": "awaiting_evidence",
+      "checks": {
+        "typecheck": "pass",
+        "lint": "pass",
+        "build": "pass",
+        "test:domain": "pass"
       }
     }
   ],

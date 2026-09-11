@@ -1,0 +1,6 @@
+{
+  "title": "YS01/02 UI申请七页签、提交锁定与评审上下文返回",
+  "status": "passed",
+  "url": "http://127.0.0.1:4179/initiation/review?status=%E5%BE%85%E9%A3%8E%E9%99%A9%E8%AF%84%E4%BC%B0&search=%E6%B2%A1%E6%9C%89%E5%8C%B9%E9%85%8D%E7%9A%84%E7%94%B3%E8%AF%B7",
+  "consoleErrors": []
+}

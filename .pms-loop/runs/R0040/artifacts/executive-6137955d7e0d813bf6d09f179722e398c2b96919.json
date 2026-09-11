@@ -1,0 +1,6 @@
+{
+  "title": "UI GL02 同样本四阶段金额、科目归因与凭证",
+  "status": "passed",
+  "url": "http://127.0.0.1:4179/executive/four-calculations?search=P-001&tab=subjects&sample=settled",
+  "consoleErrors": []
+}

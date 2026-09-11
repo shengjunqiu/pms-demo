@@ -1,0 +1,26 @@
+{
+  "title": "售前 UI：双宽分区、冻结版本深链与历史轮次一致",
+  "status": "passed",
+  "fixture": {
+    "id": "OPP-NEW-74",
+    "solution": "SOL-OPP-NEW-74-V1",
+    "cost": "TECH-OPP-NEW-74-V1",
+    "first": "REVIEW-OPP-NEW-74-1",
+    "latest": "REVIEW-OPP-NEW-74-2"
+  },
+  "screenshots": {
+    "solution": {
+      "1280": ".pms-loop/runs/R0041/artifacts/precheck/UI-GS05-1280.png",
+      "1440": ".pms-loop/runs/R0041/artifacts/precheck/UI-GS05-1440.png"
+    },
+    "cost": {
+      "1280": ".pms-loop/runs/R0041/artifacts/precheck/UI-GS06-1280.png",
+      "1440": ".pms-loop/runs/R0041/artifacts/precheck/UI-GS06-1440.png"
+    },
+    "review": {
+      "1280": ".pms-loop/runs/R0041/artifacts/precheck/UI-GS07-1280.png",
+      "1440": ".pms-loop/runs/R0041/artifacts/precheck/UI-GS07-1440.png"
+    }
+  },
+  "consoleErrors": []
+}

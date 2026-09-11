@@ -1,0 +1,274 @@
+{
+  "schema_version": 1,
+  "round": "R0045",
+  "revision": "c0472d3c526e7a03feae77f95a18b37aaf43f25cd339552395726ef027d7c2ee",
+  "items": {
+    "YS-13": {
+      "entry": "/unsigned-projects",
+      "covered_features": [
+        "YS-047",
+        "YS-048",
+        "YS-049",
+        "YS-050",
+        "YS-051",
+        "YS-052",
+        "YS-053",
+        "YS-054"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行128、功能YS-047,YS-048,YS-049,YS-050,YS-051,YS-052,YS-053,YS-054及原UI/领域规则核对。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "PMO按投入超限筛选10条，清除风险后搜索P-PLAN-001正常下钻；连续搜索与已签开关保持最新参数，更多办理进入投入页，返回保留关键词。无匹配空态，原金额/日期/额度/风险列保持局部横滚。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "PMO按投入超限筛选10条，清除风险后搜索P-PLAN-001正常下钻；连续搜索与已签开关保持最新参数，更多办理进入投入页，返回保留关键词。无匹配空态，原金额/日期/额度/风险列保持局部横滚。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "PMO按投入超限筛选10条，清除风险后搜索P-PLAN-001正常下钻；连续搜索与已签开关保持最新参数，更多办理进入投入页，返回保留关键词。无匹配空态，原金额/日期/额度/风险列保持局部横滚。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "PMO按投入超限筛选10条，清除风险后搜索P-PLAN-001正常下钻；连续搜索与已签开关保持最新参数，更多办理进入投入页，返回保留关键词。无匹配空态，原金额/日期/额度/风险列保持局部横滚。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "PMO按投入超限筛选10条，清除风险后搜索P-PLAN-001正常下钻；连续搜索与已签开关保持最新参数，更多办理进入投入页，返回保留关键词。无匹配空态，原金额/日期/额度/风险列保持局部横滚。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已人工查看当前revision三页1440/1280全页主截图，并补看详情投入/合同表单和启动阻断1280；项目编号独立完整一行，灰工作区分区清晰，页面无横溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "当前revision最终A5+B6均exit0，11份当前场景报告consoleErrors=[]；旧拆分前超时报告保留但不计通过。"
+        },
+        "business-1": {
+          "requirement": "未签金额日期额度成本使用率进展风险台账",
+          "passed": true,
+          "observation": "PMO按投入超限筛选10条，清除风险后搜索P-PLAN-001正常下钻；连续搜索与已签开关保持最新参数，更多办理进入投入页，返回保留关键词。无匹配空态，原金额/日期/额度/风险列保持局部横滚。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        },
+        "business-2": {
+          "requirement": "更新签约/追加投入/确认签订/退出可演示，超限时限联动",
+          "passed": true,
+          "observation": "PMO按投入超限筛选10条，清除风险后搜索P-PLAN-001正常下钻；连续搜索与已签开关保持最新参数，更多办理进入投入页，返回保留关键词。无匹配空态，原金额/日期/额度/风险列保持局部横滚。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "重置独立合法unsigned前置，执行本页关联UI录入/审批/阻断/返回流程",
+          "expected": "原同源金额与审批/启动门禁保持，布局两宽可用",
+          "observed": "PMO按投入超限筛选10条，清除风险后搜索P-PLAN-001正常下钻；连续搜索与已签开关保持最新参数，更多办理进入投入页，返回保留关键词。无匹配空态，原金额/日期/额度/风险列保持局部横滚。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0045/browser-final-a.log",
+        ".pms-loop/runs/R0045/browser-final-b.log",
+        ".pms-loop/runs/R0045/artifacts/r0024-9041e22008a7401df18bdcb1a14e71db714cf4bc.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-9041e22008a7401df18b29ad3c7ed6de2cadf8f7.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-ddbd7d35d15097f0e7b8f4bb973ff82154297878.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-ddbd7d35d15097f0e7b800d587cb5060835c6f16.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-ddbd7d35d15097f0e7b889dc9c34fa8563cd7313.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-42e37f2541ff4cab7d55c72f96bc9d1f1f29b8fb.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-42e37f2541ff4cab7d55cb1ca1cc637d9a4f122c.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-9041e22008a7401df18b0a300105f39dc7b6d7d6.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-9041e22008a7401df18be7e2a55e0b98eda4ba0d.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-42e37f2541ff4cab7d55c9ffc241e7a36e9b2bcb.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-9041e22008a7401df18b6754c80abe57c2a14c76.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0045/artifacts/YS-13-1440.png",
+        "1280": ".pms-loop/runs/R0045/artifacts/YS-13-1280.png"
+      }
+    },
+    "YS-14": {
+      "entry": "/unsigned-projects/P-PLAN-001",
+      "covered_features": [
+        "YS-048",
+        "YS-049",
+        "YS-050",
+        "YS-051",
+        "YS-052",
+        "YS-053",
+        "YS-054"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行129、功能YS-048,YS-049,YS-050,YS-051,YS-052,YS-053,YS-054及原UI/领域规则核对。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "市场保存签约进展；缺签章附件与回款合计1100不等于合同1200均阻断；补齐后创建CON-R0024-BROWSER及1200回款计划，已签转换真实同步。追加100待审额度/期限不变，领导批准后释放并延至10-31，驳回不释放。PMO退出保留实际成本及原流水，阻止新增投入/合同。五个旧tab深链完整。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "市场保存签约进展；缺签章附件与回款合计1100不等于合同1200均阻断；补齐后创建CON-R0024-BROWSER及1200回款计划，已签转换真实同步。追加100待审额度/期限不变，领导批准后释放并延至10-31，驳回不释放。PMO退出保留实际成本及原流水，阻止新增投入/合同。五个旧tab深链完整。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "市场保存签约进展；缺签章附件与回款合计1100不等于合同1200均阻断；补齐后创建CON-R0024-BROWSER及1200回款计划，已签转换真实同步。追加100待审额度/期限不变，领导批准后释放并延至10-31，驳回不释放。PMO退出保留实际成本及原流水，阻止新增投入/合同。五个旧tab深链完整。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "市场保存签约进展；缺签章附件与回款合计1100不等于合同1200均阻断；补齐后创建CON-R0024-BROWSER及1200回款计划，已签转换真实同步。追加100待审额度/期限不变，领导批准后释放并延至10-31，驳回不释放。PMO退出保留实际成本及原流水，阻止新增投入/合同。五个旧tab深链完整。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "市场保存签约进展；缺签章附件与回款合计1100不等于合同1200均阻断；补齐后创建CON-R0024-BROWSER及1200回款计划，已签转换真实同步。追加100待审额度/期限不变，领导批准后释放并延至10-31，驳回不释放。PMO退出保留实际成本及原流水，阻止新增投入/合同。五个旧tab深链完整。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已人工查看当前revision三页1440/1280全页主截图，并补看详情投入/合同表单和启动阻断1280；项目编号独立完整一行，灰工作区分区清晰，页面无横溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "当前revision最终A5+B6均exit0，11份当前场景报告consoleErrors=[]；旧拆分前超时报告保留但不计通过。"
+        },
+        "business-1": {
+          "requirement": "签约进展、额度/时限、成本来源、沉没成本和追加审批",
+          "passed": true,
+          "observation": "市场保存签约进展；缺签章附件与回款合计1100不等于合同1200均阻断；补齐后创建CON-R0024-BROWSER及1200回款计划，已签转换真实同步。追加100待审额度/期限不变，领导批准后释放并延至10-31，驳回不释放。PMO退出保留实际成本及原流水，阻止新增投入/合同。五个旧tab深链完整。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        },
+        "business-2": {
+          "requirement": "签订转正式前检查合同；退出留痕，不把拟签额算成已签额",
+          "passed": true,
+          "observation": "市场保存签约进展；缺签章附件与回款合计1100不等于合同1200均阻断；补齐后创建CON-R0024-BROWSER及1200回款计划，已签转换真实同步。追加100待审额度/期限不变，领导批准后释放并延至10-31，驳回不释放。PMO退出保留实际成本及原流水，阻止新增投入/合同。五个旧tab深链完整。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "重置独立合法unsigned前置，执行本页关联UI录入/审批/阻断/返回流程",
+          "expected": "原同源金额与审批/启动门禁保持，布局两宽可用",
+          "observed": "市场保存签约进展；缺签章附件与回款合计1100不等于合同1200均阻断；补齐后创建CON-R0024-BROWSER及1200回款计划，已签转换真实同步。追加100待审额度/期限不变，领导批准后释放并延至10-31，驳回不释放。PMO退出保留实际成本及原流水，阻止新增投入/合同。五个旧tab深链完整。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0045/browser-final-a.log",
+        ".pms-loop/runs/R0045/browser-final-b.log",
+        ".pms-loop/runs/R0045/artifacts/r0024-9041e22008a7401df18bdcb1a14e71db714cf4bc.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-9041e22008a7401df18b29ad3c7ed6de2cadf8f7.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-ddbd7d35d15097f0e7b8f4bb973ff82154297878.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-ddbd7d35d15097f0e7b800d587cb5060835c6f16.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-ddbd7d35d15097f0e7b889dc9c34fa8563cd7313.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-42e37f2541ff4cab7d55c72f96bc9d1f1f29b8fb.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-42e37f2541ff4cab7d55cb1ca1cc637d9a4f122c.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-9041e22008a7401df18b0a300105f39dc7b6d7d6.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-9041e22008a7401df18be7e2a55e0b98eda4ba0d.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-42e37f2541ff4cab7d55c9ffc241e7a36e9b2bcb.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-9041e22008a7401df18b6754c80abe57c2a14c76.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0045/artifacts/YS-14-1440.png",
+        "1280": ".pms-loop/runs/R0045/artifacts/YS-14-1280.png"
+      }
+    },
+    "YS-15": {
+      "entry": "/projects/P-PLAN-001/start-confirmation",
+      "covered_features": [
+        "YS-055",
+        "YS-056",
+        "YS-057"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行130、功能YS-055,YS-056,YS-057及原UI/领域规则核对。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "无完整基线或未签合同列明阻断并禁止产生启动记录；七项满足后早于批准周期的9-08被阻断，9-09正式启动成功，保留批准快照，产生四条模拟通知与WBS/日报/工时真实入口；PM进入执行可用。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "无完整基线或未签合同列明阻断并禁止产生启动记录；七项满足后早于批准周期的9-08被阻断，9-09正式启动成功，保留批准快照，产生四条模拟通知与WBS/日报/工时真实入口；PM进入执行可用。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "无完整基线或未签合同列明阻断并禁止产生启动记录；七项满足后早于批准周期的9-08被阻断，9-09正式启动成功，保留批准快照，产生四条模拟通知与WBS/日报/工时真实入口；PM进入执行可用。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "无完整基线或未签合同列明阻断并禁止产生启动记录；七项满足后早于批准周期的9-08被阻断，9-09正式启动成功，保留批准快照，产生四条模拟通知与WBS/日报/工时真实入口；PM进入执行可用。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "无完整基线或未签合同列明阻断并禁止产生启动记录；七项满足后早于批准周期的9-08被阻断，9-09正式启动成功，保留批准快照，产生四条模拟通知与WBS/日报/工时真实入口；PM进入执行可用。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已人工查看当前revision三页1440/1280全页主截图，并补看详情投入/合同表单和启动阻断1280；项目编号独立完整一行，灰工作区分区清晰，页面无横溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "当前revision最终A5+B6均exit0，11份当前场景报告consoleErrors=[]；旧拆分前超时报告保留但不计通过。"
+        },
+        "business-1": {
+          "requirement": "立项、任命接受、基线、合同等启动条件清单",
+          "passed": true,
+          "observation": "无完整基线或未签合同列明阻断并禁止产生启动记录；七项满足后早于批准周期的9-08被阻断，9-09正式启动成功，保留批准快照，产生四条模拟通知与WBS/日报/工时真实入口；PM进入执行可用。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        },
+        "business-2": {
+          "requirement": "阻断项列原因，通过才正式启动并激活执行待办",
+          "passed": true,
+          "observation": "无完整基线或未签合同列明阻断并禁止产生启动记录；七项满足后早于批准周期的9-08被阻断，9-09正式启动成功，保留批准快照，产生四条模拟通知与WBS/日报/工时真实入口；PM进入执行可用。 工程四项和235领域测试通过，技术无权限403及未知项目404已验证。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "重置独立合法unsigned前置，执行本页关联UI录入/审批/阻断/返回流程",
+          "expected": "原同源金额与审批/启动门禁保持，布局两宽可用",
+          "observed": "无完整基线或未签合同列明阻断并禁止产生启动记录；七项满足后早于批准周期的9-08被阻断，9-09正式启动成功，保留批准快照，产生四条模拟通知与WBS/日报/工时真实入口；PM进入执行可用。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0045/browser-final-a.log",
+        ".pms-loop/runs/R0045/browser-final-b.log",
+        ".pms-loop/runs/R0045/artifacts/r0024-9041e22008a7401df18bdcb1a14e71db714cf4bc.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-9041e22008a7401df18b29ad3c7ed6de2cadf8f7.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-ddbd7d35d15097f0e7b8f4bb973ff82154297878.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-ddbd7d35d15097f0e7b800d587cb5060835c6f16.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-ddbd7d35d15097f0e7b889dc9c34fa8563cd7313.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-42e37f2541ff4cab7d55c72f96bc9d1f1f29b8fb.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-42e37f2541ff4cab7d55cb1ca1cc637d9a4f122c.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-9041e22008a7401df18b0a300105f39dc7b6d7d6.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-9041e22008a7401df18be7e2a55e0b98eda4ba0d.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-42e37f2541ff4cab7d55c9ffc241e7a36e9b2bcb.json",
+        ".pms-loop/runs/R0045/artifacts/r0024-9041e22008a7401df18b6754c80abe57c2a14c76.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0045/artifacts/YS-15-1440.png",
+        "1280": ".pms-loop/runs/R0045/artifacts/YS-15-1280.png"
+      }
+    }
+  }
+}

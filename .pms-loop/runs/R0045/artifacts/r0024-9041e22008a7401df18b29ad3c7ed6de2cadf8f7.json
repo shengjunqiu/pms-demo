@@ -1,0 +1,14 @@
+{
+  "title": "YS-15 满足条件后原子启动并提供执行入口",
+  "status": "passed",
+  "url": "http://127.0.0.1:4179/projects/P-PLAN-001/labor-cost",
+  "consoleErrors": [],
+  "observations": {
+    "readyFixture": "unsigned-ready-for-start",
+    "startResult": "七项启动检查全部满足后，PMO确认正式启动；生成WBS、日报、工时事项和4条模拟通知",
+    "screenshots": {
+      "1280": ".pms-loop/runs/R0045/artifacts/YS-15-1280.png",
+      "1440": ".pms-loop/runs/R0045/artifacts/YS-15-1440.png"
+    }
+  }
+}

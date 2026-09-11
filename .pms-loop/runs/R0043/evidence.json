@@ -1,0 +1,342 @@
+{
+  "schema_version": 1,
+  "round": "R0043",
+  "revision": "edb8c9cc01628794cda07e7a8ab2dc1a2c6532e193de04d4f7500fcb1b1b1c0f",
+  "items": {
+    "GS-08": {
+      "entry": "/opportunities/OPP-NEW-74/estimate",
+      "covered_features": [
+        "GS-032",
+        "GS-033",
+        "GS-034",
+        "GS-035",
+        "GS-036"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行112、任务书行401，功能GS-032~036，不改变统一状态与审批/冻结/投入规则。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "修改集成网关数量使概算偏离评审，PMO确认冻结被阻断；原方案/成本历史可查，立项申请引用第二版。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "通过评审后真实生成、发布和PMO冻结两版概算，收入1200/首版成本38.50；九个页签完整，当前引用改为第二版，第一版仍冻结保留。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "通过评审后真实生成、发布和PMO冻结两版概算，收入1200/首版成本38.50；九个页签完整，当前引用改为第二版，第一版仍冻结保留。 修改集成网关数量使概算偏离评审，PMO确认冻结被阻断；原方案/成本历史可查，立项申请引用第二版。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "通过评审后真实生成、发布和PMO冻结两版概算，收入1200/首版成本38.50；九个页签完整，当前引用改为第二版，第一版仍冻结保留。 修改集成网关数量使概算偏离评审，PMO确认冻结被阻断；原方案/成本历史可查，立项申请引用第二版。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "浏览器覆盖概算草稿/版本空态、未知商机和申请404、无协同403、组织拒绝/空列表、驳回及冻结阻断。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已查看本轮四页8张1440/1280 fullPage截图及申请编辑态。来源与差异前置、申请分区、指标同口径，宽表仅内部滚动；同版比较主表首屏可见。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "8个真实浏览器场景全部passed、exit0，全部报告consoleErrors为空。"
+        },
+        "business-1": {
+          "requirement": "收入/建设/人力/第三方/期间/风险/毛利/版本完整",
+          "passed": true,
+          "observation": "通过评审后真实生成、发布和PMO冻结两版概算，收入1200/首版成本38.50；九个页签完整，当前引用改为第二版，第一版仍冻结保留。"
+        },
+        "business-2": {
+          "requirement": "统一科目实时汇总，评审通过才可冻结，来源版本可查",
+          "passed": true,
+          "observation": "修改集成网关数量使概算偏离评审，PMO确认冻结被阻断；原方案/成本历史可查，立项申请引用第二版。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "真实浏览器填写、审批、跨页返回与状态核对",
+          "expected": "收入/建设/人力/第三方/期间/风险/毛利/版本完整；统一科目实时汇总，评审通过才可冻结，来源版本可查",
+          "observed": "通过评审后真实生成、发布和PMO冻结两版概算，收入1200/首版成本38.50；九个页签完整，当前引用改为第二版，第一版仍冻结保留。 修改集成网关数量使概算偏离评审，PMO确认冻结被阻断；原方案/成本历史可查，立项申请引用第二版。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0043/browser-final.log",
+        ".pms-loop/runs/R0043/test-domain.log",
+        ".pms-loop/runs/R0043/artifacts/r0024-2896f1f08c96d0727741907b08e37f25f38f0eec.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-69001f49a5a10eec583910fa9e03e1a6f335b18d.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-af0adcc299ebe2221317918d0adb4c081b6ed44f.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-2896f1f08c96d0727741ad39d47f7c95522fd0c0.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-2896f1f08c96d072774108d9211f03fddbb21f66.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-af0adcc299ebe2221317c70147e254f800c07d1e.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-2896f1f08c96d0727741bbc19845fb2bbf11d7e2.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-2896f1f08c96d0727741a149ed2ad2f03a0b5795.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0043/artifacts/GS-08-1440.png",
+        "1280": ".pms-loop/runs/R0043/artifacts/GS-08-1280.png"
+      }
+    },
+    "GS-09": {
+      "entry": "/opportunities/OPP-NEW-74/estimate/compare",
+      "covered_features": [
+        "GS-035",
+        "GS-036"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行113、任务书行402，功能GS-035~036，不改变统一状态与审批/冻结/投入规则。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "方案V1历史弹窗与历史成本快照下钻有效，旧成本含现场差旅不含新认证专项；人力单价隐藏。两版来源/当前引用清楚，历史只读。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "基准/对比URL控制，两版本成本差额21.16，交换后-21.16；同版本对比0.00。统一科目展示新增、删除、修改及数量单价差异。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "基准/对比URL控制，两版本成本差额21.16，交换后-21.16；同版本对比0.00。统一科目展示新增、删除、修改及数量单价差异。 方案V1历史弹窗与历史成本快照下钻有效，旧成本含现场差旅不含新认证专项；人力单价隐藏。两版来源/当前引用清楚，历史只读。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "基准/对比URL控制，两版本成本差额21.16，交换后-21.16；同版本对比0.00。统一科目展示新增、删除、修改及数量单价差异。 方案V1历史弹窗与历史成本快照下钻有效，旧成本含现场差旅不含新认证专项；人力单价隐藏。两版来源/当前引用清楚，历史只读。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "浏览器覆盖概算草稿/版本空态、未知商机和申请404、无协同403、组织拒绝/空列表、驳回及冻结阻断。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已查看本轮四页8张1440/1280 fullPage截图及申请编辑态。来源与差异前置、申请分区、指标同口径，宽表仅内部滚动；同版比较主表首屏可见。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "8个真实浏览器场景全部passed、exit0，全部报告consoleErrors为空。"
+        },
+        "business-1": {
+          "requirement": "两版本按科目/数量/单价/金额对比，显示修改原因",
+          "passed": true,
+          "observation": "基准/对比URL控制，两版本成本差额21.16，交换后-21.16；同版本对比0.00。统一科目展示新增、删除、修改及数量单价差异。"
+        },
+        "business-2": {
+          "requirement": "历史只读，明确立项引用版本和新增删除修改差异",
+          "passed": true,
+          "observation": "方案V1历史弹窗与历史成本快照下钻有效，旧成本含现场差旅不含新认证专项；人力单价隐藏。两版来源/当前引用清楚，历史只读。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "真实浏览器填写、审批、跨页返回与状态核对",
+          "expected": "两版本按科目/数量/单价/金额对比，显示修改原因；历史只读，明确立项引用版本和新增删除修改差异",
+          "observed": "基准/对比URL控制，两版本成本差额21.16，交换后-21.16；同版本对比0.00。统一科目展示新增、删除、修改及数量单价差异。 方案V1历史弹窗与历史成本快照下钻有效，旧成本含现场差旅不含新认证专项；人力单价隐藏。两版来源/当前引用清楚，历史只读。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0043/browser-final.log",
+        ".pms-loop/runs/R0043/test-domain.log",
+        ".pms-loop/runs/R0043/artifacts/r0024-2896f1f08c96d0727741907b08e37f25f38f0eec.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-69001f49a5a10eec583910fa9e03e1a6f335b18d.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-af0adcc299ebe2221317918d0adb4c081b6ed44f.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-2896f1f08c96d0727741ad39d47f7c95522fd0c0.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-2896f1f08c96d072774108d9211f03fddbb21f66.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-af0adcc299ebe2221317c70147e254f800c07d1e.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-2896f1f08c96d0727741bbc19845fb2bbf11d7e2.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-2896f1f08c96d0727741a149ed2ad2f03a0b5795.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0043/artifacts/GS-09-1440.png",
+        "1280": ".pms-loop/runs/R0043/artifacts/GS-09-1280.png"
+      }
+    },
+    "GS-10": {
+      "entry": "/opportunities/OPP-NEW-74/early-investment",
+      "covered_features": [
+        "GS-037",
+        "GS-038",
+        "GS-039",
+        "GS-040"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行114、任务书行403，功能GS-037~040，不改变统一状态与审批/冻结/投入规则。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "高风险只有管理层可审批，PMO禁用；驳回保留原申请且额度不增加，累计硬上限阻断；未知商机/申请404、协作角色只读。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "新增申请按需求资源、签约计划、风险退出三部分填写，保存草稿后提交同一申请；无审批意见不能通过，批准后额度50、发生0，来源概算快照保持。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "新增申请按需求资源、签约计划、风险退出三部分填写，保存草稿后提交同一申请；无审批意见不能通过，批准后额度50、发生0，来源概算快照保持。 高风险只有管理层可审批，PMO禁用；驳回保留原申请且额度不增加，累计硬上限阻断；未知商机/申请404、协作角色只读。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "新增申请按需求资源、签约计划、风险退出三部分填写，保存草稿后提交同一申请；无审批意见不能通过，批准后额度50、发生0，来源概算快照保持。 高风险只有管理层可审批，PMO禁用；驳回保留原申请且额度不增加，累计硬上限阻断；未知商机/申请404、协作角色只读。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "浏览器覆盖概算草稿/版本空态、未知商机和申请404、无协同403、组织拒绝/空列表、驳回及冻结阻断。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已查看本轮四页8张1440/1280 fullPage截图及申请编辑态。来源与差异前置、申请分区、指标同口径，宽表仅内部滚动；同版比较主表首屏可见。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "8个真实浏览器场景全部passed、exit0，全部报告consoleErrors为空。"
+        },
+        "business-1": {
+          "requirement": "原因、额度、资源、周期、签约计划、风险和退出方案",
+          "passed": true,
+          "observation": "新增申请按需求资源、签约计划、风险退出三部分填写，保存草稿后提交同一申请；无审批意见不能通过，批准后额度50、发生0，来源概算快照保持。"
+        },
+        "business-2": {
+          "requirement": "模拟分级审批显示规则，批准形成商机可用额度",
+          "passed": true,
+          "observation": "高风险只有管理层可审批，PMO禁用；驳回保留原申请且额度不增加，累计硬上限阻断；未知商机/申请404、协作角色只读。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "真实浏览器填写、审批、跨页返回与状态核对",
+          "expected": "原因、额度、资源、周期、签约计划、风险和退出方案；模拟分级审批显示规则，批准形成商机可用额度",
+          "observed": "新增申请按需求资源、签约计划、风险退出三部分填写，保存草稿后提交同一申请；无审批意见不能通过，批准后额度50、发生0，来源概算快照保持。 高风险只有管理层可审批，PMO禁用；驳回保留原申请且额度不增加，累计硬上限阻断；未知商机/申请404、协作角色只读。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0043/browser-final.log",
+        ".pms-loop/runs/R0043/test-domain.log",
+        ".pms-loop/runs/R0043/artifacts/r0024-2896f1f08c96d0727741907b08e37f25f38f0eec.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-69001f49a5a10eec583910fa9e03e1a6f335b18d.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-af0adcc299ebe2221317918d0adb4c081b6ed44f.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-2896f1f08c96d0727741ad39d47f7c95522fd0c0.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-2896f1f08c96d072774108d9211f03fddbb21f66.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-af0adcc299ebe2221317c70147e254f800c07d1e.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-2896f1f08c96d0727741bbc19845fb2bbf11d7e2.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-2896f1f08c96d0727741a149ed2ad2f03a0b5795.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0043/artifacts/GS-10-1440.png",
+        "1280": ".pms-loop/runs/R0043/artifacts/GS-10-1280.png"
+      }
+    },
+    "GS-11": {
+      "entry": "/early-investments",
+      "covered_features": [
+        "GS-040",
+        "GS-041",
+        "GS-042"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行115、任务书行404，功能GS-040~042，不改变统一状态与审批/冻结/投入规则。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "30天临期配置预警、URL过滤返回保留、组织权限过滤及无匹配空态通过。原前期成本20进入立项项目后仅一笔，商机来源保留且已转立项后登记禁用。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "50批准额度、20实际发生、30剩余额度分别显示，列设置显示40.0%使用率，CSV同口径；重复凭证、超额31和有效期外日期归集均阻断且原成本不变。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "50批准额度、20实际发生、30剩余额度分别显示，列设置显示40.0%使用率，CSV同口径；重复凭证、超额31和有效期外日期归集均阻断且原成本不变。 30天临期配置预警、URL过滤返回保留、组织权限过滤及无匹配空态通过。原前期成本20进入立项项目后仅一笔，商机来源保留且已转立项后登记禁用。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "50批准额度、20实际发生、30剩余额度分别显示，列设置显示40.0%使用率，CSV同口径；重复凭证、超额31和有效期外日期归集均阻断且原成本不变。 30天临期配置预警、URL过滤返回保留、组织权限过滤及无匹配空态通过。原前期成本20进入立项项目后仅一笔，商机来源保留且已转立项后登记禁用。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "浏览器覆盖概算草稿/版本空态、未知商机和申请404、无协同403、组织拒绝/空列表、驳回及冻结阻断。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已查看本轮四页8张1440/1280 fullPage截图及申请编辑态。来源与差异前置、申请分区、指标同口径，宽表仅内部滚动；同版比较主表首屏可见。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "8个真实浏览器场景全部passed、exit0，全部报告consoleErrors为空。"
+        },
+        "business-1": {
+          "requirement": "商机维度批准/发生/剩余额度、时限及异常",
+          "passed": true,
+          "observation": "50批准额度、20实际发生、30剩余额度分别显示，列设置显示40.0%使用率，CSV同口径；重复凭证、超额31和有效期外日期归集均阻断且原成本不变。"
+        },
+        "business-2": {
+          "requirement": "超额/超期新增投入阻断或升级，前期成本来源可查",
+          "passed": true,
+          "observation": "30天临期配置预警、URL过滤返回保留、组织权限过滤及无匹配空态通过。原前期成本20进入立项项目后仅一笔，商机来源保留且已转立项后登记禁用。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "真实浏览器填写、审批、跨页返回与状态核对",
+          "expected": "商机维度批准/发生/剩余额度、时限及异常；超额/超期新增投入阻断或升级，前期成本来源可查",
+          "observed": "50批准额度、20实际发生、30剩余额度分别显示，列设置显示40.0%使用率，CSV同口径；重复凭证、超额31和有效期外日期归集均阻断且原成本不变。 30天临期配置预警、URL过滤返回保留、组织权限过滤及无匹配空态通过。原前期成本20进入立项项目后仅一笔，商机来源保留且已转立项后登记禁用。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0043/browser-final.log",
+        ".pms-loop/runs/R0043/test-domain.log",
+        ".pms-loop/runs/R0043/artifacts/r0024-2896f1f08c96d0727741907b08e37f25f38f0eec.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-69001f49a5a10eec583910fa9e03e1a6f335b18d.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-af0adcc299ebe2221317918d0adb4c081b6ed44f.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-2896f1f08c96d0727741ad39d47f7c95522fd0c0.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-2896f1f08c96d072774108d9211f03fddbb21f66.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-af0adcc299ebe2221317c70147e254f800c07d1e.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-2896f1f08c96d0727741bbc19845fb2bbf11d7e2.json",
+        ".pms-loop/runs/R0043/artifacts/r0024-2896f1f08c96d0727741a149ed2ad2f03a0b5795.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0043/artifacts/GS-11-1440.png",
+        "1280": ".pms-loop/runs/R0043/artifacts/GS-11-1280.png"
+      }
+    }
+  },
+  "validation_notes": "8 passed (3.2m)，工程四项及235领域通过；提前投入继承场景以合法transition准备正式立项前置，浏览器验证来源/项目20万元单笔继承，不声称该fixture是UI立项审批。"
+}

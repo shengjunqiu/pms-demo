@@ -1,0 +1,119 @@
+{
+  "title": "YS-14 追加投入驳回不释放且待审不改变额度期限",
+  "status": "passed",
+  "url": "http://127.0.0.1:4179/unsigned-projects/P-PLAN-001?tab=investment",
+  "consoleErrors": [],
+  "observations": {
+    "before": {
+      "quota": 0,
+      "validUntil": "2026-12-08",
+      "expectedSignDate": "2026-09-20",
+      "actualCost": 0,
+      "status": "正常进行",
+      "costs": [],
+      "requests": [],
+      "approvals": []
+    },
+    "pending": {
+      "quota": 0,
+      "validUntil": "2026-12-08",
+      "expectedSignDate": "2026-09-20",
+      "actualCost": 0,
+      "status": "正常进行",
+      "costs": [],
+      "requests": [
+        {
+          "id": "UNSIGNED-REQ-1",
+          "projectId": "P-PLAN-001",
+          "approvalId": "MGT-UNSIGNED-REQ-1",
+          "amount": 100,
+          "originalQuota": 0,
+          "proposedQuota": 100,
+          "originalValidUntil": "2026-12-08",
+          "proposedValidUntil": "2026-10-31",
+          "signProgress": "客户已确认范围，合同正在法务审核",
+          "necessity": "追加100万元用于签约前必要交付准备",
+          "risk": "按审批额度投入，未签署前每日跟踪并保留退出安排",
+          "attachments": [
+            "追加投入依据.pdf"
+          ],
+          "submittedBy": "陈亮",
+          "submittedAt": "2026-09-09",
+          "sourceSnapshot": {
+            "actualCost": 0,
+            "committedCost": 0,
+            "pendingCost": 0,
+            "expectedSignDate": "2026-10-20"
+          }
+        }
+      ],
+      "approvals": [
+        {
+          "id": "MGT-UNSIGNED-REQ-1",
+          "projectId": "P-PLAN-001",
+          "sourceId": "UNSIGNED-REQ-1",
+          "type": "未签额外投入",
+          "reason": "追加100万元用于签约前必要交付准备；签约：客户已确认范围，合同正在法务审核；风险：按审批额度投入，未签署前每日跟踪并保留退出安排",
+          "submittedBy": "U-006",
+          "status": "待审批",
+          "originalQuota": 0,
+          "proposedQuota": 100,
+          "impactAmount": 100
+        }
+      ]
+    },
+    "after": {
+      "quota": 0,
+      "validUntil": "2026-12-08",
+      "expectedSignDate": "2026-09-20",
+      "actualCost": 0,
+      "status": "正常进行",
+      "costs": [],
+      "requests": [
+        {
+          "id": "UNSIGNED-REQ-1",
+          "projectId": "P-PLAN-001",
+          "approvalId": "MGT-UNSIGNED-REQ-1",
+          "amount": 100,
+          "originalQuota": 0,
+          "proposedQuota": 100,
+          "originalValidUntil": "2026-12-08",
+          "proposedValidUntil": "2026-10-31",
+          "signProgress": "客户已确认范围，合同正在法务审核",
+          "necessity": "追加100万元用于签约前必要交付准备",
+          "risk": "按审批额度投入，未签署前每日跟踪并保留退出安排",
+          "attachments": [
+            "追加投入依据.pdf"
+          ],
+          "submittedBy": "陈亮",
+          "submittedAt": "2026-09-09",
+          "sourceSnapshot": {
+            "actualCost": 0,
+            "committedCost": 0,
+            "pendingCost": 0,
+            "expectedSignDate": "2026-10-20"
+          }
+        }
+      ],
+      "approvals": [
+        {
+          "id": "MGT-UNSIGNED-REQ-1",
+          "projectId": "P-PLAN-001",
+          "sourceId": "UNSIGNED-REQ-1",
+          "type": "未签额外投入",
+          "reason": "追加100万元用于签约前必要交付准备；签约：客户已确认范围，合同正在法务审核；风险：按审批额度投入，未签署前每日跟踪并保留退出安排",
+          "submittedBy": "U-006",
+          "status": "驳回",
+          "originalQuota": 0,
+          "proposedQuota": 100,
+          "impactAmount": 100,
+          "opinion": "签约依据不足，驳回追加额度"
+        }
+      ]
+    },
+    "screenshots": {
+      "1280": ".pms-loop/runs/R0045/artifacts/YS-14-investment-reject-1280.png",
+      "1440": ".pms-loop/runs/R0045/artifacts/YS-14-investment-reject-1440.png"
+    }
+  }
+}

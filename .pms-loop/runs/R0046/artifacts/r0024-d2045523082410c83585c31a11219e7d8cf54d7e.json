@@ -1,0 +1,6 @@
+{
+  "title": "阶段 UI：阻断审批与驳回历史，新申请清空输入",
+  "status": "passed",
+  "url": "http://127.0.0.1:4179/projects/P-001/stage-switch",
+  "consoleErrors": []
+}

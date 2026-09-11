@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "observations": [
+    {
+      "path": "/workbench/project-manager",
+      "result": "财务专员访问显示403"
+    },
+    {
+      "path": "/executive/dashboard",
+      "result": "财务专员访问显示403"
+    },
+    {
+      "count": "11",
+      "url": "http://127.0.0.1:5174/projects/P-003/dynamic-accounting?health=red&projectId=P-003",
+      "result": "高风险KPI→同数量清单→P-003→总览→核算→原始凭证，保持health=red，凭证关联P-003"
+    }
+  ],
+  "consoleErrors": []
+}

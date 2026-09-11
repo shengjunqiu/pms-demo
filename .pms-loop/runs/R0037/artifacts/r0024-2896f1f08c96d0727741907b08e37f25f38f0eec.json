@@ -1,0 +1,120 @@
+{
+  "title": "GS-10 高风险命中管理层，PMO不能审批，管理层通过后保留规则与意见",
+  "status": "passed",
+  "url": "http://127.0.0.1:4179/opportunities/OPP-NEW-74/early-investment?requestId=EARLY-1",
+  "consoleErrors": [],
+  "observations": {
+    "id": "OPP-NEW-74",
+    "request": {
+      "reason": "客户接口验证窗口临近，需要提前开展技术验证",
+      "amount": 100,
+      "resourceTypes": [
+        "人力"
+      ],
+      "department": "智慧城市业务群",
+      "people": [
+        "U-006"
+      ],
+      "startDate": "2026-09-09",
+      "endDate": "2026-09-30",
+      "signPlanDate": "2026-11-30",
+      "signPlan": "十月底完成合同会签，未签前按周复核投入",
+      "riskLevel": "高风险",
+      "risks": "签约延迟风险，每周确认采购计划与验证成果",
+      "exitPlan": "客户停止采购即停止验证，原成本按来源保留并复盘",
+      "estimateId": "EST-OPP-NEW-74-1",
+      "id": "EARLY-1",
+      "opportunityId": "OPP-NEW-74",
+      "status": "通过",
+      "createdAt": "2026-09-09",
+      "createdBy": "陈亮",
+      "submittedAt": "2026-09-09",
+      "estimateSnapshot": {
+        "id": "EST-OPP-NEW-74-1",
+        "opportunityId": "OPP-NEW-74",
+        "version": "V1.0",
+        "isFrozen": true,
+        "totalIncome": 1000,
+        "totalCost": 14.4,
+        "grossMargin": 985.6,
+        "grossMarginRate": 98.56,
+        "items": [
+          {
+            "subjectId": "SUB-01",
+            "subjectName": "直接人力成本",
+            "amount": 14.4,
+            "description": "2人50天"
+          }
+        ],
+        "createdBy": "赵工",
+        "createdAt": "2026-09-09"
+      },
+      "requiredRole": "executive",
+      "ruleVersion": "APR-EARLY-HIGH-V1",
+      "ruleReason": "提前投入高风险审批：金额≥0万元；风险高风险；等级不限",
+      "approvalSnapshot": {
+        "ruleId": "APR-EARLY-HIGH-V1",
+        "ruleVersion": "APR-EARLY-HIGH-V1",
+        "reason": "提前投入高风险审批：金额≥0万元；风险高风险；等级不限",
+        "nodes": [
+          {
+            "name": "管理层风险决策",
+            "roles": [
+              "executive"
+            ],
+            "mode": "all",
+            "timeoutDays": 3
+          }
+        ]
+      },
+      "gradingSnapshot": {
+        "id": "GRADE-V1",
+        "key": "GRADE",
+        "version": 1,
+        "name": "集团项目分级与管控",
+        "status": "已发布",
+        "enabled": true,
+        "effectiveDate": "2026-01-01",
+        "orgId": "all",
+        "projectType": "all",
+        "changeReason": "初始演示规则",
+        "createdBy": "集团PMO",
+        "createdAt": "2026-01-01",
+        "publishedBy": "集团PMO",
+        "publishedAt": "2026-01-01",
+        "superAmount": 10000,
+        "majorAmount": 5000,
+        "keyAmount": 2000,
+        "strategicMajor": true,
+        "highRiskMajor": true,
+        "strategicCustomerMajor": false,
+        "minimumMargin": 20,
+        "minimumAssessmentScore": 70,
+        "unsignedRatio": 0.1,
+        "unsignedDays": 90,
+        "unsignedWarningDays": 7,
+        "stageReleasePercent": 90
+      },
+      "maximumCumulativeQuota": 100,
+      "approvalNode": 0,
+      "nodeEnteredAt": "2026-09-09",
+      "nodeReviews": [
+        {
+          "node": 0,
+          "role": "executive",
+          "by": "王总",
+          "approve": true,
+          "opinion": "验证必要性和概算来源已核对，按额度与有效期执行",
+          "date": "2026-09-09"
+        }
+      ],
+      "opinion": "验证必要性和概算来源已核对，按额度与有效期执行",
+      "reviewedBy": "王总",
+      "reviewedAt": "2026-09-09"
+    },
+    "screenshots": {
+      "1280": ".pms-loop/runs/R0037/artifacts/GS10-executive-1280.png",
+      "1440": ".pms-loop/runs/R0037/artifacts/GS10-executive-1440.png"
+    }
+  }
+}

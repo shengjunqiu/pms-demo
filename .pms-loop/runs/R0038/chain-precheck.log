@@ -1,0 +1,16 @@
+
+> pms-demo@1.0.0 test:e2e /home/shengjunqiu/code/pms-demo
+> playwright test e2e/first-batch.spec.ts:94
+
+[WebServer] (node:2817694) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2817707) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:2817778) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/first-batch.spec.ts:94:1 › 策划计划经PMO评审、预算审批与独立基线确认 (32.4s)
+
+  1 passed (35.3s)

@@ -1,0 +1,150 @@
+
+> pms-demo@1.0.0 test:e2e /home/shengjunqiu/code/pms-demo
+> playwright test e2e/ui-tickets.spec.ts
+
+[WebServer] (node:2942471) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2942484) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:2942518) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 e2e/ui-tickets.spec.ts:99:1 › 需求真实闭环：反馈、解决、发起人退回与最终关闭，台账保留筛选 (23.5s)
+(node:2942893) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 e2e/ui-tickets.spec.ts:134:1 › BUG真实闭环：从BUG页签登记、转办、修复与发起人复测 (22.3s)
+(node:2943358) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 e2e/ui-tickets.spec.ts:155:1 › 风险与问题真实闭环：5×4评分、PMO督办、风险转问题及主PM关闭 (33.5s)
+(node:2943921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  4 e2e/ui-tickets.spec.ts:198:1 › 需求影响基线：阻断解决、真实计划申请和PMO批准后再闭环 (19.2s)
+(node:2944320) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  5 e2e/ui-tickets.spec.ts:242:1 › 筛选与隔离：旧project链接、分页返回、类型和项目草稿重置、空态及角色权限 (19.1s)
+
+
+  1) e2e/ui-tickets.spec.ts:99:1 › 需求真实闭环：反馈、解决、发起人退回与最终关闭，台账保留筛选 ──────────────────────────────────
+
+    TimeoutError: locator.fill: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for getByRole('dialog').getByLabel('期望解决日期', { exact: true })
+
+
+      60 |   await dialog.getByLabel('事项描述', { exact: true }).fill('背景：地图告警与设备交付。\n期望：按类型准确筛选。\n当前影响：操作结果需验证。');
+      61 |   await select(page, dialog, '新建责任人', options.owner ?? '赵工');
+    > 62 |   await dialog.getByLabel('期望解决日期', { exact: true }).fill('2026-09-20');
+         |                                                      ^
+      63 |   if (kind === 'risk') {
+      64 |     await dialog.getByLabel('风险概率', { exact: true }).fill('5');
+      65 |     await dialog.getByLabel('风险影响', { exact: true }).fill('4');
+        at create (/home/shengjunqiu/code/pms-demo/e2e/ui-tickets.spec.ts:62:54)
+        at /home/shengjunqiu/code/pms-demo/e2e/ui-tickets.spec.ts:102:14
+
+    Error Context: test-results/ui-tickets-需求真实闭环：反馈、解决、发起人退回与最终关闭，台账保留筛选/error-context.md
+
+  2) e2e/ui-tickets.spec.ts:134:1 › BUG真实闭环：从BUG页签登记、转办、修复与发起人复测 ───────────────────────────────────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('ticket-title')
+    Expected: "UI缺陷：筛选条件切换错误"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('ticket-title') with timeout 5000ms
+      - waiting for getByTestId('ticket-title')
+
+
+      30 | async function detail(page: Page, kind: Kind, id: string, title: string, query = '') {
+      31 |   await navigate(page, `${base(kind)}/${id}${query ? `?${query}` : ''}`);
+    > 32 |   await expect(page.getByTestId('ticket-title')).toHaveText(title);
+         |                                                  ^
+      33 | }
+      34 | async function operation(page: Page, name: string, note: string, nextStatus?: string) {
+      35 |   await page.getByRole('button', { name, exact: true }).click();
+        at detail (/home/shengjunqiu/code/pms-demo/e2e/ui-tickets.spec.ts:32:50)
+        at /home/shengjunqiu/code/pms-demo/e2e/ui-tickets.spec.ts:145:30
+
+    Error Context: test-results/ui-tickets-BUG真实闭环：从BUG页签登记、转办、修复与发起人复测/error-context.md
+
+  3) e2e/ui-tickets.spec.ts:155:1 › 风险与问题真实闭环：5×4评分、PMO督办、风险转问题及主PM关闭 ──────────────────────────────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('ticket-title')
+    Expected: "UI风险：设备交货窗口不足"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('ticket-title') with timeout 5000ms
+      - waiting for getByTestId('ticket-title')
+
+
+      30 | async function detail(page: Page, kind: Kind, id: string, title: string, query = '') {
+      31 |   await navigate(page, `${base(kind)}/${id}${query ? `?${query}` : ''}`);
+    > 32 |   await expect(page.getByTestId('ticket-title')).toHaveText(title);
+         |                                                  ^
+      33 | }
+      34 | async function operation(page: Page, name: string, note: string, nextStatus?: string) {
+      35 |   await page.getByRole('button', { name, exact: true }).click();
+        at detail (/home/shengjunqiu/code/pms-demo/e2e/ui-tickets.spec.ts:32:50)
+        at /home/shengjunqiu/code/pms-demo/e2e/ui-tickets.spec.ts:187:30
+
+    Error Context: test-results/ui-tickets-风险与问题真实闭环：5×4评分、PMO督办、风险转问题及主PM关闭/error-context.md
+
+  4) e2e/ui-tickets.spec.ts:198:1 › 需求影响基线：阻断解决、真实计划申请和PMO批准后再闭环 ───────────────────────────────────
+
+    TimeoutError: locator.fill: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for getByRole('dialog').getByLabel('期望解决日期', { exact: true })
+
+
+      60 |   await dialog.getByLabel('事项描述', { exact: true }).fill('背景：地图告警与设备交付。\n期望：按类型准确筛选。\n当前影响：操作结果需验证。');
+      61 |   await select(page, dialog, '新建责任人', options.owner ?? '赵工');
+    > 62 |   await dialog.getByLabel('期望解决日期', { exact: true }).fill('2026-09-20');
+         |                                                      ^
+      63 |   if (kind === 'risk') {
+      64 |     await dialog.getByLabel('风险概率', { exact: true }).fill('5');
+      65 |     await dialog.getByLabel('风险影响', { exact: true }).fill('4');
+        at create (/home/shengjunqiu/code/pms-demo/e2e/ui-tickets.spec.ts:62:54)
+        at /home/shengjunqiu/code/pms-demo/e2e/ui-tickets.spec.ts:202:14
+
+    Error Context: test-results/ui-tickets-需求影响基线：阻断解决、真实计划申请和PMO批准后再闭环/error-context.md
+
+  5) e2e/ui-tickets.spec.ts:242:1 › 筛选与隔离：旧project链接、分页返回、类型和项目草稿重置、空态及角色权限 ────────────────────────
+
+    Error: expect(page).toHaveURL(expected) failed
+
+    Expected pattern: /page=2/
+    Received string:  "http://127.0.0.1:4179/requirements-bugs?project=P-001&kind=requirement"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toHaveURL" with timeout 5000ms
+        12 × locator resolved to <html lang="zh-CN">…</html>
+           - unexpected value "http://127.0.0.1:4179/requirements-bugs?project=P-001&kind=requirement"
+
+
+      267 |   const row = page.locator('.ant-table-tbody tr.ant-table-row').first();
+      268 |   await row.getByRole('button').click(); await expect(page.getByTestId('ticket-title')).toBeVisible();
+    > 269 |   await page.getByRole('button', { name: '返回台账', exact: true }).click(); await expect(page).toHaveURL(/page=2/);
+          |                                                                                             ^
+      270 |   await navigate(page, '/issues-risks?projectId=P-001&kind=issue&owner=U-001&rank=重大&overdue=true&search=NOT-EXIST&page=1');
+      271 |   await expect(page.getByRole('heading', { name: '问题与风险', exact: true })).toBeVisible();
+      272 |   await expect(page.locator('.ant-table-tbody tr.ant-table-row')).toHaveCount(0);
+        at /home/shengjunqiu/code/pms-demo/e2e/ui-tickets.spec.ts:269:93
+
+    Error Context: test-results/ui-tickets-筛选与隔离：旧project链接、分页返回、类型和项目草稿重置、空态及角色权限/error-context.md
+
+  5 failed
+    e2e/ui-tickets.spec.ts:99:1 › 需求真实闭环：反馈、解决、发起人退回与最终关闭，台账保留筛选 ───────────────────────────────────
+    e2e/ui-tickets.spec.ts:134:1 › BUG真实闭环：从BUG页签登记、转办、修复与发起人复测 ────────────────────────────────────
+    e2e/ui-tickets.spec.ts:155:1 › 风险与问题真实闭环：5×4评分、PMO督办、风险转问题及主PM关闭 ───────────────────────────────
+    e2e/ui-tickets.spec.ts:198:1 › 需求影响基线：阻断解决、真实计划申请和PMO批准后再闭环 ────────────────────────────────────
+    e2e/ui-tickets.spec.ts:242:1 › 筛选与隔离：旧project链接、分页返回、类型和项目草稿重置、空态及角色权限 ─────────────────────────
+ ELIFECYCLE  Command failed with exit code 1.

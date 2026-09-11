@@ -1,0 +1,45 @@
+
+> pms-demo@1.0.0 test:e2e /home/shengjunqiu/code/pms-demo
+> playwright test e2e/first-batch.spec.ts e2e/ui-refinement.spec.ts --grep 'UI |策划计划经|商机必填'
+
+[WebServer] (node:2789976) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2789991) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 8 tests using 1 worker
+
+(node:2790014) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/first-batch.spec.ts:94:1 › 策划计划经PMO评审、预算审批与独立基线确认 (31.9s)
+  ✓  2 e2e/first-batch.spec.ts:162:1 › 商机必填、草稿、取消及冻结编辑限制 (15.3s)
+  ✘  3 e2e/ui-refinement.spec.ts:37:1 › UI 工作台：首屏待办、范围、快捷发起与原业务下钻 (12.1s)
+(node:2790694) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  4 e2e/ui-refinement.spec.ts:63:1 › UI 项目详情：金额、分组导航、旧深链与原单据 (12.3s)
+  ✓  5 e2e/ui-refinement.spec.ts:94:1 › UI 项目详情：全部原页签可达、未知项目与高风险颜色 (16.0s)
+  ✓  6 e2e/ui-refinement.spec.ts:121:1 › UI 驾驶舱：异常首屏、筛选继承、指标键盘下钻和返回 (12.4s)
+  ✓  7 e2e/ui-refinement.spec.ts:152:1 › UI 驾驶舱：六种演示状态与待决策原审批入口 (14.8s)
+  ✓  8 e2e/ui-refinement.spec.ts:175:1 › UI 工作台：四类事项数量与项目范围保持一致 (7.8s)
+
+
+  1) e2e/ui-refinement.spec.ts:37:1 › UI 工作台：首屏待办、范围、快捷发起与原业务下钻 ────────────────────────────────────
+
+    Error: page.evaluate: Execution context was destroyed, most likely because of a navigation.
+
+      24 |   for (const width of [1440, 1280]) {
+      25 |     await page.setViewportSize({ width, height: 900 });
+    > 26 |     await page.evaluate(() => window.scrollTo(0, 0));
+         |                ^
+      27 |     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+      28 |     await page.screenshot({ path: join(artifacts, `${name}-${width}.png`), animations: 'disabled' });
+      29 |   }
+        at capture (/home/shengjunqiu/code/pms-demo/e2e/ui-refinement.spec.ts:26:16)
+        at /home/shengjunqiu/code/pms-demo/e2e/ui-refinement.spec.ts:38:3
+
+    Error Context: test-results/ui-refinement-UI-工作台：首屏待办、范围、快捷发起与原业务下钻/error-context.md
+
+  1 failed
+    e2e/ui-refinement.spec.ts:37:1 › UI 工作台：首屏待办、范围、快捷发起与原业务下钻 ─────────────────────────────────────
+  7 passed (2.1m)
+ ELIFECYCLE  Command failed with exit code 1.

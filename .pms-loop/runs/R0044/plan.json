@@ -1,0 +1,189 @@
+{
+  "round": "R0044",
+  "items": [
+    {
+      "id": "YS-01",
+      "title": "立项申请",
+      "route": "/initiation/apply",
+      "kind": "表单",
+      "roles": "项目主办部门",
+      "phase": 5,
+      "feature_ids": [
+        "YS-001",
+        "YS-002",
+        "YS-003",
+        "YS-004",
+        "YS-005",
+        "YS-006"
+      ],
+      "upstream_feature_scope": "YS-001~006",
+      "source_lines": {
+        "pages": 116,
+        "brief": 410
+      },
+      "criteria": [
+        "自动带入商机方案冻结概算风险成本，显示来源版本和目录",
+        "拟立项/评审/冻结概算/附件校验；系统必交项不可取消"
+      ]
+    },
+    {
+      "id": "YS-02",
+      "title": "立项评审工作台",
+      "route": "/initiation/review",
+      "kind": "评审",
+      "roles": "PMO、专家、职能部门",
+      "phase": 5,
+      "feature_ids": [
+        "YS-007",
+        "YS-008",
+        "YS-009",
+        "YS-010",
+        "YS-011",
+        "YS-012",
+        "YS-013",
+        "YS-014",
+        "YS-015",
+        "YS-016"
+      ],
+      "upstream_feature_scope": "YS-007~016",
+      "source_lines": {
+        "pages": 117,
+        "brief": 411
+      },
+      "criteria": [
+        "左侧评审列表右侧材料，分级/毛利/风险/专业意见",
+        "会签/PMO/PMC显示命中原因；通过整改否决暂缓有业务结果"
+      ]
+    },
+    {
+      "id": "YS-03",
+      "title": "综合风险评估",
+      "route": "/initiation/:id/risk-assessment",
+      "kind": "专题/评估",
+      "roles": "PMO、专家组",
+      "phase": 5,
+      "feature_ids": [
+        "YS-009"
+      ],
+      "upstream_feature_scope": "YS-009",
+      "source_lines": {
+        "pages": 118,
+        "brief": 412
+      },
+      "criteria": [
+        "多专业风险及原始来源、等级矩阵与综合报告",
+        "人工调整等级留原因，重大风险影响审批路径"
+      ]
+    },
+    {
+      "id": "YS-04",
+      "title": "立项决策详情",
+      "route": "/initiation/:id/decision",
+      "kind": "评审详情",
+      "roles": "PMO、PMC、管理层",
+      "phase": 5,
+      "feature_ids": [
+        "YS-010",
+        "YS-011",
+        "YS-012",
+        "YS-013",
+        "YS-014",
+        "YS-015",
+        "YS-016"
+      ],
+      "upstream_feature_scope": "YS-010~016",
+      "source_lines": {
+        "pages": 119,
+        "brief": 413
+      },
+      "criteria": [
+        "材料版本、决策节点、人员意见/纪要及处理轨迹",
+        "整改后重新评审，否决保留投入，通过关联正式项目"
+      ]
+    }
+  ],
+  "sources": {
+    "prd": {
+      "path": "docs/项目管理平台PRD_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "6dac675ca22237b7fa59129eccc466a9e242d20f948c0b68e958a7227bb2bd1b"
+    },
+    "features": {
+      "path": "docs/项目管理平台详细功能清单_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "fabfac73b480ccaf01aa831ae3c5d0a6485e33fff80f517468b2b6c52829ddfb"
+    },
+    "pages": {
+      "path": "docs/项目管理平台页面清单与原型设计说明_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "db1c548b5f5ef025eb90fef06422e132f003665fc7e6156dd706b7f095c994dc"
+    },
+    "brief": {
+      "path": "docs/项目管理平台高保真原型_AgentLoop开发任务书_V1.0.md",
+      "sha256": "286f917d5edc99a4a0c7da97515a3d6308cae7395fb287bbcd1846de60045b43"
+    }
+  },
+  "feature_references": {
+    "YS-001": {
+      "title": "从商机发起立项",
+      "line": 121
+    },
+    "YS-002": {
+      "title": "商机成果承接",
+      "line": 122
+    },
+    "YS-003": {
+      "title": "立项基本信息",
+      "line": 123
+    },
+    "YS-004": {
+      "title": "风险信息补充",
+      "line": 124
+    },
+    "YS-005": {
+      "title": "交付物目录生成",
+      "line": 125
+    },
+    "YS-006": {
+      "title": "申请提交",
+      "line": 126
+    },
+    "YS-007": {
+      "title": "自动分级",
+      "line": 132
+    },
+    "YS-008": {
+      "title": "PMO确认级别",
+      "line": 133
+    },
+    "YS-009": {
+      "title": "综合风险评估",
+      "line": 134
+    },
+    "YS-010": {
+      "title": "路径自动识别",
+      "line": 135
+    },
+    "YS-011": {
+      "title": "线上会签",
+      "line": 136
+    },
+    "YS-012": {
+      "title": "PMO立项决策会",
+      "line": 137
+    },
+    "YS-013": {
+      "title": "PMC重大项目决策会",
+      "line": 138
+    },
+    "YS-014": {
+      "title": "立项通过",
+      "line": 139
+    },
+    "YS-015": {
+      "title": "整改退回",
+      "line": 140
+    },
+    "YS-016": {
+      "title": "否决/暂缓",
+      "line": 141
+    }
+  }
+}

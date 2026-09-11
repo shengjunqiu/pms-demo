@@ -5,26 +5,24 @@
 
 已验收：**62 / 72 页面**
 
-状态：`in_progress`；更新时间：2026-09-10T21:53:50+00:00
+状态：`in_progress`；更新时间：2026-09-10T21:56:54+00:00
 
 | 模块 | 已验收 | 待办/活动/阻塞 |
 |---|---:|---|
 | WK | 2/2 | 无 |
 | GS | 11/11 | 无 |
 | YS | 15/15 | 无 |
-| HS | 15/17 | HS-14(pending)、HS-15(pending) |
+| HS | 15/17 | HS-14(active)、HS-15(active) |
 | JS | 5/13 | JS-01(pending)、JS-02(pending)、JS-03(pending)、JS-04(pending)、JS-05(pending)、JS-06(pending)、JS-07(pending)、JS-08(pending) |
 | GL | 6/6 | 无 |
 | CF | 8/8 | 无 |
 
 公共能力：FND-01=done；FND-02=done
 
-活动轮次：无
+活动轮次：R0050
 
 ### 最近轮次与验证
 
-- R0045：YS-13, YS-14, YS-15；accepted；证据目录 `.pms-loop/runs/R0045/`
-  验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
 - R0046：WK-02, HS-02, HS-16；accepted；证据目录 `.pms-loop/runs/R0046/`
   验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
 - R0047：HS-03, HS-04, HS-17；accepted；证据目录 `.pms-loop/runs/R0047/`
@@ -32,6 +30,8 @@
 - R0048：HS-05, HS-06, HS-07, HS-08；accepted；证据目录 `.pms-loop/runs/R0048/`
   验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
 - R0049：HS-09, HS-10, HS-11, HS-12, HS-13；accepted；证据目录 `.pms-loop/runs/R0049/`
+  验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
+- R0050：HS-14, HS-15；awaiting_evidence；证据目录 `.pms-loop/runs/R0050/`
   验证：typecheck=pass，lint=pass，build=pass，test:domain=pass
 
 ### 假设、已知问题与恢复说明

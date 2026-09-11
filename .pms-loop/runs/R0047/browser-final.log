@@ -1,0 +1,18 @@
+
+> pms-demo@1.0.0 test:e2e /home/shengjunqiu/code/pms-demo
+> playwright test e2e/ui-reporting.spec.ts
+
+[WebServer] (node:2931045) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2931058) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:2931107) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/ui-reporting.spec.ts:15:1 › 报告 UI：无进展草稿提交、周报快照及独立来源 (32.4s)
+  ✓  2 e2e/ui-reporting.spec.ts:27:1 › 交付 UI：质量整改、文件退回新版本与里程碑门禁 (1.2m)
+  ✓  3 e2e/ui-reporting.spec.ts:42:1 › 报告交付 UI：只读、错误深链与收尾归档 (21.8s)
+
+  3 passed (2.1m)

@@ -1,0 +1,347 @@
+{
+  "schema_version": 1,
+  "round": "R0048",
+  "revision": "62400ffc122b45294ebc299767bfed5c274759be0019145f371d6209af28544d",
+  "items": {
+    "HS-05": {
+      "entry": "/requirements-bugs",
+      "covered_features": [
+        "HS-024",
+        "HS-025",
+        "HS-026",
+        "HS-027",
+        "HS-028",
+        "HS-029"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行135及任务书行434；对应功能HS-024,HS-025,HS-026,HS-027,HS-028,HS-029。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "真实需求与BUG创建、按编号项目类型筛选，当前统计与记录一致；新建类型/项目切换和取消重开清空，分页返回保留page2、旧project别名有效。BUG描述保留复现/期望实际/环境指导，未虚构新的结构化模型字段。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "真实需求与BUG创建、按编号项目类型筛选，当前统计与记录一致；新建类型/项目切换和取消重开清空，分页返回保留page2、旧project别名有效。BUG描述保留复现/期望实际/环境指导，未虚构新的结构化模型字段。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "真实需求与BUG创建、按编号项目类型筛选，当前统计与记录一致；新建类型/项目切换和取消重开清空，分页返回保留page2、旧project别名有效。BUG描述保留复现/期望实际/环境指导，未虚构新的结构化模型字段。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "真实需求与BUG创建、按编号项目类型筛选，当前统计与记录一致；新建类型/项目切换和取消重开清空，分页返回保留page2、旧project别名有效。BUG描述保留复现/期望实际/环境指导，未虚构新的结构化模型字段。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "空查询、未知事项/项目、finance只读和类型/项目/取消重开隔离通过；团队关系通过save-team-member合法transition前置，工单创建处理审批均实际UI。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "当前源码1440/1280全页已查看，主操作与摘要清晰、局部表横滚无页面溢出；新建表单内容65vh滚动、提交按钮在视口内。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "browser-complete.log五例全部passed，exit.json=0，五报告consoleErrors为空；早期失败与中断日志保留。"
+        },
+        "business-1": {
+          "requirement": "需求/BUG分类型字段，项目优先级责任人超期查询",
+          "passed": true,
+          "observation": "真实需求与BUG创建、按编号项目类型筛选，当前统计与记录一致；新建类型/项目切换和取消重开清空，分页返回保留page2、旧project别名有效。BUG描述保留复现/期望实际/环境指导，未虚构新的结构化模型字段。"
+        },
+        "business-2": {
+          "requirement": "新增→处理/转办→发起人确认关闭，影响基线的需求转变更",
+          "passed": true,
+          "observation": "真实需求与BUG创建、按编号项目类型筛选，当前统计与记录一致；新建类型/项目切换和取消重开清空，分页返回保留page2、旧project别名有效。BUG描述保留复现/期望实际/环境指导，未虚构新的结构化模型字段。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "e2e/ui-tickets.spec.ts 五条真实流程",
+          "expected": "需求/BUG分类型字段，项目优先级责任人超期查询；新增→处理/转办→发起人确认关闭，影响基线的需求转变更",
+          "observed": "真实需求与BUG创建、按编号项目类型筛选，当前统计与记录一致；新建类型/项目切换和取消重开清空，分页返回保留page2、旧project别名有效。BUG描述保留复现/期望实际/环境指导，未虚构新的结构化模型字段。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0048/browser-complete.log",
+        ".pms-loop/runs/R0048/browser-complete.exit.json",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a55f24fc19c8a6944ea99d.json",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a550141a3ea77c63db07c7.json",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a5bede724eeddf3b808500.json",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a5ac27b2024d988813ece7.json",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a5b2437d84a3c622a21a29.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0048/artifacts/UI-HS05-1440.png",
+        "1280": ".pms-loop/runs/R0048/artifacts/UI-HS05-1280.png"
+      }
+    },
+    "HS-06": {
+      "entry": "/requirements-bugs/REQ-NEW-91",
+      "covered_features": [
+        "HS-024",
+        "HS-025",
+        "HS-026",
+        "HS-027",
+        "HS-028",
+        "HS-029"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行136及任务书行435；对应功能HS-024,HS-025,HS-026,HS-027,HS-028,HS-029。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "技术反馈解决后发起人退回，再次解决由发起人关闭；转办保留creator并更新owner，技术最终关闭禁用，六条完整历史可展开。基线影响未批准先阻断，真实申请PMO通过追加基线后解决关闭，原预算不变，往返保留projectId/status。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "技术反馈解决后发起人退回，再次解决由发起人关闭；转办保留creator并更新owner，技术最终关闭禁用，六条完整历史可展开。基线影响未批准先阻断，真实申请PMO通过追加基线后解决关闭，原预算不变，往返保留projectId/status。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "技术反馈解决后发起人退回，再次解决由发起人关闭；转办保留creator并更新owner，技术最终关闭禁用，六条完整历史可展开。基线影响未批准先阻断，真实申请PMO通过追加基线后解决关闭，原预算不变，往返保留projectId/status。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "技术反馈解决后发起人退回，再次解决由发起人关闭；转办保留creator并更新owner，技术最终关闭禁用，六条完整历史可展开。基线影响未批准先阻断，真实申请PMO通过追加基线后解决关闭，原预算不变，往返保留projectId/status。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "空查询、未知事项/项目、finance只读和类型/项目/取消重开隔离通过；团队关系通过save-team-member合法transition前置，工单创建处理审批均实际UI。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "当前源码1440/1280全页已查看，主操作与摘要清晰、局部表横滚无页面溢出；新建表单内容65vh滚动、提交按钮在视口内。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "browser-complete.log五例全部passed，exit.json=0，五报告consoleErrors为空；早期失败与中断日志保留。"
+        },
+        "business-1": {
+          "requirement": "处理时间线、解决/转办/退回/关闭，需求及BUG字段差异",
+          "passed": true,
+          "observation": "技术反馈解决后发起人退回，再次解决由发起人关闭；转办保留creator并更新owner，技术最终关闭禁用，六条完整历史可展开。基线影响未批准先阻断，真实申请PMO通过追加基线后解决关闭，原预算不变，往返保留projectId/status。"
+        },
+        "business-2": {
+          "requirement": "处理人不能自行最终关闭；转办同步人，历史不可删",
+          "passed": true,
+          "observation": "技术反馈解决后发起人退回，再次解决由发起人关闭；转办保留creator并更新owner，技术最终关闭禁用，六条完整历史可展开。基线影响未批准先阻断，真实申请PMO通过追加基线后解决关闭，原预算不变，往返保留projectId/status。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "e2e/ui-tickets.spec.ts 五条真实流程",
+          "expected": "处理时间线、解决/转办/退回/关闭，需求及BUG字段差异；处理人不能自行最终关闭；转办同步人，历史不可删",
+          "observed": "技术反馈解决后发起人退回，再次解决由发起人关闭；转办保留creator并更新owner，技术最终关闭禁用，六条完整历史可展开。基线影响未批准先阻断，真实申请PMO通过追加基线后解决关闭，原预算不变，往返保留projectId/status。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0048/browser-complete.log",
+        ".pms-loop/runs/R0048/browser-complete.exit.json",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a55f24fc19c8a6944ea99d.json",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a550141a3ea77c63db07c7.json",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a5bede724eeddf3b808500.json",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a5ac27b2024d988813ece7.json",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a5b2437d84a3c622a21a29.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0048/artifacts/UI-HS06-1440.png",
+        "1280": ".pms-loop/runs/R0048/artifacts/UI-HS06-1280.png"
+      }
+    },
+    "HS-07": {
+      "entry": "/issues-risks",
+      "covered_features": [
+        "HS-030",
+        "HS-031",
+        "HS-032",
+        "HS-033",
+        "HS-034",
+        "HS-035",
+        "HS-036",
+        "HS-037",
+        "HS-038",
+        "HS-039"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行137及任务书行436；对应功能HS-030,HS-031,HS-032,HS-033,HS-034,HS-035,HS-036,HS-037,HS-038,HS-039。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "真实5×4风险评分为特大并自动PMO督办，健康原因包含风险；PMO督办至PMC，风险发生由PM转问题，原风险保留，双向关联与查询上下文一致。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "真实5×4风险评分为特大并自动PMO督办，健康原因包含风险；PMO督办至PMC，风险发生由PM转问题，原风险保留，双向关联与查询上下文一致。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "真实5×4风险评分为特大并自动PMO督办，健康原因包含风险；PMO督办至PMC，风险发生由PM转问题，原风险保留，双向关联与查询上下文一致。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "真实5×4风险评分为特大并自动PMO督办，健康原因包含风险；PMO督办至PMC，风险发生由PM转问题，原风险保留，双向关联与查询上下文一致。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "空查询、未知事项/项目、finance只读和类型/项目/取消重开隔离通过；团队关系通过save-team-member合法transition前置，工单创建处理审批均实际UI。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "当前源码1440/1280全页已查看，主操作与摘要清晰、局部表横滚无页面溢出；新建表单内容65vh滚动、提交按钮在视口内。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "browser-complete.log五例全部passed，exit.json=0，五报告consoleErrors为空；早期失败与中断日志保留。"
+        },
+        "business-1": {
+          "requirement": "问题风险分级责任人期限进展升级层级查询",
+          "passed": true,
+          "observation": "真实5×4风险评分为特大并自动PMO督办，健康原因包含风险；PMO督办至PMC，风险发生由PM转问题，原风险保留，双向关联与查询上下文一致。"
+        },
+        "business-2": {
+          "requirement": "风险转问题保留原关联，健康度原因与项目摘要一致",
+          "passed": true,
+          "observation": "真实5×4风险评分为特大并自动PMO督办，健康原因包含风险；PMO督办至PMC，风险发生由PM转问题，原风险保留，双向关联与查询上下文一致。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "e2e/ui-tickets.spec.ts 五条真实流程",
+          "expected": "问题风险分级责任人期限进展升级层级查询；风险转问题保留原关联，健康度原因与项目摘要一致",
+          "observed": "真实5×4风险评分为特大并自动PMO督办，健康原因包含风险；PMO督办至PMC，风险发生由PM转问题，原风险保留，双向关联与查询上下文一致。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0048/browser-complete.log",
+        ".pms-loop/runs/R0048/browser-complete.exit.json",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a55f24fc19c8a6944ea99d.json",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a550141a3ea77c63db07c7.json",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a5bede724eeddf3b808500.json",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a5ac27b2024d988813ece7.json",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a5b2437d84a3c622a21a29.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0048/artifacts/UI-HS07-1440.png",
+        "1280": ".pms-loop/runs/R0048/artifacts/UI-HS07-1280.png"
+      }
+    },
+    "HS-08": {
+      "entry": "/issues-risks/ISSUE-FROM-RSK-NEW-86",
+      "covered_features": [
+        "HS-030",
+        "HS-031",
+        "HS-032",
+        "HS-033",
+        "HS-034",
+        "HS-035",
+        "HS-036",
+        "HS-037",
+        "HS-038",
+        "HS-039"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行138及任务书行437；对应功能HS-030,HS-031,HS-032,HS-033,HS-034,HS-035,HS-036,HS-037,HS-038,HS-039。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "技术责任人解决问题后只能等待主PM最终关闭；风险转入问题保留责任人与原风险、期限和历史，问题关闭后风险仍已转问题。完整责任链、督办层级与轨迹可见。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "技术责任人解决问题后只能等待主PM最终关闭；风险转入问题保留责任人与原风险、期限和历史，问题关闭后风险仍已转问题。完整责任链、督办层级与轨迹可见。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "技术责任人解决问题后只能等待主PM最终关闭；风险转入问题保留责任人与原风险、期限和历史，问题关闭后风险仍已转问题。完整责任链、督办层级与轨迹可见。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "技术责任人解决问题后只能等待主PM最终关闭；风险转入问题保留责任人与原风险、期限和历史，问题关闭后风险仍已转问题。完整责任链、督办层级与轨迹可见。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "空查询、未知事项/项目、finance只读和类型/项目/取消重开隔离通过；团队关系通过save-team-member合法transition前置，工单创建处理审批均实际UI。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "当前源码1440/1280全页已查看，主操作与摘要清晰、局部表横滚无页面溢出；新建表单内容65vh滚动、提交按钮在视口内。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "browser-complete.log五例全部passed，exit.json=0，五报告consoleErrors为空；早期失败与中断日志保留。"
+        },
+        "business-1": {
+          "requirement": "责任反馈、督办升级、风险措施与问题关闭轨迹",
+          "passed": true,
+          "observation": "技术责任人解决问题后只能等待主PM最终关闭；风险转入问题保留责任人与原风险、期限和历史，问题关闭后风险仍已转问题。完整责任链、督办层级与轨迹可见。"
+        },
+        "business-2": {
+          "requirement": "PM最终关问题；重大风险升级后继续跟踪，责任链可查",
+          "passed": true,
+          "observation": "技术责任人解决问题后只能等待主PM最终关闭；风险转入问题保留责任人与原风险、期限和历史，问题关闭后风险仍已转问题。完整责任链、督办层级与轨迹可见。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "e2e/ui-tickets.spec.ts 五条真实流程",
+          "expected": "责任反馈、督办升级、风险措施与问题关闭轨迹；PM最终关问题；重大风险升级后继续跟踪，责任链可查",
+          "observed": "技术责任人解决问题后只能等待主PM最终关闭；风险转入问题保留责任人与原风险、期限和历史，问题关闭后风险仍已转问题。完整责任链、督办层级与轨迹可见。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0048/browser-complete.log",
+        ".pms-loop/runs/R0048/browser-complete.exit.json",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a55f24fc19c8a6944ea99d.json",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a550141a3ea77c63db07c7.json",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a5bede724eeddf3b808500.json",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a5ac27b2024d988813ece7.json",
+        ".pms-loop/runs/R0048/artifacts/r0024-e394a439cbfe7f9813a5b2437d84a3c622a21a29.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0048/artifacts/UI-HS08-issue-1440.png",
+        "1280": ".pms-loop/runs/R0048/artifacts/UI-HS08-issue-1280.png"
+      }
+    }
+  }
+}

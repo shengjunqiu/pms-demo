@@ -3,3 +3,4 @@ dist/
 tsconfig.tsbuildinfo
 test-results/
 playwright-report/
+.pms-loop/.lock

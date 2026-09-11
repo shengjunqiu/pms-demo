@@ -1,0 +1,15 @@
+{
+  "title": "JS02动态采购验收缺证明阻断，通过只同步履约不增加成本",
+  "status": "passed",
+  "url": "http://127.0.0.1:4179/projects/P-006/procurement?source=CO-1",
+  "consoleErrors": [],
+  "observations": {
+    "orderId": "CO-1",
+    "acceptanceId": "ACC-NEW-199",
+    "screenshots": {
+      "1280": ".pms-loop/runs/R0037/artifacts/JS02-dynamic-supplier-passed-1280.png",
+      "1440": ".pms-loop/runs/R0037/artifacts/JS02-dynamic-supplier-passed-1440.png"
+    },
+    "upstreamPreparation": "真实成本transition；不作为上游UI验收证据"
+  }
+}

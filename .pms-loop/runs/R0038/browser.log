@@ -1,0 +1,42 @@
+
+> pms-demo@1.0.0 test:e2e /home/shengjunqiu/code/pms-demo
+> playwright test e2e/ui-planning.spec.ts e2e/first-batch.spec.ts:94
+
+[WebServer] (node:2816541) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2816575) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:2816598) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 e2e/first-batch.spec.ts:94:1 › 策划计划经PMO评审、预算审批与独立基线确认 (27.1s)
+(node:2816988) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 e2e/ui-planning.spec.ts:30:1 › UI 计划：范围保存、任务编辑、里程碑导航与评审提交快照 (19.7s)
+  ✓  3 e2e/ui-planning.spec.ts:64:1 › UI 计划：旧深链保持项目与冻结基线只读 (7.9s)
+
+
+  1) e2e/first-batch.spec.ts:94:1 › 策划计划经PMO评审、预算审批与独立基线确认 ─────────────────────────────────────────
+
+    TimeoutError: locator.fill: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for getByLabel('达成条件', { exact: true })
+
+
+      104 |   await navigate(page, '/projects/P-PLAN-001/milestones');
+      105 |   await page.getByRole('button', { name: /^编\s*辑$/ }).first().click();
+    > 106 |   await page.getByLabel('达成条件', { exact: true }).fill('启动会议纪要与责任分工确认');
+          |                                                  ^
+      107 |   await page.getByRole('dialog').getByRole('button', { name: /确\s*定/ }).click();
+      108 |   await expect(page.getByText('启动会议纪要与责任分工确认', { exact: true })).toBeVisible();
+      109 |   await navigate(page, '/projects/P-PLAN-001/plan-review');
+        at /home/shengjunqiu/code/pms-demo/e2e/first-batch.spec.ts:106:50
+
+    Error Context: test-results/first-batch-策划计划经PMO评审、预算审批与独立基线确认/error-context.md
+
+  1 failed
+    e2e/first-batch.spec.ts:94:1 › 策划计划经PMO评审、预算审批与独立基线确认 ──────────────────────────────────────────
+  2 passed (58.5s)
+ ELIFECYCLE  Command failed with exit code 1.

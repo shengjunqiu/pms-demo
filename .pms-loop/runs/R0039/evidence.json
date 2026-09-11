@@ -1,0 +1,361 @@
+{
+  "schema_version": 1,
+  "round": "R0039",
+  "revision": "20aa89061b193af546aeee2bd40924b5fbfa43b391a610c0a57384e08d0ea80d",
+  "items": {
+    "GS-01": {
+      "entry": "/opportunities",
+      "covered_features": [
+        "GS-001",
+        "GS-002",
+        "GS-003",
+        "GS-004",
+        "GS-005",
+        "GS-006",
+        "GS-007",
+        "GS-008"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单第105行、任务书第394行及详细功能清单GS-001~008；保留原字段、权限与生命周期。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "日期视图保存恢复、最后跟进按业务日期取最新、完整可见集合分页排序通过；暂缓复评提醒与详情一致。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "常用筛选与核心七列、办理菜单、辅助列和导出。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "日期视图保存恢复、最后跟进按业务日期取最新、完整可见集合分页排序通过；暂缓复评提醒与详情一致。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "台账菜单可发起评估、暂缓、终止；旧评审与冻结概算不一致禁用立项；12万元投入终止要求处置并保留成本。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "实际验证空筛选恢复、未知商机404、组织403、只读角色及冻结记录；新建必填和取消，未完成立项条件给出具体原因。同步Mock不引入异步网络加载。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已逐张查看本轮最终四页1440×900及1280×900共8张完整截图，分区、数字与主动作清晰，无遮挡或整页横向溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "10个主回归通过且控制台无错误；暂缓场景首次在seed初始化因导航销毁上下文而失败，未执行业务。保留失败日志；同一冻结源码隔离复核通过，控制台无错误。"
+        },
+        "business-1": {
+          "requirement": "完整商机筛选、跟进、评估、暂缓/终止/立项入口",
+          "passed": true,
+          "observation": "日期视图保存恢复、最后跟进按业务日期取最新、完整可见集合分页排序通过；暂缓复评提醒与详情一致。"
+        },
+        "business-2": {
+          "requirement": "转立项条件不满足显示原因；有投入终止保留成本并要求处置",
+          "passed": true,
+          "observation": "台账菜单可发起评估、暂缓、终止；旧评审与冻结概算不一致禁用立项；12万元投入终止要求处置并保留成本。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "按现有角色执行本页主要操作与跨页返回",
+          "expected": "内容层次清晰且原业务行为、版本、权限保持一致",
+          "observed": "日期视图保存恢复、最后跟进按业务日期取最新、完整可见集合分页排序通过；暂缓复评提醒与详情一致。台账菜单可发起评估、暂缓、终止；旧评审与冻结概算不一致禁用立项；12万元投入终止要求处置并保留成本。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0039/browser-final.log",
+        ".pms-loop/runs/R0039/browser-paused-verified.log",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41de70cb8323015c54be4ec5.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41de16540492a734ca562220.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41de48eb32a0b85f3c532270.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41de786820ff8bf4c3438c93.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-18e809319d1ea4c2f9af07b806a9148df0bca213.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41deb2e8055131b62ba547e8.json",
+        ".pms-loop/runs/R0039/artifacts/browser-501aaaeb656e8ee17bbcce9c21aac19538a9e0e2.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41de76ca7ce3a69318ce729c.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-18e809319d1ea4c2f9afa129c1717e5a5ec08dfe.json",
+        ".pms-loop/runs/R0039/artifacts/browser-501aaaeb656e8ee17bbca1640fc49da46509904f.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41defac9cfd6cfaef86186d4.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0039/artifacts/UI-GS01-1440.png",
+        "1280": ".pms-loop/runs/R0039/artifacts/UI-GS01-1280.png"
+      }
+    },
+    "GS-02": {
+      "entry": "/opportunities/new",
+      "covered_features": [
+        "GS-002",
+        "GS-003"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单第106行、任务书第395行及详细功能清单GS-002~003；保留原字段、权限与生命周期。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "必填校验、保存草稿、取消不提交、提交确认及冻结只读通过；新建商机生成编号，负责人及协同人保存后可重开。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "基础责任、商务预期、背景需求材料三段表单与底部主操作。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "必填校验、保存草稿、取消不提交、提交确认及冻结只读通过；新建商机生成编号，负责人及协同人保存后可重开。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "实际新建1200万元商机，详情摘要、列表及评估沿用同一编号与金额。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "实际验证空筛选恢复、未知商机404、组织403、只读角色及冻结记录；新建必填和取消，未完成立项条件给出具体原因。同步Mock不引入异步网络加载。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已逐张查看本轮最终四页1440×900及1280×900共8张完整截图，分区、数字与主动作清晰，无遮挡或整页横向溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "10个主回归通过且控制台无错误；暂缓场景首次在seed初始化因导航销毁上下文而失败，未执行业务。保留失败日志；同一冻结源码隔离复核通过，控制台无错误。"
+        },
+        "business-1": {
+          "requirement": "必填校验、客户/负责人/金额/签约日期、草稿和提交",
+          "passed": true,
+          "observation": "必填校验、保存草稿、取消不提交、提交确认及冻结只读通过；新建商机生成编号，负责人及协同人保存后可重开。"
+        },
+        "business-2": {
+          "requirement": "保存生成编号并回显台账；冻结字段只读，取消返回不误提交",
+          "passed": true,
+          "observation": "必填校验、保存草稿、取消不提交、提交确认及冻结只读通过；新建商机生成编号，负责人及协同人保存后可重开。实际新建1200万元商机，详情摘要、列表及评估沿用同一编号与金额。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "按现有角色执行本页主要操作与跨页返回",
+          "expected": "内容层次清晰且原业务行为、版本、权限保持一致",
+          "observed": "必填校验、保存草稿、取消不提交、提交确认及冻结只读通过；新建商机生成编号，负责人及协同人保存后可重开。实际新建1200万元商机，详情摘要、列表及评估沿用同一编号与金额。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0039/browser-final.log",
+        ".pms-loop/runs/R0039/browser-paused-verified.log",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41de70cb8323015c54be4ec5.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41de16540492a734ca562220.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41de48eb32a0b85f3c532270.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41de786820ff8bf4c3438c93.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-18e809319d1ea4c2f9af07b806a9148df0bca213.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41deb2e8055131b62ba547e8.json",
+        ".pms-loop/runs/R0039/artifacts/browser-501aaaeb656e8ee17bbcce9c21aac19538a9e0e2.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41de76ca7ce3a69318ce729c.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-18e809319d1ea4c2f9afa129c1717e5a5ec08dfe.json",
+        ".pms-loop/runs/R0039/artifacts/browser-501aaaeb656e8ee17bbca1640fc49da46509904f.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41defac9cfd6cfaef86186d4.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0039/artifacts/UI-GS02-1440.png",
+        "1280": ".pms-loop/runs/R0039/artifacts/UI-GS02-1280.png"
+      }
+    },
+    "GS-03": {
+      "entry": "/opportunities/OPP-NEW-74",
+      "covered_features": [
+        "GS-004",
+        "GS-005",
+        "GS-006",
+        "GS-007",
+        "GS-008"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单第107行、任务书第396行及详细功能清单GS-004~008；保留原字段、权限与生命周期。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "九类页签逐一切换成功；立项缺项可见且禁用，完整通过版本链可携带同一商机发起立项；已转项目入口到P-001。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "对象名称、状态及金额摘要优先，全部九类页签和基础材料折叠区保留。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "九类页签逐一切换成功；立项缺项可见且禁用，完整通过版本链可携带同一商机发起立项；已转项目入口到P-001。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "终止保留12万元投入与来源，历史只读；未知商机404和组织拒绝403通过。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "实际验证空筛选恢复、未知商机404、组织403、只读角色及冻结记录；新建必填和取消，未完成立项条件给出具体原因。同步Mock不引入异步网络加载。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已逐张查看本轮最终四页1440×900及1280×900共8张完整截图，分区、数字与主动作清晰，无遮挡或整页横向溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "10个主回归通过且控制台无错误；暂缓场景首次在seed初始化因导航销毁上下文而失败，未执行业务。保留失败日志；同一冻结源码隔离复核通过，控制台无错误。"
+        },
+        "business-1": {
+          "requirement": "九类页签整合跟进、方案、评审、概算、提前投入、历史",
+          "passed": true,
+          "observation": "九类页签逐一切换成功；立项缺项可见且禁用，完整通过版本链可携带同一商机发起立项；已转项目入口到P-001。"
+        },
+        "business-2": {
+          "requirement": "立项按钮根据条件启停并列缺失项；上游关联与版本可追溯",
+          "passed": true,
+          "observation": "终止保留12万元投入与来源，历史只读；未知商机404和组织拒绝403通过。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "按现有角色执行本页主要操作与跨页返回",
+          "expected": "内容层次清晰且原业务行为、版本、权限保持一致",
+          "observed": "九类页签逐一切换成功；立项缺项可见且禁用，完整通过版本链可携带同一商机发起立项；已转项目入口到P-001。终止保留12万元投入与来源，历史只读；未知商机404和组织拒绝403通过。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0039/browser-final.log",
+        ".pms-loop/runs/R0039/browser-paused-verified.log",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41de70cb8323015c54be4ec5.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41de16540492a734ca562220.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41de48eb32a0b85f3c532270.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41de786820ff8bf4c3438c93.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-18e809319d1ea4c2f9af07b806a9148df0bca213.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41deb2e8055131b62ba547e8.json",
+        ".pms-loop/runs/R0039/artifacts/browser-501aaaeb656e8ee17bbcce9c21aac19538a9e0e2.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41de76ca7ce3a69318ce729c.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-18e809319d1ea4c2f9afa129c1717e5a5ec08dfe.json",
+        ".pms-loop/runs/R0039/artifacts/browser-501aaaeb656e8ee17bbca1640fc49da46509904f.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41defac9cfd6cfaef86186d4.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0039/artifacts/UI-GS03-1440.png",
+        "1280": ".pms-loop/runs/R0039/artifacts/UI-GS03-1280.png"
+      }
+    },
+    "GS-04": {
+      "entry": "/opportunities/OPP-NEW-74/evaluation",
+      "covered_features": [
+        "GS-009",
+        "GS-010",
+        "GS-011",
+        "GS-012",
+        "GS-013",
+        "GS-014",
+        "GS-015"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单第108行、任务书第397行及详细功能清单GS-009~015；保留原字段、权限与生命周期。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "客户经理/技术/财务按各自维度提交意见；未完成条件时拟立项禁用；六维完成后真实进入拟立项并形成方案任务。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "六维进度、专业评估工作区及综合结论分区，评分、风险、毛利和附件字段保留。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "客户经理/技术/财务按各自维度提交意见；未完成条件时拟立项禁用；六维完成后真实进入拟立项并形成方案任务。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "单维意见提交使0/6变为1/6，经详情和列表办理返回仍为同一轮1/6；暂缓必填原因、复评日及责任人，复评重新发起成功。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "实际验证空筛选恢复、未知商机404、组织403、只读角色及冻结记录；新建必填和取消，未完成立项条件给出具体原因。同步Mock不引入异步网络加载。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已逐张查看本轮最终四页1440×900及1280×900共8张完整截图，分区、数字与主动作清晰，无遮挡或整页横向溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "10个主回归通过且控制台无错误；暂缓场景首次在seed初始化因导航销毁上下文而失败，未执行业务。保留失败日志；同一冻结源码隔离复核通过，控制台无错误。"
+        },
+        "business-1": {
+          "requirement": "专业维度评分/结论/风险/附件与综合建议",
+          "passed": true,
+          "observation": "客户经理/技术/财务按各自维度提交意见；未完成条件时拟立项禁用；六维完成后真实进入拟立项并形成方案任务。"
+        },
+        "business-2": {
+          "requirement": "角色只编辑自己维度；暂缓填写复评日和责任人",
+          "passed": true,
+          "observation": "单维意见提交使0/6变为1/6，经详情和列表办理返回仍为同一轮1/6；暂缓必填原因、复评日及责任人，复评重新发起成功。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "按现有角色执行本页主要操作与跨页返回",
+          "expected": "内容层次清晰且原业务行为、版本、权限保持一致",
+          "observed": "客户经理/技术/财务按各自维度提交意见；未完成条件时拟立项禁用；六维完成后真实进入拟立项并形成方案任务。单维意见提交使0/6变为1/6，经详情和列表办理返回仍为同一轮1/6；暂缓必填原因、复评日及责任人，复评重新发起成功。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0039/browser-final.log",
+        ".pms-loop/runs/R0039/browser-paused-verified.log",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41de70cb8323015c54be4ec5.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41de16540492a734ca562220.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41de48eb32a0b85f3c532270.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41de786820ff8bf4c3438c93.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-18e809319d1ea4c2f9af07b806a9148df0bca213.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41deb2e8055131b62ba547e8.json",
+        ".pms-loop/runs/R0039/artifacts/browser-501aaaeb656e8ee17bbcce9c21aac19538a9e0e2.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41de76ca7ce3a69318ce729c.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-18e809319d1ea4c2f9afa129c1717e5a5ec08dfe.json",
+        ".pms-loop/runs/R0039/artifacts/browser-501aaaeb656e8ee17bbca1640fc49da46509904f.json",
+        ".pms-loop/runs/R0039/artifacts/r0024-ef3a7c770820419a41defac9cfd6cfaef86186d4.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0039/artifacts/UI-GS04-1440.png",
+        "1280": ".pms-loop/runs/R0039/artifacts/UI-GS04-1280.png"
+      }
+    }
+  }
+}

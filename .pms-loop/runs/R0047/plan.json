@@ -1,0 +1,182 @@
+{
+  "round": "R0047",
+  "items": [
+    {
+      "id": "HS-03",
+      "title": "项目日报",
+      "route": "/projects/:id/daily-reports",
+      "kind": "列表/表单",
+      "roles": "项目经理",
+      "phase": 6,
+      "feature_ids": [
+        "HS-013",
+        "HS-014",
+        "HS-015",
+        "HS-016",
+        "HS-017"
+      ],
+      "upstream_feature_scope": "日报填报、进展、里程碑、问题风险",
+      "source_lines": {
+        "pages": 133,
+        "brief": 432
+      },
+      "criteria": [
+        "自动日报待办，项目带入、进展/无进展原因、下一步和里程碑",
+        "问题风险独立关联；里程碑完成需实际时间和材料"
+      ]
+    },
+    {
+      "id": "HS-04",
+      "title": "项目周报",
+      "route": "/projects/:id/weekly-reports",
+      "kind": "列表/表单",
+      "roles": "项目经理",
+      "phase": 6,
+      "feature_ids": [
+        "HS-018",
+        "HS-019"
+      ],
+      "upstream_feature_scope": "周度进展汇总、计划、风险",
+      "source_lines": {
+        "pages": 134,
+        "brief": 433
+      },
+      "criteria": [
+        "由日报/计划/成本/风险聚合周报草稿",
+        "可补充提交，模拟上报范围/历史保留且不发送真实消息"
+      ]
+    },
+    {
+      "id": "HS-17",
+      "title": "阶段交付物",
+      "route": "/projects/:id/deliverables",
+      "kind": "列表/文档",
+      "roles": "项目经理、PMO",
+      "phase": 6,
+      "feature_ids": [
+        "HS-020",
+        "HS-021",
+        "HS-022",
+        "HS-023",
+        "HS-075",
+        "HS-076",
+        "HS-077",
+        "PT-015",
+        "PT-016",
+        "PT-017",
+        "PT-018",
+        "PT-019",
+        "PT-020"
+      ],
+      "upstream_feature_scope": "阶段交付物上传、审核、归档",
+      "source_lines": {
+        "pages": 147,
+        "brief": 446
+      },
+      "criteria": [
+        "类型阶段模板、必交责任时点、文件名版本审核归档",
+        "模拟上传不出网，必交审核未通过阻断阶段，质量检查整改关联"
+      ]
+    }
+  ],
+  "sources": {
+    "prd": {
+      "path": "docs/项目管理平台PRD_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "6dac675ca22237b7fa59129eccc466a9e242d20f948c0b68e958a7227bb2bd1b"
+    },
+    "features": {
+      "path": "docs/项目管理平台详细功能清单_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "fabfac73b480ccaf01aa831ae3c5d0a6485e33fff80f517468b2b6c52829ddfb"
+    },
+    "pages": {
+      "path": "docs/项目管理平台页面清单与原型设计说明_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "db1c548b5f5ef025eb90fef06422e132f003665fc7e6156dd706b7f095c994dc"
+    },
+    "brief": {
+      "path": "docs/项目管理平台高保真原型_AgentLoop开发任务书_V1.0.md",
+      "sha256": "286f917d5edc99a4a0c7da97515a3d6308cae7395fb287bbcd1846de60045b43"
+    }
+  },
+  "feature_references": {
+    "HS-013": {
+      "title": "日报自动生成",
+      "line": 244
+    },
+    "HS-014": {
+      "title": "整体完工比例",
+      "line": 245
+    },
+    "HS-015": {
+      "title": "最新进展",
+      "line": 246
+    },
+    "HS-016": {
+      "title": "问题风险关联",
+      "line": 247
+    },
+    "HS-017": {
+      "title": "里程碑更新",
+      "line": 248
+    },
+    "HS-018": {
+      "title": "周报生成",
+      "line": 249
+    },
+    "HS-019": {
+      "title": "周报上报",
+      "line": 250
+    },
+    "HS-020": {
+      "title": "质量计划",
+      "line": 256
+    },
+    "HS-021": {
+      "title": "质量检查",
+      "line": 257
+    },
+    "HS-022": {
+      "title": "整改管理",
+      "line": 258
+    },
+    "HS-023": {
+      "title": "内部质量评审",
+      "line": 259
+    },
+    "HS-075": {
+      "title": "交付物自动加载",
+      "line": 346
+    },
+    "HS-076": {
+      "title": "交付物上传",
+      "line": 347
+    },
+    "HS-077": {
+      "title": "阶段审核",
+      "line": 348
+    },
+    "PT-015": {
+      "title": "文档目录模板",
+      "line": 474
+    },
+    "PT-016": {
+      "title": "项目目录实例化",
+      "line": 475
+    },
+    "PT-017": {
+      "title": "文件上传",
+      "line": 476
+    },
+    "PT-018": {
+      "title": "文件版本",
+      "line": 477
+    },
+    "PT-019": {
+      "title": "必交校验",
+      "line": 478
+    },
+    "PT-020": {
+      "title": "归档确认",
+      "line": 479
+    }
+  }
+}

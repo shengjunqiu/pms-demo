@@ -1,0 +1,88 @@
+
+> pms-demo@1.0.0 test:domain /home/shengjunqiu/code/pms-demo
+> vitest run src --maxWorkers=1
+
+
+ RUN  v3.2.7 /home/shengjunqiu/code/pms-demo
+
+ ✓ src/models/__tests__/initiation.test.ts (16 tests) 6773ms
+   ✓ 立项评审与正式项目承接 > 提交立项锁定所选概算，商机后来切换冻结版本不改审批与项目引用  502ms
+   ✓ 立项评审与正式项目承接 > 六节点分别签署，同角色节点不可合并或重复，一次 PMO 点击不能批准  666ms
+   ✓ 立项评审与正式项目承接 > 通过项目初始无 PM/预算/基线，候选人可见接受且此前不能策划  570ms
+   ✓ 立项评审与正式项目承接 > 继承真实早期成本一次，旧汇总不虚构，投入来源仍可追溯  440ms
+   ✓ 立项评审与正式项目承接 > 整改保留上一轮资料，回复后形成新轮；否决暂缓留存成本处置责任  355ms
+   ✓ 立项评审与正式项目承接 > 已签依据仅允许归属该商机的真实未绑定合同，项目承接合同事实  447ms
+   ✓ 立项评审与正式项目承接 > 暂缓保存复评责任与成本处置，PMO恢复后须新轮提交，旧决定不变  300ms
+   ✓ 立项评审与正式项目承接 > 风险矩阵不许下调或丢失来源，PMO新增必交目录进入正式项目  566ms
+   ✓ 立项评审与正式项目承接 > 提交冻结分级规则：后来降低阈值只作用新申请，不回算当前轮次  327ms
+   ✓ 立项评审与正式项目承接 > 正式 CF 多节点按提交快照推进，停用配置不影响在途申请且未完成不生成项目  507ms
+   ✓ 立项评审与正式项目承接 > 配置任一签署节点记录独立拒绝，其他角色通过后可完成当前节点  467ms
+   ✓ 立项评审与正式项目承接 > 立项通过按提交模板实例化，后续新模板不改本轮目录且必交项不被降级  435ms
+   ✓ 立项评审与正式项目承接 > 第六专业签完成时才开始正式节点计时，保留规则快照与既有签署  404ms
+ ✓ src/models/__tests__/budget-planning.test.ts (9 tests) 4754ms
+ ✓ src/models/__tests__/settlement.test.ts (8 tests) 5262ms
+   ✓ 正式结算与冻结协议 > 客户通过未确认、历史未决与原变更均阻断  303ms
+   ✓ 正式结算与冻结协议 > 逐科目承诺/预测实际发生守恒，旧滚动科目快照保留  1069ms
+   ✓ 正式结算与冻结协议 > 提交冻结成本入口，材料退回保持冻结、追加版本保留旧快照  1208ms
+   ✓ 正式结算与冻结协议 > 仅财务金额退回可解冻；重提引用新金额，旧结果保留  1178ms
+   ✓ 正式结算与冻结协议 > 财务→PMO审核→评审→最终锁定，建设锁定但不关闭项目且运维隔离  1242ms
+ ✓ src/models/__tests__/business.test.ts (14 tests) 5134ms
+   ✓ 管理审批联动原事项但不跳过风险、终验和结算流程；未签审批只变更额度  450ms
+ ✓ src/models/__tests__/project-changes.test.ts (5 tests) 4811ms
+   ✓ 重大工期或金额必须高阶审批；角色不能绕过；建设冻结和源基线变化阻断  470ms
+ ✓ src/models/__tests__/closeout.test.ts (12 tests) 4911ms
+   ✓ 后评价与正式归档 > 六类目标及复盘完整才能提交，确认后不可覆盖经验记录  532ms
+   ✓ 后评价与正式归档 > 14目录原记录不冒充正式文件，缺件阻断；补档不解除建设锁定  495ms
+   ✓ 后评价与正式归档 > 退回补档创建新版本，保留旧文件结论且禁止跨项目来源  545ms
+   ✓ 后评价与正式归档 > 完整目录归档保留全部来源版本，正式文件和后评价不可覆写  866ms
+   ✓ 后评价与正式归档 > 归档后旧问题/成本入口不可写，管理员无解档旁路，运维成本仍独立  880ms
+   ✓ 后评价版本化模板消费 > 模板必填与系统必填评分阻断提交，评分后提交；完成记录不可改评分  629ms
+ ✓ src/models/__tests__/todos.test.ts (1 test) 3696ms
+ ✓ src/models/__tests__/closeout-integration.test.ts (2 tests) 3674ms
+ ✓ src/models/__tests__/portfolio.test.ts (2 tests) 3566ms
+ ✓ src/models/__tests__/presales.test.ts (8 tests) 2744ms
+   ✓ 方案成本与专家评审 > 专家意见未齐或有整改时PMO不能直接通过  326ms
+   ✓ 方案成本与专家评审 > 整改回复和实质方案变更后才能产生新轮次，旧快照保持不变  555ms
+   ✓ 方案成本与专家评审 > 整改可仅实质调整成本并生成新轮次，旧双版本保持不变  438ms
+   ✓ 方案成本与专家评审 > 参与人和附件仅重排不能绕过整改实质变更门禁  368ms
+   ✓ 方案成本与专家评审 > 真实评审通过才完成方案任务，领导角色不能代替PMO  302ms
+ ✓ src/models/__tests__/unsigned.test.ts (12 tests) 2678ms
+   ✓ 未签投入、合同及正式启动 > 签约必须有原单和守恒回款节点，并冻结合同、商机和回款来源轨迹  348ms
+   ✓ 未签投入、合同及正式启动 > 启动重验真实合同、任命、基线和阶段，达成启动里程碑并暴露真实执行待办  361ms
+   ✓ 未签投入、合同及正式启动 > 主PM合法换任只认当前接受任命和唯一有效项目经理，不把历史接受记录计为冲突  345ms
+   ✓ 未签投入、合同及正式启动 > 实际启动日期不得早于合同签订、当前基线生效或当前主PM接受任命日期  324ms
+   ✓ 未签投入、合同及正式启动 > 失效任命、历史摘要基线、启动里程碑缺失与建设冻结均不能启动  364ms
+ ✓ src/models/__tests__/opportunities.test.ts (8 tests) 2012ms
+   ✓ 商机初评业务闭环 > 六维完成后形成快照与唯一方案任务，锁定基础字段  458ms
+   ✓ 商机初评业务闭环 > 低毛利、不可行专业结论都不能绕过条件门  409ms
+   ✓ 商机初评业务闭环 > 暂缓必须安排复评，复评追加轮次且保留历史  406ms
+ ✓ src/models/__tests__/acceptance.test.ts (9 tests) 1503ms
+ ✓ src/models/__tests__/receipts.test.ts (21 tests) 1430ms
+ ✓ src/models/__tests__/operations.test.ts (9 tests) 1304ms
+ ✓ src/models/__tests__/reports.test.ts (3 tests) 1229ms
+   ✓ 质量整改独立闭环，材料版本经质量门与PMO审核后才允许里程碑达成  835ms
+ ✓ src/models/__tests__/early-investments.test.ts (7 tests) 1201ms
+ ✓ src/models/__tests__/configuration-finance.test.ts (9 tests) 1115ms
+ ✓ src/models/__tests__/cost-orders.test.ts (3 tests) 992ms
+   ✓ 采购批准增加指定科目承诺，验收入账等额转换且重复入账被拦截  348ms
+   ✓ 外包引用本项目WBS与基线并通过履约验收，费用只在财务入账后进入实际  480ms
+ ✓ src/models/__tests__/tickets.test.ts (4 tests) 943ms
+ ✓ src/models/__tests__/budget-editor.test.ts (5 tests) 851ms
+ ✓ src/models/__tests__/estimates.test.ts (5 tests) 749ms
+ ✓ src/models/__tests__/labor.test.ts (3 tests) 683ms
+   ✓ 成员、任务、有效日期、同日重复和跨项目累计工时执行硬校验  326ms
+ ✓ src/models/__tests__/configuration.test.ts (6 tests) 660ms
+ ✓ src/models/__tests__/stage.test.ts (2 tests) 553ms
+ ✓ src/models/__tests__/progress.test.ts (5 tests) 536ms
+ ✓ src/models/__tests__/shared-contracts.test.ts (4 tests) 480ms
+ ✓ src/models/__tests__/configuration-access.test.ts (14 tests) 441ms
+ ✓ src/models/__tests__/initiation-todos.test.ts (8 tests) 313ms
+ ✓ src/models/__tests__/access-scope.test.ts (6 tests) 284ms
+ ✓ src/models/__tests__/domain.test.ts (10 tests) 260ms
+ ✓ src/models/__tests__/access-integration.test.ts (5 tests) 255ms
+
+ Test Files  32 passed (32)
+      Tests  235 passed (235)
+   Start at  05:03:35
+   Duration  92.26s (transform 962ms, setup 0ms, collect 17.82s, tests 65.80s, environment 8ms, prepare 2.80s)
+

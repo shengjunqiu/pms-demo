@@ -1,0 +1,429 @@
+{
+  "schema_version": 1,
+  "round": "R0040",
+  "revision": "d929cc5ee4af9164596b0dd6c8c87b2c46440d506988dfa13396fcab2ea44493",
+  "items": {
+    "GL-02": {
+      "entry": "/executive/four-calculations?search=P-001",
+      "covered_features": [
+        "BI-023",
+        "BI-024",
+        "BI-025",
+        "BI-026",
+        "BI-027",
+        "BI-028"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单第162行、任务书第471行及详细功能清单BI-023,BI-024,BI-025,BI-026,BI-027,BI-028，对照原页面范围保留业务字段、上下文与权限。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "P-001概算3212、预算2847.70、滚动2986.20、预算滚动差138.50；未结算显示—。已结算样本切换为0项目，不冒充零结算成本。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "同样本四阶段成本柱图、差额和毛利轨迹，科目归因及有效版本表。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "P-001概算3212、预算2847.70、滚动2986.20、预算滚动差138.50；未结算显示—。已结算样本切换为0项目，不冒充零结算成本。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "从成本科目查看贡献项目，再进入P-001动态核算原科目；返回专题仍保留search=P-001。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "五页项目经理直接访问均显示403；异常空查询、未知穿透项目和无已结算样本通过，表格使用真实空态；同步Mock未新增网络加载。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已逐张查看本轮五页1440×900及1280×900共10张最终完整截图，层级和金额清晰；宽表内部横滚，固定操作列可见，文档无横向溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "正式8项浏览器场景全部通过且consoleErrors为空；包含共享计划导航两项回归；工程检查含235个领域测试通过。"
+        },
+        "business-1": {
+          "requirement": "组合四算/毛利轨迹、预算核算结算差异、科目偏差",
+          "passed": true,
+          "observation": "同样本四阶段成本柱图、差额和毛利轨迹，科目归因及有效版本表。P-001概算3212、预算2847.70、滚动2986.20、预算滚动差138.50；未结算显示—。已结算样本切换为0项目，不冒充零结算成本。"
+        },
+        "business-2": {
+          "requirement": "比较相同样本及有效版本，未结算不当零，偏差可到项目来源",
+          "passed": true,
+          "observation": "从成本科目查看贡献项目，再进入P-001动态核算原科目；返回专题仍保留search=P-001。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "管理层按当前页筛选、下钻、返回及原单处理",
+          "expected": "聚合与原始数据同源，返回保留上下文，当前角色权限正确",
+          "observed": "P-001概算3212、预算2847.70、滚动2986.20、预算滚动差138.50；未结算显示—。已结算样本切换为0项目，不冒充零结算成本。从成本科目查看贡献项目，再进入P-001动态核算原科目；返回专题仍保留search=P-001。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0040/browser-final.log",
+        ".pms-loop/runs/R0040/precheck.log",
+        ".pms-loop/runs/R0040/decision-precheck.log",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d0df16f685a20abe121dc4.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d0b1929bc1c874c3b2b37c.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d05e3711a7f78d5562dd73.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d07afd93044a7b35e69c41.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d09f179722e398c2b96919.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d0546fab1f5b7599a4053e.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0040/artifacts/GL02-1440.png",
+        "1280": ".pms-loop/runs/R0040/artifacts/GL02-1280.png"
+      }
+    },
+    "GL-03": {
+      "entry": "/executive/project-drilldown?search=P-001",
+      "covered_features": [
+        "BI-032",
+        "BI-033",
+        "BI-034",
+        "BI-035"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单第163行、任务书第472行及详细功能清单BI-032,BI-033,BI-034,BI-035，对照原页面范围保留业务字段、上下文与权限。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "组织/指标筛选进入P-001，里程碑原记录抽屉显示责任人；进入项目总览后返回经营结论，再回筛选清单仍保留P-001条件。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "项目清单与单项目经营结论分区，四算、责任人和原因/原始业务页签。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "组织/指标筛选进入P-001，里程碑原记录抽屉显示责任人；进入项目总览后返回经营结论，再回筛选清单仍保留P-001条件。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "原始成本按已发生、未发生承诺、剩余预测展示；共享选择器与235领域检查通过；未知项目显示不存在。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "五页项目经理直接访问均显示403；异常空查询、未知穿透项目和无已结算样本通过，表格使用真实空态；同步Mock未新增网络加载。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已逐张查看本轮五页1440×900及1280×900共10张最终完整截图，层级和金额清晰；宽表内部横滚，固定操作列可见，文档无横向溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "正式8项浏览器场景全部通过且consoleErrors为空；包含共享计划导航两项回归；工程检查含235个领域测试通过。"
+        },
+        "business-1": {
+          "requirement": "组织/指标→项目清单→单项目→异常/成本/里程碑原始明细",
+          "passed": true,
+          "observation": "项目清单与单项目经营结论分区，四算、责任人和原因/原始业务页签。组织/指标筛选进入P-001，里程碑原记录抽屉显示责任人；进入项目总览后返回经营结论，再回筛选清单仍保留P-001条件。"
+        },
+        "business-2": {
+          "requirement": "筛选权限和责任链贯通，返回恢复条件与滚动位置",
+          "passed": true,
+          "observation": "原始成本按已发生、未发生承诺、剩余预测展示；共享选择器与235领域检查通过；未知项目显示不存在。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "管理层按当前页筛选、下钻、返回及原单处理",
+          "expected": "聚合与原始数据同源，返回保留上下文，当前角色权限正确",
+          "observed": "组织/指标筛选进入P-001，里程碑原记录抽屉显示责任人；进入项目总览后返回经营结论，再回筛选清单仍保留P-001条件。原始成本按已发生、未发生承诺、剩余预测展示；共享选择器与235领域检查通过；未知项目显示不存在。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0040/browser-final.log",
+        ".pms-loop/runs/R0040/precheck.log",
+        ".pms-loop/runs/R0040/decision-precheck.log",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d0df16f685a20abe121dc4.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d0b1929bc1c874c3b2b37c.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d05e3711a7f78d5562dd73.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d07afd93044a7b35e69c41.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d09f179722e398c2b96919.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d0546fab1f5b7599a4053e.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0040/artifacts/GL03-1440.png",
+        "1280": ".pms-loop/runs/R0040/artifacts/GL03-1280.png"
+      }
+    },
+    "GL-04": {
+      "entry": "/executive/portfolio",
+      "covered_features": [
+        "BI-009",
+        "BI-010",
+        "BI-011",
+        "BI-012",
+        "BI-013"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单第164行、任务书第473行及详细功能清单BI-009,BI-010,BI-011,BI-012,BI-013，对照原页面范围保留业务字段、上下文与权限。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "集团66项目，预计收入224401.60、合同169276.60、加权预测毛利率40.5%；可进入下级组织再返回上一级；按健康度进入高风险项目清单。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "去重项目数、收入、合同及加权毛利率，前三组收入占比，组合表及原下钻。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "集团66项目，预计收入224401.60、合同169276.60、加权预测毛利率40.5%；可进入下级组织再返回上一级；按健康度进入高风险项目清单。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "返回组合保持dimension=health；分组通过原选择器聚合，毛利率按汇总金额计算，领域检查通过。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "五页项目经理直接访问均显示403；异常空查询、未知穿透项目和无已结算样本通过，表格使用真实空态；同步Mock未新增网络加载。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已逐张查看本轮五页1440×900及1280×900共10张最终完整截图，层级和金额清晰；宽表内部横滚，固定操作列可见，文档无横向溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "正式8项浏览器场景全部通过且consoleErrors为空；包含共享计划导航两项回归；工程检查含235个领域测试通过。"
+        },
+        "business-1": {
+          "requirement": "组织区域类型等级行业客户等组合数量金额成本毛利健康回款",
+          "passed": true,
+          "observation": "去重项目数、收入、合同及加权毛利率，前三组收入占比，组合表及原下钻。集团66项目，预计收入224401.60、合同169276.60、加权预测毛利率40.5%；可进入下级组织再返回上一级；按健康度进入高风险项目清单。"
+        },
+        "business-2": {
+          "requirement": "集团→业务群→部门→项目，项目去重且比率按金额汇总",
+          "passed": true,
+          "observation": "返回组合保持dimension=health；分组通过原选择器聚合，毛利率按汇总金额计算，领域检查通过。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "管理层按当前页筛选、下钻、返回及原单处理",
+          "expected": "聚合与原始数据同源，返回保留上下文，当前角色权限正确",
+          "observed": "集团66项目，预计收入224401.60、合同169276.60、加权预测毛利率40.5%；可进入下级组织再返回上一级；按健康度进入高风险项目清单。返回组合保持dimension=health；分组通过原选择器聚合，毛利率按汇总金额计算，领域检查通过。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0040/browser-final.log",
+        ".pms-loop/runs/R0040/precheck.log",
+        ".pms-loop/runs/R0040/decision-precheck.log",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d0df16f685a20abe121dc4.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d0b1929bc1c874c3b2b37c.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d05e3711a7f78d5562dd73.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d07afd93044a7b35e69c41.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d09f179722e398c2b96919.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d0546fab1f5b7599a4053e.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0040/artifacts/GL04-1440.png",
+        "1280": ".pms-loop/runs/R0040/artifacts/GL04-1280.png"
+      }
+    },
+    "GL-05": {
+      "entry": "/executive/exceptions",
+      "covered_features": [
+        "BI-014",
+        "BI-015",
+        "BI-016",
+        "BI-017",
+        "BI-018",
+        "BI-019",
+        "BI-020",
+        "BI-021",
+        "BI-022"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单第165行、任务书第474行及详细功能清单BI-014,BI-015,BI-016,BI-017,BI-018,BI-019,BI-020,BI-021,BI-022，对照原页面范围保留业务字段、上下文与权限。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "默认33异常项目/11高风险/2到期未收；选择高风险保留exception=red；列设置启用责任组织后表头出现；原因抽屉进入原成本明细。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "异常概览、七类页签、核心列及可恢复辅助列，原因与责任链抽屉。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "默认33异常项目/11高风险/2到期未收；选择高风险保留exception=red；列设置启用责任组织后表头出现；原因抽屉进入原成本明细。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "查询不存在项目时显示空表；辅助列保留金额、组织、阶段、日期等；页内只读，不复制业务处理。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "五页项目经理直接访问均显示403；异常空查询、未知穿透项目和无已结算样本通过，表格使用真实空态；同步Mock未新增网络加载。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已逐张查看本轮五页1440×900及1280×900共10张最终完整截图，层级和金额清晰；宽表内部横滚，固定操作列可见，文档无横向溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "正式8项浏览器场景全部通过且consoleErrors为空；包含共享计划导航两项回归；工程检查含235个领域测试通过。"
+        },
+        "business-1": {
+          "requirement": "七种异常Tabs，项目金额组织阶段健康原因首次触发时长偏差责任人",
+          "passed": true,
+          "observation": "异常概览、七类页签、核心列及可恢复辅助列，原因与责任链抽屉。默认33异常项目/11高风险/2到期未收；选择高风险保留exception=red；列设置启用责任组织后表头出现；原因抽屉进入原成本明细。"
+        },
+        "business-2": {
+          "requirement": "可看项目/原因/明细/责任链，继承筛选且不直接改业务",
+          "passed": true,
+          "observation": "查询不存在项目时显示空表；辅助列保留金额、组织、阶段、日期等；页内只读，不复制业务处理。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "管理层按当前页筛选、下钻、返回及原单处理",
+          "expected": "聚合与原始数据同源，返回保留上下文，当前角色权限正确",
+          "observed": "默认33异常项目/11高风险/2到期未收；选择高风险保留exception=red；列设置启用责任组织后表头出现；原因抽屉进入原成本明细。查询不存在项目时显示空表；辅助列保留金额、组织、阶段、日期等；页内只读，不复制业务处理。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0040/browser-final.log",
+        ".pms-loop/runs/R0040/precheck.log",
+        ".pms-loop/runs/R0040/decision-precheck.log",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d0df16f685a20abe121dc4.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d0b1929bc1c874c3b2b37c.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d05e3711a7f78d5562dd73.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d07afd93044a7b35e69c41.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d09f179722e398c2b96919.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d0546fab1f5b7599a4053e.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0040/artifacts/GL05-1440.png",
+        "1280": ".pms-loop/runs/R0040/artifacts/GL05-1280.png"
+      }
+    },
+    "GL-06": {
+      "entry": "/executive/decisions",
+      "covered_features": [
+        "BI-029",
+        "BI-030",
+        "BI-031"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单第166行、任务书第475行及详细功能清单BI-029,BI-030,BI-031，对照原页面范围保留业务字段、上下文与权限。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "默认19待决策/16项目/最长4天；按超概算筛选进入APR-1原审批，填写意见通过后回列表APR-1消失，历史列表显示已通过。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "待决策数量、涉及项目和最长等待优先，事项类型、历史与来源审批分区。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "默认19待决策/16项目/最长4天；按超概算筛选进入APR-1原审批，填写意见通过后回列表APR-1消失，历史列表显示已通过。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "审批详情引用提交快照，领导通过后PMO基线确认仍禁用；原事项状态同步，不在聚合页建立第二份审批。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "五页项目经理直接访问均显示403；异常空查询、未知穿透项目和无已结算样本通过，表格使用真实空态；同步Mock未新增网络加载。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已逐张查看本轮五页1440×900及1280×900共10张最终完整截图，层级和金额清晰；宽表内部横滚，固定操作列可见，文档无横向溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "正式8项浏览器场景全部通过且consoleErrors为空；包含共享计划导航两项回归；工程检查含235个领域测试通过。"
+        },
+        "business-1": {
+          "requirement": "重大变更预算风险未签验收结算事项及影响节点等待建议",
+          "passed": true,
+          "observation": "待决策数量、涉及项目和最长等待优先，事项类型、历史与来源审批分区。默认19待决策/16项目/最长4天；按超概算筛选进入APR-1原审批，填写意见通过后回列表APR-1消失，历史列表显示已通过。"
+        },
+        "business-2": {
+          "requirement": "只聚合原事项，进入原审批处理后数量同步，不复制审批",
+          "passed": true,
+          "observation": "审批详情引用提交快照，领导通过后PMO基线确认仍禁用；原事项状态同步，不在聚合页建立第二份审批。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "管理层按当前页筛选、下钻、返回及原单处理",
+          "expected": "聚合与原始数据同源，返回保留上下文，当前角色权限正确",
+          "observed": "默认19待决策/16项目/最长4天；按超概算筛选进入APR-1原审批，填写意见通过后回列表APR-1消失，历史列表显示已通过。审批详情引用提交快照，领导通过后PMO基线确认仍禁用；原事项状态同步，不在聚合页建立第二份审批。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0040/browser-final.log",
+        ".pms-loop/runs/R0040/precheck.log",
+        ".pms-loop/runs/R0040/decision-precheck.log",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d0df16f685a20abe121dc4.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d0b1929bc1c874c3b2b37c.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d05e3711a7f78d5562dd73.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d07afd93044a7b35e69c41.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d09f179722e398c2b96919.json",
+        ".pms-loop/runs/R0040/artifacts/executive-6137955d7e0d813bf6d0546fab1f5b7599a4053e.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0040/artifacts/GL06-1440.png",
+        "1280": ".pms-loop/runs/R0040/artifacts/GL06-1280.png"
+      }
+    }
+  }
+}

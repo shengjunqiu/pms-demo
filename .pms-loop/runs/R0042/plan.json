@@ -1,0 +1,256 @@
+{
+  "round": "R0042",
+  "items": [
+    {
+      "id": "YS-05",
+      "title": "项目团队",
+      "route": "/projects/:id/team",
+      "kind": "详情/配置",
+      "roles": "项目经理、交付部门、PMO",
+      "phase": 5,
+      "feature_ids": [
+        "YS-017",
+        "YS-018",
+        "YS-019",
+        "YS-020",
+        "YS-021"
+      ],
+      "upstream_feature_scope": "YS-017~021",
+      "source_lines": {
+        "pages": 120,
+        "brief": 414
+      },
+      "criteria": [
+        "唯一主PM、接受/拒绝任命、技术及协同成员、投入周期",
+        "成员加入退出影响演示权限，历史任务工时责任不回写"
+      ]
+    },
+    {
+      "id": "YS-09",
+      "title": "项目预算编制",
+      "route": "/projects/:id/budget",
+      "kind": "编制",
+      "roles": "项目经理",
+      "phase": 5,
+      "feature_ids": [
+        "YS-031",
+        "YS-032",
+        "YS-033",
+        "YS-034",
+        "YS-035",
+        "YS-036",
+        "YS-037",
+        "YS-038",
+        "YS-039",
+        "YS-040"
+      ],
+      "upstream_feature_scope": "YS-031~040",
+      "source_lines": {
+        "pages": 124,
+        "brief": 418
+      },
+      "criteria": [
+        "概算继承、预算帽、WBS阶段人力费用采购外包汇总",
+        "实时差异毛利，超概算可保存，提交需原因走高级审批"
+      ]
+    },
+    {
+      "id": "YS-10",
+      "title": "概算预算对比",
+      "route": "/projects/:id/estimate-budget",
+      "kind": "专题",
+      "roles": "项目经理、PMO、财务",
+      "phase": 5,
+      "feature_ids": [
+        "YS-038",
+        "YS-039",
+        "YS-040",
+        "YS-041",
+        "YS-042",
+        "YS-043"
+      ],
+      "upstream_feature_scope": "YS-038~043",
+      "source_lines": {
+        "pages": 125,
+        "brief": 419
+      },
+      "criteria": [
+        "冻结概算与预算按统一科目对比总额/差额/比率/毛利",
+        "异常来源可下钻，版本和差异原因明确，零分母安全"
+      ]
+    },
+    {
+      "id": "YS-11",
+      "title": "预算审批详情",
+      "route": "/projects/:id/budget/review",
+      "kind": "评审",
+      "roles": "PMO、财务、管理层",
+      "phase": 5,
+      "feature_ids": [
+        "YS-041",
+        "YS-042",
+        "YS-043"
+      ],
+      "upstream_feature_scope": "YS-041~043",
+      "source_lines": {
+        "pages": 126,
+        "brief": 420
+      },
+      "criteria": [
+        "常规/超概算分支、原因、材料版本、审批意见",
+        "通过生成预算版本并待PMO基线确认；审批中引用版本不跳动"
+      ]
+    },
+    {
+      "id": "YS-12",
+      "title": "项目基线",
+      "route": "/projects/:id/baseline",
+      "kind": "详情/版本",
+      "roles": "PMO、项目经理",
+      "phase": 5,
+      "feature_ids": [
+        "PT-021",
+        "PT-022",
+        "PT-023",
+        "PT-024",
+        "PT-025",
+        "YS-044",
+        "YS-045",
+        "YS-046"
+      ],
+      "upstream_feature_scope": "YS-044~046",
+      "source_lines": {
+        "pages": 127,
+        "brief": 421
+      },
+      "criteria": [
+        "范围进度成本资源四基线快照、生效原因和版本差异",
+        "只有有效版用于执行，变更追加版本，旧版只读"
+      ]
+    }
+  ],
+  "sources": {
+    "prd": {
+      "path": "docs/项目管理平台PRD_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "6dac675ca22237b7fa59129eccc466a9e242d20f948c0b68e958a7227bb2bd1b"
+    },
+    "features": {
+      "path": "docs/项目管理平台详细功能清单_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "fabfac73b480ccaf01aa831ae3c5d0a6485e33fff80f517468b2b6c52829ddfb"
+    },
+    "pages": {
+      "path": "docs/项目管理平台页面清单与原型设计说明_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "db1c548b5f5ef025eb90fef06422e132f003665fc7e6156dd706b7f095c994dc"
+    },
+    "brief": {
+      "path": "docs/项目管理平台高保真原型_AgentLoop开发任务书_V1.0.md",
+      "sha256": "286f917d5edc99a4a0c7da97515a3d6308cae7395fb287bbcd1846de60045b43"
+    }
+  },
+  "feature_references": {
+    "PT-021": {
+      "title": "范围基线",
+      "line": 485
+    },
+    "PT-022": {
+      "title": "进度基线",
+      "line": 486
+    },
+    "PT-023": {
+      "title": "成本基线",
+      "line": 487
+    },
+    "PT-024": {
+      "title": "资源基线",
+      "line": 488
+    },
+    "PT-025": {
+      "title": "版本对比",
+      "line": 489
+    },
+    "YS-017": {
+      "title": "项目经理候选推荐",
+      "line": 147
+    },
+    "YS-018": {
+      "title": "项目经理任命",
+      "line": 148
+    },
+    "YS-019": {
+      "title": "项目团队组建",
+      "line": 149
+    },
+    "YS-020": {
+      "title": "团队角色权限",
+      "line": 150
+    },
+    "YS-021": {
+      "title": "人员变更",
+      "line": 151
+    },
+    "YS-031": {
+      "title": "人员资源计划",
+      "line": 171
+    },
+    "YS-032": {
+      "title": "人力成本自动测算",
+      "line": 172
+    },
+    "YS-033": {
+      "title": "期间费用预算",
+      "line": 173
+    },
+    "YS-034": {
+      "title": "采购成本确认",
+      "line": 174
+    },
+    "YS-035": {
+      "title": "外包成本确认",
+      "line": 175
+    },
+    "YS-036": {
+      "title": "第三方费用确认",
+      "line": 176
+    },
+    "YS-037": {
+      "title": "预算汇总",
+      "line": 177
+    },
+    "YS-038": {
+      "title": "概算对比",
+      "line": 178
+    },
+    "YS-039": {
+      "title": "毛利测算",
+      "line": 179
+    },
+    "YS-040": {
+      "title": "预算提交",
+      "line": 180
+    },
+    "YS-041": {
+      "title": "超概算判断",
+      "line": 186
+    },
+    "YS-042": {
+      "title": "常规预算审批",
+      "line": 187
+    },
+    "YS-043": {
+      "title": "超概算审批",
+      "line": 188
+    },
+    "YS-044": {
+      "title": "基线生成",
+      "line": 189
+    },
+    "YS-045": {
+      "title": "基线确认",
+      "line": 190
+    },
+    "YS-046": {
+      "title": "基线快照",
+      "line": 191
+    }
+  }
+}

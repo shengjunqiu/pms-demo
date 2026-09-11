@@ -1,0 +1,17 @@
+
+> pms-demo@1.0.0 test:e2e /home/shengjunqiu/code/pms-demo
+> playwright test e2e/ui-initiation.spec.ts
+
+[WebServer] (node:2890086) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2890099) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:2890130) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/ui-initiation.spec.ts:160:1 › YS01/02 UI申请七页签、提交锁定与评审上下文返回 (23.3s)
+  ✓  2 e2e/ui-initiation.spec.ts:199:1 › YS03/04 UI高风险填写、降级阻断、分级与真实PMC节点通过 (28.1s)
+  ✓  3 e2e/ui-initiation.spec.ts:231:1 › YS04 UI六专业独立会签与正式配置审批 (27.5s)
+  ✓  4 e2e/ui-initiation.spec.ts:253:1 › YS04/01 UI整改退回、回复重提与原版保留 (20.2s)

@@ -1,0 +1,10 @@
+{
+  "title": "YS-15 未签合同阻断且不创建启动记录",
+  "status": "passed",
+  "url": "http://127.0.0.1:4179/projects/P-PLAN-001/start-confirmation",
+  "consoleErrors": [],
+  "observations": {
+    "blockedFixture": "unsigned-ready-for-contract",
+    "blockedResult": "真实合同未签时禁止启动且无记录"
+  }
+}

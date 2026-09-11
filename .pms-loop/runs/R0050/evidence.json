@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "round": "R0050",
+  "revision": "404d38cf8fc8a13c86aff65264f7ed54d710d6d55b2d2ac5c3058d8d3b76449e",
+  "items": {
+    "HS-14": {
+      "entry": "",
+      "covered_features": [],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": false,
+          "observation": ""
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": false,
+          "observation": ""
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": false,
+          "observation": ""
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": false,
+          "observation": ""
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": false,
+          "observation": ""
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": false,
+          "observation": ""
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": false,
+          "observation": ""
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": false,
+          "observation": ""
+        },
+        "business-1": {
+          "requirement": "范围进度成本资源等变更列表、级别影响状态",
+          "passed": false,
+          "observation": ""
+        },
+        "business-2": {
+          "requirement": "进入申请/材料/对比/原审批，能追踪引起偏差的变更",
+          "passed": false,
+          "observation": ""
+        }
+      },
+      "scenarios": [
+        {
+          "action": "",
+          "expected": "",
+          "observed": ""
+        }
+      ],
+      "artifacts": [],
+      "screenshots": {
+        "1440": "",
+        "1280": ""
+      }
+    },
+    "HS-15": {
+      "entry": "",
+      "covered_features": [],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": false,
+          "observation": ""
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": false,
+          "observation": ""
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": false,
+          "observation": ""
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": false,
+          "observation": ""
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": false,
+          "observation": ""
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": false,
+          "observation": ""
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": false,
+          "observation": ""
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": false,
+          "observation": ""
+        },
+        "business-1": {
+          "requirement": "原目标基线对比与范围进度成本毛利资源合同影响",
+          "passed": false,
+          "observation": ""
+        },
+        "business-2": {
+          "requirement": "分级审批通过追加统一基线版本，退回保持原版",
+          "passed": false,
+          "observation": ""
+        }
+      },
+      "scenarios": [
+        {
+          "action": "",
+          "expected": "",
+          "observed": ""
+        }
+      ],
+      "artifacts": [],
+      "screenshots": {
+        "1440": "",
+        "1280": ""
+      }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+
+> pms-demo@1.0.0 test:e2e /home/shengjunqiu/code/pms-demo
+> playwright test e2e/internal-supplier-acceptance.spec.ts
+
+[WebServer] (node:2793086) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2793101) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:2793125) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/internal-supplier-acceptance.spec.ts:70:1 › JS01内部整改必须回复后复验，旧轮次与新结论保留 (44.6s)
+  ✓  2 e2e/internal-supplier-acceptance.spec.ts:150:1 › JS02动态采购验收缺证明阻断，通过只同步履约不增加成本 (42.6s)
+  ✘  3 e2e/internal-supplier-acceptance.spec.ts:208:1 › JS01/02筛选空态、错误记录、未知项目和只读角色 (12.5s)
+
+
+  1) e2e/internal-supplier-acceptance.spec.ts:208:1 › JS01/02筛选空态、错误记录、未知项目和只读角色 ───────────────────
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: locator('.ant-table-placeholder')
+    Expected substring: "暂无数据"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" locator('.ant-table-placeholder') with timeout 5000ms
+      - waiting for locator('.ant-table-placeholder')
+
+
+      216 |     await closeDrawer(page);
+      217 |     await page.getByLabel('验收查询', { exact: true }).fill('NO-SUCH-ACCEPTANCE');
+    > 218 |     await expect(page.locator('.ant-table-placeholder')).toContainText('暂无数据');
+          |                                                          ^
+      219 |     screenshots[path] = await capturePageEvidence(page, `JS-${path}-empty`);
+      220 |     await navigate(page, `${base}/${path}?record=UNKNOWN`);
+      221 |     await expect(page.getByText('验收记录不存在', { exact: true })).toBeVisible();
+        at /home/shengjunqiu/code/pms-demo/e2e/internal-supplier-acceptance.spec.ts:218:58
+
+    Error Context: test-results/internal-supplier-acceptance-JS01-02筛选空态、错误记录、未知项目和只读角色/error-context.md
+
+  1 failed
+    e2e/internal-supplier-acceptance.spec.ts:208:1 › JS01/02筛选空态、错误记录、未知项目和只读角色 ────────────────────
+  2 passed (1.7m)
+ ELIFECYCLE  Command failed with exit code 1.

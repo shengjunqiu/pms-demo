@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "round": "R0046",
+  "revision": "00c72480667a712bb365f3b7b9b3eb0e28e91b808698fd551ba237e79385cd03",
+  "items": {
+    "WK-02": {
+      "entry": "/workbench/todos",
+      "covered_features": [
+        "PT-008",
+        "PT-009",
+        "PT-010",
+        "PT-011",
+        "PT-012",
+        "PT-013",
+        "PT-014"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行104及功能PT-008,PT-009,PT-010,PT-011,PT-012,PT-013,PT-014原规则核对；235领域通过。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "PMO按P-001及PLAN-1筛选本人待办，进入真实原单；PMO批准后本人已办显示意见，原申请仍待财务，返回保留筛选；财务通过后原计划生效。原工作台两宽下钻回归2例通过。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "PMO按P-001及PLAN-1筛选本人待办，进入真实原单；PMO批准后本人已办显示意见，原申请仍待财务，返回保留筛选；财务通过后原计划生效。原工作台两宽下钻回归2例通过。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "PMO按P-001及PLAN-1筛选本人待办，进入真实原单；PMO批准后本人已办显示意见，原申请仍待财务，返回保留筛选；财务通过后原计划生效。原工作台两宽下钻回归2例通过。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "PMO按P-001及PLAN-1筛选本人待办，进入真实原单；PMO批准后本人已办显示意见，原申请仍待财务，返回保留筛选；财务通过后原计划生效。原工作台两宽下钻回归2例通过。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "PMO按P-001及PLAN-1筛选本人待办，进入真实原单；PMO批准后本人已办显示意见，原申请仍待财务，返回保留筛选；财务通过后原计划生效。原工作台两宽下钻回归2例通过。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已人工查看最终revision三页1440/1280全页截图及计划原单两宽；阶段门、办理动作及历史分区，表格局部滚动，页面无横溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "最终当前revision五个UI场景均exit0、consoleErrors=[]；首版另含工作台下钻两宽2例通过，后续仅关联plan-requests原单灰工作区布局补齐。"
+        },
+        "business-1": {
+          "requirement": "待办/已办按业务类型项目时限查询，显示当前节点与责任人",
+          "passed": true,
+          "observation": "PMO按P-001及PLAN-1筛选本人待办，进入真实原单；PMO批准后本人已办显示意见，原申请仍待财务，返回保留筛选；财务通过后原计划生效。原工作台两宽下钻回归2例通过。"
+        },
+        "business-2": {
+          "requirement": "处理进入原业务详情，结果同步待办和原单据，未授权动作不可用",
+          "passed": true,
+          "observation": "PMO按P-001及PLAN-1筛选本人待办，进入真实原单；PMO批准后本人已办显示意见，原申请仍待财务，返回保留筛选；财务通过后原计划生效。原工作台两宽下钻回归2例通过。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "执行ui-progress真实业务交互、角色切换和深链场景",
+          "expected": "原审批/阶段/基线规则保持，两宽可用",
+          "observed": "PMO按P-001及PLAN-1筛选本人待办，进入真实原单；PMO批准后本人已办显示意见，原申请仍待财务，返回保留筛选；财务通过后原计划生效。原工作台两宽下钻回归2例通过。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0046/browser-final.log",
+        ".pms-loop/runs/R0046/browser-verified.log",
+        ".pms-loop/runs/R0046/artifacts/r0024-d2045523082410c83585d393d0fd88b2527658ec.json",
+        ".pms-loop/runs/R0046/artifacts/r0024-d2045523082410c8358578c9d87defee3e0c7934.json",
+        ".pms-loop/runs/R0046/artifacts/r0024-d2045523082410c83585c31a11219e7d8cf54d7e.json",
+        ".pms-loop/runs/R0046/artifacts/r0024-d2045523082410c83585a260f6e316aa0029dbb5.json",
+        ".pms-loop/runs/R0046/artifacts/r0024-d2045523082410c83585e6961f1e58fd4358ab0b.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0046/artifacts/UI-WK02-1440.png",
+        "1280": ".pms-loop/runs/R0046/artifacts/UI-WK02-1280.png"
+      }
+    },
+    "HS-02": {
+      "entry": "/projects/P-001/progress",
+      "covered_features": [
+        "HS-007",
+        "HS-008",
+        "HS-009",
+        "HS-010",
+        "HS-011",
+        "HS-012"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行132及功能HS-007,HS-008,HS-009,HS-010,HS-011,HS-012原规则核对；235领域通过。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "task深链选中任务；0→50并填实际开始后总体68.75，基线/原计划日期不变；100缺实际完成日期被阻断；财务更新禁用，未知项目404。P001草稿切P002关闭，返回P001无旧草稿。恢复当前阶段，全部里程碑可展开，WBS及关联申请完整。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "task深链选中任务；0→50并填实际开始后总体68.75，基线/原计划日期不变；100缺实际完成日期被阻断；财务更新禁用，未知项目404。P001草稿切P002关闭，返回P001无旧草稿。恢复当前阶段，全部里程碑可展开，WBS及关联申请完整。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "task深链选中任务；0→50并填实际开始后总体68.75，基线/原计划日期不变；100缺实际完成日期被阻断；财务更新禁用，未知项目404。P001草稿切P002关闭，返回P001无旧草稿。恢复当前阶段，全部里程碑可展开，WBS及关联申请完整。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "task深链选中任务；0→50并填实际开始后总体68.75，基线/原计划日期不变；100缺实际完成日期被阻断；财务更新禁用，未知项目404。P001草稿切P002关闭，返回P001无旧草稿。恢复当前阶段，全部里程碑可展开，WBS及关联申请完整。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "task深链选中任务；0→50并填实际开始后总体68.75，基线/原计划日期不变；100缺实际完成日期被阻断；财务更新禁用，未知项目404。P001草稿切P002关闭，返回P001无旧草稿。恢复当前阶段，全部里程碑可展开，WBS及关联申请完整。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已人工查看最终revision三页1440/1280全页截图及计划原单两宽；阶段门、办理动作及历史分区，表格局部滚动，页面无横溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "最终当前revision五个UI场景均exit0、consoleErrors=[]；首版另含工作台下钻两宽2例通过，后续仅关联plan-requests原单灰工作区布局补齐。"
+        },
+        "business-1": {
+          "requirement": "总体完成率、里程碑轴、WBS甘特、计划实际与延期",
+          "passed": true,
+          "observation": "task深链选中任务；0→50并填实际开始后总体68.75，基线/原计划日期不变；100缺实际完成日期被阻断；财务更新禁用，未知项目404。P001草稿切P002关闭，返回P001无旧草稿。恢复当前阶段，全部里程碑可展开，WBS及关联申请完整。"
+        },
+        "business-2": {
+          "requirement": "更新执行事实不改基线，里程碑/计划变更/阶段入口可用",
+          "passed": true,
+          "observation": "task深链选中任务；0→50并填实际开始后总体68.75，基线/原计划日期不变；100缺实际完成日期被阻断；财务更新禁用，未知项目404。P001草稿切P002关闭，返回P001无旧草稿。恢复当前阶段，全部里程碑可展开，WBS及关联申请完整。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "执行ui-progress真实业务交互、角色切换和深链场景",
+          "expected": "原审批/阶段/基线规则保持，两宽可用",
+          "observed": "task深链选中任务；0→50并填实际开始后总体68.75，基线/原计划日期不变；100缺实际完成日期被阻断；财务更新禁用，未知项目404。P001草稿切P002关闭，返回P001无旧草稿。恢复当前阶段，全部里程碑可展开，WBS及关联申请完整。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0046/browser-final.log",
+        ".pms-loop/runs/R0046/browser-verified.log",
+        ".pms-loop/runs/R0046/artifacts/r0024-d2045523082410c83585d393d0fd88b2527658ec.json",
+        ".pms-loop/runs/R0046/artifacts/r0024-d2045523082410c8358578c9d87defee3e0c7934.json",
+        ".pms-loop/runs/R0046/artifacts/r0024-d2045523082410c83585c31a11219e7d8cf54d7e.json",
+        ".pms-loop/runs/R0046/artifacts/r0024-d2045523082410c83585a260f6e316aa0029dbb5.json",
+        ".pms-loop/runs/R0046/artifacts/r0024-d2045523082410c83585e6961f1e58fd4358ab0b.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0046/artifacts/UI-HS02-1440.png",
+        "1280": ".pms-loop/runs/R0046/artifacts/UI-HS02-1280.png"
+      }
+    },
+    "HS-16": {
+      "entry": "/projects/P-001/stage-switch",
+      "covered_features": [
+        "HS-074",
+        "HS-075",
+        "HS-076",
+        "HS-077",
+        "HS-078",
+        "HS-079",
+        "HS-080",
+        "PT-038"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行146及功能HS-074,HS-075,HS-076,HS-077,HS-078,HS-079,HS-080,PT-038原规则核对；235领域通过。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "现有执行未完/材料缺件阻断PMO通过，驳回留历史且新申请清空输入。就绪前置明确使用领域fixture设置已覆盖的任务/材料事实，再真实UI提交与PMO批准进入收尾/客户终验，按审批snapshot释放预算，预算总额/基线/验收事实不变，历史显示批准快照。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "现有执行未完/材料缺件阻断PMO通过，驳回留历史且新申请清空输入。就绪前置明确使用领域fixture设置已覆盖的任务/材料事实，再真实UI提交与PMO批准进入收尾/客户终验，按审批snapshot释放预算，预算总额/基线/验收事实不变，历史显示批准快照。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "现有执行未完/材料缺件阻断PMO通过，驳回留历史且新申请清空输入。就绪前置明确使用领域fixture设置已覆盖的任务/材料事实，再真实UI提交与PMO批准进入收尾/客户终验，按审批snapshot释放预算，预算总额/基线/验收事实不变，历史显示批准快照。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "现有执行未完/材料缺件阻断PMO通过，驳回留历史且新申请清空输入。就绪前置明确使用领域fixture设置已覆盖的任务/材料事实，再真实UI提交与PMO批准进入收尾/客户终验，按审批snapshot释放预算，预算总额/基线/验收事实不变，历史显示批准快照。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "现有执行未完/材料缺件阻断PMO通过，驳回留历史且新申请清空输入。就绪前置明确使用领域fixture设置已覆盖的任务/材料事实，再真实UI提交与PMO批准进入收尾/客户终验，按审批snapshot释放预算，预算总额/基线/验收事实不变，历史显示批准快照。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已人工查看最终revision三页1440/1280全页截图及计划原单两宽；阶段门、办理动作及历史分区，表格局部滚动，页面无横溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "最终当前revision五个UI场景均exit0、consoleErrors=[]；首版另含工作台下钻两宽2例通过，后续仅关联plan-requests原单灰工作区布局补齐。"
+        },
+        "business-1": {
+          "requirement": "里程碑实际达成、必交材料审核、重大阻断异常校验",
+          "passed": true,
+          "observation": "现有执行未完/材料缺件阻断PMO通过，驳回留历史且新申请清空输入。就绪前置明确使用领域fixture设置已覆盖的任务/材料事实，再真实UI提交与PMO批准进入收尾/客户终验，按审批snapshot释放预算，预算总额/基线/验收事实不变，历史显示批准快照。"
+        },
+        "business-2": {
+          "requirement": "不满足不能切阶段，通过留痕并按规则释放预算",
+          "passed": true,
+          "observation": "现有执行未完/材料缺件阻断PMO通过，驳回留历史且新申请清空输入。就绪前置明确使用领域fixture设置已覆盖的任务/材料事实，再真实UI提交与PMO批准进入收尾/客户终验，按审批snapshot释放预算，预算总额/基线/验收事实不变，历史显示批准快照。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "执行ui-progress真实业务交互、角色切换和深链场景",
+          "expected": "原审批/阶段/基线规则保持，两宽可用",
+          "observed": "现有执行未完/材料缺件阻断PMO通过，驳回留历史且新申请清空输入。就绪前置明确使用领域fixture设置已覆盖的任务/材料事实，再真实UI提交与PMO批准进入收尾/客户终验，按审批snapshot释放预算，预算总额/基线/验收事实不变，历史显示批准快照。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0046/browser-final.log",
+        ".pms-loop/runs/R0046/browser-verified.log",
+        ".pms-loop/runs/R0046/artifacts/r0024-d2045523082410c83585d393d0fd88b2527658ec.json",
+        ".pms-loop/runs/R0046/artifacts/r0024-d2045523082410c8358578c9d87defee3e0c7934.json",
+        ".pms-loop/runs/R0046/artifacts/r0024-d2045523082410c83585c31a11219e7d8cf54d7e.json",
+        ".pms-loop/runs/R0046/artifacts/r0024-d2045523082410c83585a260f6e316aa0029dbb5.json",
+        ".pms-loop/runs/R0046/artifacts/r0024-d2045523082410c83585e6961f1e58fd4358ab0b.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0046/artifacts/UI-HS16-1440.png",
+        "1280": ".pms-loop/runs/R0046/artifacts/UI-HS16-1280.png"
+      }
+    }
+  }
+}

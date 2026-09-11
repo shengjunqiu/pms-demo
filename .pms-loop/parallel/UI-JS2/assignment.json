@@ -1,0 +1,40 @@
+{
+  "package_id": "UI-JS2",
+  "items": [
+    "JS-05",
+    "JS-06",
+    "JS-07",
+    "JS-08"
+  ],
+  "owner": "/root/ui_planning",
+  "writer": "/root/ui_planning",
+  "integration_root": "/home/shengjunqiu/code/pms-demo",
+  "workdir": "/tmp/pms-ui-settlement",
+  "branch": "pms/ui-settlement",
+  "base_commit": "d2994f3",
+  "contract_commit": "d2994f3",
+  "owned_paths": [
+    "src/pages/settlement/SettlementPage.tsx",
+    "src/pages/settlement/SettlementAnalysisPage.tsx",
+    "e2e/ui-settlement.spec.ts",
+    "e2e/receipts.spec.ts"
+  ],
+  "shared_changes": [],
+  "development_dependencies": [],
+  "acceptance_dependencies": [
+    "root集成与验收"
+  ],
+  "acceptance_ready": false,
+  "acceptance_group": "UI-JS2",
+  "status": "assigned",
+  "last_confirmed_at": "2026-09-11",
+  "acceptance_checklist": [
+    "工程检查",
+    "真实结算正常及两类退回、收款",
+    "双宽权限",
+    "正式accept"
+  ],
+  "scenarios": "见/tmp/pms-ui-settlement-preparation.md",
+  "fixtures": "合法transition前置需明确，目标流程真实UI",
+  "next_action": "四页改造独占交付"
+}

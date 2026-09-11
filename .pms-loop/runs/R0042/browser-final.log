@@ -1,0 +1,19 @@
+
+> pms-demo@1.0.0 test:e2e /home/shengjunqiu/code/pms-demo
+> playwright test e2e/ui-budget-workspace.spec.ts e2e/budget-acceptance.spec.ts
+
+[WebServer] (node:2872103) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2872116) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:2872143) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/budget-acceptance.spec.ts:40:1 › YS-09 删除中间新增事项再新增，保存后各事项仍独立 (15.6s)
+  ✓  2 e2e/budget-acceptance.spec.ts:61:1 › YS-09/10/11/12 超概算保存、原因阻断、高级审批和独立基线确认 (38.8s)
+  ✓  3 e2e/ui-budget-workspace.spec.ts:28:1 › UI 团队：维护成员投入、原因与当前主PM退出限制 (8.3s)
+  ✓  4 e2e/ui-budget-workspace.spec.ts:43:1 › UI 预算工作区：五页上下文、版本来源、只读审批与基线快照 (17.4s)
+
+  4 passed (1.4m)

@@ -1,0 +1,199 @@
+
+> pms-demo@1.0.0 test:e2e /home/shengjunqiu/code/pms-demo
+> playwright test e2e/ui-initiation.spec.ts
+
+[WebServer] (node:2885393) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2885411) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:2885439) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 e2e/ui-initiation.spec.ts:157:1 › YS01/02 UI申请七页签、提交锁定与评审上下文返回 (24.0s)
+(node:2885911) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 e2e/ui-initiation.spec.ts:196:1 › YS03/04 UI高风险填写、降级阻断、分级与真实PMC节点通过 (32.1s)
+(node:2886402) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 e2e/ui-initiation.spec.ts:228:1 › YS04 UI六专业独立会签与正式配置审批 (16.1s)
+(node:2886678) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  4 e2e/ui-initiation.spec.ts:249:1 › YS04/01 UI整改退回、回复重提与原版保留 (19.9s)
+(node:2887058) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  5 e2e/ui-initiation.spec.ts:276:1 › YS权限 UI只读、敏感意见隐藏与未知申请 (17.6s)
+
+
+  1) e2e/ui-initiation.spec.ts:157:1 › YS01/02 UI申请七页签、提交锁定与评审上下文返回 ────────────────────────────────
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "Warning: [antd: Table] `index` parameter of `rowKey` function is deprecated. There is no guarantee that it will work as expected.",
+    + ]
+
+      92 |   const errors = browserErrors.get(page) ?? [];
+      93 |   writeFileSync(join(artifacts, `initiation-${info.testId.replace(/[^a-z0-9]/gi, '')}.json`), JSON.stringify({ title: info.title, status: info.status, url: page.url(), consoleErrors: errors }, null, 2));
+    > 94 |   expect(errors).toEqual([]);
+         |                  ^
+      95 | });
+      96 | async function capture(page: Page, name: string) {
+      97 |   for (const width of [1440, 1280]) {
+        at /home/shengjunqiu/code/pms-demo/e2e/ui-initiation.spec.ts:94:18
+
+    Error Context: test-results/ui-initiation-YS01-02-UI申请七页签、提交锁定与评审上下文返回/error-context.md
+
+  2) e2e/ui-initiation.spec.ts:196:1 › YS03/04 UI高风险填写、降级阻断、分级与真实PMC节点通过 ───────────────────────────
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('dialog')
+    Expected: 0
+    Received: 1
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('dialog') with timeout 5000ms
+      - waiting for getByRole('dialog')
+        14 × locator resolved to 1 element
+           - unexpected value "1"
+
+
+      130 | async function confirmDecision(page: Page) {
+      131 |   await page.getByRole('dialog').getByRole('button', { name: /^确\s*定$/ }).click();
+    > 132 |   await expect(page.getByRole('dialog')).toHaveCount(0);
+          |                                          ^
+      133 | }
+      134 | async function finishConfiguredApproval(page: Page, id: string, meeting: boolean) {
+      135 |   // Follow the real configured nodes; an all-role node may require several independent signatures.
+        at confirmDecision (/home/shengjunqiu/code/pms-demo/e2e/ui-initiation.spec.ts:132:42)
+        at finishConfiguredApproval (/home/shengjunqiu/code/pms-demo/e2e/ui-initiation.spec.ts:151:5)
+        at /home/shengjunqiu/code/pms-demo/e2e/ui-initiation.spec.ts:221:18
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 4
+
+    - Array []
+    + Array [
+    +   "Warning: [antd: Table] `index` parameter of `rowKey` function is deprecated. There is no guarantee that it will work as expected.",
+    +   "决策会须有会议日期、至少两位参会人和纪要",
+    + ]
+
+      92 |   const errors = browserErrors.get(page) ?? [];
+      93 |   writeFileSync(join(artifacts, `initiation-${info.testId.replace(/[^a-z0-9]/gi, '')}.json`), JSON.stringify({ title: info.title, status: info.status, url: page.url(), consoleErrors: errors }, null, 2));
+    > 94 |   expect(errors).toEqual([]);
+         |                  ^
+      95 | });
+      96 | async function capture(page: Page, name: string) {
+      97 |   for (const width of [1440, 1280]) {
+        at /home/shengjunqiu/code/pms-demo/e2e/ui-initiation.spec.ts:94:18
+
+    Error Context: test-results/ui-initiation-YS03-04-UI高风险填写、降级阻断、分级与真实PMC节点通过/error-context.md
+
+  3) e2e/ui-initiation.spec.ts:228:1 › YS04 UI六专业独立会签与正式配置审批 ───────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('heading', { name: '项目分级与决策', exact: true }).first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('heading', { name: '项目分级与决策', exact: true }).first() with timeout 5000ms
+      - waiting for getByRole('heading', { name: '项目分级与决策', exact: true }).first()
+
+
+      113 | async function open(page: Page, path: string, title: string, id?: string) {
+      114 |   await navigate(page, path);
+    > 115 |   await expect(page.getByRole('heading', { name: title, exact: true }).first()).toBeVisible();
+          |                                                                                 ^
+      116 |   if (id) await expect(page.locator('.pms-page-header')).toContainText(id);
+      117 | }
+      118 | async function application(page: Page, id: string) {
+        at open (/home/shengjunqiu/code/pms-demo/e2e/ui-initiation.spec.ts:115:81)
+        at /home/shengjunqiu/code/pms-demo/e2e/ui-initiation.spec.ts:235:5
+
+    Error Context: test-results/ui-initiation-YS04-UI六专业独立会签与正式配置审批/error-context.md
+
+  4) e2e/ui-initiation.spec.ts:249:1 › YS04/01 UI整改退回、回复重提与原版保留 ────────────────────────────────────
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "Warning: [antd: Table] `index` parameter of `rowKey` function is deprecated. There is no guarantee that it will work as expected.",
+    + ]
+
+      92 |   const errors = browserErrors.get(page) ?? [];
+      93 |   writeFileSync(join(artifacts, `initiation-${info.testId.replace(/[^a-z0-9]/gi, '')}.json`), JSON.stringify({ title: info.title, status: info.status, url: page.url(), consoleErrors: errors }, null, 2));
+    > 94 |   expect(errors).toEqual([]);
+         |                  ^
+      95 | });
+      96 | async function capture(page: Page, name: string) {
+      97 |   for (const width of [1440, 1280]) {
+        at /home/shengjunqiu/code/pms-demo/e2e/ui-initiation.spec.ts:94:18
+
+    Error Context: test-results/ui-initiation-YS04-01-UI整改退回、回复重提与原版保留/error-context.md
+
+  5) e2e/ui-initiation.spec.ts:276:1 › YS权限 UI只读、敏感意见隐藏与未知申请 ───────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText('404 页面未找到', { exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText('404 页面未找到', { exact: true }) with timeout 5000ms
+      - waiting for getByText('404 页面未找到', { exact: true })
+
+
+      289 |   await capture(page, 'YS02-readonly');
+      290 |   await navigate(page, '/initiation/UNKNOWN/decision');
+    > 291 |   await expect(page.getByText('404 页面未找到', { exact: true })).toBeVisible();
+          |                                                              ^
+      292 | });
+      293 |
+        at /home/shengjunqiu/code/pms-demo/e2e/ui-initiation.spec.ts:291:62
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "Warning: [antd: Table] `index` parameter of `rowKey` function is deprecated. There is no guarantee that it will work as expected.",
+    + ]
+
+      92 |   const errors = browserErrors.get(page) ?? [];
+      93 |   writeFileSync(join(artifacts, `initiation-${info.testId.replace(/[^a-z0-9]/gi, '')}.json`), JSON.stringify({ title: info.title, status: info.status, url: page.url(), consoleErrors: errors }, null, 2));
+    > 94 |   expect(errors).toEqual([]);
+         |                  ^
+      95 | });
+      96 | async function capture(page: Page, name: string) {
+      97 |   for (const width of [1440, 1280]) {
+        at /home/shengjunqiu/code/pms-demo/e2e/ui-initiation.spec.ts:94:18
+
+    Error Context: test-results/ui-initiation-YS权限-UI只读、敏感意见隐藏与未知申请/error-context.md
+
+  5 failed
+    e2e/ui-initiation.spec.ts:157:1 › YS01/02 UI申请七页签、提交锁定与评审上下文返回 ─────────────────────────────────
+    e2e/ui-initiation.spec.ts:196:1 › YS03/04 UI高风险填写、降级阻断、分级与真实PMC节点通过 ────────────────────────────
+    e2e/ui-initiation.spec.ts:228:1 › YS04 UI六专业独立会签与正式配置审批 ────────────────────────────────────────
+    e2e/ui-initiation.spec.ts:249:1 › YS04/01 UI整改退回、回复重提与原版保留 ─────────────────────────────────────
+    e2e/ui-initiation.spec.ts:276:1 › YS权限 UI只读、敏感意见隐藏与未知申请 ────────────────────────────────────────
+ ELIFECYCLE  Command failed with exit code 1.

@@ -1,0 +1,109 @@
+
+> pms-demo@1.0.0 test:e2e /home/shengjunqiu/code/pms-demo
+> playwright test e2e/r0024-unsigned.spec.ts
+
+[WebServer] (node:2899820) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2899833) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:2899872) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 e2e/r0024-unsigned.spec.ts:37:1 › YS-13 未签台账按风险过滤并保留真实下钻 (20.5s)
+(node:2900357) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 e2e/r0024-unsigned.spec.ts:91:1 › YS-14 签约进展和合同原单形成同源记录 (29.3s)
+(node:2901000) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 e2e/r0024-unsigned.spec.ts:188:1 › YS-15 阻断原因完整且满足条件后原子启动 (30.3s)
+(node:2901440) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  4 e2e/r0024-unsigned.spec.ts:263:1 › 未签页面空结果、无权限及缺基线不会冒充可启动 (16.3s)
+
+
+  1) e2e/r0024-unsigned.spec.ts:37:1 › YS-13 未签台账按风险过滤并保留真实下钻 ──────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: 'P-PLAN-001 福建园区设备运维协同平台' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: 'P-PLAN-001 福建园区设备运维协同平台' }) with timeout 5000ms
+      - waiting for getByRole('button', { name: 'P-PLAN-001 福建园区设备运维协同平台' })
+
+
+      71 |     name: 'P-PLAN-001 福建园区设备运维协同平台',
+      72 |   });
+    > 73 |   await expect(projectLink).toBeVisible();
+         |                             ^
+      74 |   await projectLink.click();
+      75 |   await expect(page).toHaveURL('/unsigned-projects/P-PLAN-001');
+      76 |   await expect(
+        at /home/shengjunqiu/code/pms-demo/e2e/r0024-unsigned.spec.ts:73:29
+
+    Error Context: test-results/r0024-unsigned-YS-13-未签台账按风险过滤并保留真实下钻/error-context.md
+
+  2) e2e/r0024-unsigned.spec.ts:91:1 › YS-14 签约进展和合同原单形成同源记录 ───────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText('已签转换', { exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText('已签转换', { exact: true }) with timeout 5000ms
+      - waiting for getByText('已签转换', { exact: true })
+
+
+      168 |   await expect(page.getByRole('button', { name: 'P-PLAN-001 福建园区设备运维协同平台' })).toHaveCount(0);
+      169 |   await page.getByRole('button', { name: '含已签转换记录' }).click();
+    > 170 |   await expect(page.getByText('已签转换', { exact: true })).toBeVisible();
+          |                                                         ^
+      171 |   await navigate(page, '/projects/P-PLAN-001/start-confirmation');
+      172 |   await expect(page.getByText('未满足', { exact: true })).toHaveCount(0);
+      173 |   await page.getByPlaceholder('启动会议安排、执行要求与确认意见').fill('沿用刚登记的合同和现有基线正式启动');
+        at /home/shengjunqiu/code/pms-demo/e2e/r0024-unsigned.spec.ts:170:57
+
+    Error Context: test-results/r0024-unsigned-YS-14-签约进展和合同原单形成同源记录/error-context.md
+
+  3) e2e/r0024-unsigned.spec.ts:188:1 › YS-15 阻断原因完整且满足条件后原子启动 ─────────────────────────────────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: expect(page).toHaveURL(expected) failed
+
+    Expected: "http://127.0.0.1:4179/projects/P-PLAN-001/daily-reports"
+    Received: ""
+
+    Call log:
+      - Expect "toHaveURL" with timeout 5000ms
+      - Protocol error (Runtime.callFunctionOn): Internal server error, session closed.
+
+
+       at helpers.ts:15
+
+      13 | export async function navigate(page: Page, path: string) {
+      14 |   await page.evaluate((url) => { window.history.pushState({}, '', url); window.dispatchEvent(new PopStateEvent('popstate')); }, path);
+    > 15 |   await expect(page).toHaveURL(path);
+         |                      ^
+      16 |   await page.evaluate(() => window.scrollTo(0, 0));
+      17 |   await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+      18 | }
+        at navigate (/home/shengjunqiu/code/pms-demo/e2e/helpers.ts:15:22)
+        at /home/shengjunqiu/code/pms-demo/e2e/r0024-unsigned.spec.ts:248:3
+
+    Error Context: test-results/r0024-unsigned-YS-15-阻断原因完整且满足条件后原子启动/error-context.md
+
+  3 failed
+    e2e/r0024-unsigned.spec.ts:37:1 › YS-13 未签台账按风险过滤并保留真实下钻 ───────────────────────────────────────
+    e2e/r0024-unsigned.spec.ts:91:1 › YS-14 签约进展和合同原单形成同源记录 ────────────────────────────────────────
+    e2e/r0024-unsigned.spec.ts:188:1 › YS-15 阻断原因完整且满足条件后原子启动 ──────────────────────────────────────
+  1 passed (1.7m)
+ ELIFECYCLE  Command failed with exit code 1.

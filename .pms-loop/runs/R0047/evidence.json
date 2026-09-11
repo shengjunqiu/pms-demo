@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "round": "R0047",
+  "revision": "c011aa03f970b4afc93d4301ef772160fa5f20da1c5a2283f5a6ac7aa108f550",
+  "items": {
+    "HS-03": {
+      "entry": "/projects/P-001/daily-reports",
+      "covered_features": [
+        "HS-013",
+        "HS-014",
+        "HS-015",
+        "HS-016",
+        "HS-017"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行133，任务书行432，功能HS-013,HS-014,HS-015,HS-016,HS-017。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "主PM真实无进展必填校验、保存草稿重开保留两关联ID、提交后只读且日报唯一，WBS和问题未覆盖；材料未齐里程碑阻断，其他材料合法transition前置后实际UI登记达成，计划日期保留。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "主PM真实无进展必填校验、保存草稿重开保留两关联ID、提交后只读且日报唯一，WBS和问题未覆盖；材料未齐里程碑阻断，其他材料合法transition前置后实际UI登记达成，计划日期保留。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "主PM真实无进展必填校验、保存草稿重开保留两关联ID、提交后只读且日报唯一，WBS和问题未覆盖；材料未齐里程碑阻断，其他材料合法transition前置后实际UI登记达成，计划日期保留。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "主PM真实无进展必填校验、保存草稿重开保留两关联ID、提交后只读且日报唯一，WBS和问题未覆盖；材料未齐里程碑阻断，其他材料合法transition前置后实际UI登记达成，计划日期保留。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "财务日报只读；错误report/document深链显示不存在；已提交报告、已归档文档不可编辑。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已查看当前1440/1280全页截图，报告三成本独立标签，修复1280金额重叠；表格局部横向滚动，页面无横溢。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "最终browser-final.log三个场景exit0；对应报告consoleErrors均为空。"
+        },
+        "business-1": {
+          "requirement": "自动日报待办，项目带入、进展/无进展原因、下一步和里程碑",
+          "passed": true,
+          "observation": "主PM真实无进展必填校验、保存草稿重开保留两关联ID、提交后只读且日报唯一，WBS和问题未覆盖；材料未齐里程碑阻断，其他材料合法transition前置后实际UI登记达成，计划日期保留。"
+        },
+        "business-2": {
+          "requirement": "问题风险独立关联；里程碑完成需实际时间和材料",
+          "passed": true,
+          "observation": "主PM真实无进展必填校验、保存草稿重开保留两关联ID、提交后只读且日报唯一，WBS和问题未覆盖；材料未齐里程碑阻断，其他材料合法transition前置后实际UI登记达成，计划日期保留。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "执行 e2e/ui-reporting.spec.ts 实际页面操作",
+          "expected": "自动日报待办，项目带入、进展/无进展原因、下一步和里程碑；问题风险独立关联；里程碑完成需实际时间和材料",
+          "observed": "主PM真实无进展必填校验、保存草稿重开保留两关联ID、提交后只读且日报唯一，WBS和问题未覆盖；材料未齐里程碑阻断，其他材料合法transition前置后实际UI登记达成，计划日期保留。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0047/browser-final.log",
+        ".pms-loop/runs/R0047/artifacts/r0024-aab319e959db4d4a4184d4356c5889bd7a5eae10.json",
+        ".pms-loop/runs/R0047/artifacts/r0024-aab319e959db4d4a41847d40cbf421a29a9c1052.json",
+        ".pms-loop/runs/R0047/artifacts/r0024-aab319e959db4d4a4184a56fa5286f6abe821577.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0047/artifacts/UI-HS03-1440.png",
+        "1280": ".pms-loop/runs/R0047/artifacts/UI-HS03-1280.png"
+      }
+    },
+    "HS-04": {
+      "entry": "/projects/P-001/weekly-reports",
+      "covered_features": [
+        "HS-018",
+        "HS-019"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行134，任务书行433，功能HS-018,HS-019。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "由当周日报/WBS/成本/风险生成快照草稿，实际补充模拟上报后保留收件角色和历史；来源问题下钻可达，后续合法任务更新不改变原周报快照。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "由当周日报/WBS/成本/风险生成快照草稿，实际补充模拟上报后保留收件角色和历史；来源问题下钻可达，后续合法任务更新不改变原周报快照。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "由当周日报/WBS/成本/风险生成快照草稿，实际补充模拟上报后保留收件角色和历史；来源问题下钻可达，后续合法任务更新不改变原周报快照。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "由当周日报/WBS/成本/风险生成快照草稿，实际补充模拟上报后保留收件角色和历史；来源问题下钻可达，后续合法任务更新不改变原周报快照。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "财务日报只读；错误report/document深链显示不存在；已提交报告、已归档文档不可编辑。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已查看当前1440/1280全页截图，报告三成本独立标签，修复1280金额重叠；表格局部横向滚动，页面无横溢。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "最终browser-final.log三个场景exit0；对应报告consoleErrors均为空。"
+        },
+        "business-1": {
+          "requirement": "由日报/计划/成本/风险聚合周报草稿",
+          "passed": true,
+          "observation": "由当周日报/WBS/成本/风险生成快照草稿，实际补充模拟上报后保留收件角色和历史；来源问题下钻可达，后续合法任务更新不改变原周报快照。"
+        },
+        "business-2": {
+          "requirement": "可补充提交，模拟上报范围/历史保留且不发送真实消息",
+          "passed": true,
+          "observation": "由当周日报/WBS/成本/风险生成快照草稿，实际补充模拟上报后保留收件角色和历史；来源问题下钻可达，后续合法任务更新不改变原周报快照。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "执行 e2e/ui-reporting.spec.ts 实际页面操作",
+          "expected": "由日报/计划/成本/风险聚合周报草稿；可补充提交，模拟上报范围/历史保留且不发送真实消息",
+          "observed": "由当周日报/WBS/成本/风险生成快照草稿，实际补充模拟上报后保留收件角色和历史；来源问题下钻可达，后续合法任务更新不改变原周报快照。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0047/browser-final.log",
+        ".pms-loop/runs/R0047/artifacts/r0024-aab319e959db4d4a4184d4356c5889bd7a5eae10.json",
+        ".pms-loop/runs/R0047/artifacts/r0024-aab319e959db4d4a41847d40cbf421a29a9c1052.json",
+        ".pms-loop/runs/R0047/artifacts/r0024-aab319e959db4d4a4184a56fa5286f6abe821577.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0047/artifacts/UI-HS04-1440.png",
+        "1280": ".pms-loop/runs/R0047/artifacts/UI-HS04-1280.png"
+      }
+    },
+    "HS-17": {
+      "entry": "/projects/P-001/deliverables",
+      "covered_features": [
+        "HS-020",
+        "HS-021",
+        "HS-022",
+        "HS-023",
+        "HS-075",
+        "HS-076",
+        "HS-077",
+        "PT-015",
+        "PT-016",
+        "PT-017",
+        "PT-018",
+        "PT-019",
+        "PT-020"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行147，任务书行446，功能HS-020,HS-021,HS-022,HS-023,HS-075,HS-076,HS-077,PT-015,PT-016,PT-017,PT-018,PT-019,PT-020。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "真实质量不合格生成重大问题，未关闭复查阻断；主PM解决并关闭后复查通过。文件V1退回、V2重新上传送审通过，历史两版保留；P006真实归档后禁止修改。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "真实质量不合格生成重大问题，未关闭复查阻断；主PM解决并关闭后复查通过。文件V1退回、V2重新上传送审通过，历史两版保留；P006真实归档后禁止修改。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "真实质量不合格生成重大问题，未关闭复查阻断；主PM解决并关闭后复查通过。文件V1退回、V2重新上传送审通过，历史两版保留；P006真实归档后禁止修改。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "真实质量不合格生成重大问题，未关闭复查阻断；主PM解决并关闭后复查通过。文件V1退回、V2重新上传送审通过，历史两版保留；P006真实归档后禁止修改。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "财务日报只读；错误report/document深链显示不存在；已提交报告、已归档文档不可编辑。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已查看当前1440/1280全页截图，报告三成本独立标签，修复1280金额重叠；表格局部横向滚动，页面无横溢。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "最终browser-final.log三个场景exit0；对应报告consoleErrors均为空。"
+        },
+        "business-1": {
+          "requirement": "类型阶段模板、必交责任时点、文件名版本审核归档",
+          "passed": true,
+          "observation": "真实质量不合格生成重大问题，未关闭复查阻断；主PM解决并关闭后复查通过。文件V1退回、V2重新上传送审通过，历史两版保留；P006真实归档后禁止修改。"
+        },
+        "business-2": {
+          "requirement": "模拟上传不出网，必交审核未通过阻断阶段，质量检查整改关联",
+          "passed": true,
+          "observation": "真实质量不合格生成重大问题，未关闭复查阻断；主PM解决并关闭后复查通过。文件V1退回、V2重新上传送审通过，历史两版保留；P006真实归档后禁止修改。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "执行 e2e/ui-reporting.spec.ts 实际页面操作",
+          "expected": "类型阶段模板、必交责任时点、文件名版本审核归档；模拟上传不出网，必交审核未通过阻断阶段，质量检查整改关联",
+          "observed": "真实质量不合格生成重大问题，未关闭复查阻断；主PM解决并关闭后复查通过。文件V1退回、V2重新上传送审通过，历史两版保留；P006真实归档后禁止修改。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0047/browser-final.log",
+        ".pms-loop/runs/R0047/artifacts/r0024-aab319e959db4d4a4184d4356c5889bd7a5eae10.json",
+        ".pms-loop/runs/R0047/artifacts/r0024-aab319e959db4d4a41847d40cbf421a29a9c1052.json",
+        ".pms-loop/runs/R0047/artifacts/r0024-aab319e959db4d4a4184a56fa5286f6abe821577.json"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0047/artifacts/UI-HS17-1440.png",
+        "1280": ".pms-loop/runs/R0047/artifacts/UI-HS17-1280.png"
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "title": "阶段 UI：就绪前置后真实提交批准，历史使用批准快照",
+  "status": "passed",
+  "url": "http://127.0.0.1:4179/projects/P-001/stage-switch?request=PLAN-1",
+  "consoleErrors": []
+}

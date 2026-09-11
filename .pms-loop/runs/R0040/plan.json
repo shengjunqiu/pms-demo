@@ -1,0 +1,255 @@
+{
+  "round": "R0040",
+  "items": [
+    {
+      "id": "GL-02",
+      "title": "四算经营专题",
+      "route": "/executive/four-calculations",
+      "kind": "专题分析",
+      "roles": "管理层、PMO、财务",
+      "phase": 2,
+      "feature_ids": [
+        "BI-023",
+        "BI-024",
+        "BI-025",
+        "BI-026",
+        "BI-027",
+        "BI-028"
+      ],
+      "upstream_feature_scope": "概算→预算→核算→结算、毛利与成本偏差",
+      "source_lines": {
+        "pages": 162,
+        "brief": 471
+      },
+      "criteria": [
+        "组合四算/毛利轨迹、预算核算结算差异、科目偏差",
+        "比较相同样本及有效版本，未结算不当零，偏差可到项目来源"
+      ]
+    },
+    {
+      "id": "GL-03",
+      "title": "项目穿透分析",
+      "route": "/executive/project-drilldown",
+      "kind": "专题分析",
+      "roles": "管理层、PMO",
+      "phase": 2,
+      "feature_ids": [
+        "BI-032",
+        "BI-033",
+        "BI-034",
+        "BI-035"
+      ],
+      "upstream_feature_scope": "从集团/部门/指标下钻至项目及原始业务明细",
+      "source_lines": {
+        "pages": 163,
+        "brief": 472
+      },
+      "criteria": [
+        "组织/指标→项目清单→单项目→异常/成本/里程碑原始明细",
+        "筛选权限和责任链贯通，返回恢复条件与滚动位置"
+      ]
+    },
+    {
+      "id": "GL-04",
+      "title": "项目组合分析",
+      "route": "/executive/portfolio",
+      "kind": "专题分析",
+      "roles": "管理层、PMO",
+      "phase": 2,
+      "feature_ids": [
+        "BI-009",
+        "BI-010",
+        "BI-011",
+        "BI-012",
+        "BI-013"
+      ],
+      "upstream_feature_scope": "按组织、区域、类型、等级、客户、行业分析项目组合",
+      "source_lines": {
+        "pages": 164,
+        "brief": 473
+      },
+      "criteria": [
+        "组织区域类型等级行业客户等组合数量金额成本毛利健康回款",
+        "集团→业务群→部门→项目，项目去重且比率按金额汇总"
+      ]
+    },
+    {
+      "id": "GL-05",
+      "title": "项目异常中心",
+      "route": "/executive/exceptions",
+      "kind": "台账/分析",
+      "roles": "管理层、PMO",
+      "phase": 2,
+      "feature_ids": [
+        "BI-014",
+        "BI-015",
+        "BI-016",
+        "BI-017",
+        "BI-018",
+        "BI-019",
+        "BI-020",
+        "BI-021",
+        "BI-022"
+      ],
+      "upstream_feature_scope": "高风险、进度、成本、毛利、回款、未签投入异常",
+      "source_lines": {
+        "pages": 165,
+        "brief": 474
+      },
+      "criteria": [
+        "七种异常Tabs，项目金额组织阶段健康原因首次触发时长偏差责任人",
+        "可看项目/原因/明细/责任链，继承筛选且不直接改业务"
+      ]
+    },
+    {
+      "id": "GL-06",
+      "title": "领导待决策事项",
+      "route": "/executive/decisions",
+      "kind": "工作台/列表",
+      "roles": "管理层、PMO",
+      "phase": 2,
+      "feature_ids": [
+        "BI-029",
+        "BI-030",
+        "BI-031"
+      ],
+      "upstream_feature_scope": "重大变更、超概算、重大风险、未签超限、验收结算异常",
+      "source_lines": {
+        "pages": 166,
+        "brief": 475
+      },
+      "criteria": [
+        "重大变更预算风险未签验收结算事项及影响节点等待建议",
+        "只聚合原事项，进入原审批处理后数量同步，不复制审批"
+      ]
+    }
+  ],
+  "sources": {
+    "prd": {
+      "path": "docs/项目管理平台PRD_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "6dac675ca22237b7fa59129eccc466a9e242d20f948c0b68e958a7227bb2bd1b"
+    },
+    "features": {
+      "path": "docs/项目管理平台详细功能清单_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "fabfac73b480ccaf01aa831ae3c5d0a6485e33fff80f517468b2b6c52829ddfb"
+    },
+    "pages": {
+      "path": "docs/项目管理平台页面清单与原型设计说明_V1.1_新增领导项目经营驾驶舱.md",
+      "sha256": "db1c548b5f5ef025eb90fef06422e132f003665fc7e6156dd706b7f095c994dc"
+    },
+    "brief": {
+      "path": "docs/项目管理平台高保真原型_AgentLoop开发任务书_V1.0.md",
+      "sha256": "286f917d5edc99a4a0c7da97515a3d6308cae7395fb287bbcd1846de60045b43"
+    }
+  },
+  "feature_references": {
+    "BI-009": {
+      "title": "四阶段分布",
+      "line": 560
+    },
+    "BI-010": {
+      "title": "组织项目组合",
+      "line": 561
+    },
+    "BI-011": {
+      "title": "项目类型分布",
+      "line": 562
+    },
+    "BI-012": {
+      "title": "项目等级分布",
+      "line": 563
+    },
+    "BI-013": {
+      "title": "客户/行业分析",
+      "line": 564
+    },
+    "BI-014": {
+      "title": "健康度计算",
+      "line": 570
+    },
+    "BI-015": {
+      "title": "健康度分布",
+      "line": 571
+    },
+    "BI-016": {
+      "title": "健康原因说明",
+      "line": 572
+    },
+    "BI-017": {
+      "title": "高风险项目TOP",
+      "line": 573
+    },
+    "BI-018": {
+      "title": "进度异常TOP",
+      "line": 574
+    },
+    "BI-019": {
+      "title": "成本异常TOP",
+      "line": 575
+    },
+    "BI-020": {
+      "title": "毛利异常TOP",
+      "line": 576
+    },
+    "BI-021": {
+      "title": "回款异常TOP",
+      "line": 577
+    },
+    "BI-022": {
+      "title": "未签投入异常TOP",
+      "line": 578
+    },
+    "BI-023": {
+      "title": "四算纵向对比",
+      "line": 584
+    },
+    "BI-024": {
+      "title": "概算预算差异",
+      "line": 585
+    },
+    "BI-025": {
+      "title": "预算核算差异",
+      "line": 586
+    },
+    "BI-026": {
+      "title": "核算结算差异",
+      "line": 587
+    },
+    "BI-027": {
+      "title": "成本科目偏差来源",
+      "line": 588
+    },
+    "BI-028": {
+      "title": "毛利变化轨迹",
+      "line": 589
+    },
+    "BI-029": {
+      "title": "待决策事项聚合",
+      "line": 595
+    },
+    "BI-030": {
+      "title": "事项影响摘要",
+      "line": 596
+    },
+    "BI-031": {
+      "title": "跳转原业务处理",
+      "line": 597
+    },
+    "BI-032": {
+      "title": "指标下钻项目清单",
+      "line": 598
+    },
+    "BI-033": {
+      "title": "单项目全景穿透",
+      "line": 599
+    },
+    "BI-034": {
+      "title": "异常原因穿透",
+      "line": 600
+    },
+    "BI-035": {
+      "title": "责任链查看",
+      "line": 601
+    }
+  }
+}

@@ -1,0 +1,23 @@
+
+> pms-demo@1.0.0 test:e2e /home/shengjunqiu/code/pms-demo
+> playwright test e2e/ui-executive.spec.ts e2e/ui-planning.spec.ts
+
+[WebServer] (node:2848607) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:2848620) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 8 tests using 1 worker
+
+(node:2848644) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/ui-executive.spec.ts:34:1 › UI GL02 同样本四阶段金额、科目归因与凭证 (17.3s)
+  ✓  2 e2e/ui-executive.spec.ts:55:1 › UI GL03 穿透摘要、责任记录及原业务返回 (15.7s)
+  ✓  3 e2e/ui-executive.spec.ts:77:1 › UI GL04 组合维度、收入占比与上下级穿透 (13.6s)
+  ✓  4 e2e/ui-executive.spec.ts:96:1 › UI GL05 异常分类、收纳列与责任链原记录 (14.2s)
+  ✓  5 e2e/ui-executive.spec.ts:115:1 › UI GL06 待决策摘要、历史切换与原审批 (16.0s)
+  ✓  6 e2e/ui-executive.spec.ts:147:1 › UI GL 空范围与项目经理访问边界 (14.4s)
+  ✓  7 e2e/ui-planning.spec.ts:30:1 › UI 计划：范围保存、任务编辑、里程碑导航与评审提交快照 (19.9s)
+  ✓  8 e2e/ui-planning.spec.ts:64:1 › UI 计划：旧深链保持项目与冻结基线只读 (7.9s)
+
+  8 passed (2.0m)

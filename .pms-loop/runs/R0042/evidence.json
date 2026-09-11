@@ -1,0 +1,420 @@
+{
+  "schema_version": 1,
+  "round": "R0042",
+  "revision": "d9abb81df5052f0e88c9c37f27eb88d27c9803221aaeb096ae15b9baecd2d843",
+  "items": {
+    "YS-05": {
+      "entry": "/projects/P-PLAN-001/team",
+      "covered_features": [
+        "YS-017",
+        "YS-018",
+        "YS-019",
+        "YS-020",
+        "YS-021"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行120、任务书行414；功能YS-017~021。采用原统一业务状态和规则，按docs/UI_REDESIGN分区优化。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "PM行退出禁用，编辑80%/240小时保存并生成原因历史；默认U-005成员退出后inactive，任务和成本历史JSON完全一致。PMO任命先拒绝后重新任命接受，唯一PM仍U-001。 成员加入P-001后，技术角色提交真实工时，PM审核通过且个人单价/金额隐藏，原审批意见和工时审计可追溯。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "PM行退出禁用，编辑80%/240小时保存并生成原因历史；默认U-005成员退出后inactive，任务和成本历史JSON完全一致。PMO任命先拒绝后重新任命接受，唯一PM仍U-001。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "PM行退出禁用，编辑80%/240小时保存并生成原因历史；默认U-005成员退出后inactive，任务和成本历史JSON完全一致。PMO任命先拒绝后重新任命接受，唯一PM仍U-001。 成员加入P-001后，技术角色提交真实工时，PM审核通过且个人单价/金额隐藏，原审批意见和工时审计可追溯。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "成员加入P-001后，技术角色提交真实工时，PM审核通过且个人单价/金额隐藏，原审批意见和工时审计可追溯。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "五页UNKNOWN项目404、客户经理403均实际验证；团队无变更空态、预算原因必填、基线未形成与历史细项未记录有明确说明。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已逐张查看当前revision十张1440/1280 fullPage截图。团队整表可读，预算六指标等高，零差异不显示负零，来源/审批/基线分区清楚，无整页横向溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "最新4个Playwright场景及团队状态/基线版本补查均通过，报告consoleErrors/errors为空。"
+        },
+        "business-1": {
+          "requirement": "唯一主PM、接受/拒绝任命、技术及协同成员、投入周期",
+          "passed": true,
+          "observation": "PM行退出禁用，编辑80%/240小时保存并生成原因历史；默认U-005成员退出后inactive，任务和成本历史JSON完全一致。PMO任命先拒绝后重新任命接受，唯一PM仍U-001。"
+        },
+        "business-2": {
+          "requirement": "成员加入退出影响演示权限，历史任务工时责任不回写",
+          "passed": true,
+          "observation": "成员加入P-001后，技术角色提交真实工时，PM审核通过且个人单价/金额隐藏，原审批意见和工时审计可追溯。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "实际浏览器操作并跨页核对",
+          "expected": "唯一主PM、接受/拒绝任命、技术及协同成员、投入周期；成员加入退出影响演示权限，历史任务工时责任不回写",
+          "observed": "PM行退出禁用，编辑80%/240小时保存并生成原因历史；默认U-005成员退出后inactive，任务和成本历史JSON完全一致。PMO任命先拒绝后重新任命接受，唯一PM仍U-001。 成员加入P-001后，技术角色提交真实工时，PM审核通过且个人单价/金额隐藏，原审批意见和工时审计可追溯。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0042/browser-final.log",
+        ".pms-loop/runs/R0042/browser-budget-verified.log",
+        ".pms-loop/runs/R0042/browser-team-access.log",
+        ".pms-loop/runs/R0042/artifacts/team-states.json",
+        ".pms-loop/runs/R0042/artifacts/baseline-versions.json",
+        ".pms-loop/runs/R0042/test-domain.log"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0042/artifacts/YS05-1440.png",
+        "1280": ".pms-loop/runs/R0042/artifacts/YS05-1280.png"
+      }
+    },
+    "YS-09": {
+      "entry": "/projects/P-PLAN-001/budget",
+      "covered_features": [
+        "YS-031",
+        "YS-032",
+        "YS-033",
+        "YS-034",
+        "YS-035",
+        "YS-036",
+        "YS-037",
+        "YS-038",
+        "YS-039",
+        "YS-040"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行124、任务书行418；功能YS-031~040。采用原统一业务状态和规则，按docs/UI_REDESIGN分区优化。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "删除中间新增采购再新增并保存重开，各项独立。冻结概算700、预算700差异显示0.00；增加100采购预算800，毛利率33.33，超过概算仍可保存。 空原因提交被阻断，填写原因、应对措施与责任说明后走集团领导；预算按原统一科目、WBS/里程碑/资源汇总。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "删除中间新增采购再新增并保存重开，各项独立。冻结概算700、预算700差异显示0.00；增加100采购预算800，毛利率33.33，超过概算仍可保存。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "删除中间新增采购再新增并保存重开，各项独立。冻结概算700、预算700差异显示0.00；增加100采购预算800，毛利率33.33，超过概算仍可保存。 空原因提交被阻断，填写原因、应对措施与责任说明后走集团领导；预算按原统一科目、WBS/里程碑/资源汇总。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "空原因提交被阻断，填写原因、应对措施与责任说明后走集团领导；预算按原统一科目、WBS/里程碑/资源汇总。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "五页UNKNOWN项目404、客户经理403均实际验证；团队无变更空态、预算原因必填、基线未形成与历史细项未记录有明确说明。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已逐张查看当前revision十张1440/1280 fullPage截图。团队整表可读，预算六指标等高，零差异不显示负零，来源/审批/基线分区清楚，无整页横向溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "最新4个Playwright场景及团队状态/基线版本补查均通过，报告consoleErrors/errors为空。"
+        },
+        "business-1": {
+          "requirement": "概算继承、预算帽、WBS阶段人力费用采购外包汇总",
+          "passed": true,
+          "observation": "删除中间新增采购再新增并保存重开，各项独立。冻结概算700、预算700差异显示0.00；增加100采购预算800，毛利率33.33，超过概算仍可保存。"
+        },
+        "business-2": {
+          "requirement": "实时差异毛利，超概算可保存，提交需原因走高级审批",
+          "passed": true,
+          "observation": "空原因提交被阻断，填写原因、应对措施与责任说明后走集团领导；预算按原统一科目、WBS/里程碑/资源汇总。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "实际浏览器操作并跨页核对",
+          "expected": "概算继承、预算帽、WBS阶段人力费用采购外包汇总；实时差异毛利，超概算可保存，提交需原因走高级审批",
+          "observed": "删除中间新增采购再新增并保存重开，各项独立。冻结概算700、预算700差异显示0.00；增加100采购预算800，毛利率33.33，超过概算仍可保存。 空原因提交被阻断，填写原因、应对措施与责任说明后走集团领导；预算按原统一科目、WBS/里程碑/资源汇总。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0042/browser-final.log",
+        ".pms-loop/runs/R0042/browser-budget-verified.log",
+        ".pms-loop/runs/R0042/browser-team-access.log",
+        ".pms-loop/runs/R0042/artifacts/team-states.json",
+        ".pms-loop/runs/R0042/artifacts/baseline-versions.json",
+        ".pms-loop/runs/R0042/test-domain.log"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0042/artifacts/YS09-1440.png",
+        "1280": ".pms-loop/runs/R0042/artifacts/YS09-1280.png"
+      }
+    },
+    "YS-10": {
+      "entry": "/projects/P-PLAN-001/estimate-budget",
+      "covered_features": [
+        "YS-038",
+        "YS-039",
+        "YS-040",
+        "YS-041",
+        "YS-042",
+        "YS-043"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行125、任务书行419；功能YS-038~043。采用原统一业务状态和规则，按docs/UI_REDESIGN分区优化。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "冻结概算700对预算700，直接人力差异0.00，零概算科目显示—（零概算）；负零显示修正。新增采购后对比显示预算800及原填写原因。 同页版本来源明确，调整预算返回同项目，金额与编制/提交快照一致，未改变底层金额精度。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "冻结概算700对预算700，直接人力差异0.00，零概算科目显示—（零概算）；负零显示修正。新增采购后对比显示预算800及原填写原因。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "冻结概算700对预算700，直接人力差异0.00，零概算科目显示—（零概算）；负零显示修正。新增采购后对比显示预算800及原填写原因。 同页版本来源明确，调整预算返回同项目，金额与编制/提交快照一致，未改变底层金额精度。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "同页版本来源明确，调整预算返回同项目，金额与编制/提交快照一致，未改变底层金额精度。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "五页UNKNOWN项目404、客户经理403均实际验证；团队无变更空态、预算原因必填、基线未形成与历史细项未记录有明确说明。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已逐张查看当前revision十张1440/1280 fullPage截图。团队整表可读，预算六指标等高，零差异不显示负零，来源/审批/基线分区清楚，无整页横向溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "最新4个Playwright场景及团队状态/基线版本补查均通过，报告consoleErrors/errors为空。"
+        },
+        "business-1": {
+          "requirement": "冻结概算与预算按统一科目对比总额/差额/比率/毛利",
+          "passed": true,
+          "observation": "冻结概算700对预算700，直接人力差异0.00，零概算科目显示—（零概算）；负零显示修正。新增采购后对比显示预算800及原填写原因。"
+        },
+        "business-2": {
+          "requirement": "异常来源可下钻，版本和差异原因明确，零分母安全",
+          "passed": true,
+          "observation": "同页版本来源明确，调整预算返回同项目，金额与编制/提交快照一致，未改变底层金额精度。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "实际浏览器操作并跨页核对",
+          "expected": "冻结概算与预算按统一科目对比总额/差额/比率/毛利；异常来源可下钻，版本和差异原因明确，零分母安全",
+          "observed": "冻结概算700对预算700，直接人力差异0.00，零概算科目显示—（零概算）；负零显示修正。新增采购后对比显示预算800及原填写原因。 同页版本来源明确，调整预算返回同项目，金额与编制/提交快照一致，未改变底层金额精度。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0042/browser-final.log",
+        ".pms-loop/runs/R0042/browser-budget-verified.log",
+        ".pms-loop/runs/R0042/browser-team-access.log",
+        ".pms-loop/runs/R0042/artifacts/team-states.json",
+        ".pms-loop/runs/R0042/artifacts/baseline-versions.json",
+        ".pms-loop/runs/R0042/test-domain.log"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0042/artifacts/YS10-1440.png",
+        "1280": ".pms-loop/runs/R0042/artifacts/YS10-1280.png"
+      }
+    },
+    "YS-11": {
+      "entry": "/projects/P-001/budget/review",
+      "covered_features": [
+        "YS-041",
+        "YS-042",
+        "YS-043"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行126、任务书行420；功能YS-041~043。采用原统一业务状态和规则，按docs/UI_REDESIGN分区优化。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "P-001 APR-1显示指定PMC/集团领导节点和提交时引用快照；仅一层标题。P-PLAN-001常规审批由PMO，超概算由集团领导，其他角色通过按钮禁用。 真实填写意见通过并确认后仍等待PMO独立基线确认，未自动解锁执行。审批版本选择器和基线入口有效；切换版本使用独立组件边界。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "P-001 APR-1显示指定PMC/集团领导节点和提交时引用快照；仅一层标题。P-PLAN-001常规审批由PMO，超概算由集团领导，其他角色通过按钮禁用。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "P-001 APR-1显示指定PMC/集团领导节点和提交时引用快照；仅一层标题。P-PLAN-001常规审批由PMO，超概算由集团领导，其他角色通过按钮禁用。 真实填写意见通过并确认后仍等待PMO独立基线确认，未自动解锁执行。审批版本选择器和基线入口有效；切换版本使用独立组件边界。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "真实填写意见通过并确认后仍等待PMO独立基线确认，未自动解锁执行。审批版本选择器和基线入口有效；切换版本使用独立组件边界。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "五页UNKNOWN项目404、客户经理403均实际验证；团队无变更空态、预算原因必填、基线未形成与历史细项未记录有明确说明。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已逐张查看当前revision十张1440/1280 fullPage截图。团队整表可读，预算六指标等高，零差异不显示负零，来源/审批/基线分区清楚，无整页横向溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "最新4个Playwright场景及团队状态/基线版本补查均通过，报告consoleErrors/errors为空。"
+        },
+        "business-1": {
+          "requirement": "常规/超概算分支、原因、材料版本、审批意见",
+          "passed": true,
+          "observation": "P-001 APR-1显示指定PMC/集团领导节点和提交时引用快照；仅一层标题。P-PLAN-001常规审批由PMO，超概算由集团领导，其他角色通过按钮禁用。"
+        },
+        "business-2": {
+          "requirement": "通过生成预算版本并待PMO基线确认；审批中引用版本不跳动",
+          "passed": true,
+          "observation": "真实填写意见通过并确认后仍等待PMO独立基线确认，未自动解锁执行。审批版本选择器和基线入口有效；切换版本使用独立组件边界。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "实际浏览器操作并跨页核对",
+          "expected": "常规/超概算分支、原因、材料版本、审批意见；通过生成预算版本并待PMO基线确认；审批中引用版本不跳动",
+          "observed": "P-001 APR-1显示指定PMC/集团领导节点和提交时引用快照；仅一层标题。P-PLAN-001常规审批由PMO，超概算由集团领导，其他角色通过按钮禁用。 真实填写意见通过并确认后仍等待PMO独立基线确认，未自动解锁执行。审批版本选择器和基线入口有效；切换版本使用独立组件边界。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0042/browser-final.log",
+        ".pms-loop/runs/R0042/browser-budget-verified.log",
+        ".pms-loop/runs/R0042/browser-team-access.log",
+        ".pms-loop/runs/R0042/artifacts/team-states.json",
+        ".pms-loop/runs/R0042/artifacts/baseline-versions.json",
+        ".pms-loop/runs/R0042/test-domain.log"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0042/artifacts/YS11-1440.png",
+        "1280": ".pms-loop/runs/R0042/artifacts/YS11-1280.png"
+      }
+    },
+    "YS-12": {
+      "entry": "/projects/P-001/baseline",
+      "covered_features": [
+        "PT-021",
+        "PT-022",
+        "PT-023",
+        "PT-024",
+        "PT-025",
+        "YS-044",
+        "YS-045",
+        "YS-046"
+      ],
+      "checks": {
+        "traceability": {
+          "requirement": "原文功能范围与页面独有要求落实，注明原文定位",
+          "passed": true,
+          "observation": "页面清单行127、任务书行421；功能YS-044~046。采用原统一业务状态和规则，按docs/UI_REDESIGN分区优化。"
+        },
+        "navigation": {
+          "requirement": "路由、导航/关联入口、下钻与返回上下文可用",
+          "passed": true,
+          "observation": "P-PLAN-001超概算预算800通过后集团领导不能确认基线，PMO确认后本版预算800，WBS与里程碑新增禁用。 四基线页签可查看；P-001历史V0.9只读，本版预算2847.70；与V1.1按范围/预算/日期/WBS/资源比较，选择原对比版本后对比选择清空。历史未记录细项明确说明，不补造。"
+        },
+        "content": {
+          "requirement": "真实感中文数据、字段、状态、规则，无占位内容",
+          "passed": true,
+          "observation": "P-PLAN-001超概算预算800通过后集团领导不能确认基线，PMO确认后本版预算800，WBS与里程碑新增禁用。"
+        },
+        "interaction": {
+          "requirement": "关键动作有正确且可观察的业务结果",
+          "passed": true,
+          "observation": "P-PLAN-001超概算预算800通过后集团领导不能确认基线，PMO确认后本版预算800，WBS与里程碑新增禁用。 四基线页签可查看；P-001历史V0.9只读，本版预算2847.70；与V1.1按范围/预算/日期/WBS/资源比较，选择原对比版本后对比选择清空。历史未记录细项明确说明，不补造。"
+        },
+        "data": {
+          "requirement": "跨页面实体、金额、数量和筛选口径一致",
+          "passed": true,
+          "observation": "四基线页签可查看；P-001历史V0.9只读，本版预算2847.70；与V1.1按范围/预算/日期/WBS/资源比较，选择原对比版本后对比选择清空。历史未记录细项明确说明，不补造。"
+        },
+        "states": {
+          "requirement": "加载、空态、无权限及适用的异常状态可演示",
+          "passed": true,
+          "observation": "五页UNKNOWN项目404、客户经理403均实际验证；团队无变更空态、预算原因必填、基线未形成与历史细项未记录有明确说明。"
+        },
+        "visual": {
+          "requirement": "已查看1440×900、1280×900截图，无明显破版",
+          "passed": true,
+          "observation": "已逐张查看当前revision十张1440/1280 fullPage截图。团队整表可读，预算六指标等高，零差异不显示负零，来源/审批/基线分区清楚，无整页横向溢出。"
+        },
+        "console": {
+          "requirement": "实际检查浏览器控制台，无错误及严重警告",
+          "passed": true,
+          "observation": "最新4个Playwright场景及团队状态/基线版本补查均通过，报告consoleErrors/errors为空。"
+        },
+        "business-1": {
+          "requirement": "范围进度成本资源四基线快照、生效原因和版本差异",
+          "passed": true,
+          "observation": "P-PLAN-001超概算预算800通过后集团领导不能确认基线，PMO确认后本版预算800，WBS与里程碑新增禁用。"
+        },
+        "business-2": {
+          "requirement": "只有有效版用于执行，变更追加版本，旧版只读",
+          "passed": true,
+          "observation": "四基线页签可查看；P-001历史V0.9只读，本版预算2847.70；与V1.1按范围/预算/日期/WBS/资源比较，选择原对比版本后对比选择清空。历史未记录细项明确说明，不补造。"
+        }
+      },
+      "scenarios": [
+        {
+          "action": "实际浏览器操作并跨页核对",
+          "expected": "范围进度成本资源四基线快照、生效原因和版本差异；只有有效版用于执行，变更追加版本，旧版只读",
+          "observed": "P-PLAN-001超概算预算800通过后集团领导不能确认基线，PMO确认后本版预算800，WBS与里程碑新增禁用。 四基线页签可查看；P-001历史V0.9只读，本版预算2847.70；与V1.1按范围/预算/日期/WBS/资源比较，选择原对比版本后对比选择清空。历史未记录细项明确说明，不补造。"
+        }
+      ],
+      "artifacts": [
+        ".pms-loop/runs/R0042/browser-final.log",
+        ".pms-loop/runs/R0042/browser-budget-verified.log",
+        ".pms-loop/runs/R0042/browser-team-access.log",
+        ".pms-loop/runs/R0042/artifacts/team-states.json",
+        ".pms-loop/runs/R0042/artifacts/baseline-versions.json",
+        ".pms-loop/runs/R0042/test-domain.log"
+      ],
+      "screenshots": {
+        "1440": ".pms-loop/runs/R0042/artifacts/YS12-1440.png",
+        "1280": ".pms-loop/runs/R0042/artifacts/YS12-1280.png"
+      }
+    }
+  },
+  "validation_notes": "最终revision d9abb81：工程四项235领域通过；最终4浏览器exit0，团队任命退出及5页403/404、基线历史比较补查exit0。前revision常规审批全链及团队真实工时权限通过；其后仅BudgetSummary显示负零修正，最终重新验预算全链与双宽。保留初次身份切换超时、隐藏textarea匹配、补查下拉过渡双匹配等失败日志，均定位后复核；团队access报告1passed但runner退出143，未篡改为exit0。"
+}
