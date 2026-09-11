@@ -195,7 +195,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onCl
             按 <kbd className="px-1.5 py-0.5 bg-white border border-slate-200 rounded font-mono text-[10px]">ESC</kbd> 关闭
           </span>
         </div>
-        <span className="text-[11px] text-slate-400">PMS 全生命周期企业管理平台</span>
+        <span className="text-[11px] text-slate-400">项目管理平台 · 全生命周期四算联动</span>
       </div>
     </Modal>
   );

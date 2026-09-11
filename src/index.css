@@ -2,6 +2,40 @@
 
 :root {
   /* ==========================================================================
+     PMS 统一专业字体排版系统 (Typography System)
+     ========================================================================== */
+  /* 字体家族栈 (Font Stacks) */
+  --pms-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+  --pms-font-mono: 'JetBrains Mono', 'SF Mono', Consolas, Menlo, Monaco, 'Courier New', monospace;
+
+  /* 字号阶梯 (Type Scale) */
+  --pms-font-size-display: 24px;   /* 核心指标统计数 / 关键大金额 (Display) */
+  --pms-font-size-title: 18px;     /* 页面主标题 / 弹窗主标题 (Title) */
+  --pms-font-size-subtitle: 16px;  /* 模块/次级主标题 (Subtitle) */
+  --pms-font-size-base: 14px;      /* 核心正文 / 输入控件 (Body Base) */
+  --pms-font-size-sm: 13px;        /* 表格数据 / 按钮文本 / 紧凑标签 (Compact) */
+  --pms-font-size-caption: 12px;   /* 辅助说明 / 元数据 / 表头 / 分页 (Caption) */
+  --pms-font-size-micro: 11px;     /* 徽标 / 标签微提示 / 状态点说明 (Micro) */
+
+  /* 字重梯度 (Font Weights) */
+  --pms-font-weight-regular: 400;  /* 常规正文 */
+  --pms-font-weight-medium: 500;   /* 表格数据、标签、次级标题 */
+  --pms-font-weight-semibold: 600; /* 卡片标题、表头、关键金额 */
+  --pms-font-weight-bold: 700;     /* 页面大标题、关键指标数值 */
+
+  /* 行高系统 (Line Heights) */
+  --pms-line-height-tight: 1.25;   /* 大标题 / 指标数值紧凑对齐 */
+  --pms-line-height-normal: 1.5;   /* 表格 / 控件内文本 */
+  --pms-line-height-relaxed: 1.65; /* 长段落 / 说明文字 */
+
+  /* 文本色彩层级 (Text Colors Hierarchy) */
+  --pms-text-primary: #0f172a;     /* Slate-900: 主要标题、重要数值 */
+  --pms-text-secondary: #334155;   /* Slate-700: 正文、表头、字段标签 */
+  --pms-text-tertiary: #64748b;    /* Slate-500: 辅助说明、次级元数据 */
+  --pms-text-muted: #94a3b8;       /* Slate-400: 禁用、占位符、边注 */
+  --pms-text-link: #2563eb;        /* Blue-600: 交互链接 */
+
+  /* ==========================================================================
      PMS 统一专业空间系统 (8pt Rhythm System)
      Base Unit: 4px | Primary Step: 8px
      ========================================================================== */
@@ -26,10 +60,28 @@ body,
   padding: 0;
   width: 100%;
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
-    'Noto Sans', sans-serif;
+  font-family: var(--pms-font-sans);
   background-color: #f8fafc;
+  color: var(--pms-text-primary);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 全局金融/统计等宽数字工具类 */
+.pms-tabular-num,
+.font-mono {
+  font-family: var(--pms-font-mono) !important;
+  font-variant-numeric: tabular-nums lining-nums !important;
+  letter-spacing: -0.02em;
+}
+
+/* 全局单据编号/代码专用排版 */
+.pms-code-badge {
+  font-family: var(--pms-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--pms-font-size-caption);
+  font-weight: var(--pms-font-weight-medium);
+  letter-spacing: -0.01em;
 }
 
 * {
@@ -38,9 +90,14 @@ body,
 
 /* Shared workspace rhythm: page → business section → content. */
 .pms-page-header { margin-bottom: var(--pms-space-5); }
-.pms-page-header .ant-typography-secondary { color: #64748b; }
+.pms-page-header .ant-typography-secondary { color: var(--pms-text-tertiary); font-size: var(--pms-font-size-sm); }
 .pms-workspace { min-width: 0; }
-.pms-workspace .ant-card-head-title { font-size: 14px; font-weight: 600; }
+.pms-workspace .ant-card-head-title {
+  font-size: var(--pms-font-size-base);
+  font-weight: var(--pms-font-weight-semibold);
+  color: var(--pms-text-primary);
+  letter-spacing: -0.01em;
+}
 .pms-workspace .ant-card { box-shadow: none; }
 .pms-workspace .ant-tabs-top > .ant-tabs-nav { margin-bottom: var(--pms-space-4); }
 .pms-metric {
@@ -53,9 +110,26 @@ body,
 .pms-metric--interactive { cursor: pointer; transition: all .18s cubic-bezier(0.4, 0, 0.2, 1); }
 .pms-metric--interactive:hover { border-color: #93b4f5; background: #f8fbff; transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05); }
 .pms-metric--interactive:focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
-.pms-metric-value { font-size: 24px; line-height: 1.35; font-weight: 650; color: #0f172a; font-variant-numeric: tabular-nums; letter-spacing: -.4px; }
-.pms-metric-caption { margin-top: auto; padding-top: var(--pms-space-2); }
-.pms-section-note { color: #64748b; font-size: 12px; line-height: 1.7; }
+.pms-metric-value {
+  font-family: var(--pms-font-mono);
+  font-size: var(--pms-font-size-display);
+  line-height: var(--pms-line-height-tight);
+  font-weight: var(--pms-font-weight-bold);
+  color: var(--pms-text-primary);
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: -0.03em;
+}
+.pms-metric-caption {
+  margin-top: auto;
+  padding-top: var(--pms-space-2);
+  font-size: var(--pms-font-size-caption);
+  color: var(--pms-text-tertiary);
+}
+.pms-section-note {
+  color: var(--pms-text-tertiary);
+  font-size: var(--pms-font-size-caption);
+  line-height: var(--pms-line-height-relaxed);
+}
 .pms-focus-row { margin-bottom: var(--pms-space-5); }
 .pms-focus-row > .ant-col > .ant-card { height: 100%; }
 .pms-action-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--pms-space-2); margin-top: var(--pms-space-3); }
@@ -63,10 +137,16 @@ body,
 .pms-decision { padding: var(--pms-space-3) 0; border-bottom: 1px solid #f1f5f9; }
 .pms-decision:first-child { padding-top: 0; }
 .pms-decision:last-child { border-bottom: 0; padding-bottom: 0; }
-.pms-decision-title { font-size: 14px; font-weight: 600; line-height: 1.6; margin-bottom: var(--pms-space-1); }
+.pms-decision-title {
+  font-size: var(--pms-font-size-base);
+  font-weight: var(--pms-font-weight-semibold);
+  line-height: var(--pms-line-height-normal);
+  color: var(--pms-text-primary);
+  margin-bottom: var(--pms-space-1);
+}
 .pms-project-summary { margin-bottom: var(--pms-space-4); }
-.pms-project-summary .ant-descriptions-item-label { font-size: 12px; color: #64748b; }
-.pms-project-summary .ant-descriptions-item-content { font-size: 13px; }
+.pms-project-summary .ant-descriptions-item-label { font-size: var(--pms-font-size-caption); color: var(--pms-text-tertiary); }
+.pms-project-summary .ant-descriptions-item-content { font-size: var(--pms-font-size-sm); color: var(--pms-text-primary); }
 .pms-project-meta { margin-top: var(--pms-space-3); padding-top: var(--pms-space-3); border-top: 1px solid #f1f5f9; }
 .pms-project-tabs { padding: 0 var(--pms-space-4) var(--pms-space-4); background: #fff; border: 1px solid #e2e8f0; border-radius: var(--pms-radius-lg); }
 .pms-project-groups .ant-tabs-tab { padding-top: 14px; padding-bottom: 14px; }
@@ -82,17 +162,24 @@ body,
   .pms-metric--interactive { transition: none; }
 }
 .pms-focus-row > .pms-stacked-cards > .ant-card { height: auto; }
-.pms-project-name.ant-btn { padding: 0; height: auto; white-space: normal; text-align: left; font-size: 13px; }
+.pms-project-name.ant-btn { padding: 0; height: auto; white-space: normal; text-align: left; font-size: var(--pms-font-size-sm); }
 .pms-analysis-options { margin-bottom: var(--pms-space-4); padding: var(--pms-space-3) var(--pms-space-4); background: #fff; border: 1px solid #e2e8f0; border-radius: var(--pms-radius-md); }
-.pms-analysis-options summary { cursor: pointer; font-size: 13px; color: #475569; }
-.pms-project-meta summary { cursor: pointer; font-size: 12px; color: #64748b; }
+.pms-analysis-options summary { cursor: pointer; font-size: var(--pms-font-size-sm); color: var(--pms-text-secondary); }
+.pms-project-meta summary { cursor: pointer; font-size: var(--pms-font-size-caption); color: var(--pms-text-tertiary); }
 .pms-project-lifecycle { display: flex; align-items: center; flex-wrap: wrap; gap: var(--pms-space-6); margin-bottom: var(--pms-space-4); padding: 0 var(--pms-space-1); }
 .pms-project-tabs .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab { border-radius: var(--pms-radius-sm); margin-right: var(--pms-space-1); border-color: transparent; background: #f8fafc; }
 .pms-project-tabs .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab-active { background: #eff6ff; border-color: #bfdbfe; }
 .pms-project-tabs .ant-tabs-card > .ant-tabs-nav::before { border: 0; }
 .pms-section { min-width: 0; margin-bottom: var(--pms-space-4); background: #fff; border: 1px solid #e2e8f0; border-radius: var(--pms-radius-lg); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02); }
 .pms-section-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--pms-space-3); padding: 14px var(--pms-space-4); border-bottom: 1px solid #f1f5f9; }
-.pms-section-heading h2 { margin: 0; font-size: 14px; line-height: 1.6; font-weight: 600; color: #1e293b; letter-spacing: -0.2px; }
+.pms-section-heading h2 {
+  margin: 0;
+  font-size: var(--pms-font-size-base);
+  line-height: var(--pms-line-height-normal);
+  font-weight: var(--pms-font-weight-semibold);
+  color: var(--pms-text-primary);
+  letter-spacing: -0.015em;
+}
 .pms-section-body { padding: var(--pms-space-4); min-width: 0; }
 .pms-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--pms-space-3); margin-bottom: var(--pms-space-4); padding: var(--pms-space-3) var(--pms-space-4); background: #fff; border: 1px solid #e2e8f0; border-radius: var(--pms-radius-lg); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02); }
 .pms-section-actions { display: flex; flex-wrap: wrap; gap: var(--pms-space-2); }
@@ -101,16 +188,22 @@ body,
   border: 1px solid #e2e8f0;
   border-radius: var(--pms-radius-md);
   overflow: hidden;
+  font-size: var(--pms-font-size-sm);
 }
 .ant-table-wrapper .ant-table-container {
   overflow-x: auto;
 }
 .ant-table-wrapper .ant-table-thead > tr > th {
   border-bottom: 1px solid #e2e8f0 !important;
-  font-weight: 600;
+  font-weight: var(--pms-font-weight-semibold);
+  font-size: var(--pms-font-size-caption);
+  color: var(--pms-text-secondary);
+  text-transform: none;
 }
 .ant-table-wrapper .ant-table-tbody > tr > td {
   border-bottom: 1px solid #f1f5f9;
+  font-size: var(--pms-font-size-sm);
+  color: var(--pms-text-primary);
 }
 .ant-table-wrapper .ant-table-tbody > tr:last-child > td {
   border-bottom: none;
@@ -145,21 +238,118 @@ body,
   width: 4px;
 }
 .pms-sider-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 4px;
 }
 .pms-sider-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.3);
 }
-.pms-sider .ant-menu-dark .ant-menu-item-selected {
-  background-color: #2563eb !important;
+
+/* 侧边栏搜索框样式精致化 */
+.pms-sider-search.ant-input-affix-wrapper {
+  background: #111827 !important;
+  border-color: #1f293d !important;
+  padding: 5px 10px !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.25) !important;
+  transition: all 0.2s ease !important;
+}
+.pms-sider-search.ant-input-affix-wrapper:hover {
+  border-color: #3b82f6 !important;
+  background: #131d31 !important;
+}
+.pms-sider-search.ant-input-affix-wrapper-focused {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25) !important;
+  background: #0f172a !important;
+}
+.pms-sider-search input.ant-input {
+  background: transparent !important;
+  color: #f1f5f9 !important;
+  font-size: 12px !important;
+}
+.pms-sider-search input.ant-input::placeholder {
+  color: #64748b !important;
+  font-size: 12px !important;
+}
+
+/* 侧边栏一级分组大标题与分割线 */
+.pms-sider .ant-menu-dark .ant-menu-item-group-title {
+  padding: 14px 16px 4px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.05em !important;
+  color: #64748b !important;
+}
+
+/* 侧边栏菜单项与子菜单项圆角与微交互 */
+.pms-sider .ant-menu-dark .ant-menu-item,
+.pms-sider .ant-menu-dark .ant-menu-submenu-title {
+  border-radius: 6px;
+  margin: 2px 8px !important;
+  width: calc(100% - 16px) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.01em;
+  color: #94a3b8 !important;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pms-sider .ant-menu-dark .ant-menu-submenu-title:hover {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  color: #f8fafc !important;
+}
+
+.pms-sider .ant-menu-dark .ant-menu-submenu-open > .ant-menu-submenu-title {
+  color: #f1f5f9 !important;
+  font-weight: 600 !important;
+}
+
+/* 二级子菜单左侧树形引导连接线 (Tree Guide Line) */
+.pms-sider .ant-menu-dark .ant-menu-sub {
+  background: #070b12 !important;
+  position: relative;
+  padding: 4px 0 !important;
+}
+
+.pms-sider .ant-menu-dark .ant-menu-sub::before {
+  content: '';
+  position: absolute;
+  left: 28px;
+  top: 8px;
+  bottom: 8px;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.09);
+  pointer-events: none;
+}
+
+.pms-sider .ant-menu-dark .ant-menu-sub .ant-menu-item {
+  padding-left: 38px !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  color: #94a3b8 !important;
+  height: 36px !important;
+  line-height: 36px !important;
+}
+
+.pms-sider .ant-menu-dark .ant-menu-sub .ant-menu-item:hover {
+  color: #f8fafc !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* 选中项高亮态：微渐变蓝 + 柔和发光阴影 + 纯白高亮字体（覆盖自身及所有内部文本与链接） */
+.pms-sider .ant-menu-dark .ant-menu-item-selected,
+.pms-sider .ant-menu-dark .ant-menu-item-selected *,
+.pms-sider .ant-menu-dark .ant-menu-item-selected a,
+.pms-sider .ant-menu-dark .ant-menu-item-selected .ant-menu-title-content,
+.pms-sider .ant-menu-dark .ant-menu-sub .ant-menu-item.ant-menu-item-selected,
+.pms-sider .ant-menu-dark .ant-menu-sub .ant-menu-item.ant-menu-item-selected * {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
   color: #ffffff !important;
-  font-weight: 500;
-  border-radius: 6px;
-  box-shadow: 0 1px 3px 0 rgba(37, 99, 235, 0.3);
+  font-weight: 600 !important;
+  box-shadow: 0 2px 6px -1px rgba(37, 99, 235, 0.4), 0 1px 2px -1px rgba(37, 99, 235, 0.2);
 }
-.pms-sider .ant-menu-dark .ant-menu-item {
-  border-radius: 6px;
-  margin-top: 2px;
-  margin-bottom: 2px;
+
+.pms-sider .ant-menu-dark .ant-menu-item-selected .ant-menu-title-content {
+  background: transparent !important;
+  box-shadow: none !important;
 }

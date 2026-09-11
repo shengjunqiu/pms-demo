@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useBusinessStore } from '@/mock/business';
 import { canAccessPage, canAccessProject, selectAccessPolicy } from '@/mock/configuration-access';
 import { projectForTarget } from '@/mock/access';
 import { StateView } from '@/components/common/StateView';
 import { GlobalSearchModal } from '@/components/common/GlobalSearchModal';
-import { Layout, Menu, Select, Space, Typography, Button, Dropdown, Avatar } from 'antd';
+import { Layout, Menu, Select, Space, Typography, Dropdown, Avatar, Input } from 'antd';
 import {
   DashboardOutlined,
   ProjectOutlined,
@@ -14,9 +14,8 @@ import {
   UserOutlined,
   AppstoreOutlined,
   CheckCircleOutlined,
-  MenuUnfoldOutlined,
-  MenuFoldOutlined,
   SearchOutlined,
+  CloseCircleFilled,
 } from '@ant-design/icons';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAppStore, ROLES, UserRole } from '@/store/useAppStore';
@@ -27,53 +26,101 @@ const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
 
 export const MainLayout: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [menuSearch, setMenuSearch] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
   const { currentRole, setRole, currentUser, asOfDate } = useAppStore();
   const { data, recordAccess } = useBusinessStore();
   const [openGroups, setOpenGroups] = useState<string[]>(['WK']);
 
-  // 按照业务流转次序构建：高频工作台/驾驶舱 ➔ 四算生命周期①②③④ ➔ 系统配置
-  const groups = [
-    { key: 'WK', label: '工作台与待办', icon: <AppstoreOutlined /> },
-    { key: 'GL', label: '领导经营驾驶舱', icon: <DashboardOutlined /> },
-    { key: 'GS', label: '① 商机与概算阶段', icon: <DollarOutlined /> },
-    { key: 'YS', label: '② 预算与立项阶段', icon: <ProjectOutlined /> },
-    { key: 'HS', label: '③ 核算与执行阶段', icon: <ScheduleOutlined /> },
-    { key: 'JS', label: '④ 结算与收尾阶段', icon: <CheckCircleOutlined /> },
-    { key: 'CF', label: '系统与规则配置', icon: <SettingOutlined /> },
+  // 三大业务逻辑分区与流转次序（纯中文，无英文字母与数字序号）
+  const navSections = [
+    {
+      sectionKey: 'workspace',
+      sectionTitle: '工作台与驾驶舱',
+      groups: [
+        { key: 'WK', label: '工作台与待办', icon: <AppstoreOutlined /> },
+        { key: 'GL', label: '领导经营驾驶舱', icon: <DashboardOutlined /> },
+      ],
+    },
+    {
+      sectionKey: 'lifecycle',
+      sectionTitle: '四算全生命周期',
+      groups: [
+        { key: 'GS', label: '商机与概算阶段', icon: <DollarOutlined /> },
+        { key: 'YS', label: '预算与立项阶段', icon: <ProjectOutlined /> },
+        { key: 'HS', label: '核算与执行阶段', icon: <ScheduleOutlined /> },
+        { key: 'JS', label: '结算与收尾阶段', icon: <CheckCircleOutlined /> },
+      ],
+    },
+    {
+      sectionKey: 'system',
+      sectionTitle: '系统设置与管理',
+      groups: [
+        { key: 'CF', label: '系统与规则配置', icon: <SettingOutlined /> },
+      ],
+    },
   ];
-  const menuItems = groups.map((group) => {
-    const children = PAGE_MANIFEST.filter(
-      (page) => page.id.startsWith(group.key) && canAccessPage(data, currentUser, page.id)
-    ).map((page) => ({
-      key: demoRoute(page.route),
-      label: (
-        <span className="flex items-center justify-between pr-1">
-          <span className="truncate">{page.title}</span>
-          <span className="font-mono text-[10px] text-slate-500 opacity-60 ml-1.5 flex-shrink-0">
-            {page.id}
-          </span>
-        </span>
-      ),
-    }));
 
-    return {
-      key: group.key,
-      icon: group.icon,
-      label: (
-        <span className="flex items-center justify-between w-full pr-1">
-          <span className="font-medium text-xs tracking-tight">{group.label}</span>
-          <span className="text-[10px] text-slate-400 bg-slate-800/80 px-1.5 py-0.2 rounded font-mono">
-            {children.length}
-          </span>
-        </span>
-      ),
-      children,
-    };
-  }).filter((group) => group.children.length > 0);
+  // 扁平化的所有 groups
+  const allGroups = useMemo(() => navSections.flatMap((s) => s.groups), []);
+
+  const normalizedKeyword = menuSearch.trim().toLowerCase();
+
+  // 根据当前权限与搜索过滤计算菜单项
+  const menuItems = useMemo(() => {
+    const items: any[] = [];
+
+    navSections.forEach((section) => {
+      const sectionGroupItems: any[] = [];
+
+      section.groups.forEach((group) => {
+        const groupPages = PAGE_MANIFEST.filter(
+          (page) => page.id.startsWith(group.key) && canAccessPage(data, currentUser, page.id)
+        );
+
+        // 支持通过页面ID、标题或路由搜索
+        const filteredPages = normalizedKeyword
+          ? groupPages.filter(
+              (p) =>
+                p.id.toLowerCase().includes(normalizedKeyword) ||
+                p.title.toLowerCase().includes(normalizedKeyword) ||
+                p.route.toLowerCase().includes(normalizedKeyword)
+            )
+          : groupPages;
+
+        if (filteredPages.length > 0) {
+          const children = filteredPages.map((page) => ({
+            key: demoRoute(page.route),
+            label: page.title,
+          }));
+
+          sectionGroupItems.push({
+            key: group.key,
+            icon: group.icon,
+            label: group.label,
+            children,
+          });
+        }
+      });
+
+      if (sectionGroupItems.length > 0) {
+        items.push({
+          key: `divider-${section.sectionKey}`,
+          type: 'group',
+          label: (
+            <div className="text-xs font-semibold text-slate-400/90 tracking-normal px-2 pt-3 pb-1.5 select-none">
+              {section.sectionTitle}
+            </div>
+          ),
+          children: sectionGroupItems,
+        });
+      }
+    });
+
+    return items;
+  }, [navSections, data, currentUser, normalizedKeyword]);
 
   const currentPage = PAGE_MANIFEST.find((p) => {
     if (p.route === location.pathname) return true;
@@ -86,8 +133,14 @@ export const MainLayout: React.FC = () => {
   const activeGroup = currentPage?.id.split('-')[0];
   const isWorkspace = !!currentPage && ['WK', 'GL', 'GS', 'YS', 'HS', 'JS', 'CF'].includes(currentPage.id.split('-')[0])
     || /^\/projects\/[^/]+\/plan-requests\/[^/]+$/.test(location.pathname);
+
   // 手风琴（Accordion）展开：每次只保留最新点击的一个模块，避免纵向无限拉长
   const handleOpenChange = (keys: string[]) => {
+    if (normalizedKeyword) {
+      // 搜索中允许展开全部匹配的分组
+      setOpenGroups(keys);
+      return;
+    }
     const latestOpenKey = keys.find((key) => !openGroups.includes(key));
     if (latestOpenKey) {
       setOpenGroups([latestOpenKey]);
@@ -96,9 +149,31 @@ export const MainLayout: React.FC = () => {
     }
   };
 
+  // 搜索时自动展开所有包含匹配结果的分组
   useEffect(() => {
-    if (activeGroup) setOpenGroups([activeGroup]);
-  }, [activeGroup]);
+    if (normalizedKeyword) {
+      const matchedGroupKeys = allGroups
+        .filter((g) =>
+          PAGE_MANIFEST.some(
+            (p) =>
+              p.id.startsWith(g.key) &&
+              canAccessPage(data, currentUser, p.id) &&
+              (p.id.toLowerCase().includes(normalizedKeyword) ||
+                p.title.toLowerCase().includes(normalizedKeyword) ||
+                p.route.toLowerCase().includes(normalizedKeyword))
+          )
+        )
+        .map((g) => g.key);
+      setOpenGroups(matchedGroupKeys);
+    } else if (activeGroup) {
+      setOpenGroups([activeGroup]);
+    }
+  }, [normalizedKeyword, allGroups, data, currentUser, activeGroup]);
+
+  useEffect(() => {
+    if (activeGroup && !normalizedKeyword) setOpenGroups([activeGroup]);
+  }, [activeGroup, normalizedKeyword]);
+
   const policyId = selectAccessPolicy(data, currentRole)?.id;
   useEffect(() => {
     recordAccess(location.pathname + location.search, allowed, currentUser);
@@ -108,10 +183,7 @@ export const MainLayout: React.FC = () => {
     <Layout style={{ minHeight: '100vh', width: '100%', background: '#f8fafc' }}>
       <Sider
         trigger={null}
-        collapsible
-        collapsed={collapsed}
         width={240}
-        collapsedWidth={64}
         className="pms-sider"
         style={{
           display: 'flex',
@@ -132,8 +204,8 @@ export const MainLayout: React.FC = () => {
             height: 64,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: collapsed ? 'center' : 'flex-start',
-            padding: collapsed ? '0' : '0 16px',
+            justifyContent: 'flex-start',
+            padding: '0 16px',
             background: '#090d16',
             color: '#fff',
             fontWeight: 'bold',
@@ -144,19 +216,36 @@ export const MainLayout: React.FC = () => {
             flexShrink: 0,
           }}
         >
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-sm flex-shrink-0">
-            PMS
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-base shadow-sm flex-shrink-0 tracking-tight">
+            S
           </div>
-          {!collapsed && (
-            <div className="ml-3 flex flex-col justify-center">
-              <span className="leading-none text-slate-100 font-bold text-sm">PMS 平台</span>
-              <span className="text-[11px] text-slate-400 font-normal mt-1 leading-none">四算联动全生命周期</span>
-            </div>
-          )}
+          <div className="ml-3 flex flex-col justify-center">
+            <span className="leading-none text-slate-100 font-bold text-sm tracking-tight">项目管理平台</span>
+            <span className="text-[11px] text-slate-400 font-normal mt-1 leading-none">四算联动全生命周期</span>
+          </div>
+        </div>
+
+        {/* 搜索过滤框 */}
+        <div className="px-3 py-2.5 border-b border-[#1e293b]/80 flex-shrink-0 bg-[#0b1120]">
+          <Input
+            placeholder="快速搜索功能"
+            prefix={<SearchOutlined className="text-slate-400 text-xs mr-1" />}
+            suffix={
+              menuSearch ? (
+                <CloseCircleFilled
+                  className="text-slate-400 hover:text-slate-200 cursor-pointer text-xs transition-colors"
+                  onClick={() => setMenuSearch('')}
+                />
+              ) : null
+            }
+            value={menuSearch}
+            onChange={(e) => setMenuSearch(e.target.value)}
+            className="pms-sider-search bg-[#111827] border-[#1f293d] text-slate-100 placeholder:text-slate-400 text-xs rounded-lg py-1 hover:border-blue-500 focus:border-blue-500 focus:bg-[#0f172a]"
+          />
         </div>
 
         {/* 中间菜单区：可独立悬浮滚动 */}
-        <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }} className="pms-sider-scroll">
+        <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }} className="pms-sider-scroll py-1.5">
           <Menu
             theme="dark"
             mode="inline"
@@ -168,26 +257,9 @@ export const MainLayout: React.FC = () => {
             style={{ borderRight: 0, background: '#0f172a' }}
           />
         </div>
-
-        {/* 底部折叠悬浮栏 */}
-        <div
-          onClick={() => setCollapsed(!collapsed)}
-          className="flex items-center justify-between px-4 py-3 bg-[#090d16] border-t border-[#1e293b] text-slate-400 hover:text-white hover:bg-slate-800/60 cursor-pointer select-none transition-colors"
-          style={{ flexShrink: 0, height: 44 }}
-          title={collapsed ? '展开侧边栏' : '收起侧边栏'}
-        >
-          {collapsed ? (
-            <MenuUnfoldOutlined className="mx-auto text-base" />
-          ) : (
-            <>
-              <span className="text-xs text-slate-400 font-medium">收起侧边导航</span>
-              <MenuFoldOutlined className="text-sm" />
-            </>
-          )}
-        </div>
       </Sider>
 
-      <Layout style={{ marginLeft: collapsed ? 64 : 240, transition: 'all 0.2s', minWidth: 0, background: '#f8fafc' }}>
+      <Layout style={{ marginLeft: 240, transition: 'all 0.2s', minWidth: 0, background: '#f8fafc' }}>
         <Header
           style={{
             padding: '0 20px',
@@ -204,14 +276,6 @@ export const MainLayout: React.FC = () => {
           }}
         >
           <Space size={16} align="center">
-            <Button
-              type="text"
-              aria-label="折叠或展开导航"
-              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              onClick={() => setCollapsed(!collapsed)}
-              style={{ fontSize: 16, width: 32, height: 32 }}
-            />
-
             {/* Spotlight 风格全局搜索入口 */}
             <button
               type="button"
@@ -238,7 +302,7 @@ export const MainLayout: React.FC = () => {
               </div>
             ) : (
               <Text strong style={{ fontSize: 14, color: '#1e293b' }} className="hidden lg:inline-block">
-                项目管理全生命周期平台
+                项目管理平台
               </Text>
             )}
           </Space>

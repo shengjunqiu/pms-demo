@@ -7,11 +7,27 @@ export const pmsTheme: ThemeConfig = {
     colorWarning: '#f59e0b', // amber-500
     colorError: '#ef4444',   // rose-500
     colorInfo: '#2563eb',
-    colorTextBase: '#0f172a', // slate-900
+    colorTextBase: '#0f172a', // slate-900 (主文本色)
+    colorTextSecondary: '#475569', // slate-600 (次级文本色)
+    colorTextTertiary: '#64748b', // slate-500 (三级辅助/标签文本色)
+    colorTextQuaternary: '#94a3b8', // slate-400 (弱化/占位文本色)
     colorBgBase: '#ffffff',
     colorBorder: '#e2e8f0',   // slate-200
     borderRadius: 8,          // rounded-lg
+    // =========================================================================
+    // 统一专业排版体系 (Typography Scale & Stacks)
+    // =========================================================================
     fontSize: 14,
+    fontSizeHeading1: 24, // 核心指标 Display / 顶级统计
+    fontSizeHeading2: 20, // 页面主标题 Page Title
+    fontSizeHeading3: 16, // 区块级标题 Section Title
+    fontSizeHeading4: 14, // 卡片级标题 Card Title
+    fontSizeHeading5: 13, // 表头/紧凑标题 Table Header
+    fontSizeSM: 12,       // 辅助注释 Caption / 标签 Tag
+    lineHeight: 1.5714,   // 标准正文行高
+    lineHeightHeading1: 1.3333,
+    lineHeightHeading2: 1.4,
+    lineHeightHeading3: 1.5,
     fontFamily: `Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif`,
     fontFamilyCode: `"JetBrains Mono", "SF Mono", Consolas, Menlo, monospace`,
     // 标准 4px/8px 空间网格系统 (8pt Grid System)
@@ -19,6 +35,10 @@ export const pmsTheme: ThemeConfig = {
     sizeUnit: 4,
   },
   components: {
+    Typography: {
+      titleMarginBottom: 0,
+      titleMarginTop: 0,
+    },
     Layout: {
       headerBg: '#ffffff',
       headerHeight: 64,
