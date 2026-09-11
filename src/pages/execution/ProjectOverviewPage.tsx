@@ -1,8 +1,8 @@
 import { canViewSensitiveField } from '@/mock/configuration-access';
 import { marginReason } from '@/utils/sensitive';
 import { useState } from 'react';
-import { Alert, Button, Card, Col, Descriptions, Drawer, Empty, Progress, Row, Select, Space, Statistic, Steps, Table, Tabs, Tag, Timeline, Typography } from 'antd';
-import { ArrowLeftOutlined, ArrowRightOutlined, DollarOutlined, FundOutlined, LineChartOutlined } from '@ant-design/icons';
+import { Alert, Button, Card, Col, Descriptions, Drawer, Empty, Progress, Row, Select, Space, Statistic, Table, Tabs, Tag, Timeline, Typography } from 'antd';
+import { ArrowRightOutlined, DollarOutlined, FundOutlined, LineChartOutlined } from '@ant-design/icons';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useBusinessStore } from '@/mock/business';
 import { useAppStore } from '@/store/useAppStore';
@@ -41,7 +41,37 @@ export function ProjectOverviewPage() {
   const accounting = () => { const next = new URLSearchParams(params); next.delete('tab'); navigate(`/projects/${p.id}/dynamic-accounting?${next}`); };
   const open = (title: string, fields: [string, unknown][]) => setDetail({ title, fields: fields.map(([label, value]) => ({ label, value: Array.isArray(value) ? value.join('、') : String(value ?? '—') })) });
   const marker = (status: string) => <Tag color={status.includes('通过') || status.includes('完成') || status.includes('已达成') ? 'success' : status.includes('整改') || status.includes('逾期') ? 'error' : 'processing'}>{status}</Tag>;
-  const milestoneView = <Timeline items={milestones.map((m) => ({ color: m.status === '已达成' ? 'green' : m.status === '逾期未达成' ? 'red' : 'blue', children: <Space wrap><Button type="link" size="small" onClick={() => open(m.type, [['编号', m.id], ['计划日期', m.plannedDate], ['实际日期', m.actualDate], ['状态', m.status], ['必交材料', m.requiredDeliverables], ['责任人', p.pmName]])}>{m.type}</Button>{marker(m.status)}<Text type="secondary">{m.plannedDate}</Text></Space> }))} />;
+  const milestoneView = (
+    <div className="grid grid-cols-5 gap-3 mb-4">
+      {milestones.map((m) => {
+        const isDone = m.status === '已达成';
+        const isOverdue = m.status === '逾期未达成';
+        return (
+          <div
+            key={m.id}
+            className={`rounded-lg border px-3.5 py-3 transition-all cursor-pointer hover:shadow-md ${
+              isOverdue ? 'bg-rose-50/80 border-rose-200 hover:border-rose-300'
+              : isDone ? 'bg-emerald-50/50 border-emerald-200 hover:border-emerald-300'
+              : 'bg-white border-slate-200 hover:border-blue-300'
+            }`}
+            onClick={() => open(m.name, [['编号', m.id], ['计划日期', m.plannedDate], ['实际日期', m.actualDate], ['状态', m.status], ['必交材料', m.requiredDeliverables], ['责任人', p.pmName]])}
+          >
+            <div className="flex items-center justify-between gap-2 mb-1.5">
+              <span className={`text-xs font-semibold truncate ${
+                isDone ? 'text-emerald-700' : isOverdue ? 'text-rose-700' : 'text-slate-700'
+              }`}>{m.name}</span>
+              <Tag color={isOverdue ? 'error' : isDone ? 'success' : 'processing'} className="m-0 text-[9px] leading-none px-1 py-0 flex-shrink-0">
+                {m.status}
+              </Tag>
+            </div>
+            <div className="text-[11px] text-slate-400">
+              {m.plannedDate}{m.actualDate ? ` → ${m.actualDate}` : ''}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
   const counts = [
     { label: '未关闭问题', value: issues.filter((i) => i.status !== '已关闭').length, tab: 'risks' },
     { label: '当前风险', value: risks.filter((r) => !['已关闭', '已缓解'].includes(r.status)).length, tab: 'risks' },
@@ -92,9 +122,46 @@ export function ProjectOverviewPage() {
           ))}
         </Row>
       </Card>
-      <Card title="最近动态" size="small" style={{ marginTop: 16 }}>{data.dailyReports.filter((r) => r.projectId === p.id).slice(0, 1).map((r) => <div key={r.id}><Text strong>{r.date} · {r.reporter}</Text><p>{r.completedTasks}</p><Button size="small" onClick={() => selectTab('reports')}>查看日报周报</Button></div>)}</Card>
+      </Col>
+    <Col span={10}>
+      <Card title="关键里程碑" size="small" className="h-full">
+        <div className="flex flex-col gap-2">
+          {milestones.map((m) => {
+            const isDone = m.status === '已达成';
+            const isOverdue = m.status === '逾期未达成';
+            return (
+              <div
+                key={m.id}
+                className={`flex items-start gap-3 rounded-lg border px-3.5 py-2.5 transition-all cursor-pointer hover:shadow-xs ${
+                  isOverdue
+                    ? 'bg-rose-50/70 border-rose-200'
+                    : isDone
+                      ? 'bg-emerald-50/60 border-emerald-200'
+                      : 'bg-white border-slate-200'
+                }`}
+                onClick={() => open(m.name, [['编号', m.id], ['计划日期', m.plannedDate], ['实际日期', m.actualDate], ['状态', m.status], ['必交材料', m.requiredDeliverables], ['责任人', p.pmName]])}
+              >
+                <div className={`flex-shrink-0 w-2 h-2 rounded-full mt-1.5 ${
+                  isOverdue ? 'bg-rose-500' : isDone ? 'bg-emerald-500' : 'bg-blue-500'
+                }`} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-semibold text-slate-800 truncate">{m.name}</span>
+                    <Tag color={isOverdue ? 'error' : isDone ? 'success' : 'processing'} className="m-0 text-[10px] leading-none px-1.5 py-0.5 flex-shrink-0">
+                      {m.status}
+                    </Tag>
+                  </div>
+                  <div className="flex items-center gap-2 mt-0.5 text-[11px] text-slate-400">
+                    <span>计划: {m.plannedDate}</span>
+                    {m.actualDate && <span>实际: {m.actualDate}</span>}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
     </Col>
-    <Col span={10}><Card title="关键里程碑" size="small">{milestoneView}</Card><Card title="验收与交付" size="small" style={{ marginTop: 16 }}><p>材料审核通过 {materials.filter((m) => m.status === '通过').length} / {materials.length} 项</p><Progress percent={materials.length ? Math.round(materials.filter((m) => m.status === '通过').length / materials.length * 100) : 0} /><Space><Button onClick={() => selectTab('deliverables')}>交付物清单</Button><Button onClick={() => selectTab('acceptance')}>验收记录</Button></Space></Card></Col>
   </Row>;
   const riskRows = [...issues.map((i) => ({ id: i.id, kind: '问题', title: i.title, level: i.severity, status: i.status, owner: i.owner, date: i.deadline, source: i.fromRiskId ?? '直接登记' })), ...risks.map((r) => ({ id: r.id, kind: '风险', title: r.title, level: r.level, status: r.status, owner: r.owner, date: r.identifiedDate, source: r.strategy }))];
   const demandRows = [...requirements.map((r) => ({ ...r, kind: '需求', level: r.priority })), ...bugs.map((b) => ({ ...b, kind: 'BUG', level: b.severity }))];
@@ -141,7 +208,7 @@ export function ProjectOverviewPage() {
   const activeTab = tabs.some((tab) => tab.key === currentTab) ? currentTab : 'overview';
   return <div>
     {/* 顶部 Hero 实体卡片 */}
-    <div className="bg-white border border-slate-200 rounded-xl p-5 mb-4 shadow-2xs">
+    <div className="bg-white border border-slate-200 rounded-xl p-5 mb-3 shadow-2xs">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
         <div className="flex items-start gap-3.5">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-lg shadow-sm flex-shrink-0">
@@ -166,17 +233,6 @@ export function ProjectOverviewPage() {
               <span>计划交付: <strong className="text-slate-700 font-medium">{p.plannedEndDate}</strong></span>
             </div>
           </div>
-        </div>
-
-        <div className="flex items-center gap-2 self-start lg:self-center">
-          <Select
-            aria-label="切换项目"
-            value={p.id}
-            style={{ width: 230 }}
-            options={allowed.map((row) => ({ value: row.id, label: `${row.id} ${row.name}` }))}
-            onChange={(value) => navigate(`/projects/${value}?${params}`)}
-          />
-          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>返回</Button>
         </div>
       </div>
 
@@ -203,14 +259,57 @@ export function ProjectOverviewPage() {
       </details>
     </div>
 
-    <div className="pms-project-lifecycle bg-white p-3.5 border border-slate-200 rounded-lg mb-4 flex items-center justify-between">
-      <div className="text-xs font-semibold text-slate-700 mr-4 flex-shrink-0">四算生命周期进展:</div>
-      <Steps size="small" style={{ flex: 1, minWidth: 420 }} current={['概算', '预算', '核算', '结算及运维'].indexOf(fourStage(p))} items={['概算', '预算', '核算', '结算及运维'].map((title) => ({ title }))} />
+    <div className="grid grid-cols-4 gap-3 mb-2">
+      {['概算', '预算', '核算', '结算及运维'].map((title, i) => {
+        const currentIdx = ['概算', '预算', '核算', '结算及运维'].indexOf(fourStage(p));
+        const isActive = i === currentIdx;
+        const isPast = i < currentIdx;
+        const stageAmounts = [calc.estimate?.totalCost, calc.budget?.totalAmount, calc.rolling, calc.settlement?.finalCost];
+        return (
+          <div
+            key={title}
+            className={`rounded-xl border px-4 py-3 transition-all ${
+              isActive
+                ? 'bg-blue-50/70 border-blue-300 shadow-2xs'
+                : isPast
+                  ? 'bg-white border-emerald-200 shadow-2xs'
+                  : 'bg-white border-slate-200'
+            }`}
+          >
+            <div className="flex items-center gap-1.5 mb-1">
+              <div className={`w-2 h-2 rounded-full ${
+                isActive ? 'bg-blue-600' : isPast ? 'bg-emerald-500' : 'bg-slate-300'
+              }`} />
+              <span className={`text-sm font-semibold ${
+                isActive ? 'text-blue-700' : isPast ? 'text-emerald-700' : 'text-slate-400'
+              }`}>
+                {title}
+              </span>
+              {isActive && (
+                <span className="ml-auto text-[10px] font-medium text-blue-600 bg-blue-100/60 px-1.5 py-0.5 rounded-full">当前</span>
+              )}
+              {isPast && (
+                <span className="ml-auto text-[10px] font-medium text-emerald-600 bg-emerald-100/60 px-1.5 py-0.5 rounded-full">已完成</span>
+              )}
+            </div>
+            <div className={`text-xs font-mono ${
+              isActive ? 'text-blue-600' : isPast ? 'text-emerald-600' : 'text-slate-300'
+            }`}>
+              {stageAmounts[i] != null
+                ? `${stageAmounts[i]!.toFixed(1)} 万元`
+                : isActive
+                  ? '核算中'
+                  : '—'
+              }
+            </div>
+          </div>
+        );
+      })}
     </div>
 
     <div className="pms-project-tabs">
       <Tabs className="pms-project-groups" activeKey={activeGroup.key} onChange={(key) => selectTab(groups.find((group) => group.key === key)!.tabs[0])} items={groups.map(({ key, label }) => ({ key, label }))} />
-      <Tabs size="small" type="card" activeKey={activeTab} onChange={selectTab} items={tabs.filter((tab) => activeGroup.tabs.includes(tab.key))} />
+      <Tabs className="pms-project-subtabs" size="small" activeKey={activeTab} onChange={selectTab} items={tabs.filter((tab) => activeGroup.tabs.includes(tab.key))} />
     </div>
     <Drawer title={detail?.title ?? '原始业务记录'} open={!!detail} onClose={() => setDetail(undefined)} width={560}>{detail ? <Descriptions bordered column={1} items={detail.fields.map((field) => ({ key: field.label, label: field.label, children: field.value }))} /> : <Empty />}</Drawer>
   </div>;

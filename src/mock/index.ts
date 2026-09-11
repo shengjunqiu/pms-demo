@@ -590,16 +590,29 @@ export const mockWbsTasks: WbsTask[] = Array.from({ length: 520 }).map((_, i) =>
   };
 });
 
-// 11. 里程碑：P-001下一节点初验，P-002终验逾期28天；其他项目按业务阶段生成。
+// 11. 里程碑：分五类节点（开工、开发完毕、初验、试运行、终验），按项目状态模拟进度。
 export const mockMilestones: Milestone[] = mockProjects.flatMap((p) => {
-  const types: Milestone['type'][] = ['启动', '开发完成', '内部初验', '客户终验'];
+  const types: Milestone['type'][] = ['启动', '开发完成', '内部初验', '试运行', '客户终验'];
+  const stageLabels: Partial<Record<Milestone['type'], string>> = { 启动: '开工', 开发完成: '开发完毕', 内部初验: '初验', 试运行: '试运行', 客户终验: '终验' };
+  const doneCount = p.status === '已结算' ? 5 : p.isMaintenance ? 5 : p.status === '已终止' ? 0 : p.id === 'P-002' ? 3 : (['P-001', 'P-004'].includes(p.id) ? 2 : 1);
   return types.map((type, i) => {
-    const done = p.status === '已结算' || p.isMaintenance || (p.id === 'P-002' ? i < 3 : i < 2);
-    return { id: `MLS-${p.id}-${i + 1}`, projectId: p.id, name: `${p.name} · ${type}`, type,
-      plannedDate: done ? '2026-08-01' : p.id === 'P-002' ? '2026-08-12' : i === 2 ? '2026-09-20' : p.plannedEndDate,
+    const done = i < doneCount;
+    const plannedDate = done ? '2026-08-01'
+      : p.id === 'P-002' && i === 3 ? '2026-09-05'
+      : p.id === 'P-002' && i === 4 ? '2026-09-30'
+      : i === 2 ? '2026-09-20'
+      : i === 3 ? '2026-10-15'
+      : i === 4 ? '2026-12-31'
+      : p.plannedEndDate;
+    const status: Milestone['status'] = done ? '已达成'
+      : p.id === 'P-002' && i < doneCount + 1 ? '逾期未达成'
+      : '未达成';
+    return {
+      id: `MLS-${p.id}-${i + 1}`, projectId: p.id,
+      name: stageLabels[type] ?? type, type,
+      plannedDate, status,
       actualDate: done ? '2026-08-01' : undefined,
-      status: done ? '已达成' : p.id === 'P-002' ? '逾期未达成' : '未达成',
-      requiredDeliverables: i >= 2 ? ['测试报告', '验收确认函'] : ['实施计划'],
+      requiredDeliverables: i >= 3 ? ['测试报告', '验收确认函'] : i >= 1 ? ['测试报告'] : ['实施计划'],
     };
   });
 });

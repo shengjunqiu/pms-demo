@@ -45,6 +45,23 @@ export const GLOBAL_NAV_SECTIONS: GlobalNavSection[] = [
     ],
   },
   {
+    key: 'management',
+    title: '经营分析',
+    groups: [
+      {
+        key: 'management-center',
+        label: '项目经营看板',
+        icon: 'executive',
+        entries: [
+          { pageId: 'GL-01' },
+          { pageId: 'GL-03' },
+          { pageId: 'GL-05' },
+          { pageId: 'WK-03' },
+        ],
+      },
+    ],
+  },
+  {
     key: 'business',
     title: '业务中心',
     groups: [
@@ -61,23 +78,6 @@ export const GLOBAL_NAV_SECTIONS: GlobalNavSection[] = [
           { pageId: 'HS-05' },
           { pageId: 'HS-07' },
           { pageId: 'HS-14' },
-        ],
-      },
-    ],
-  },
-  {
-    key: 'management',
-    title: '经营分析',
-    groups: [
-      {
-        key: 'management-center',
-        label: '项目经营看板',
-        icon: 'executive',
-        entries: [
-          { pageId: 'GL-01' },
-          { pageId: 'GL-03' },
-          { pageId: 'GL-05' },
-          { pageId: 'WK-03' },
         ],
       },
     ],

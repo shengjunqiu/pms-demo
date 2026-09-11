@@ -17,7 +17,7 @@ export function planningSnapshot(state: BusinessState,id: string): PlanningSnaps
  return structuredClone(draft??{scope:state.baselines.find(b=>b.projectId===id&&b.status==='已生效')?.scopeDesc??`${p.name} 已批准交付范围`,tasks:state.tasks.filter(t=>t.projectId===id),milestones:state.milestones.filter(m=>m.projectId===id),resources:teamResources(state,id),plannedStartDate:p.plannedStartDate,plannedEndDate:p.plannedEndDate});
 }
 export function milestoneTemplate(projectId:string,start:string,end:string,projectType:Project['type']='混合交付'):Milestone[] {
- const types:Milestone['type'][]=projectType==='咨询服务'?['启动','方案确认','客户终验']:projectType==='运维服务'?['启动','客户终验']:['启动','方案确认','开发完成','内部初验','客户终验'];
+ const types:Milestone['type'][]=projectType==='咨询服务'?['启动','方案确认','客户终验']:projectType==='运维服务'?['启动','客户终验']:['启动','开发完成','内部初验','试运行','客户终验'];
  return types.map((type,i)=>({id:`MS-${projectId}-${i+1}`,projectId,name:type,type,plannedDate:new Date(Date.parse(start)+(Date.parse(end)-Date.parse(start))*i/Math.max(1,types.length-1)).toISOString().slice(0,10),status:'未达成',requiredDeliverables:[i===0?'实施计划':i<3?'测试报告':'验收确认函'],ownerId:'U-001',ownerName:'张建国',completionCondition:`${type}范围完成，必交材料审核通过`,acceptanceBasis:'经评审的项目范围说明书',isKey:true,templateRequired:true}));
 }
 export function initializePlanning(state:BusinessState) {

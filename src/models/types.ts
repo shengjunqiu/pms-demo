@@ -208,7 +208,7 @@ export interface Milestone {
   id: string;
   projectId: string;
   name: string;
-  type: '签约' | '启动' | '方案确认' | '开发完成' | '内部初验' | '客户终验' | '项目结算';
+  type: '签约' | '启动' | '方案确认' | '开发完成' | '内部初验' | '试运行' | '客户终验' | '项目结算';
   plannedDate: string;
   actualDate?: string;
   status: '未达成' | '临期预警' | '逾期未达成' | '已达成';

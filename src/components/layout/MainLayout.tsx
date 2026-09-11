@@ -47,7 +47,7 @@ export const MainLayout: React.FC = () => {
   const navigate = useNavigate();
   const { currentRole, setRole, currentUser, asOfDate } = useAppStore();
   const { data, recordAccess } = useBusinessStore();
-  const [openGroups, setOpenGroups] = useState<string[]>(['workspace']);
+  const [openGroups, setOpenGroups] = useState<string[]>(['workspace', 'business-center', 'management-center', 'settings']);
 
   const allGroups = useMemo(() => GLOBAL_NAV_SECTIONS.flatMap((section) => section.groups), []);
   const normalizedKeyword = menuSearch.trim().toLowerCase();
@@ -109,19 +109,9 @@ export const MainLayout: React.FC = () => {
   const isWorkspace = !!currentPage && ['WK', 'GL', 'GS', 'YS', 'HS', 'JS', 'CF'].includes(currentPage.id.split('-')[0])
     || /^\/projects\/[^/]+\/plan-requests\/[^/]+$/.test(location.pathname);
 
-  // 手风琴（Accordion）展开：每次只保留最新点击的一个模块，避免纵向无限拉长
+  // 自由展开/收起多分组
   const handleOpenChange = (keys: string[]) => {
-    if (normalizedKeyword) {
-      // 搜索中允许展开全部匹配的分组
-      setOpenGroups(keys);
-      return;
-    }
-    const latestOpenKey = keys.find((key) => !openGroups.includes(key));
-    if (latestOpenKey) {
-      setOpenGroups([latestOpenKey]);
-    } else {
-      setOpenGroups(keys);
-    }
+    setOpenGroups(normalizedKeyword ? allGroups.map((g) => g.key) : keys);
   };
 
   // 搜索时自动展开所有包含匹配结果的分组
@@ -138,14 +128,8 @@ export const MainLayout: React.FC = () => {
         }))
         .map((group) => group.key);
       setOpenGroups(matchedGroupKeys);
-    } else if (activeGroup) {
-      setOpenGroups([activeGroup]);
     }
   }, [normalizedKeyword, allGroups, data, currentUser, activeGroup]);
-
-  useEffect(() => {
-    if (activeGroup && !normalizedKeyword) setOpenGroups([activeGroup]);
-  }, [activeGroup, normalizedKeyword]);
 
   const policyId = selectAccessPolicy(data, currentRole)?.id;
   useEffect(() => {
