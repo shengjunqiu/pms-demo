@@ -21,10 +21,10 @@
   "acceptance_dependencies": ["协调者集成后正式验收"],
   "acceptance_ready": false,
   "acceptance_group": "UI-JS3",
-  "status": "in_progress",
+  "status": "blocked",
   "last_confirmed_at": "2026-09-11",
   "acceptance_checklist": ["工程检查", "后评价/归档/运维/关闭真实流程", "双宽与权限", "正式accept"],
   "scenarios": "P-008后评价归档关闭；P-007运维移交与周期；阻断和只读状态",
   "fixtures": "只用现有统一BusinessState和真实transition，不修改共享store、类型、路由或配置",
-  "next_action": "完成五页独占UI与定向测试后提交单一交付提交"
+  "next_action": "子agent运行环境缺少Pi宿主依赖；重启会话修复后恢复，或经用户明确授权改为当前主agent串行实施"
 }

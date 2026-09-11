@@ -20,10 +20,10 @@
   "acceptance_dependencies": ["协调者集成后正式验收"],
   "acceptance_ready": false,
   "acceptance_group": "UI-JS1-R2",
-  "status": "in_progress",
+  "status": "blocked",
   "last_confirmed_at": "2026-09-11",
   "acceptance_checklist": ["工程检查", "内部/供应商/客户验收与报验真实流程", "双宽与权限", "正式accept"],
   "scenarios": "P-006整改复验与客户验收；P-001正常验收/报验；无供应商不适用；权限与历史轮次",
   "fixtures": "只用现有统一BusinessState和真实transition，不伪造完成状态",
-  "next_action": "完成独占页面与测试后提交单一交付提交"
+  "next_action": "子agent运行环境缺少Pi宿主依赖；重启会话修复后恢复，或经用户明确授权改为当前主agent串行实施"
 }
