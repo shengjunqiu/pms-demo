@@ -14,7 +14,7 @@ export const BusinessStageBadge: React.FC<{ stage?: BusinessStage; className?: s
 }) => {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50/80 text-blue-700 border border-blue-200/60 shadow-xs ${className}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50/70 text-blue-700 ring-1 ring-inset ring-blue-600/20 shadow-2xs ${className}`}
     >
       <span className="h-1.5 w-1.5 rounded-full bg-blue-600 animate-pulse" />
       <span>{stage}</span>
@@ -40,7 +40,7 @@ export const DeliveryStageBadge: React.FC<{ stage?: DeliveryStage; className?: s
 }) => {
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-purple-50/80 text-purple-700 border border-purple-200/60 shadow-xs ${className}`}
+      className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-indigo-50/70 text-indigo-700 ring-1 ring-inset ring-indigo-500/20 shadow-2xs ${className}`}
     >
       {stage}
     </span>
@@ -59,7 +59,7 @@ export const HealthBadge: React.FC<{ status?: HealthStatus; label?: string; clas
   if (status.includes('高风险') || status.includes('重大') || status.includes('严重') || status.includes('红') || status.includes('超支')) {
     return (
       <span
-        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200/70 shadow-xs ${className}`}
+        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-50/90 text-rose-700 ring-1 ring-inset ring-rose-600/25 shadow-2xs ${className}`}
       >
         <ExclamationCircleOutlined className="text-rose-600 text-[11px]" />
         <span>{text}</span>
@@ -69,7 +69,7 @@ export const HealthBadge: React.FC<{ status?: HealthStatus; label?: string; clas
   if (status.includes('关注') || status.includes('预警') || status.includes('黄') || status.includes('中度')) {
     return (
       <span
-        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200/70 shadow-xs ${className}`}
+        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50/90 text-amber-700 ring-1 ring-inset ring-amber-600/25 shadow-2xs ${className}`}
       >
         <WarningOutlined className="text-amber-600 text-[11px]" />
         <span>{text}</span>
@@ -78,7 +78,7 @@ export const HealthBadge: React.FC<{ status?: HealthStatus; label?: string; clas
   }
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/70 shadow-xs ${className}`}
+      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50/90 text-emerald-700 ring-1 ring-inset ring-emerald-600/25 shadow-2xs ${className}`}
     >
       <CheckCircleOutlined className="text-emerald-600 text-[11px]" />
       <span>{text}</span>
@@ -96,7 +96,7 @@ export const RiskBadge: React.FC<{ level?: RiskLevel; className?: string }> = ({
   if (level.includes('特大')) {
     return (
       <span
-        className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-300/80 shadow-xs ${className}`}
+        className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-rose-50 text-rose-700 ring-1 ring-inset ring-rose-600/30 shadow-2xs ${className}`}
       >
         {level}
       </span>
@@ -105,7 +105,7 @@ export const RiskBadge: React.FC<{ level?: RiskLevel; className?: string }> = ({
   if (level.includes('高')) {
     return (
       <span
-        className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200/70 shadow-xs ${className}`}
+        className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/30 shadow-2xs ${className}`}
       >
         {level}
       </span>
@@ -114,7 +114,7 @@ export const RiskBadge: React.FC<{ level?: RiskLevel; className?: string }> = ({
   if (level.includes('中')) {
     return (
       <span
-        className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200/70 shadow-xs ${className}`}
+        className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-600/30 shadow-2xs ${className}`}
       >
         {level}
       </span>
@@ -122,7 +122,7 @@ export const RiskBadge: React.FC<{ level?: RiskLevel; className?: string }> = ({
   }
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200/80 shadow-xs ${className}`}
+      className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100/90 text-slate-700 ring-1 ring-inset ring-slate-400/20 shadow-2xs ${className}`}
     >
       {level}
     </span>

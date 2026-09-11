@@ -33,11 +33,11 @@ export const MetricStatCard: React.FC<MetricStatCardProps> = ({
   variant = 'card',
   signed = false,
 }) => {
-  const statusColorMap = {
-    healthy: 'text-emerald-600',
-    warning: 'text-amber-600',
-    danger: 'text-rose-600',
-    info: 'text-blue-600',
+  const statusPillMap = {
+    healthy: 'bg-emerald-50/90 text-emerald-700 ring-1 ring-inset ring-emerald-600/20',
+    warning: 'bg-amber-50/90 text-amber-700 ring-1 ring-inset ring-amber-600/20',
+    danger: 'bg-rose-50/90 text-rose-700 ring-1 ring-inset ring-rose-600/20',
+    info: 'bg-blue-50/90 text-blue-700 ring-1 ring-inset ring-blue-600/20',
   };
 
   return (
@@ -73,15 +73,25 @@ export const MetricStatCard: React.FC<MetricStatCardProps> = ({
 
       {/* 3. 卡片底行：辅助指标 / 同比环比 / 细分健康度占比 */}
       {(subtitle || trend || statusText) && (
-        <div className="pms-metric-caption flex items-center justify-between text-xs text-slate-500">
-          {subtitle && <span>{subtitle}</span>}
+        <div className="pms-metric-caption flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100/80 mt-auto">
+          {subtitle && <span className="truncate max-w-[60%]">{subtitle}</span>}
           {trend && (
-            <span className={`font-mono font-medium ${trend.isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
-              {trend.label} {trend.isPositive ? '↑' : '↓'} {trend.value}
+            <span
+              className={`inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded font-mono text-[11px] font-medium ${
+                trend.isPositive
+                  ? 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20'
+                  : 'bg-rose-50 text-rose-700 ring-1 ring-inset ring-rose-600/20'
+              }`}
+            >
+              <span>{trend.label}</span>
+              <span>{trend.isPositive ? '↑' : '↓'}</span>
+              <span>{trend.value}</span>
             </span>
           )}
           {statusText && (
-            <span className={`font-mono font-medium ${statusColorMap[statusType]}`}>
+            <span
+              className={`inline-flex items-center px-1.5 py-0.2 rounded-full font-mono text-[11px] font-medium ${statusPillMap[statusType]}`}
+            >
               {statusText}
             </span>
           )}

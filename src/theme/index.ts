@@ -2,17 +2,18 @@ import { ThemeConfig } from 'antd';
 
 export const pmsTheme: ThemeConfig = {
   token: {
-    colorPrimary: '#2563eb', // PMS Blue (blue-600)
-    colorSuccess: '#10b981', // emerald-500
-    colorWarning: '#f59e0b', // amber-500
-    colorError: '#ef4444',   // rose-500
-    colorInfo: '#2563eb',
+    colorPrimary: '#1d4ed8', // 国际深邃海蓝 (blue-700)
+    colorPrimaryHover: '#2563eb',
+    colorSuccess: '#059669', // 翡翠绿 (emerald-600)
+    colorWarning: '#d97706', // 琥珀黄 (amber-600)
+    colorError: '#e11d48',   // 浆果玫红 (rose-600)
+    colorInfo: '#1d4ed8',
     colorTextBase: '#0f172a', // slate-900 (主文本色)
-    colorTextSecondary: '#475569', // slate-600 (次级文本色)
+    colorTextSecondary: '#334155', // slate-700 (次级文本色)
     colorTextTertiary: '#64748b', // slate-500 (三级辅助/标签文本色)
     colorTextQuaternary: '#94a3b8', // slate-400 (弱化/占位文本色)
     colorBgBase: '#ffffff',
-    colorBorder: '#e2e8f0',   // slate-200
+    colorBorder: 'rgba(226, 232, 240, 0.9)', // 柔和微透半透明描边
     borderRadius: 8,          // rounded-lg
     // =========================================================================
     // 统一专业排版体系 (Typography Scale & Stacks)
