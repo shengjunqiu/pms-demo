@@ -143,6 +143,201 @@ export interface ReceiptPlan {
   paidAmount: number;
 }
 
+// 合同台账（对齐 BPM 合同台账表单结构，金额单位：万元）
+export interface ContractLedgerAttachment {
+  id: string;
+  category: '合同电子版' | '验收资料' | '其他附件';
+  fileName: string;
+  status: '正常' | '待补充';
+}
+export interface ContractLedgerChange {
+  id: string;
+  date: string;
+  operator: string;
+  field: string;
+  before: string;
+  after: string;
+}
+export interface ContractLedgerReceiptPhase {
+  id: string;
+  ratio: number; // 回款占比（0-1）
+  amount: number; // 阶段金额
+  stage: '预付款' | '进度款' | '验收款' | '终验款' | '质保款';
+  milestone: string;
+  plannedDate?: string;
+  plannedAmount: number;
+  actualAmount: number;
+  condition: string;
+  owner: string;
+}
+export interface ContractLedgerDepositPhase {
+  id: string;
+  kind: '履约保证金' | '质保保证金';
+  amount: number;
+  dueDate?: string;
+  condition: string;
+  returnedAmount: number;
+}
+export interface ContractLedgerMaintenance {
+  type: '整体' | '软件' | '硬件';
+  months: number;
+  startDate?: string;
+  endDate?: string;
+  acceptanceStatus: '未开始' | '维保中' | '已验收';
+}
+export interface ContractLedgerDevice {
+  id: string;
+  code: string;
+  goodsType: '系统集成' | '集成服务' | '外购软件' | '技术服务' | '建造';
+  name: string;
+  brand: string;
+  model: string;
+  unit: string;
+  quantity: number;
+  attribute: '外购设备' | '外包' | '外购软件' | '外购服务' | '自研产品';
+  saleUnitPrice: number;
+  saleTotalPrice: number;
+  supplier?: string;
+}
+export interface ContractLedgerMargin {
+  income: number; // 合同/预计中标金额
+  softwareIncome: number;
+  hardwareIncome: number;
+  selfProductIncome: number;
+  costItems: { type: string; item: string; amount: number; note: string }[];
+  totalCost: number;
+  grossProfit: number;
+  grossMarginRate: number;
+  hqServiceFee: number;
+  presaleServiceFee: number;
+  tax: number;
+  netProfit: number;
+  netProfitRate: number;
+}
+export interface ContractLedgerTaxPoint {
+  id: string;
+  name: string;
+  taxRate: number;
+  incomeWithTax: number;
+  incomeWithoutTax: number;
+  tax: number;
+  cost: number;
+}
+export interface ContractLedgerInvoice {
+  id: string;
+  code: string;
+  goodsName: string;
+  invoiceType: '增值税专用发票' | '增值税普通发票';
+  applicant: string;
+  applyDate: string;
+  amount: number;
+  processStatus: '流程中' | '已终止' | '已完成';
+  invoiceStatus: '未开票' | '已开票' | '已作废';
+}
+export interface ContractLedgerLitigation {
+  id: string;
+  code: string;
+  disputeParty: string;
+  applyType: '仲裁' | '诉讼' | '律师函';
+  involvedAmount: number;
+  riskLevel: '高' | '中' | '低';
+  status: '流程中' | '已结案' | '已终止';
+}
+export interface ContractLedgerLetter {
+  id: string;
+  direction: '客户来函' | '我方去函';
+  title: string;
+  date: string;
+  sender: string;
+  summary: string;
+}
+export interface ContractLedgerBasic {
+  opportunityCode: string;
+  contractType: '一般合同' | '框架合同' | '补充协议';
+  signOrg: string;
+  execStatus: '在建' | '已完工' | '已验收' | '已结算' | '已终止';
+  industry: string;
+  region: string;
+  businessDept: string;
+  businessManager: string;
+  customerAttribute: '政府单位' | '事业单位' | '企业单位';
+  cooperationMode: '直签' | '联合体' | '转包';
+  presalePerson: string;
+  sharer: string;
+  amounts: {
+    total: number;
+    hardware: number;
+    software: number;
+    selfProduct: number;
+    acceptanceTotal: number;
+    retentionRatio: number; // 质保金比例 %
+    paidTotal: number;
+    invoicedTotal: number;
+    receivableTotal: number;
+  };
+  dates: {
+    plannedStart?: string;
+    plannedEnd?: string;
+    acceptanceDue?: string;
+    finalAcceptanceDue?: string;
+    actualStart?: string;
+    warrantDue?: string;
+    remark?: string;
+  };
+}
+export interface ContractLedger {
+  contractId: string;
+  projectId: string;
+  basic: ContractLedgerBasic;
+  attachments: ContractLedgerAttachment[];
+  changeRecords: ContractLedgerChange[];
+  receiptPhases: ContractLedgerReceiptPhase[];
+  depositPhases: ContractLedgerDepositPhase[];
+  maintenance?: ContractLedgerMaintenance;
+  devices: ContractLedgerDevice[];
+  margin: ContractLedgerMargin;
+  taxPoints: ContractLedgerTaxPoint[];
+  invoices: ContractLedgerInvoice[];
+  litigations: ContractLedgerLitigation[];
+  letters: ContractLedgerLetter[];
+}
+
+// 项目成本模块（对齐 BPM 项目成本结构，金额单位：万元）
+export interface ProjectCostSubject {
+  subject: string;
+  estimateCost: number;
+  budgetCost: number;
+  actualCost: number;
+}
+export interface ProjectCostItem {
+  item: string;
+  subjects: ProjectCostSubject[];
+}
+export interface ProjectCostCategory {
+  category: '外部成本' | '交付结算';
+  items: ProjectCostItem[];
+}
+export interface ProjectCostServiceFee {
+  label: '总部服务费' | '售前服务费' | '销售服务费';
+  estimate: number;
+  budget: number;
+  actual: number;
+}
+export interface ProjectCostOverview {
+  projectId: string;
+  summary: {
+    estimateCost: number;
+    budgetCost: number;
+    actualCost: number;
+    softwareIncome: number;
+    hardwareIncome: number;
+    opsIncome: number;
+    totalIncome: number;
+  };
+  serviceFees: ProjectCostServiceFee[];
+  categories: ProjectCostCategory[];
+}
+
 // 预算版本
 export interface BudgetVersion {
   details?: BudgetLine[]; ruleVersion?: string; overEstimateReasons?: string[];

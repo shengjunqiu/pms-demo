@@ -26,6 +26,7 @@ import { applyEstimateAction, type EstimateAction } from '@/mock/estimates';
 import type { EstimateDraft, EstimateMetadata } from '@/models/estimates';
 import { applyTeamAction, type TeamAction } from './team';
 import { budgetOverruns, saveBudgetDraft, toBudgetVersion, validateBudgetDraft, type BudgetDraftAction } from './budget-drafts';
+import { createDetailedMockBudgetDrafts } from '@/mock/budget-fixtures';
 import { applyPresalesAction, type PresalesAction } from '@/mock/presales';
 import type { PresalesWorkspace } from '@/models/presales';
 import { applyBudgetPlanningAction, budgetBaselineProposal, confirmBudgetBaseline, initializePlanning, teamResources, planningSnapshot, type BudgetPlanningAction } from '@/mock/budget';
@@ -42,11 +43,13 @@ import { applyReportAction, type ReportAction } from '@/mock/reports';
 import { applyCostOrderAction, type CostOrder, type CostOrderAction } from '@/mock/cost-orders';
 import { applyTicketAction, ticketMeta, type TicketAction, type TicketMeta } from '@/mock/tickets';
 import { AS_OF_DATE, mockOpportunities, mockContracts, mockProjects, mockBudgetVersions, mockBaselineVersions, mockIssues, mockRisks, mockBugs, mockDecisions, mockAcceptances, mockCostItems, mockEstimateVersions, mockMilestones, mockSettlements, mockReceiptPlans, mockChanges, mockWbsTasks, mockRequirements, mockDailyReports, mockWeeklyReports } from '@/mock';
-import type { Opportunity, Contract, ReceiptPlan, Project, BudgetVersion, BaselineVersion, Issue, Risk, Bug, CostItem, DecisionItem, AcceptanceRecord, EstimateVersion, Milestone, SettlementRecord, ProjectChange, WbsTask, Requirement, DailyReport, WeeklyReport } from '@/models/types';
+import type { Opportunity, Contract, ContractLedger, ProjectCostOverview, ReceiptPlan, Project, BudgetVersion, BaselineVersion, Issue, Risk, Bug, CostItem, DecisionItem, AcceptanceRecord, EstimateVersion, Milestone, SettlementRecord, ProjectChange, WbsTask, Requirement, DailyReport, WeeklyReport } from '@/models/types';
 import type { UserRole } from '@/store/useAppStore';
 import { allocateMoney, money, percentage, sumMoney } from '@/utils/money';
 import { projectEstimate } from '@/mock/versions';
 import { assertConstructionWritable } from '@/mock/construction-lock';
+import { createMockContractLedgers } from '@/mock/contract-ledger';
+import { createMockProjectCostOverviews } from '@/mock/project-cost';
 
 export interface Actor { id: string; name: string; role: UserRole }
 export interface Approval {
@@ -85,7 +88,7 @@ export interface BusinessState {
   planningDrafts: Record<string,PlanningDraft>; planningReviews: PlanningReview[];
   opportunities: Opportunity[]; opportunityMeta: Record<string, OpportunityMeta>;
   contracts: Contract[]; acceptanceDetails: Record<string, AcceptanceDetail>; acceptanceReports: AcceptanceReport[];
-  receiptPlans: ReceiptPlan[];
+  receiptPlans: ReceiptPlan[]; contractLedgers: ContractLedger[]; projectCostOverviews: ProjectCostOverview[];
   constructionFreezes: Record<string, { requestId: string; reason: string }>;
   laborEntries: LaborEntry[]; qualityPlans: Record<string, QualityPlan>; dailyReports: DailyReport[]; weeklyReports: WeeklyReport[]; costOrders: CostOrder[]; requirements: Requirement[]; ticketMeta: Record<string, TicketMeta>; tasks: WbsTask[]; planRequests: PlanRequest[]; projects: Project[]; budgets: BudgetVersion[]; baselines: BaselineVersion[];
   estimates: EstimateVersion[]; milestones: Milestone[]; settlements: SettlementRecord[];
@@ -95,7 +98,7 @@ export interface BusinessState {
   audit: AuditEvent[];
 }
 export function createBusinessState(): BusinessState {
-  const state: BusinessState = structuredClone({ accessConfiguration:createAccessConfiguration(), receiptRecords:[], financeConfiguration:createFinanceConfiguration(), unsignedProjects:{}, unsignedInvestmentRequests:[], startConfirmations:{}, operationCostSources:[], operationHandovers:{}, operationCycles:[], operationEvents:[], projectClosures:{}, configuration: createConfigurationState(), templateApplications: {}, initiations: [], postEvaluations: {}, projectArchives: {}, changeRequests: [], earlyInvestmentRequests: [], earlyCosts: [], settlementRequests: [], settlementCostReviews: [], settlementCostDispositions: [], settlementAnalyses: {}, settlementForecastSnapshots: {}, estimateDrafts: {}, estimateMeta: {}, projectTeams: {}, budgetDrafts: {}, presales: {}, planningDrafts: {}, planningReviews: [], acceptanceDetails: {}, acceptanceReports: [], opportunities: mockOpportunities, opportunityMeta: {}, contracts: mockContracts, receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
+  const state: BusinessState = structuredClone({ accessConfiguration:createAccessConfiguration(), receiptRecords:[], financeConfiguration:createFinanceConfiguration(), unsignedProjects:{}, unsignedInvestmentRequests:[], startConfirmations:{}, operationCostSources:[], operationHandovers:{}, operationCycles:[], operationEvents:[], projectClosures:{}, configuration: createConfigurationState(), templateApplications: {}, initiations: [], postEvaluations: {}, projectArchives: {}, changeRequests: [], earlyInvestmentRequests: [], earlyCosts: [], settlementRequests: [], settlementCostReviews: [], settlementCostDispositions: [], settlementAnalyses: {}, settlementForecastSnapshots: {}, estimateDrafts: {}, estimateMeta: {}, projectTeams: {}, budgetDrafts: {}, presales: {}, planningDrafts: {}, planningReviews: [], acceptanceDetails: {}, acceptanceReports: [], opportunities: mockOpportunities, opportunityMeta: {}, contracts: mockContracts, contractLedgers: createMockContractLedgers(), projectCostOverviews: createMockProjectCostOverviews(), receiptPlans: mockReceiptPlans, constructionFreezes: {}, laborEntries: [], qualityPlans: {}, dailyReports: mockDailyReports, weeklyReports: mockWeeklyReports, costOrders: [], requirements: mockRequirements, ticketMeta: {}, tasks: mockWbsTasks, planRequests: [], projects: mockProjects.map((project) => ({ ...project, frozenEstimateVersionId: projectEstimate(project, mockEstimateVersions)?.id })), budgets: mockBudgetVersions, baselines: mockBaselineVersions,
     estimates: mockEstimateVersions, milestones: mockMilestones, settlements: mockSettlements,
     issues: mockIssues, risks: mockRisks, bugs: mockBugs, costs: mockCostItems, approvals: [], changes: mockChanges, managementApprovals: [],
     decisions: mockDecisions, acceptances: mockAcceptances, lockedProjects: ['P-008'], maintenanceCosts: [], audit: [],
@@ -109,6 +112,7 @@ export function createBusinessState(): BusinessState {
     if (!opportunity.currentEstimateVersionId && candidates.length === 1) opportunity.currentEstimateVersionId = candidates[0].id;
   }
   initializePlanning(state);
+  state.budgetDrafts = createDetailedMockBudgetDrafts();
   for(const p of state.projects)state.projectTeams[p.id]={members:teamResources(state,p.id),appointments:[{id:`APPOINT-${p.id}-1`,userId:p.pmId,name:p.pmName,status:'已接受',nominatedAt:p.plannedStartDate,nominatedBy:'PMO',respondedAt:p.plannedStartDate,opinion:'原立项任命接收记录'}],history:[]};
   initializePendingChanges(state);
   initAcceptanceFixture(state);
