@@ -1,12 +1,8 @@
 import { canViewSensitiveField } from '@/mock/configuration-access';
 import { useState } from 'react';
-import { Alert, Button, Card, Col, Descriptions, Drawer, Empty, Row, Space, Table, Tabs, Tag, Typography } from 'antd';
+import { Alert, Button, Card, Descriptions, Drawer, Empty, Space, Table, Tabs, Tag, Typography } from 'antd';
 import {
   ArrowLeftOutlined,
-  ProjectOutlined,
-  FundOutlined,
-  LineChartOutlined,
-  CheckCircleOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { mockDepartments, AS_OF_DATE } from '@/mock';
@@ -17,7 +13,7 @@ import { PageSection } from '@/components/common/PageSection';
 import { PageHeader } from '@/components/common/PageHeader';
 import { StateView } from '@/components/common/StateView';
 import { ProjectFilters } from '@/components/common/ProjectFilters';
-import { MetricStatCard } from '@/components/common/MetricStatCard';
+
 import { HealthBadge } from '@/components/common/Badges';
 import { readProjectFilter } from '@/utils/project-query';
 import { MoneyText } from '@/components/common/MoneyText';

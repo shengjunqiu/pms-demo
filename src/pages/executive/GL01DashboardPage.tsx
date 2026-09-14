@@ -406,7 +406,8 @@ export function GL01DashboardPage() {
                             { title: '事项标题', dataIndex: 'title' },
                             { title: '严重等级', dataIndex: 'level', width: 90, render: (v: string) => <Tag color={v === '特大' || v === '重大' ? 'error' : 'warning'}>{v || '一般'}</Tag> },
                             { title: '闭环状态', dataIndex: 'status', width: 100, render: (v: string) => <Tag color={v.includes('已关闭') || v.includes('已解决') ? 'default' : 'processing'}>{v}</Tag> },
-                            { title: '责任人', dataIndex: 'owner', width: 90, render: (v: string, r: any) => v || r.ownerName || r.ownerId || '项目经理' },
+                            { title: '责任人', dataIndex: 'owner', width: 90, // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            render: (v: string, r: any) => v || r.ownerName || r.ownerId || '项目经理' },
                           ]}
                         />
                       ),
