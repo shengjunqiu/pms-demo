@@ -14,8 +14,8 @@ interface NavTab {
 
 const PROJECT_NAV_TABS: NavTab[] = [
   { key: 'overview', label: '项目总览', pageIds: ['HS-01'] },
-  { key: 'initiation', label: '立项', pageIds: ['YS-05', 'YS-06', 'YS-07', 'YS-08', 'YS-09', 'YS-10', 'YS-11', 'YS-12', 'YS-15'] },
-  { key: 'execution', label: '执行与核算', pageIds: ['HS-02', 'HS-03', 'HS-04', 'HS-09', 'HS-10', 'HS-11', 'HS-12', 'HS-13', 'HS-16', 'HS-17'] },
+  { key: 'initiation', label: '立项阶段', pageIds: ['YS-05', 'YS-06', 'YS-07', 'YS-08', 'YS-09', 'YS-10', 'YS-11', 'YS-12', 'YS-15'] },
+  { key: 'execution', label: '执行阶段', pageIds: ['HS-02', 'HS-03', 'HS-04', 'HS-09', 'HS-10', 'HS-11', 'HS-12', 'HS-13', 'HS-16', 'HS-17'] },
   { key: 'acceptance', label: '验收结算', pageIds: ['JS-01', 'JS-02', 'JS-03', 'JS-04', 'JS-05', 'JS-06', 'JS-07', 'JS-08', 'JS-09', 'JS-10', 'JS-11', 'JS-13'] },
   { key: 'collaboration', label: '协作台账', pageIds: ['HS-05', 'HS-07', 'HS-14'] },
 ] as const;

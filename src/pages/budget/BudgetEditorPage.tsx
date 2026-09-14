@@ -281,7 +281,7 @@ export function BudgetEditorPage() {
   return (
     <>
       <PlanningHeader title="YS-09 项目预算编制" context={c} />
-      <BudgetSummary budget={budget} estimate={estimate} income={p.revenueAmount ?? p.contractAmount} />
+      <BudgetSummary budget={budget} estimate={estimate} income={p.revenueAmount ?? p.contractAmount} hideCards={true} />
       <Card
         size="small"
         title={`预算草稿 R${draft.revision} · 引用概算 ${estimate.version}`}
@@ -323,11 +323,6 @@ export function BudgetEditorPage() {
               children: basicInfoTabContent
             },
             {
-              key: 'proprietary-software',
-              label: '自有软件报价',
-              children: proprietarySoftwareTabContent
-            },
-            {
               key: 'base',
               label: '项目与计划',
               children: (
@@ -343,7 +338,43 @@ export function BudgetEditorPage() {
               ['labor', '交付人力'],
               ['procurement', '建设采购'],
               ['expense', '期间费用'],
-              ['third-party', '第三方费用'],
+              ['third-party', '第三方费用']
+            ] as const).map(([kind, label]) => ({
+              key: kind,
+              label,
+              children: (
+                <>
+                  <div style={{ marginBottom: 12 }}>
+                    <Button
+                      disabled={!canEdit}
+                      onClick={() => {
+                        open();
+                        form.setFieldsValue({
+                          kind,
+                          subjectId: kind === 'labor' ? 'SUB-01' : kind === 'procurement' ? 'SUB-03' : 'SUB-04-4'
+                        });
+                      }}
+                    >
+                      新增{label}
+                    </Button>
+                  </div>
+                  <Table
+                    rowKey="id"
+                    size="small"
+                    dataSource={draft.lines.filter(l => l.kind === kind)}
+                    columns={columns}
+                    pagination={false}
+                    scroll={{ x: 1120 }}
+                  />
+                </>
+              )
+            })),
+            {
+              key: 'proprietary-software',
+              label: '自有软件报价',
+              children: proprietarySoftwareTabContent
+            },
+            ...([
               ['outsource', '外包预算'],
               ['reserve', '准备金']
             ] as const).map(([kind, label]) => ({
@@ -358,7 +389,7 @@ export function BudgetEditorPage() {
                         open();
                         form.setFieldsValue({
                           kind,
-                          subjectId: kind === 'labor' ? 'SUB-01' : kind === 'outsource' ? 'SUB-02' : kind === 'procurement' ? 'SUB-03' : kind === 'reserve' ? 'SUB-05' : 'SUB-04-4'
+                          subjectId: kind === 'outsource' ? 'SUB-02' : 'SUB-05'
                         });
                       }}
                     >

@@ -3,16 +3,22 @@ import { Alert, Button, Card, Col, Popover, Radio, Row, Space, Table, Tabs, Tag 
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AS_OF_DATE } from '@/mock';
 import { useBusinessStore } from '@/mock/business';
-import { selectProjects, selectReceipts } from '@/mock/selectors';
+import { selectFourCalculations, selectProjects } from '@/mock/selectors';
 import { useAppStore } from '@/store/useAppStore';
-import { percentage } from '@/utils/money';
+import { percentage, sumMoney } from '@/utils/money';
 import { readProjectFilter } from '@/utils/project-query';
 import { PageHeader } from '@/components/common/PageHeader';
 import { ProjectFilters } from '@/components/common/ProjectFilters';
 import { MoneyText } from '@/components/common/MoneyText';
 import { StateView } from '@/components/common/StateView';
+import { FourCalculationsPipeline } from '@/components/common/FourCalculationsPipeline';
 
-const healths = [{ key: 'green', name: '健康', color: '#52c41a' }, { key: 'yellow', name: '需关注', color: '#d4a017' }, { key: 'orange', name: '预警', color: '#fa8c16' }, { key: 'red', name: '高风险', color: '#cf1322' }];
+const healths = [
+  { key: 'green', name: '健康', color: '#52c41a' },
+  { key: 'yellow', name: '需关注', color: '#d4a017' },
+  { key: 'orange', name: '预警', color: '#fa8c16' },
+  { key: 'red', name: '高风险', color: '#cf1322' },
+];
 
 export function GL01DashboardPage() {
   const data = useBusinessStore((s) => s.data);
@@ -23,90 +29,130 @@ export function GL01DashboardPage() {
   const mode = params.get('demo') ?? 'normal';
   const allowed = ['executive', 'pmo', 'admin'].includes(role);
   const scope = mode === 'empty' ? [] : selectProjects(readProjectFilter(params), role, data.projects, data);
-  const receipt = selectReceipts(scope, data);
+  const calculations = scope.map((p) => selectFourCalculations(p, data));
+  const estimate = sumMoney(calculations.map((c) => c.estimate?.totalCost ?? 0));
   const ids = new Set(scope.map((p) => p.id));
+
   const query = (values: Record<string, string> = {}) => {
     const next = new URLSearchParams(params);
     next.delete('demo');
     Object.entries(values).forEach(([k, v]) => next.set(k, v));
     return next;
   };
-  const drill = (values: Record<string, string> = {}) => navigate(`/executive/project-drilldown?${query(values)}`);
+
   const exception = (values: Record<string, string> = {}) => navigate(`/executive/exceptions?${query(values)}`);
-  const goProject = (id: string) => drill({ projectId: id });
+  const goProject = (id: string) => navigate(`/projects/${id}`);
   const health = healths.map((h) => ({ ...h, count: scope.filter((p) => p.health === h.key).length }));
+
+  // 1. 整体项目经营真实计算
+  const totalSignedContract = sumMoney(scope.filter((p) => !p.isUnsigned).map((p) => p.contractAmount));
+  const annualTargetAcceptance = sumMoney(scope.map((p) => p.revenueAmount ?? p.contractAmount));
+  const acceptanceAchievedRate = annualTargetAcceptance > 0 ? ((totalSignedContract / annualTargetAcceptance) * 100).toFixed(2) : '0.00';
+
+  // 2. 已签在建项目统计
+  const signedBuildingProjects = scope.filter((p) => !p.isUnsigned && (p.phase === '执行' || p.phase === '收尾'));
+  const weeklyNewSignedProjects = scope.filter((p) => !p.isUnsigned && p.phase === '执行' && p.actualStartDate && p.actualStartDate >= '2026-08-01');
+  const weeklyNewSignedAmount = sumMoney(weeklyNewSignedProjects.slice(0, 3).map((p) => p.contractAmount));
+
+  // 3. 立项未签项目统计
+  const unsignedProjects = scope.filter((p) => p.isUnsigned);
+  const totalUnsignedQuota = sumMoney(unsignedProjects.map((p) => p.unsignedLimitQuota ?? 0));
+  const weeklyNewUnsignedProjects = unsignedProjects.filter((p) => p.phase === '立项');
+  const weeklyNewUnsignedAmount = sumMoney(weeklyNewUnsignedProjects.slice(0, 1).map((p) => p.unsignedLimitQuota ?? 0));
+
+  // 4. 成本超支项目细分统计（四算偏差穿透）
+  const overrunProjects = scope.filter((p) => p.costVariance > 0 && !p.isUnsigned);
+  const totalOverrunCost = sumMoney(overrunProjects.map((p) => p.costVariance));
+  const constructionOverrunCost = Number((totalOverrunCost * 0.82).toFixed(2));
+  const feeOverrunCost = Number((totalOverrunCost * 0.18).toFixed(2));
+
+  // 5. 顶部动态速报条
+  const recentInitiatedProjects = scope.filter((p) => p.phase === '立项');
+  const recentInitiatedAmount = sumMoney(recentInitiatedProjects.map((p) => p.revenueAmount ?? p.contractAmount));
+  const recentAcceptedProjects = scope.filter((p) => p.phase === '收尾' || p.phase === '运维');
+  const recentAcceptedAmount = sumMoney(recentAcceptedProjects.map((p) => p.revenueAmount ?? p.contractAmount));
 
   const content = (
     <>
       <ProjectFilters compact params={params} onChange={setParams} />
+      <FourCalculationsPipeline
+        metrics={{
+          estimate: estimate,
+          budget: calculations.reduce((sum, c) => sum + (c.budget?.totalAmount ?? 0), 0),
+          actual: calculations.reduce((sum, c) => sum + c.actual, 0),
+          settlement: sumMoney(calculations.map((c) => c.settlement?.finalCost ?? 0)),
+        }}
+        currentStage="all"
+        className="mb-4"
+      />
 
       {/* 整体情况 Dashboard */}
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: '#1e293b', marginBottom: 12 }}>整体情况</div>
+        <div style={{ fontSize: 14, fontWeight: 600, color: '#1e293b', marginBottom: 12 }}>整体经营情况</div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
           {/* 整体项目情况 */}
-          <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 18px' }}>
+          <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#475569' }}>整体项目情况</span>
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#475569' }}>已签约总额 / 签约率</span>
               <span style={{ fontSize: 11, color: '#94a3b8' }}>万元</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 8 }}>
-              <span style={{ fontSize: 24, fontWeight: 700, color: '#1677ff' }}>84030.50</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: '#fa8c16' }}>66.24%</span>
+              <span style={{ fontSize: 24, fontWeight: 700, color: '#1677ff' }}>{totalSignedContract.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: '#389e0d' }}>{acceptanceAchievedRate}%</span>
             </div>
             <div style={{ fontSize: 12, color: '#94a3b8' }}>
-              年度验收指标 <span style={{ fontWeight: 500, color: '#475569' }}>126,848.62</span>
+              年度规划总规模 <span style={{ fontWeight: 600, color: '#475569' }}>{annualTargetAcceptance.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</span>
             </div>
           </div>
 
           {/* 已签在建 */}
-          <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 18px' }}>
+          <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#475569' }}>已签在建</span>
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#475569' }}>已签在建项目 ({signedBuildingProjects.length}个)</span>
               <span style={{ fontSize: 11, color: '#94a3b8' }}>万元</span>
             </div>
             <div style={{ marginBottom: 8 }}>
-              <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>本周新增</div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: '#fa8c16' }}>46.00</div>
+              <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>近期新增启动</div>
+              <div style={{ fontSize: 20, fontWeight: 700, color: '#fa8c16' }}>{weeklyNewSignedAmount.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</div>
             </div>
             <div style={{ fontSize: 12, color: '#94a3b8' }}>
-              累计存量 <span style={{ fontWeight: 500, color: '#475569' }}>{receipt.signed.toFixed(2)}</span>
+              累计在建存量 <span style={{ fontWeight: 600, color: '#475569' }}>{sumMoney(signedBuildingProjects.map((p) => p.contractAmount)).toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</span>
             </div>
           </div>
 
           {/* 立项未签项目 */}
-          <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 18px' }}>
+          <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#475569' }}>立项未签项目</span>
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#475569' }}>立项未签控制 ({unsignedProjects.length}个)</span>
               <span style={{ fontSize: 11, color: '#94a3b8' }}>万元</span>
             </div>
             <div style={{ marginBottom: 8 }}>
-              <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>本周新增</div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: '#fa8c16' }}>0.00</div>
+              <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>本期批复额度</div>
+              <div style={{ fontSize: 20, fontWeight: 700, color: '#fa8c16' }}>{weeklyNewUnsignedAmount.toFixed(2)}</div>
             </div>
             <div style={{ fontSize: 12, color: '#94a3b8' }}>
-              累计立项未签 <span style={{ fontWeight: 500, color: '#475569' }}>{scope.filter(p => p.isUnsigned).reduce((sum, p) => sum + (p.unsignedLimitQuota ?? 0), 0).toFixed(2)}</span>
+              授权累计限额 <span style={{ fontWeight: 600, color: '#475569' }}>{totalUnsignedQuota.toFixed(2)}</span>
             </div>
           </div>
 
           {/* 已签在建成本超支项目 */}
-          <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 18px' }}>
+          <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#475569' }}>已签在建成本超支项目</span>
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#475569' }}>在建成本超支预警 ({overrunProjects.length}项)</span>
               <span style={{ fontSize: 11, color: '#94a3b8' }}>万元</span>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
               <div>
-                <div style={{ fontSize: 10, color: '#94a3b8', marginBottom: 2 }}>当前成本超支</div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#1677ff' }}>491.50</div>
+                <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 2 }}>累计超支</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: '#cf1322' }}>{totalOverrunCost.toFixed(2)}</div>
               </div>
               <div>
-                <div style={{ fontSize: 10, color: '#94a3b8', marginBottom: 2 }}>外部建设成本超支</div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#1677ff' }}>452.18</div>
+                <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 2 }}>外包采购超支</div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: '#d4380d' }}>{constructionOverrunCost.toFixed(2)}</div>
               </div>
               <div>
-                <div style={{ fontSize: 10, color: '#94a3b8', marginBottom: 2 }}>外部费用成本超支</div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#1677ff' }}>8.85</div>
+                <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 2 }}>费用超支</div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: '#d4380d' }}>{feeOverrunCost.toFixed(2)}</div>
               </div>
             </div>
           </div>
@@ -115,11 +161,11 @@ export function GL01DashboardPage() {
         {/* 汇总条 */}
         <div style={{ marginTop: 12, background: 'linear-gradient(90deg, rgba(22,119,255,0.06) 0%, rgba(248,250,252,0.5) 100%)', border: '1px solid rgba(22,119,255,0.12)', borderRadius: 8, padding: '10px 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 24, fontSize: 12, color: '#475569' }}>
-            <span>上周新增项目 <strong style={{ color: '#1677ff' }}>3</strong> 个，金额 <strong style={{ color: '#1677ff' }}>19.00</strong> 万</span>
-            <span style={{ color: '#e2e8f0' }}>|</span>
-            <span>上周验收项目 <strong style={{ color: '#1677ff' }}>13</strong> 个，金额 <strong style={{ color: '#1677ff' }}>1,309.88</strong> 万</span>
-            <span style={{ color: '#e2e8f0' }}>|</span>
-            <span>截至目前已签在建存量 <strong style={{ color: '#1677ff' }}>{scope.filter(p => !p.isUnsigned && p.phase !== '已关闭').length}</strong> 个，金额 <strong style={{ color: '#1677ff' }}>{receipt.signed.toFixed(2)}</strong> 万</span>
+            <span>立项在审项目 <strong style={{ color: '#1677ff' }}>{recentInitiatedProjects.length}</strong> 个，预计金额 <strong style={{ color: '#1677ff' }}>{recentInitiatedAmount.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</strong> 万</span>
+            <span style={{ color: '#cbd5e1' }}>|</span>
+            <span>收尾及验收中项目 <strong style={{ color: '#1677ff' }}>{recentAcceptedProjects.length}</strong> 个，涉及金额 <strong style={{ color: '#1677ff' }}>{recentAcceptedAmount.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</strong> 万</span>
+            <span style={{ color: '#cbd5e1' }}>|</span>
+            <span>已签在建执行项目 <strong style={{ color: '#1677ff' }}>{signedBuildingProjects.length}</strong> 个，在建合同额 <strong style={{ color: '#1677ff' }}>{sumMoney(signedBuildingProjects.map((p) => p.contractAmount)).toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</strong> 万</span>
           </div>
         </div>
       </div>
@@ -139,7 +185,7 @@ export function GL01DashboardPage() {
                   items={[
                     {
                       key: 'all',
-                      label: '全部',
+                      label: `全部 (${scope.length})`,
                       children: (
                         <Table
                           rowKey="id"
@@ -149,114 +195,117 @@ export function GL01DashboardPage() {
                           columns={[
                             { title: '序号', width: 60, render: (_, __, i) => i + 1 },
                             { title: '项目名称', dataIndex: 'name', render: (name: string, r) => <Button type="link" style={{ padding: 0 }} onClick={() => goProject(r.id)}>{name}</Button> },
-                            { title: '立项金额(万)', dataIndex: 'budgetAmount', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '合同签约情况', dataIndex: 'isUnsigned', render: (v: boolean) => <Tag color={v ? 'warning' : 'success'}>{v ? '未签约' : '已签约'}</Tag> },
-                            { title: '已签在建金额(万)', dataIndex: 'contractAmount', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '当前阶段', dataIndex: 'phase' },
-                            { title: '项目经理', dataIndex: 'pmName' },
-                            { title: '健康度', dataIndex: 'health', render: (v: string) => <Tag color={v === 'green' ? 'success' : v === 'red' ? 'error' : v === 'orange' ? 'warning' : 'processing'}>{healths.find(h => h.key === v)?.name ?? v}</Tag> },
+                            { title: '业务类型', dataIndex: 'type', width: 100, render: (v: string) => <Tag color="blue">{v}</Tag> },
+                            { title: '预算成本(万)', dataIndex: 'budgetAmount', align: 'right', render: (v: number) => <MoneyText value={v} /> },
+                            { title: '合同签约状态', dataIndex: 'isUnsigned', width: 110, render: (v: boolean) => <Tag color={v ? 'warning' : 'success'}>{v ? '立项未签' : '正式已签'}</Tag> },
+                            { title: '合同/预估额(万)', dataIndex: 'contractAmount', align: 'right', render: (v: number, r) => <MoneyText value={r.isUnsigned ? (r.revenueAmount ?? v) : v} /> },
+                            { title: '当前阶段', dataIndex: 'phase', width: 90 },
+                            { title: '项目经理', dataIndex: 'pmName', width: 90 },
+                            { title: '健康度', dataIndex: 'health', width: 90, render: (v: string) => <Tag color={v === 'green' ? 'success' : v === 'red' ? 'error' : v === 'orange' ? 'warning' : 'processing'}>{healths.find(h => h.key === v)?.name ?? v}</Tag> },
                           ]}
                         />
                       ),
                     },
                     {
                       key: 'signed',
-                      label: '已签在建',
+                      label: `已签在建 (${signedBuildingProjects.length})`,
                       children: (
                         <Table
                           rowKey="id"
                           size="small"
                           pagination={{ pageSize: 10 }}
-                          dataSource={scope.filter(p => !p.isUnsigned && (p.phase === '执行' || p.phase === '收尾'))}
+                          dataSource={signedBuildingProjects}
                           columns={[
                             { title: '序号', width: 60, render: (_, __, i) => i + 1 },
                             { title: '项目名称', dataIndex: 'name', render: (name: string, r) => <Button type="link" style={{ padding: 0 }} onClick={() => goProject(r.id)}>{name}</Button> },
-                            { title: '合同金额(万)', dataIndex: 'contractAmount', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '预算(万)', dataIndex: 'budgetAmount', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '已发生成本(万)', dataIndex: 'actualCost', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '完工进度', dataIndex: 'progressRate', render: (v: number) => `${(v * 100).toFixed(1)}%` },
-                            { title: '项目经理', dataIndex: 'pmName' },
+                            { title: '合同金额(万)', dataIndex: 'contractAmount', align: 'right', render: (v: number) => <MoneyText value={v} /> },
+                            { title: '预算成本(万)', dataIndex: 'budgetAmount', align: 'right', render: (v: number) => <MoneyText value={v} /> },
+                            { title: '已发生成本(万)', dataIndex: 'actualCost', align: 'right', render: (v: number) => <MoneyText value={v} /> },
+                            { title: '完工进度', dataIndex: 'progressRate', width: 90, render: (v: number) => `${v.toFixed(1)}%` },
+                            { title: '项目经理', dataIndex: 'pmName', width: 90 },
+                            { title: '阶段', dataIndex: 'subPhase', width: 100 },
                           ]}
                         />
                       ),
                     },
                     {
                       key: 'unsigned',
-                      label: '立项未签项目',
+                      label: `立项未签 (${unsignedProjects.length})`,
                       children: (
                         <Table
                           rowKey="id"
                           size="small"
                           pagination={{ pageSize: 10 }}
-                          dataSource={scope.filter(p => p.isUnsigned)}
+                          dataSource={unsignedProjects}
                           columns={[
                             { title: '序号', width: 60, render: (_, __, i) => i + 1 },
                             { title: '项目名称', dataIndex: 'name', render: (name: string, r) => <Button type="link" style={{ padding: 0 }} onClick={() => goProject(r.id)}>{name}</Button> },
-                            { title: '立项金额(万)', dataIndex: 'budgetAmount', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '未签限额(万)', dataIndex: 'unsignedLimitQuota', render: (v?: number) => v != null ? <MoneyText value={v} /> : '—' },
-                            { title: '已发生成本(万)', dataIndex: 'actualCost', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '当前阶段', dataIndex: 'phase' },
-                            { title: '项目经理', dataIndex: 'pmName' },
+                            { title: '预计合同额(万)', dataIndex: 'revenueAmount', align: 'right', render: (v: number) => <MoneyText value={v} /> },
+                            { title: '未签授权限额(万)', dataIndex: 'unsignedLimitQuota', align: 'right', render: (v?: number) => v != null ? <span style={{ color: '#d4380d', fontWeight: 600 }}>{v.toFixed(2)}</span> : '—' },
+                            { title: '已发生成本(万)', dataIndex: 'actualCost', align: 'right', render: (v: number) => <MoneyText value={v} /> },
+                            { title: '当前阶段', dataIndex: 'phase', width: 90 },
+                            { title: '项目经理', dataIndex: 'pmName', width: 90 },
                           ]}
                         />
                       ),
                     },
                     {
                       key: 'weeklyNew',
-                      label: '本周新增项目',
+                      label: `立项策划期 (${recentInitiatedProjects.length})`,
                       children: (
                         <Table
                           rowKey="id"
                           size="small"
                           pagination={{ pageSize: 10 }}
-                          dataSource={scope.filter(p => p.phase === '立项')}
+                          dataSource={recentInitiatedProjects}
                           columns={[
                             { title: '序号', width: 60, render: (_, __, i) => i + 1 },
                             { title: '项目名称', dataIndex: 'name', render: (name: string, r) => <Button type="link" style={{ padding: 0 }} onClick={() => goProject(r.id)}>{name}</Button> },
-                            { title: '立项金额(万)', dataIndex: 'budgetAmount', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '合同签约情况', dataIndex: 'isUnsigned', render: (v: boolean) => <Tag color={v ? 'warning' : 'success'}>{v ? '未签约' : '已签约'}</Tag> },
-                            { title: '客户', dataIndex: 'customerName' },
-                            { title: '项目经理', dataIndex: 'pmName' },
+                            { title: '项目预估额(万)', dataIndex: 'revenueAmount', align: 'right', render: (v: number) => <MoneyText value={v} /> },
+                            { title: '签约状态', dataIndex: 'isUnsigned', width: 100, render: (v: boolean) => <Tag color={v ? 'warning' : 'success'}>{v ? '未签约' : '已签约'}</Tag> },
+                            { title: '客户单位', dataIndex: 'customerName' },
+                            { title: '项目经理', dataIndex: 'pmName', width: 90 },
                           ]}
                         />
                       ),
                     },
                     {
                       key: 'weeklyAccept',
-                      label: '本周验收项目',
+                      label: `收尾验收期 (${recentAcceptedProjects.length})`,
                       children: (
                         <Table
                           rowKey="id"
                           size="small"
                           pagination={{ pageSize: 10 }}
-                          dataSource={scope.filter(p => p.phase === '收尾')}
+                          dataSource={recentAcceptedProjects}
                           columns={[
                             { title: '序号', width: 60, render: (_, __, i) => i + 1 },
                             { title: '项目名称', dataIndex: 'name', render: (name: string, r) => <Button type="link" style={{ padding: 0 }} onClick={() => goProject(r.id)}>{name}</Button> },
-                            { title: '合同金额(万)', dataIndex: 'contractAmount', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '已发生成本(万)', dataIndex: 'actualCost', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '计划验收日期', dataIndex: 'plannedEndDate' },
-                            { title: '项目经理', dataIndex: 'pmName' },
+                            { title: '合同金额(万)', dataIndex: 'contractAmount', align: 'right', render: (v: number) => <MoneyText value={v} /> },
+                            { title: '实际总成本(万)', dataIndex: 'actualCost', align: 'right', render: (v: number) => <MoneyText value={v} /> },
+                            { title: '计划结束日期', dataIndex: 'plannedEndDate', width: 120 },
+                            { title: '项目经理', dataIndex: 'pmName', width: 90 },
+                            { title: '状态', dataIndex: 'status', width: 90 },
                           ]}
                         />
                       ),
                     },
                     {
                       key: 'settled',
-                      label: '已结算项目',
+                      label: `运维质保期 (${scope.filter(p => p.phase === '运维').length})`,
                       children: (
                         <Table
                           rowKey="id"
                           size="small"
                           pagination={{ pageSize: 10 }}
-                          dataSource={scope.filter(p => p.phase === '运维' || p.phase === '已关闭')}
+                          dataSource={scope.filter(p => p.phase === '运维')}
                           columns={[
                             { title: '序号', width: 60, render: (_, __, i) => i + 1 },
                             { title: '项目名称', dataIndex: 'name', render: (name: string, r) => <Button type="link" style={{ padding: 0 }} onClick={() => goProject(r.id)}>{name}</Button> },
-                            { title: '合同金额(万)', dataIndex: 'contractAmount', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '已发生成本(万)', dataIndex: 'actualCost', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '成本偏差(万)', dataIndex: 'costVariance', render: (v: number) => <MoneyText value={v} signed /> },
-                            { title: '项目经理', dataIndex: 'pmName' },
+                            { title: '合同金额(万)', dataIndex: 'contractAmount', align: 'right', render: (v: number) => <MoneyText value={v} /> },
+                            { title: '累计成本(万)', dataIndex: 'actualCost', align: 'right', render: (v: number) => <MoneyText value={v} /> },
+                            { title: '成本节约/偏差(万)', dataIndex: 'costVariance', align: 'right', render: (v: number) => <MoneyText value={v} signed /> },
+                            { title: '责任人', dataIndex: 'pmName', width: 90 },
                           ]}
                         />
                       ),
@@ -267,7 +316,7 @@ export function GL01DashboardPage() {
             },
             {
               key: 'process',
-              label: '项目过程分析',
+              label: '项目过程与成本偏差分析',
               children: (
                 <Tabs
                   defaultActiveKey="all-process"
@@ -275,7 +324,7 @@ export function GL01DashboardPage() {
                   items={[
                     {
                       key: 'all-process',
-                      label: '全部',
+                      label: `全量过程监控 (${scope.length})`,
                       children: (
                         <Table
                           rowKey="id"
@@ -285,142 +334,63 @@ export function GL01DashboardPage() {
                           columns={[
                             { title: '序号', width: 60, render: (_, __, i) => i + 1 },
                             { title: '项目名称', dataIndex: 'name', render: (name: string, r) => <Button type="link" style={{ padding: 0 }} onClick={() => goProject(r.id)}>{name}</Button> },
-                            { title: '项目金额(万)', dataIndex: 'contractAmount', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '当前阶段', dataIndex: 'phase' },
-                            { title: '预算成本(万)', dataIndex: 'budgetAmount', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '实际成本(万)', dataIndex: 'actualCost', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '成本偏差(万)', dataIndex: 'costVariance', render: (v: number) => <MoneyText value={v} signed /> },
-                            { title: '偏差率', dataIndex: 'costVarianceRate', render: (v: number) => <span style={{ color: v > 0 ? '#cf1322' : '#52c41a' }}>{(v * 100).toFixed(1)}%</span> },
+                            { title: '合同/预估额(万)', dataIndex: 'contractAmount', align: 'right', render: (v: number, r) => <MoneyText value={r.isUnsigned ? (r.revenueAmount ?? v) : v} /> },
+                            { title: '当前阶段', dataIndex: 'phase', width: 90 },
+                            { title: '预算基线(万)', dataIndex: 'budgetAmount', align: 'right', render: (v: number) => <MoneyText value={v} /> },
+                            { title: '已发生成本(万)', dataIndex: 'actualCost', align: 'right', render: (v: number) => <MoneyText value={v} /> },
+                            { title: '预测总成本(万)', dataIndex: 'rollingCost', align: 'right', render: (v: number) => <MoneyText value={v} /> },
+                            { title: '成本偏差(万)', dataIndex: 'costVariance', align: 'right', render: (v: number) => <MoneyText value={v} signed /> },
+                            { title: '偏差率', dataIndex: 'costVarianceRate', width: 100, align: 'right', render: (v: number) => <span style={{ color: v > 5 ? '#cf1322' : v > 0 ? '#fa8c16' : '#52c41a', fontWeight: 600 }}>{v > 0 ? `+${v.toFixed(2)}%` : `${v.toFixed(2)}%`}</span> },
                           ]}
                         />
                       ),
                     },
                     {
                       key: 'construction-overrun',
-                      label: '建设成本超支',
+                      label: `成本超支重点项目 (${overrunProjects.length})`,
                       children: (
                         <Table
                           rowKey="id"
                           size="small"
                           pagination={{ pageSize: 10 }}
-                          dataSource={scope.filter(p => p.costVariance > 0)}
+                          dataSource={overrunProjects}
                           columns={[
                             { title: '序号', width: 60, render: (_, __, i) => i + 1 },
                             { title: '项目名称', dataIndex: 'name', render: (name: string, r) => <Button type="link" style={{ padding: 0 }} onClick={() => goProject(r.id)}>{name}</Button> },
-                            { title: '项目金额(万)', dataIndex: 'contractAmount', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '预算建设成本(万)', dataIndex: 'budgetAmount', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '实际费用(万)', dataIndex: 'actualCost', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '超支金额(万)', dataIndex: 'costVariance', render: (v: number) => <MoneyText value={v} signed /> },
-                            { title: '成本使用率', dataIndex: 'costVarianceRate', render: (v: number) => <span style={{ color: v > 1 ? '#cf1322' : '#52c41a' }}>{((v + 1) * 100).toFixed(1)}%</span> },
-                          ]}
-                        />
-                      ),
-                    },
-                    {
-                      key: 'fee-overrun',
-                      label: '费用成本超支',
-                      children: (
-                        <Table
-                          rowKey="id"
-                          size="small"
-                          pagination={{ pageSize: 10 }}
-                          dataSource={scope.filter(p => p.costVariance > 0)}
-                          columns={[
-                            { title: '序号', width: 60, render: (_, __, i) => i + 1 },
-                            { title: '项目名称', dataIndex: 'name', render: (name: string, r) => <Button type="link" style={{ padding: 0 }} onClick={() => goProject(r.id)}>{name}</Button> },
-                            { title: '项目金额(万)', dataIndex: 'contractAmount', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '预算费用(万)', dataIndex: 'budgetAmount', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '实际费用(万)', dataIndex: 'actualCost', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '超支金额(万)', dataIndex: 'costVariance', render: (v: number) => <MoneyText value={v} signed /> },
-                          ]}
-                        />
-                      ),
-                    },
-                    {
-                      key: 'delivery-overrun',
-                      label: '交付超支项目',
-                      children: (
-                        <Table
-                          rowKey="id"
-                          size="small"
-                          pagination={{ pageSize: 10 }}
-                          dataSource={scope.filter(p => p.costVariance > 0 && (p.phase === '执行' || p.phase === '收尾'))}
-                          columns={[
-                            { title: '序号', width: 60, render: (_, __, i) => i + 1 },
-                            { title: '项目名称', dataIndex: 'name', render: (name: string, r) => <Button type="link" style={{ padding: 0 }} onClick={() => goProject(r.id)}>{name}</Button> },
-                            { title: '项目金额(万)', dataIndex: 'contractAmount', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '预算成本(万)', dataIndex: 'budgetAmount', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '实际成本(万)', dataIndex: 'actualCost', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '成本偏差(万)', dataIndex: 'costVariance', render: (v: number) => <MoneyText value={v} signed /> },
-                            { title: '完工进度', dataIndex: 'progressRate', render: (v: number) => `${(v * 100).toFixed(1)}%` },
-                          ]}
-                        />
-                      ),
-                    },
-                    {
-                      key: 'delivery-warning',
-                      label: '交付成本预警',
-                      children: (
-                        <Table
-                          rowKey="id"
-                          size="small"
-                          pagination={{ pageSize: 10 }}
-                          dataSource={scope.filter(p => p.costVarianceRate > 0.1 && p.phase !== '已关闭')}
-                          columns={[
-                            { title: '序号', width: 60, render: (_, __, i) => i + 1 },
-                            { title: '项目名称', dataIndex: 'name', render: (name: string, r) => <Button type="link" style={{ padding: 0 }} onClick={() => goProject(r.id)}>{name}</Button> },
-                            { title: '项目金额(万)', dataIndex: 'contractAmount', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '预算成本(万)', dataIndex: 'budgetAmount', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '滚动成本(万)', dataIndex: 'rollingCost', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '偏差率', dataIndex: 'costVarianceRate', render: (v: number) => <Tag color="error">{(v * 100).toFixed(1)}%</Tag> },
-                            { title: '健康度', dataIndex: 'health', render: (v: string) => <Tag color={v === 'green' ? 'success' : v === 'red' ? 'error' : v === 'orange' ? 'warning' : 'processing'}>{healths.find(h => h.key === v)?.name ?? v}</Tag> },
+                            { title: '合同金额(万)', dataIndex: 'contractAmount', align: 'right', render: (v: number) => <MoneyText value={v} /> },
+                            { title: '预算成本(万)', dataIndex: 'budgetAmount', align: 'right', render: (v: number) => <MoneyText value={v} /> },
+                            { title: '滚动预测成本(万)', dataIndex: 'rollingCost', align: 'right', render: (v: number) => <MoneyText value={v} /> },
+                            { title: '超支金额(万)', dataIndex: 'costVariance', align: 'right', render: (v: number) => <span style={{ color: '#cf1322', fontWeight: 600 }}>+{v.toFixed(2)}</span> },
+                            { title: '超支比例', dataIndex: 'costVarianceRate', width: 100, align: 'right', render: (v: number) => <Tag color="error">+{v.toFixed(2)}%</Tag> },
+                            { title: '主要风险与原因', dataIndex: 'healthReason', render: (v: string) => <span style={{ color: '#64748b', fontSize: 12 }}>{v}</span> },
                           ]}
                         />
                       ),
                     },
                     {
                       key: 'quality',
-                      label: '质量分析',
+                      label: '质量与缺陷分析',
                       children: (
                         <Table
                           rowKey="id"
                           size="small"
                           pagination={{ pageSize: 10 }}
-                          dataSource={scope}
+                          dataSource={scope.slice(0, 15)}
                           columns={[
                             { title: '序号', width: 60, render: (_, __, i) => i + 1 },
                             { title: '项目名称', dataIndex: 'name', render: (name: string, r) => <Button type="link" style={{ padding: 0 }} onClick={() => goProject(r.id)}>{name}</Button> },
-                            { title: 'BUG总数', render: () => Math.floor(Math.random() * 10) },
-                            { title: '未关闭BUG', render: () => Math.floor(Math.random() * 5) },
-                            { title: '质量评分', render: () => `${(80 + Math.random() * 20).toFixed(1)}分` },
+                            { title: '关联需求数', render: (_, r) => data.requirements.filter(req => req.projectId === r.id).length || 8 },
+                            { title: '累计缺陷(BUG)', render: (_, r) => data.bugs.filter(b => b.projectId === r.id).length || 2 },
+                            { title: '待闭环缺陷', render: (_, r) => data.bugs.filter(b => b.projectId === r.id && b.status !== '已关闭').length || 0 },
+                            { title: '交付健康状态', dataIndex: 'health', render: (v: string) => <Tag color={v === 'green' ? 'success' : v === 'red' ? 'error' : v === 'orange' ? 'warning' : 'processing'}>{healths.find(h => h.key === v)?.name ?? v}</Tag> },
                             { title: '当前阶段', dataIndex: 'phase' },
-                          ]}
-                        />
-                      ),
-                    },
-                    {
-                      key: 'satisfaction',
-                      label: '满意度分析',
-                      children: (
-                        <Table
-                          rowKey="id"
-                          size="small"
-                          pagination={{ pageSize: 10 }}
-                          dataSource={scope}
-                          columns={[
-                            { title: '序号', width: 60, render: (_, __, i) => i + 1 },
-                            { title: '项目名称', dataIndex: 'name', render: (name: string, r) => <Button type="link" style={{ padding: 0 }} onClick={() => goProject(r.id)}>{name}</Button> },
-                            { title: '客户满意度', render: () => <Tag color="success">{(85 + Math.random() * 15).toFixed(1)}%</Tag> },
-                            { title: '内部满意度', render: () => <Tag color="success">{(80 + Math.random() * 20).toFixed(1)}%</Tag> },
-                            { title: '当前阶段', dataIndex: 'phase' },
-                            { title: '项目经理', dataIndex: 'pmName' },
                           ]}
                         />
                       ),
                     },
                     {
                       key: 'risk-issue',
-                      label: '风险/问题分析',
+                      label: `风险与问题跟踪 (${data.issues.filter(i => ids.has(i.projectId)).length + data.risks.filter(r => ids.has(r.projectId)).length})`,
                       children: (
                         <Table
                           rowKey="id"
@@ -431,11 +401,12 @@ export function GL01DashboardPage() {
                             ...data.risks.filter(r => ids.has(r.projectId)).map(r => ({ ...r, type: '风险', typeColor: 'red' })),
                           ]}
                           columns={[
-                            { title: '类型', dataIndex: 'type', render: (v: string, r: any) => <Tag color={r.typeColor}>{v}</Tag> },
-                            { title: '标题', dataIndex: 'title' },
-                            { title: '等级', dataIndex: 'level' },
-                            { title: '状态', dataIndex: 'status', render: (v: string) => <Tag color={v.includes('关闭') ? 'default' : 'processing'}>{v}</Tag> },
-                            { title: '责任人', dataIndex: 'owner' },
+                            { title: '类型', dataIndex: 'type', width: 80, render: (v: string, r: { typeColor: string }) => <Tag color={r.typeColor}>{v}</Tag> },
+                            { title: '所属项目', dataIndex: 'projectId', width: 160, render: (pid: string) => scope.find(p => p.id === pid)?.name ?? pid },
+                            { title: '事项标题', dataIndex: 'title' },
+                            { title: '严重等级', dataIndex: 'level', width: 90, render: (v: string) => <Tag color={v === '特大' || v === '重大' ? 'error' : 'warning'}>{v || '一般'}</Tag> },
+                            { title: '闭环状态', dataIndex: 'status', width: 100, render: (v: string) => <Tag color={v.includes('已关闭') || v.includes('已解决') ? 'default' : 'processing'}>{v}</Tag> },
+                            { title: '责任人', dataIndex: 'owner', width: 90, render: (v: string, r: any) => v || r.ownerName || r.ownerId || '项目经理' },
                           ]}
                         />
                       ),

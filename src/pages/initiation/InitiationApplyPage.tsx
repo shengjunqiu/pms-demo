@@ -1,6 +1,5 @@
 import { useActionAccess } from '@/hooks/useActionAccess';
 import { canViewSensitiveField } from "@/mock/configuration-access";
-import { selectTemplate } from "@/mock/configuration";
 import { canViewInitiation } from "@/mock/initiation";
 import { useState } from "react";
 import {
@@ -8,18 +7,14 @@ import {
   App,
   Button,
   Card,
-  Col,
-  DatePicker,
+  Collapse,
+  Descriptions,
   Form,
-  Input,
-  InputNumber,
-  Row,
   Select,
   Space,
-  Switch,
   Table,
   Tabs,
-  Upload,
+  Tag,
 } from "antd";
 import { useSearchParams } from "react-router-dom";
 import dayjs from "dayjs";
@@ -27,8 +22,6 @@ import { useBusinessStore } from "@/mock/business";
 import { useAppStore } from "@/store/useAppStore";
 import {
   defaultInitiationInput,
-  initiationDocuments,
-  initiationSource,
   initiationPrerequisites,
 } from "@/mock/initiation";
 import { canManageOpportunity, canViewOpportunity } from "@/mock/opportunities";
@@ -37,7 +30,6 @@ import { StateView } from "@/components/common/StateView";
 import {
   InitiationHeader,
   InitiationHistory,
-  SourceSummary,
   useInitiationNavigation,
 } from "./InitiationShared";
 export function InitiationApplyPage() {
@@ -56,45 +48,61 @@ export function InitiationApplyPage() {
   const [form] = Form.useForm();
   const app = data.initiations.find((a) => a.id === query.get("id"));
   const selected = app?.input.opportunityId ?? query.get("opportunityId") ?? "";
-  const [tab, setTab] = useState("basic");
+  const [tab, setTab] = useState("detail");
   const selectedOpportunity = data.opportunities.find((o) => o.id === selected);
   const o = selectedOpportunity && canViewOpportunity(data, selectedOpportunity, actor)
     ? selectedOpportunity
     : undefined;
   const input =
     app?.input ?? (o ? defaultInitiationInput(data, o.id) : undefined);
-  const source =
-    app?.rounds.at(-1)?.source ??
-    (o && !initiationPrerequisites(data, o).length
-      ? initiationSource(data, o.id)
-      : undefined);
+
+  // Mock 立项申请详情数据
+  const mockDetailData = {
+    basicInfo: {
+      opportunityCode: input?.opportunityId ?? '-',
+      customerName: o?.customerName ?? '-',
+      customerCode: 'CUST-' + (o?.customerId ?? '-').slice(-6),
+      businessManager: o?.ownerName ?? '-',
+      totalAmount: input?.amount ?? 0,
+      mainBusiness: o?.departmentName ?? '-',
+      softwareAmount: (input?.amount ?? 0) * 0.8,
+      hardwareAmount: (input?.amount ?? 0) * 0.2,
+      estimatedSignDate: input?.expectedSignDate ?? '-',
+      contractSignDate: '-',
+      salesStatus: input?.contractStatus ?? '未签',
+      internalBidNo: '',
+    },
+    deliveryInfo: {
+      deliveryOrg: o?.departmentName ?? '-',
+      industryCategory: input?.type ?? '-',
+      procurementOrg: '-',
+      responsibleDept: o?.departmentName ?? '-',
+      pmSource: '部门指派',
+      projectManager: '-',
+      projectDirector: '王总',
+      acceptDeliveryConfirmation: false,
+      projectTechnicalManager: '-',
+    },
+    implementationDepts: [
+      { category: '软件交付', deptName: o?.departmentName ?? '-', allocationRatio: 70, initiationCode: app?.id ?? '-' },
+      { category: '硬件集成', deptName: '系统集成部', allocationRatio: 30, initiationCode: app?.id ?? '-' },
+    ],
+    approvalRecords: app?.rounds.at(-1)?.signatures.map((s) => ({
+      step: s.node,
+      approver: s.by,
+      dept: '-',
+      opinion: s.opinion,
+      date: s.date,
+      status: s.conclusion,
+    })) ?? [],
+  };
+
+
   const locked = !!app && !["草稿", "整改"].includes(app.status);
   const canEdit = canDo("save-initiation", app?.id ?? o?.id) && !!o && canManageOpportunity(data, o, actor) && !locked;
-  const type = Form.useWatch("type", form) ?? input?.type;
-  const template = selectTemplate(
-    {
-      ...data,
-      configuration:
-        app?.rounds.at(-1)?.configurationSnapshot ?? data.configuration,
-    },
-    "deliverable",
-    o?.departmentId ?? "all",
-    type ?? "混合交付",
-    app?.rounds.at(-1)?.level ?? "all",
-  );
-  const catalog = [
-    ...new Map(
-      [
-        ...(template?.rows ?? []).map((r) => ({
-          name: r.name,
-          stage: r.phase,
-          required: r.required,
-          role: r.role,
-        })),
-        ...initiationDocuments(type, app?.rounds.at(-1)?.level),
-      ].map((r) => [r.name, r]),
-    ).values(),
-  ];
+
+
+
   if (app && !canViewInitiation(data, app, actor))
     return <StateView type="403" />;
   if (query.get("id") && !app) return <StateView type="404" />;
@@ -215,289 +223,150 @@ export function InitiationApplyPage() {
             style={{ marginTop: 16 }}
             items={[
               {
-                key: "basic",
-                label: "基本信息",
+                key: "detail",
+                label: "立项申请详情",
                 children: (
                   <Card>
-                    <Row gutter={24}>
-                      <Col span={16}>
-                        <Form.Item
-                          name="name"
-                          label="项目名称"
-                          rules={[{ required: true }]}
-                        >
-                          <Input />
-                        </Form.Item>
-                      </Col>
-                      <Col span={8}>
-                        <Form.Item name="type" label="项目类型">
-                          <Select
-                            options={[
-                              "软件开发",
-                              "系统集成",
-                              "咨询服务",
-                              "运维服务",
-                              "混合交付",
-                            ].map((value) => ({ value, label: value }))}
-                          />
-                        </Form.Item>
-                      </Col>
-                      <Col span={8}>
-                        <Form.Item name="amount" label="预计金额（万元）">
-                          <InputNumber min={0.01} style={{ width: "100%" }} />
-                        </Form.Item>
-                      </Col>
-                      <Col span={8}>
-                        <Form.Item name="region" label="区域">
-                          <Input />
-                        </Form.Item>
-                      </Col>
-                      <Col span={8}>
-                        <Form.Item
-                          name="strategic"
-                          label="战略项目"
-                          valuePropName="checked"
-                        >
-                          <Switch />
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                    <Form.Item name="necessity" label="立项必要性">
-                      <Input.TextArea
-                        disabled={"necessity" in hiddenInput || !canEdit}
-                        placeholder={
-                          "necessity" in hiddenInput
-                            ? "原说明含毛利，已隐藏并原样保留"
-                            : undefined
-                        }
-                        rows={3}
-                      />
-                    </Form.Item>
-                    <Form.Item name="recommendation" label="等级建议与依据">
-                      <Input.TextArea
-                        disabled={"recommendation" in hiddenInput || !canEdit}
-                        placeholder={
-                          "recommendation" in hiddenInput
-                            ? "原说明含毛利，已隐藏并原样保留"
-                            : undefined
-                        }
-                        rows={2}
-                      />
-                    </Form.Item>
-                  </Card>
-                ),
-              },
-              {
-                key: "source",
-                label: "商机承接",
-                children: source ? (
-                  <Card>
-                    <SourceSummary
-                      source={{
-                        ...source,
-                        expertOpinions: source.expertOpinions.map((row) => ({
-                          ...row,
-                          opinion: displayText(row.opinion) ?? "",
-                        })),
-                      }}
-                    />
-                  </Card>
-                ) : (
-                  <Alert message="完成商机评估、方案评审与概算冻结后可形成来源快照" />
-                ),
-              },
-              {
-                key: "estimate",
-                label: "概算与毛利",
-                children: source ? (
-                  <Card>
-                    <p>
-                      冻结版本 {source.estimate.id} · 收入{" "}
-                      {source.estimate.totalIncome} 万元 · 成本{" "}
-                      {source.estimate.totalCost} 万元 · 毛利{" "}
-                      {viewMargin
-                        ? `${source.estimate.grossMarginRate}%`
-                        : hiddenMargin}
-                    </p>
-                    <Table
-                      rowKey="subjectId"
-                      dataSource={source.estimate.items}
-                      pagination={false}
-                      columns={[
-                        { title: "科目", dataIndex: "subjectName" },
-                        { title: "概算金额（万元）", dataIndex: "amount", align: "right" },
+                    <div style={{ textAlign: 'center', marginBottom: 24, position: 'relative' }}>
+                      <h2 style={{ fontSize: 20, fontWeight: 600, color: '#1e293b', margin: 0 }}>立项申请</h2>
+                      <Tag color="processing" style={{ position: 'absolute', right: 16, top: 0, fontSize: 12, padding: '2px 12px' }}>{app?.status ?? '草稿'}</Tag>
+                    </div>
+
+                    <Collapse
+                      defaultActiveKey={['basic', 'delivery', 'implementation', 'approval']}
+                      items={[
+                        {
+                          key: 'basic',
+                          label: <span style={{ fontWeight: 600 }}>基本信息</span>,
+                          children: (
+                            <Descriptions bordered column={3} size="small" items={[
+                              { label: '商机/合同', children: mockDetailData.basicInfo.opportunityCode },
+                              { label: '客户名称', children: mockDetailData.basicInfo.customerName },
+                              { label: '客户编号', children: mockDetailData.basicInfo.customerCode },
+                              { label: '业务经理', children: mockDetailData.basicInfo.businessManager },
+                              { label: '总金额', children: `${mockDetailData.basicInfo.totalAmount} 万元` },
+                              { label: '主事业部', children: mockDetailData.basicInfo.mainBusiness },
+                              { label: '预计签单时间', children: mockDetailData.basicInfo.estimatedSignDate },
+                              { label: '软件金额', children: `${mockDetailData.basicInfo.softwareAmount.toFixed(2)} 万元` },
+                              { label: '销售状态', children: mockDetailData.basicInfo.salesStatus },
+                              { label: '合同签订时间', children: mockDetailData.basicInfo.contractSignDate },
+                              { label: '硬件金额', children: `${mockDetailData.basicInfo.hardwareAmount.toFixed(2)} 万元` },
+                              { label: '内部转包编号', children: mockDetailData.basicInfo.internalBidNo || '—' },
+                            ]} />
+                          ),
+                        },
+                        {
+                          key: 'delivery',
+                          label: <span style={{ fontWeight: 600 }}>交付信息</span>,
+                          children: (
+                            <Descriptions bordered column={3} size="small" items={[
+                              { label: '交付行业机构', children: mockDetailData.deliveryInfo.deliveryOrg },
+                              { label: '行业归属', children: mockDetailData.deliveryInfo.industryCategory },
+                              { label: '采购签约组织', children: mockDetailData.deliveryInfo.procurementOrg },
+                              { label: '负责交付部门', children: mockDetailData.deliveryInfo.responsibleDept },
+                              { label: '项目经理来源', children: mockDetailData.deliveryInfo.pmSource },
+                              { label: '项目经理', children: mockDetailData.deliveryInfo.projectManager },
+                              { label: '项目总监', children: mockDetailData.deliveryInfo.projectDirector },
+                              { label: '是否接受任命确认过程交付物', children: mockDetailData.deliveryInfo.acceptDeliveryConfirmation ? '是' : '否' },
+                              { label: '项目技术经理', children: mockDetailData.deliveryInfo.projectTechnicalManager },
+                            ]} />
+                          ),
+                        },
+                        {
+                          key: 'implementation',
+                          label: <span style={{ fontWeight: 600 }}>实施部门</span>,
+                          children: (
+                            <Table
+                              rowKey="category"
+                              size="small"
+                              pagination={false}
+                              dataSource={mockDetailData.implementationDepts}
+                              columns={[
+                                { title: '分配类别', dataIndex: 'category' },
+                                { title: '部门名称', dataIndex: 'deptName' },
+                                { title: '分配比例(%)', dataIndex: 'allocationRatio' },
+                                { title: '立项编号', dataIndex: 'initiationCode' },
+                              ]}
+                            />
+                          ),
+                        },
+                        {
+                          key: 'approval',
+                          label: <span style={{ fontWeight: 600 }}>审批记录</span>,
+                          children: mockDetailData.approvalRecords.length > 0 ? (
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+                              {mockDetailData.approvalRecords.map((record, idx) => (
+                                <div key={idx} style={{ padding: '12px', background: '#fafbfc', borderRadius: 8, border: '1px solid #e2e8f0' }}>
+                                  <div style={{ fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 8 }}>{record.step}</div>
+                                  <div style={{ fontSize: 13, color: '#0f172a', marginBottom: 4 }}>{record.approver}</div>
+                                  {record.status && (
+                                    <Tag color={record.status === '同意' ? 'success' : 'processing'} style={{ fontSize: 11 }}>
+                                      {record.status}
+                                    </Tag>
+                                  )}
+                                  {record.date && (
+                                    <div style={{ fontSize: 10, color: '#cbd5e1', marginTop: 4 }}>{record.date}</div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <Alert message="暂无审批记录" type="info" />
+                          ),
+                        },
                       ]}
                     />
                   </Card>
-                ) : (
-                  <Alert message="缺少冻结概算" />
                 ),
               },
               {
-                key: "risk",
-                label: "风险信息",
+                key: "profit",
+                label: "毛利测算",
+                children: (
+                  <Card>
+                    <Descriptions bordered column={2} size="small" items={[
+                      { label: '合同金额', children: `${input?.amount ?? 0} 万元` },
+                      { label: '预估成本', children: `${((input?.amount ?? 0) * 0.75).toFixed(2)} 万元` },
+                      { label: '预估毛利', children: `${((input?.amount ?? 0) * 0.25).toFixed(2)} 万元` },
+                      { label: '毛利率', children: '25.00%' },
+                    ]} />
+                  </Card>
+                ),
+              },
+              {
+                key: "equipment",
+                label: "设备清单",
                 children: (
                   <Card>
                     <Table
                       rowKey="id"
+                      size="small"
                       pagination={false}
-                      dataSource={source?.risks ?? []}
+                      dataSource={[
+                        { id: 1, name: 'AI推理服务器', spec: 'NVIDIA A100 80GB', qty: 2, unit: '台', price: 150000 },
+                        { id: 2, name: '存储设备', spec: '100TB NAS', qty: 1, unit: '台', price: 80000 },
+                      ]}
                       columns={[
-                        { title: "来源", dataIndex: "sourceId" },
-                        { title: "领域", dataIndex: "domain" },
-                        { title: "风险说明", dataIndex: "description" },
-                        { title: "初步应对", dataIndex: "mitigation" },
+                        { title: '设备名称', dataIndex: 'name' },
+                        { title: '规格型号', dataIndex: 'spec' },
+                        { title: '数量', dataIndex: 'qty' },
+                        { title: '单位', dataIndex: 'unit' },
+                        { title: '单价(元)', dataIndex: 'price', render: (v: number) => `¥${v.toLocaleString()}` },
                       ]}
                     />
-                    <Alert message="提交后由 PMO 在综合风险报告中逐项确认评分、责任人和应对措施。" />
                   </Card>
                 ),
               },
               {
-                key: "delivery",
-                label: "项目交付信息",
+                key: "auxiliary",
+                label: "辅助信息",
                 children: (
                   <Card>
-                    <Row gutter={24}>
-                      {[
-                        ["plannedStartDate", "计划开始"],
-                        ["plannedEndDate", "计划结束"],
-                        ["expectedSignDate", "预计签约"],
-                      ].map(([name, label]) => (
-                        <Col span={8} key={name}>
-                          <Form.Item name={name} label={label}>
-                            <DatePicker style={{ width: "100%" }} />
-                          </Form.Item>
-                        </Col>
-                      ))}
-                    </Row>
-                    <Form.Item name="scope" label="项目范围与边界">
-                      <Input.TextArea
-                        disabled={"scope" in hiddenInput || !canEdit}
-                        placeholder={
-                          "scope" in hiddenInput
-                            ? "原说明含毛利，已隐藏并原样保留"
-                            : undefined
-                        }
-                        rows={4}
-                      />
-                    </Form.Item>
-                    <Form.Item name="customerNeeds" label="客户诉求及交付要求">
-                      <Input.TextArea
-                        disabled={"customerNeeds" in hiddenInput || !canEdit}
-                        placeholder={
-                          "customerNeeds" in hiddenInput
-                            ? "原说明含毛利，已隐藏并原样保留"
-                            : undefined
-                        }
-                        rows={3}
-                      />
-                    </Form.Item>
-                    <Form.Item name="contractStatus" label="合同状态">
-                      <Select
-                        options={["未签", "已签"].map((value) => ({
-                          value,
-                          label: value,
-                        }))}
-                      />
-                    </Form.Item>
-                    <Form.Item name="contractReference" label="已签合同依据">
-                      <Select
-                        allowClear
-                        onChange={(id) => {
-                          const c = data.contracts.find((c) => c.id === id);
-                          if (c) form.setFieldValue("amount", c.amount);
-                        }}
-                        placeholder="选择本商机尚未绑定项目的真实已签合同"
-                        options={data.contracts
-                          .filter(
-                            (c) =>
-                              c.opportunityId === selected &&
-                              !c.projectId &&
-                              c.status === "已签订",
-                          )
-                          .map((c) => ({
-                            value: c.id,
-                            label: `${c.code} · ${c.amount} 万元`,
-                          }))}
-                      />
-                    </Form.Item>
-                  </Card>
-                ),
-              },
-              {
-                key: "docs",
-                label: "交付物目录",
-                children: (
-                  <Card>
-                    <Alert
-                      style={{ marginBottom: 12 }}
-                      showIcon
-                      message={`交付物模板 ${template?.id ?? "无适用配置"} · ${app?.rounds.length ? "使用该轮提交快照" : "提交时固定配置版本"}`}
-                      description="规则指定的必交项不可降为可选，PMO可在分级时追加或提升必交项。"
-                    />
-                    <Table
-                      rowKey="name"
-                      pagination={false}
-                      dataSource={catalog}
-                      columns={[
-                        { title: "阶段", dataIndex: "stage" },
-                        { title: "交付物名称", dataIndex: "name" },
-                        {
-                          title: "是否必须",
-                          render: (_, r) => (r.required ? "必须" : "可选"),
-                        },
-                        {
-                          title: "提交时点",
-                          render: (_, r) => `${r.stage}评审前`,
-                        },
-                        { title: "责任角色", dataIndex: "role" },
-                      ]}
-                    />
-                    <Form.Item
-                      name="additionalDeliverables"
-                      label="补充必须交付物"
-                    >
-                      <Select
-                        mode="tags"
-                        tokenSeparators={["，"]}
-                        placeholder="输入补充材料名称，规则必交材料不能移除"
-                      />
-                    </Form.Item>
-                  </Card>
-                ),
-              },
-              {
-                key: "files",
-                label: "附件",
-                children: (
-                  <Card>
-                    <Form.Item
-                      name="files"
-                      label="立项申请附件"
-                      valuePropName="fileList"
-                      getValueFromEvent={(e) => e.fileList}
-                      extra="演示记录文件名，不上传服务器"
-                    >
-                      <Upload beforeUpload={() => false}>
-                        <Button>选择立项材料</Button>
-                      </Upload>
-                    </Form.Item>
-                    {app?.rounds.at(-1)?.status === "整改" && (
-                      <Form.Item name="rectificationReply" label="逐项整改回复">
-                        <Input.TextArea
-                          disabled={
-                            "rectificationReply" in hiddenInput || !canEdit
-                          }
-                          placeholder={
-                            "rectificationReply" in hiddenInput
-                              ? "原说明含毛利，已隐藏并原样保留"
-                              : undefined
-                          }
-                          rows={4}
-                        />
-                      </Form.Item>
-                    )}
+                    <Descriptions bordered column={2} size="small" items={[
+                      { label: '商机归属组织', children: o?.departmentName ?? '-' },
+                      { label: '独立分签标识', children: input?.contractStatus === '已签' ? '已签约' : '待签约' },
+                      { label: '主项目标识', children: '单独立项' },
+                    ]} />
                   </Card>
                 ),
               },

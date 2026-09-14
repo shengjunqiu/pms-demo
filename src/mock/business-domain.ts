@@ -114,6 +114,34 @@ export function createBusinessState(): BusinessState {
   initializePlanning(state);
   state.budgetDrafts = createDetailedMockBudgetDrafts();
   for(const p of state.projects)state.projectTeams[p.id]={members:teamResources(state,p.id),appointments:[{id:`APPOINT-${p.id}-1`,userId:p.pmId,name:p.pmName,status:'已接受',nominatedAt:p.plannedStartDate,nominatedBy:'PMO',respondedAt:p.plannedStartDate,opinion:'原立项任命接收记录'}],history:[]};
+  // P-001 项目团队增强：补充多样化角色、参与比例与工时
+  const p001Team = state.projectTeams['P-001'];
+  if (p001Team) {
+    const pm = p001Team.members.find((m) => m.userId === 'U-001');
+    if (pm) { pm.allocation = 80; pm.plannedHours = 128; pm.keyPosition = true; }
+    const extras = [
+      { userId: 'U-005', name: '赵工', role: '方案架构师', departmentId: 'D-008', allocation: 80, plannedHours: 128, keyPosition: true },
+      { userId: 'U-006', name: '陈亮', role: '市场商务经理', departmentId: 'D-010', allocation: 30, plannedHours: 48, keyPosition: false },
+      { userId: 'U-008', name: '郑经理', role: '运维负责人', departmentId: 'D-013', allocation: 50, plannedHours: 80, keyPosition: false },
+      { userId: 'U-010', name: '钱工程师', role: '高级开发工程师', departmentId: 'D-007', allocation: 100, plannedHours: 160, keyPosition: false },
+      { userId: 'U-011', name: '孙总', role: '财务专员', departmentId: 'D-011', allocation: 20, plannedHours: 32, keyPosition: false },
+      { userId: 'U-013', name: '冯架构', role: '测试经理', departmentId: 'D-008', allocation: 60, plannedHours: 96, keyPosition: false },
+      { userId: 'U-015', name: '林志远', role: '高级开发工程师', departmentId: 'D-007', allocation: 100, plannedHours: 160, keyPosition: false },
+      { userId: 'U-017', name: '何思齐', role: '开发工程师', departmentId: 'D-007', allocation: 100, plannedHours: 160, keyPosition: false },
+      { userId: 'U-019', name: '许文静', role: '质控专员', departmentId: 'D-012', allocation: 40, plannedHours: 64, keyPosition: false },
+      { userId: 'U-021', name: '吴嘉宁', role: 'PMO专员', departmentId: 'D-006', allocation: 25, plannedHours: 40, keyPosition: false },
+    ];
+    for (const m of extras) {
+      const existing = p001Team.members.find((x) => x.userId === m.userId);
+      if (existing) { Object.assign(existing, m); }
+      else { p001Team.members.push({ ...m, active: true, startDate: '2026-01-10', endDate: '2026-12-31' }); }
+    }
+    // 补充 2 条历史任命记录用于操作记录展示
+    p001Team.appointments.push(
+      { id: 'APPOINT-P-001-2', userId: 'U-005', name: '赵工', status: '已接受', nominatedAt: '2026-01-05', nominatedBy: '张建国', respondedAt: '2026-01-06', opinion: '具备智慧城市平台架构设计经验，承担方案架构职责' },
+      { id: 'APPOINT-P-001-3', userId: 'U-010', name: '钱工程师', status: '已接受', nominatedAt: '2026-01-08', nominatedBy: '张建国', respondedAt: '2026-01-09', opinion: '核心开发主力，负责海防数据接入模块' },
+    );
+  }
   initializePendingChanges(state);
   initAcceptanceFixture(state);
   initOperationsFixture(state);

@@ -21,7 +21,7 @@ import { MetricStatCard } from '@/components/common/MetricStatCard';
 import { HealthBadge } from '@/components/common/Badges';
 import { readProjectFilter } from '@/utils/project-query';
 import { MoneyText } from '@/components/common/MoneyText';
-import { percentage, formatPercent } from '@/utils/money';
+
 
 const names = { green: '健康', yellow: '需关注', orange: '预警', red: '高风险' };
 const colors = { green: 'success', yellow: 'gold', orange: 'orange', red: 'error' };
@@ -69,22 +69,8 @@ export function GL03ProjectDrilldownPage() {
       { key: 'director', label: '项目总监（演示任命）', children: mockDepartments.find((d) => d.id === mockDepartments.find((d) => d.id === p.departmentId)?.parentId)?.leader ?? '王总' },
       { key: 'phase', label: '生命周期', children: `${fourStage(p)} · ${p.subPhase}` }, { key: 'health', label: '健康度', children: <Tag color={colors[p.health]}>{names[p.health]}</Tag> },
     ]} /><Alert showIcon type={p.health === 'red' ? 'error' : p.health === 'green' ? 'success' : 'warning'} message={healthReason(p.healthReason)} style={{ paddingTop: 8, paddingBottom: 8 }} /></Card>
-    <Row gutter={16} style={{ marginBottom: 16 }}>{[
-      { label: '冻结概算', value: calc.estimate?.totalCost, icon: <ProjectOutlined /> },
-      { label: '有效预算', value: calc.budget?.totalAmount, icon: <FundOutlined /> },
-      { label: '动态核算', value: calc.rolling, icon: <LineChartOutlined /> },
-      { label: '冻结结算', value: calc.settlement?.finalCost, icon: <CheckCircleOutlined /> },
-    ].map((m) => (
-      <Col span={6} key={m.label}>
-        <MetricStatCard
-          title={m.label}
-          value={m.value !== undefined ? m.value : '—'}
-          unit={m.value !== undefined ? '万元' : ''}
-          icon={m.icon}
-        />
-      </Col>
-    ))}</Row>
-    <PageSection title="经营结论"><Typography.Paragraph>项目收入 <MoneyText value={calc.income} />；滚动偏差 <MoneyText value={calc.variance} signed />（{formatPercent(percentage(calc.variance, calc.budget?.totalAmount ?? 0))}）；预测毛利 {showMargin ? <><MoneyText value={calc.grossMargin} />（{formatPercent(calc.grossMarginRate)}）</> : '已隐藏'}。未结算显示 —，未签预计收入不计入已签合同。</Typography.Paragraph></PageSection>
+
+
     <PageSection title="原因与原始业务" description="从成本科目、里程碑或风险问题继续追溯"><Tabs activeKey={params.get('tab') ?? 'cost'} onChange={(tab) => view({ tab })} items={[
       { key: 'cost', label: '成本异常原因', children: <Table rowKey="subjectId" size="small" pagination={false} dataSource={calc.subjects} columns={[
         { title: '科目 / 来源', render: (_, r) => <Button type="link" onClick={() => projectLink(undefined, true, r.subjectId)}>{r.subjectName}</Button> },
