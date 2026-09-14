@@ -18,8 +18,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id: string) {
-          // vendor 框架库
-          if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/') || id.includes('node_modules/react-router')) {
+          if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/') || id.includes('node_modules/scheduler') || id.includes('node_modules/react-router')) {
             return 'vendor-react';
           }
           if (id.includes('node_modules/@ant-design/icons')) {
@@ -34,16 +33,29 @@ export default defineConfig({
           if (id.includes('node_modules/dayjs')) {
             return 'vendor-utils';
           }
-          // 公共组件（被多页面共享的）
-          if (id.includes('/src/components/common/') || id.includes('/src/store/') || id.includes('/src/theme/') || id.includes('/src/mock/')) {
-            return 'shared-common';
+          // mock 数据独立拆包
+          if (id.includes('/src/mock/')) {
+            return 'mock-data';
+          }
+          if (id.includes('/src/store/') || id.includes('/src/theme/') || id.includes('/src/models/types')) {
+            return 'shared-core';
+          }
+          if (id.includes('/src/components/common/')) {
+            return 'shared-ui';
           }
           if (id.includes('/src/utils/')) {
             return 'shared-utils';
+          }
+          if (id.includes('/src/routes/navigation') || id.includes('/src/routes/manifest')) {
+            return 'routes-static';
           }
         },
       },
     },
     chunkSizeWarningLimit: 500,
+    cssCodeSplit: false,
+    minify: 'esbuild',
+    target: 'es2020',
+    cssMinify: 'esbuild',
   },
 });
