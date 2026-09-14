@@ -1,3 +1,12 @@
+import React, { Suspense, lazy } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { useAppStore } from '@/store/useAppStore';
+import { ROLE_HOME } from '@/routes/navigation';
+import { PAGE_MANIFEST } from '@/routes/manifest';
+import { Spin } from 'antd';
+
+// 模块路由（体积小，保持静态导入）
 import { accessConfigurationRoutes } from '@/routes/modules/configuration-access';
 import {financeConfigurationRoutes} from '@/routes/modules/configuration-finance';
 import {unsignedRoutes} from '@/routes/modules/unsigned';
@@ -5,43 +14,45 @@ import { configurationRoutes } from '@/routes/modules/configuration';
 import { budgetRoutes } from '@/routes/modules/budget';
 import { settlementRoutes } from '@/routes/modules/settlement';
 import { opportunityRoutes } from '@/routes/modules/opportunities';
-import { ProjectManagerWorkbenchPage } from '@/pages/workbench/ProjectManagerWorkbenchPage';
-import { LaborCostPage } from '@/pages/execution/LaborCostPage';
-import { ReportsPage } from '@/pages/execution/ReportsPage';
-import { DeliverablesPage } from '@/pages/execution/DeliverablesPage';
-import { CostSourcesPage } from '@/pages/execution/CostSourcesPage';
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { MainLayout } from '@/components/layout/MainLayout';
 import { RoutesManifestPage } from '@/pages/manifest/RoutesManifestPage';
 import { PagePlaceholder } from '@/pages/common/PagePlaceholder';
 import { StateView } from '@/components/common/StateView';
-import { useAppStore } from '@/store/useAppStore';
-import { ROLE_HOME } from '@/routes/navigation';
-import { PAGE_MANIFEST } from '@/routes/manifest';
 
-// Phase 2: GL 领导经营驾驶舱系列
-import { GL01DashboardPage } from '@/pages/executive/GL01DashboardPage';
-// import { GL02FourCalculationsPage } from '@/pages/executive/GL02FourCalculationsPage';
-import { GL03ProjectDrilldownPage } from '@/pages/executive/GL03ProjectDrilldownPage';
-import { GL04PortfolioPage } from '@/pages/executive/GL04PortfolioPage';
-import { GL05ExceptionsPage } from '@/pages/executive/GL05ExceptionsPage';
-import { DynamicAccountingPage } from '@/pages/execution/DynamicAccountingPage';
-import { GL06DecisionsPage } from '@/pages/executive/GL06DecisionsPage';
-import { ManagementApprovalPage } from '@/pages/approvals/ManagementApprovalPage';
-import { BudgetApprovalPage } from '@/pages/approvals/BudgetApprovalPage';
-import { TicketsPage } from '@/pages/tickets/TicketsPage';
-import { TicketDetailPage } from '@/pages/tickets/TicketDetailPage';
-import { TodosPage } from '@/pages/workbench/TodosPage';
-import { ProjectProgressPage } from '@/pages/execution/ProjectProgressPage';
-import { PlanRequestPage } from '@/pages/approvals/PlanRequestPage';
-import { ProjectOverviewPage } from '@/pages/execution/ProjectOverviewPage';
-import { ProjectLedgerPage } from '@/pages/projects/ProjectLedgerPage';
+// 页面级动态导入
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type LazyModule = Record<string, React.ComponentType<any>>;
+const lazyPage = <T extends LazyModule>(importer: () => Promise<T>, exportName: keyof T) =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  lazy(() => importer().then(m => ({ default: m[exportName] as React.ComponentType<any> })));
+
+const ProjectManagerWorkbenchPage = lazyPage(() => import('@/pages/workbench/ProjectManagerWorkbenchPage'), 'ProjectManagerWorkbenchPage');
+const LaborCostPage = lazyPage(() => import('@/pages/execution/LaborCostPage'), 'LaborCostPage');
+const ReportsPage = lazyPage(() => import('@/pages/execution/ReportsPage'), 'ReportsPage');
+const DeliverablesPage = lazyPage(() => import('@/pages/execution/DeliverablesPage'), 'DeliverablesPage');
+const CostSourcesPage = lazyPage(() => import('@/pages/execution/CostSourcesPage'), 'CostSourcesPage');
+const GL01DashboardPage = lazyPage(() => import('@/pages/executive/GL01DashboardPage'), 'GL01DashboardPage');
+const GL03ProjectDrilldownPage = lazyPage(() => import('@/pages/executive/GL03ProjectDrilldownPage'), 'GL03ProjectDrilldownPage');
+const GL04PortfolioPage = lazyPage(() => import('@/pages/executive/GL04PortfolioPage'), 'GL04PortfolioPage');
+const GL05ExceptionsPage = lazyPage(() => import('@/pages/executive/GL05ExceptionsPage'), 'GL05ExceptionsPage');
+const DynamicAccountingPage = lazyPage(() => import('@/pages/execution/DynamicAccountingPage'), 'DynamicAccountingPage');
+const GL06DecisionsPage = lazyPage(() => import('@/pages/executive/GL06DecisionsPage'), 'GL06DecisionsPage');
+const ManagementApprovalPage = lazyPage(() => import('@/pages/approvals/ManagementApprovalPage'), 'ManagementApprovalPage');
+const BudgetApprovalPage = lazyPage(() => import('@/pages/approvals/BudgetApprovalPage'), 'BudgetApprovalPage');
+const TicketsPage = lazyPage(() => import('@/pages/tickets/TicketsPage'), 'TicketsPage');
+const TicketDetailPage = lazyPage(() => import('@/pages/tickets/TicketDetailPage'), 'TicketDetailPage');
+const TodosPage = lazyPage(() => import('@/pages/workbench/TodosPage'), 'TodosPage');
+const ProjectProgressPage = lazyPage(() => import('@/pages/execution/ProjectProgressPage'), 'ProjectProgressPage');
+const PlanRequestPage = lazyPage(() => import('@/pages/approvals/PlanRequestPage'), 'PlanRequestPage');
+const ProjectOverviewPage = lazyPage(() => import('@/pages/execution/ProjectOverviewPage'), 'ProjectOverviewPage');
+const ProjectLedgerPage = lazyPage(() => import('@/pages/projects/ProjectLedgerPage'), 'ProjectLedgerPage');
+
+const PageLoading = () => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 300 }}><Spin /></div>;
 
 function RoleHome() { const role = useAppStore((s) => s.currentRole); return <Navigate to={ROLE_HOME[role]} replace />; }
 
 export const AppRouter: React.FC = () => {
   return (
+    <Suspense fallback={<PageLoading />}>
     <Routes>
       <Route path="/" element={<MainLayout />}>
         {accessConfigurationRoutes.map(route=><Route key={route.path} path={route.path} element={route.element}/>)}
@@ -116,5 +127,6 @@ export const AppRouter: React.FC = () => {
         <Route path="*" element={<StateView type="404" />} />
       </Route>
     </Routes>
+    </Suspense>
   );
 };
