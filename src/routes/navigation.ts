@@ -54,7 +54,6 @@ export const GLOBAL_NAV_SECTIONS: GlobalNavSection[] = [
         icon: 'executive',
         entries: [
           { pageId: 'GL-01' },
-          { pageId: 'GL-03' },
           { pageId: 'GL-05' },
           { pageId: 'WK-03' },
         ],
