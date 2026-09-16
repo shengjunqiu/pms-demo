@@ -1,6 +1,0 @@
-{
-  "title": "P006部分收款后重复流水被拒，合同余额及原流水条数保持不变",
-  "status": "passed",
-  "url": "http://127.0.0.1:4179/projects/P-006/business-result",
-  "consoleErrors": []
-}

@@ -1,4 +1,0 @@
-
-> pms-demo@1.0.0 lint /home/shengjunqiu/code/pms-demo
-> eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0
-

@@ -1,6 +1,0 @@
-{
-  "title": "指定组织约束商机与立项来源，审计收窄只隐藏日志且恢复后原事件仍存在",
-  "status": "passed",
-  "url": "http://127.0.0.1:4179/settings/audit-log",
-  "consoleErrors": []
-}

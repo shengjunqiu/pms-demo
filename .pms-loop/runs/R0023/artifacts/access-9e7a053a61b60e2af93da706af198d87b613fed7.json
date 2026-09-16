@@ -1,6 +1,0 @@
-{
-  "title": "默认PM仍可审核真实团队成员工时，个人单价和金额保持隐藏",
-  "status": "passed",
-  "url": "http://127.0.0.1:4179/settings/audit-log",
-  "consoleErrors": []
-}

@@ -1,4 +1,0 @@
-
-> pms-demo@1.0.0 typecheck /home/shengjunqiu/code/pms-demo
-> tsc -b --noEmit
-

@@ -1,1 +1,0 @@
-All 235 domain tests and 5 browser scenarios passed. GS11-source-1440 screenshot caught the opening CSS animation; added animations: disabled to the screenshot call, then rerun engineering and all browser evidence. Previous evidence retained here.

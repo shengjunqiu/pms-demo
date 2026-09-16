@@ -1,5 +1,0 @@
-2026-09-10 R0024 browser acceptance finding
-
-On the integrated revision f5c9435f..., P-PLAN-001 could complete plan review, budget approval, PMO baseline confirmation, and real contract registration. All seven startup checks then displayed 满足, but formal start still failed because the fixture plannedStartDate was 2026-09-10 while AS_OF_DATE and the latest permitted actual start date were 2026-09-09. No date could satisfy both action.date >= project.plannedStartDate and action.date <= AS_OF_DATE.
-
-Fix: align the planning fixture's approved start date to AS_OF_DATE and make the domain helper use the real fixture date by default, then rerun the full Loop check and current-revision browser chain.
