@@ -599,6 +599,8 @@ export function AcceptancePage({ kind }: { kind: AcceptanceType }) {
                     ? `${d.confirmedBy} · ${d.confirmedAt}`
                     : "尚未确认",
                 },
+                { key: 'createdAt', label: '创建日期', children: selected.createdAt },
+                { key: 'submittedBy', label: '提交人', children: selected.submittedBy },
               ]}
             />
             <Space wrap style={{ margin: "16px 0" }}>

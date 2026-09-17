@@ -535,6 +535,16 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
                     "首次申请"
                   ),
                 },
+                {
+                  key: "createdAt",
+                  label: "创建日期",
+                  children: request.createdAt,
+                },
+                {
+                  key: "submittedBy",
+                  label: "提交人",
+                  children: request.submittedBy,
+                },
               ]}
             />
             <Space wrap style={{ marginBottom: 16 }}>

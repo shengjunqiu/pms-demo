@@ -357,6 +357,7 @@ describe("真实收款与合同计划单一实收", () => {
       note: "已锁定测试快照",
       files: ["结算报告.pdf"],
       submittedBy: "张建国",
+      createdAt: "2026-09-01",
       snapshot: settlementSnapshot(s, id),
       history: [],
     });

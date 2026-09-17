@@ -45,7 +45,7 @@ import { applyTicketAction, ticketMeta, type TicketAction, type TicketMeta } fro
 import { AS_OF_DATE, mockOpportunities, mockContracts, mockProjects, mockBudgetVersions, mockBaselineVersions, mockIssues, mockRisks, mockBugs, mockDecisions, mockAcceptances, mockCostItems, mockEstimateVersions, mockMilestones, mockSettlements, mockReceiptPlans, mockChanges, mockWbsTasks, mockRequirements, mockDailyReports, mockWeeklyReports } from '@/mock';
 import type { Opportunity, Contract, ContractLedger, ProjectCostOverview, ReceiptPlan, Project, BudgetVersion, BaselineVersion, Issue, Risk, Bug, CostItem, DecisionItem, AcceptanceRecord, EstimateVersion, Milestone, SettlementRecord, ProjectChange, WbsTask, Requirement, DailyReport, WeeklyReport } from '@/models/types';
 import type { UserRole } from '@/store/useAppStore';
-import { allocateMoney, money, percentage, sumMoney } from '@/utils/money';
+import { allocateMoney, money, percentage } from '@/utils/money';
 import { projectEstimate } from '@/mock/versions';
 import { assertConstructionWritable } from '@/mock/construction-lock';
 import { createMockContractLedgers } from '@/mock/contract-ledger';
@@ -407,11 +407,9 @@ function buildDemoBusinessState(): BusinessState {
     const totalAmount = money(Math.max(budget.totalAmount, estimate.totalCost) * 1.04);
     const amounts = allocateMoney(totalAmount, budget.items.map((i) => i.amount));
     const items = budget.items.map((item, i) => ({ ...item, amount: amounts[i] }));
-    const amount = (id: string) => sumMoney(items.filter((i) => i.subjectId === id || i.subjectId.startsWith(`${id}-`)).map((i) => i.amount));
     state = transition(state, { type: 'submit-budget', projectId: p.id, reason: '新增数据接入范围与交付保障工作，申请按冻结概算评估追加预算。', budget: {
       ...budget, id: `SUBMIT-${p.id}`, version: 'V-待审', status: '审批中', totalAmount, items,
-      laborCost: amount('SUB-01'), outsourceCost: amount('SUB-02'), procurementCost: amount('SUB-03'), expenseCost: amount('SUB-04'), reserveCost: amount('SUB-05'),
-    } }, { id: 'U-004', name: '刘敏', role: 'finance' });
+      } }, { id: 'U-004', name: '刘敏', role: 'finance' });
     const decision = state.decisions[state.decisions.length - 1];
     decision.createdAt = '2026-09-05';
     if (state.approvals.length > 15) state = transition(state, { type: 'review', approvalId: decision.id, approve: false, opinion: '分项测算与交付范围尚不一致，请补充材料后重新申报。' }, { id: 'U-003', name: '王总', role: 'executive' });

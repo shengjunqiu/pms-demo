@@ -1,4 +1,4 @@
-import type { FullBaselineSnapshot, BudgetLine } from './budget';
+import type { FullBaselineSnapshot } from './budget';
 import type { ReportSnapshot } from '@/mock/reports';
 // 组织架构
 export interface Department {
@@ -51,6 +51,8 @@ export interface Opportunity {
   earlyInvestmentQuota: number; // 万元
   earlyInvestmentUsed: number; // 万元
   createdAt: string;
+  source?: string;
+  projectType?: string;
 }
 
 // 概算版本
@@ -115,6 +117,8 @@ export interface Project {
   actualStartDate?: string;
   actualEndDate?: string;
   currentBaselineVersion: string;
+  createdAt: string;
+  description?: string;
 }
 
 // 合同
@@ -131,6 +135,15 @@ export interface Contract {
   status: '已签订' | '履约中' | '已完成' | '已终止';
   paidAmount: number; // 实收金额 万元
   unpaidAmount: number; // 待收金额 万元
+  contractType?: '一般合同' | '框架合同' | '补充协议';
+  signOrg?: string;
+  industry?: string;
+  region?: string;
+  execStatus?: '在建' | '已完工' | '已验收' | '已结算' | '已终止';
+  departmentId?: string;
+  departmentName?: string;
+  pmId?: string;
+  pmName?: string;
 }
 
 export interface ReceiptPlan {
@@ -263,7 +276,7 @@ export interface ContractLedgerBasic {
   customerAttribute: '政府单位' | '事业单位' | '企业单位';
   cooperationMode: '直签' | '联合体' | '转包';
   presalePerson: string;
-  sharer: string;
+
   amounts: {
     total: number;
     hardware: number;
@@ -340,18 +353,13 @@ export interface ProjectCostOverview {
 
 // 预算版本
 export interface BudgetVersion {
-  details?: BudgetLine[]; ruleVersion?: string; overEstimateReasons?: string[];
+  overEstimateReasons?: string[];
   id: string;
   projectId: string;
   version: string;
   status: '草稿' | '审批中' | '待确认' | '已生效' | '已废弃';
   isOverEstimate: boolean; // 是否超概算
   totalAmount: number; // 万元
-  laborCost: number;
-  procurementCost: number;
-  outsourceCost: number;
-  expenseCost: number;
-  reserveCost: number;
   items: {
     subjectId: string;
     subjectName: string;
@@ -394,12 +402,12 @@ export interface WbsTask {
   progress: number; // 0-100
   isMilestone: boolean;
   status: '未开始' | '进行中' | '已完成' | '已延期';
+  actualHours?: number;
 }
 
 // 里程碑
 export interface Milestone {
   ownerId?: string; ownerName?: string; completionCondition?: string; acceptanceBasis?: string; isKey?: boolean; templateRequired?: boolean;
-  completionNote?: string;
   id: string;
   projectId: string;
   name: string;
@@ -464,14 +472,13 @@ export interface Risk {
 
 // 日报
 export interface DailyReport {
-  status?: '草稿' | '已提交'; reportedProgress?: number; hasProgress?: boolean; noProgressReason?: string; coordination?: string; linkedIds?: string[]; snapshot?: ReportSnapshot;
+  status?: '草稿' | '已上报'; reportedProgress?: number; hasProgress?: boolean; noProgressReason?: string; coordination?: string; linkedIds?: string[]; snapshot?: ReportSnapshot;
   id: string;
   projectId: string;
   date: string;
   reporter: string;
   completedTasks: string;
   plannedTasks: string;
-  spentHours: number;
 }
 
 // 周报
@@ -511,6 +518,7 @@ export interface CostItem {
   occurredDate: string;
   sourceId?: string; // 关联工时、采购单或报销单
   description: string;
+  contractId?: string;
 }
 
 // 采购记录
@@ -555,7 +563,7 @@ export interface ProjectChange {
   type: '范围/进度变更' | '成本/资源变更' | '合同/综合变更';
   costImpact: number; // 万元
   scheduleImpactDays: number;
-  status: '草稿' | 'PMO审批中' | 'PMC审议中' | '已批准' | '已否决';
+  status: '草稿' | '影响评估中' | '待分级' | 'PMO审批中' | 'PMC审议中' | '已批准' | '已否决';
   newBaselineId?: string;
   createdAt: string;
 }
@@ -581,6 +589,8 @@ export interface AcceptanceRecord {
   status: '待验收' | '整改中' | '已通过';
   acceptanceDate?: string;
   amount: number; // 万元
+  createdAt: string;
+  submittedBy: string;
 }
 
 // 结算记录
@@ -594,6 +604,8 @@ export interface SettlementRecord {
   status: '草稿' | '审核中' | '已锁定已生效';
   isCostLocked: boolean;
   settledDate?: string;
+  createdAt: string;
+  submittedBy: string;
 }
 
 // 待决策事项

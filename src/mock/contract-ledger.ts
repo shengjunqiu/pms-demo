@@ -85,7 +85,6 @@ export function createMockContractLedgers(): ContractLedger[] {
       customerAttribute: '政府单位',
       cooperationMode: ['P-001', 'P-005'].includes(project.id) ? '联合体' : '直签',
       presalePerson: '房艳龙',
-      sharer: '王丹妮',
       amounts: {
         total,
         hardware: money(total * hardwareRatio),

@@ -27,7 +27,7 @@ export interface SettlementSnapshot {
 }
 export interface SettlementRequest {
   id: string; projectId: string; version: number; previousId?: string; supersededBy?: string; status: '草稿'|'财务核算'|'PMO审核'|'结算评审'|'待最终锁定'|'材料整改'|'金额退回'|'已锁定';
-  note: string; files: string[]; submittedBy: string; snapshot: SettlementSnapshot;
+  note: string; files: string[]; submittedBy: string; createdAt: string; snapshot: SettlementSnapshot;
   finance?: { actor: string; date: string; invoicedAmount: number; taxAmount: number; opinion: string };
   history: { actor: string; date: string; action: string; opinion: string }[];
 }

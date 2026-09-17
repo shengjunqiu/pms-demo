@@ -45,7 +45,7 @@ export function applyDeliverableAction(state: BusinessState, action: Deliverable
     if (previous?.id !== milestone.id) throw new Error('必须按里程碑顺序确认');
     if (milestone.type === '客户终验' && state.acceptances.filter((a) => a.projectId === p.id && a.type === '客户终验').sort((a, b) => b.round - a.round)[0]?.status !== '已通过') throw new Error('客户终验须有验收通过记录');
     if (milestone.type === '项目结算') throw new Error('项目结算必须通过结算审批');
-    milestone.actualDate = action.actualDate; milestone.status = '已达成'; milestone.completionNote = action.note;
+    milestone.actualDate = action.actualDate; milestone.status = '已达成';
   } else {
     const m = material!; if (!action.note.trim()) throw new Error('文档办理说明必填');
     if (m.archived) throw new Error('文档已归档，版本不可修改');

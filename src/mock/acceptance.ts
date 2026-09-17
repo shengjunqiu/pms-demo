@@ -73,7 +73,7 @@ export function applyAcceptanceAction(state: BusinessState, action: AcceptanceAc
     const same = state.acceptances.filter((a) => a.projectId === p.id && a.type === action.kind && (action.kind !== '供应商验收' || state.acceptanceDetails[a.id]?.supplierSourceId === action.detail.supplierSourceId));
     if (same.some((a) => a.id !== record?.id && a.status === '待验收' && state.acceptanceDetails[a.id]?.submitted)) throw new Error('此验收已有待处理轮次');
     const reuse = record && !detail?.submitted && record.status === '待验收';
-    const next: AcceptanceRecord = reuse ? record : { id: `ACC-NEW-${state.acceptances.length + 1}`, projectId: p.id, type: action.kind, round: Math.max(0,...same.map((a) => a.round))+1, status:'待验收', amount:0 };
+    const next: AcceptanceRecord = reuse ? record : { id: `ACC-NEW-${state.acceptances.length + 1}`, projectId: p.id, type: action.kind, round: Math.max(0,...same.map((a) => a.round))+1, status:'待验收', amount:0, createdAt: AS_OF_DATE, submittedBy: actor.name };
     if (!reuse) state.acceptances.push(next);
     const d: AcceptanceDetail = { ...action.detail, submitted:true, previousId: record?.status === '整改中' ? record.id : undefined, checks:checkNames(action.kind).map((name) => ({name,passed:false,note:''})),corrections:[],opinion:'',process:'',proofFiles:[],history:[] };
     history(d,'提交验收',d.scope); state.acceptanceDetails[next.id]=d;

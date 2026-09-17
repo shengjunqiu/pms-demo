@@ -293,6 +293,7 @@ export function ProjectOverviewPage() {
       { key: 'status', label: '健康度', children: <HealthBadge status={healthNames[p.health]} /> }, { key: 'contract', label: '合同状态', children: p.isUnsigned ? <Tag color="warning">已立项未签约</Tag> : <Tag color="success">已签约</Tag> },
       { key: 'income', label: '拟签/项目收入', children: <><MoneyText value={calc.income} /> 万元</> }, { key: 'margin', label: '预测毛利率', children: showMargin?formatPercent(calc.grossMarginRate):'已隐藏' }, { key: 'date', label: '计划验收', children: p.plannedEndDate },
       { key: 'director', label: '项目总监（演示任命）', children: mockDepartments.find((d) => d.id === mockDepartments.find((org) => org.id === p.departmentId)?.parentId)?.leader ?? '王总' },
+      { key: 'description', label: '项目描述', span: 3, children: p.description ?? '暂无描述' },
       { key: 'actual', label: '已发生成本', children: <><MoneyText value={calc.actual} /> 万元</> }, { key: 'signed', label: '已签合同金额', children: <><MoneyText value={receipt.signed} /> 万元</> },
     ];
   const groups = [
@@ -330,6 +331,8 @@ export function ProjectOverviewPage() {
               <span>主项目经理: <strong className="text-slate-700 font-medium">{p.pmName}</strong></span>
               <span>•</span>
               <span>计划交付: <strong className="text-slate-700 font-medium">{p.plannedEndDate}</strong></span>
+              <span>•</span>
+              <span>创建日期: <strong className="text-slate-700 font-medium">{p.createdAt}</strong></span>
             </div>
           </div>
         </div>

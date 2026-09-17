@@ -168,6 +168,8 @@ const projectSeeds: Project[] = [
     plannedEndDate: '2026-12-31',
     actualStartDate: '2026-01-15',
     currentBaselineVersion: 'V1.1',
+    createdAt: '2026-01-01',
+    description: '福建省晋江市岸海防综合治理平台项目，覆盖海岸线监控、船舶识别、应急指挥等核心功能。',
   },
   {
     id: 'P-002',
@@ -202,6 +204,8 @@ const projectSeeds: Project[] = [
     plannedEndDate: '2026-08-12',
     actualStartDate: '2026-02-05',
     currentBaselineVersion: 'V1.0',
+    createdAt: '2026-02-01',
+    description: '福建省生态环境视频能力平台项目，实现全省生态环境视频监控统一接入与智能分析。',
   },
   {
     id: 'P-003',
@@ -236,6 +240,8 @@ const projectSeeds: Project[] = [
     plannedEndDate: '2026-10-31',
     actualStartDate: '2026-01-05',
     currentBaselineVersion: 'V2.0',
+    createdAt: '2026-01-05',
+    description: '某市城市运行管理服务平台项目，构建城市运行体征监测与应急指挥调度体系。',
   },
   {
     id: 'P-004',
@@ -271,6 +277,8 @@ const projectSeeds: Project[] = [
     plannedEndDate: '2027-08-31',
     actualStartDate: '2026-08-10',
     currentBaselineVersion: 'V0.9',
+    createdAt: '2026-08-01',
+    description: '某省一体化政务服务能力提升项目，推动政务服务事项标准化、线上化与智能化。',
   },
   {
     id: 'P-005',
@@ -305,6 +313,8 @@ const projectSeeds: Project[] = [
     plannedEndDate: '2027-04-30',
     actualStartDate: '2025-11-10',
     currentBaselineVersion: 'V1.0',
+    createdAt: '2025-11-01',
+    description: '某市公共安全视频智能化建设项目，建设全市视频监控智能化分析平台。',
   },
   {
     id: 'P-006',
@@ -339,6 +349,8 @@ const projectSeeds: Project[] = [
     plannedEndDate: '2026-08-31',
     actualStartDate: '2025-09-10',
     currentBaselineVersion: 'V1.2',
+    createdAt: '2025-09-01',
+    description: '某区智慧园区数字化平台项目，打造园区运营管理、企业服务与数据可视化一体化平台。',
   },
   {
     id: 'P-007',
@@ -373,6 +385,8 @@ const projectSeeds: Project[] = [
     plannedEndDate: '2026-12-31',
     actualStartDate: '2026-01-01',
     currentBaselineVersion: 'V1.0',
+    createdAt: '2026-01-01',
+    description: '某市政务云运维服务项目，提供政务云平台日常运维、安全巡检与应急保障服务。',
   },
   {
     id: 'P-008',
@@ -408,6 +422,8 @@ const projectSeeds: Project[] = [
     actualStartDate: '2025-03-15',
     actualEndDate: '2026-04-10',
     currentBaselineVersion: 'V1.0',
+    createdAt: '2025-03-01',
+    description: '某县数据中台建设项目，构建县域数据资源中心与数据共享交换平台。',
   },
   // 补齐至 65 个正式项目 (含未签>=10, 运维>=12)
   ...Array.from({ length: 57 }).map((_, idx) => {
@@ -466,6 +482,8 @@ const projectSeeds: Project[] = [
       plannedStartDate: '2026-01-01',
       plannedEndDate: '2026-12-31',
       currentBaselineVersion: 'V1.0',
+      createdAt: '2026-01-01',
+      description: '项目描述',
     };
   }),
 ];
@@ -535,11 +553,7 @@ export const mockBudgetVersions: BudgetVersion[] = Array.from({ length: 85 }).ma
     status: i < mockProjects.length ? '已生效' : '草稿',
     isOverEstimate: p.id === 'P-003',
     totalAmount: total,
-    laborCost: amounts[0],
-    procurementCost: amounts[2],
-    outsourceCost: amounts[1],
-    expenseCost: amounts[3],
-    reserveCost: amounts[4],
+
     items: [
       { subjectId: 'SUB-01', subjectName: '直接人力成本', amount: amounts[0] },
       { subjectId: 'SUB-02', subjectName: '外包开发成本', amount: amounts[1] },
@@ -627,7 +641,6 @@ export const mockDailyReports: DailyReport[] = Array.from({ length: 310 }).map((
     reporter: p.pmName,
     completedTasks: '完成系统核心模块接口对接联调与单元测试',
     plannedTasks: '推进前台交互界面与数据统计联调',
-    spentHours: 8,
   };
 });
 
@@ -817,6 +830,7 @@ export const mockAcceptances: AcceptanceRecord[] = mockProjects.flatMap((p) => {
     id: `ACC-${p.id}-${i + 1}`, projectId: p.id, type, round: 1,
     status: p.status === '已结算' || p.isMaintenance || (p.id === 'P-006' && i < 2) ? '已通过' : p.id === 'P-006' && i === 2 ? '整改中' : '待验收',
     amount: p.contractAmount, acceptanceDate: p.status === '已结算' ? '2026-03-31' : undefined,
+    createdAt: '2026-03-15', submittedBy: '张建国',
   }));
 });
 
@@ -837,6 +851,8 @@ export const mockSettlements: SettlementRecord[] = Array.from({ length: 35 }).ma
     status: p.id === 'P-008' ? '已锁定已生效' : '审核中',
     isCostLocked: p.id === 'P-008',
     settledDate: p.id === 'P-008' ? '2026-04-10' : undefined,
+    createdAt: '2026-04-01',
+    submittedBy: '刘敏',
   };
 });
 

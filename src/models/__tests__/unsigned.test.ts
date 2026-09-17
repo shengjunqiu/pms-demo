@@ -69,11 +69,6 @@ function planned(plannedStartDate?: string) {
     projectId: planId,
     totalAmount: 600,
     items: [{ subjectId: 'SUB-01', subjectName: '交付人力', amount: 600 }],
-    laborCost: 600,
-    procurementCost: 0,
-    outsourceCost: 0,
-    expenseCost: 0,
-    reserveCost: 0,
   };
   state = transition(
     state,

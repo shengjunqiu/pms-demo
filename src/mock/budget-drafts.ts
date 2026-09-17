@@ -21,8 +21,8 @@ export function getBudgetDraft(state:BusinessState,id:string):BudgetDraft {
 }
 export function toBudgetVersion(draft:BudgetDraft,actor:Actor):BudgetVersion {
  const subjects=new Map(BUDGET_SUBJECTS.map(s=>[s.id,s.name]));for(const line of draft.lines)subjects.set(line.subjectId,line.subjectName??subjects.get(line.subjectId)??line.subjectId);
- const items=[...subjects].map(([id,name])=>({id,name})).map(s=>({subjectId:s.id,subjectName:s.name,amount:sumMoney(draft.lines.filter(l=>l.subjectId===s.id).map(lineAmount))}));const amount=(id:string)=>sumMoney(items.filter(i=>i.subjectId===id||i.subjectId.startsWith(id+'-')).map(i=>i.amount));
- return {id:`DRAFT-${draft.projectId}-${draft.revision}`,projectId:draft.projectId,version:`草稿R${draft.revision}`,status:'草稿',isOverEstimate:false,totalAmount:sumMoney(items.map(i=>i.amount)),laborCost:amount('SUB-01'),outsourceCost:amount('SUB-02'),procurementCost:amount('SUB-03'),expenseCost:amount('SUB-04'),reserveCost:amount('SUB-05'),items,createdAt:AS_OF_DATE,createdBy:actor.id,details:structuredClone(draft.lines),ruleVersion:BUDGET_RULE.version};
+ const items=[...subjects].map(([id,name])=>({id,name})).map(s=>({subjectId:s.id,subjectName:s.name,amount:sumMoney(draft.lines.filter(l=>l.subjectId===s.id).map(lineAmount))}));
+ return {id:`DRAFT-${draft.projectId}-${draft.revision}`,projectId:draft.projectId,version:`草稿R${draft.revision}`,status:'草稿',isOverEstimate:false,totalAmount:sumMoney(items.map(i=>i.amount)),items,createdAt:AS_OF_DATE,createdBy:actor.id};
 }
 export function validateBudgetDraft(state:BusinessState,draft:BudgetDraft,submit=false){
  const p=state.projects.find(p=>p.id===draft.projectId)!;const estimate=projectEstimate(p,state.estimates);if(!estimate||draft.estimateVersionId!==estimate.id)throw new Error('预算须引用项目绑定的冻结概算');
