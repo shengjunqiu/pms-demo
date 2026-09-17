@@ -79,10 +79,12 @@ export const AppRouter: React.FC = () => {
         <Route path="projects/:id/outsourcing" element={<CostSourcesPage />} />
         <Route path="projects/:id/expenses" element={<CostSourcesPage />} />
         <Route path="projects/:id/dynamic-accounting" element={<DynamicAccountingPage />} />
-        <Route path="requirements-bugs" element={<TicketsPage family="quality" />} />
-        <Route path="requirements-bugs/:id" element={<TicketDetailPage family="quality" />} />
-        <Route path="issues-risks" element={<TicketsPage family="risk" />} />
-        <Route path="issues-risks/:id" element={<TicketDetailPage family="risk" />} />
+        <Route path="tickets" element={<TicketsPage />} />
+        <Route path="tickets/:id" element={<TicketDetailPage />} />
+        <Route path="requirements-bugs" element={<TicketsPage />} />
+        <Route path="requirements-bugs/:id" element={<TicketDetailPage />} />
+        <Route path="issues-risks" element={<TicketsPage />} />
+        <Route path="issues-risks/:id" element={<TicketDetailPage />} />
         <Route path="workbench/project-manager" element={<ProjectManagerWorkbenchPage />} />
         <Route path="workbench/todos" element={<TodosPage />} />
         <Route path="projects" element={<ProjectLedgerPage />} />
@@ -102,7 +104,7 @@ export const AppRouter: React.FC = () => {
           if (budgetRoutes.some(r=>r.path===relativeRoute)) return null;
           if (settlementRoutes.some(r=>r.path===relativeRoute)) return null;
           if (opportunityRoutes.some(r=>r.path===relativeRoute)) return null;
-          if (['workbench/project-manager', 'projects/:id/stage-switch', 'projects/:id/labor-cost', 'projects/:id/reports', 'projects/:id/daily-reports', 'projects/:id/weekly-reports', 'projects/:id/deliverables', 'projects/:id/costs', 'projects/:id/procurement', 'projects/:id/outsourcing', 'projects/:id/expenses', 'requirements-bugs', 'requirements-bugs/:id', 'issues-risks', 'issues-risks/:id', 'workbench/todos', 'projects/:id/progress', 'projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions', 'executive/decisions'].includes(relativeRoute)) {
+          if (['workbench/project-manager', 'projects/:id/stage-switch', 'projects/:id/labor-cost', 'projects/:id/reports', 'projects/:id/daily-reports', 'projects/:id/weekly-reports', 'projects/:id/deliverables', 'projects/:id/costs', 'projects/:id/procurement', 'projects/:id/outsourcing', 'projects/:id/expenses', 'tickets', 'tickets/:id', 'requirements-bugs', 'requirements-bugs/:id', 'issues-risks', 'issues-risks/:id', 'workbench/todos', 'projects/:id/progress', 'projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions', 'executive/decisions'].includes(relativeRoute)) {
             return null;
           }
           return (

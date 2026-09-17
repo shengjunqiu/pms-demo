@@ -150,6 +150,7 @@ export function ProjectLedgerPage() {
           />
           <Select allowClear placeholder="生命周期" value={phase} onChange={setPhase} options={phaseOptions} style={{ width: 140 }} />
           <Select allowClear placeholder="健康度" value={health} onChange={setHealth} options={healthOptions} style={{ width: 140 }} />
+          <Select allowClear placeholder="合同状态" value={unsignedOnly ? 'unsigned' : undefined} onChange={(v) => setUnsignedOnly(v === 'unsigned')} options={[{ value: 'unsigned', label: '未签项目' }]} style={{ width: 140 }} />
           <Typography.Text type="secondary">共 {projects.length} 个项目</Typography.Text>
         </Space>
         <Table
