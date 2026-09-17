@@ -1,7 +1,7 @@
 import { useActionAccess } from '@/hooks/useActionAccess';
 import { useState } from 'react';
-import { Alert, App, Button, Checkbox, Descriptions, Drawer, Input, InputNumber, Modal, Select, Space, Table, Tag } from 'antd';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Alert, App, Button, Checkbox, Descriptions, Drawer, Input, InputNumber, Modal, Select, Space, Table, Tag, Tabs } from 'antd';
+import { useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom';
 import { AS_OF_DATE } from '@/mock';
 import { useBusinessStore } from '@/mock/business';
 import { currentWeek, dailyNeeded, reportSnapshot, REPORT_RULES } from '@/mock/reports';
@@ -12,10 +12,14 @@ import { MoneyText } from '@/components/common/MoneyText';
 import { PageHeader } from '@/components/common/PageHeader';
 import { StateView } from '@/components/common/StateView';
 
-export function ReportsPage({ weekly = false }: { weekly?: boolean }) {
-  const {id}=useParams();return <ReportsContent key={`${id}-${weekly}`} weekly={weekly}/>;
+export function ReportsPage() {
+  const {id}=useParams();const location=useLocation();
+  const pathTab = location.pathname.includes('weekly-reports') ? 'weekly' : location.pathname.includes('daily-reports') ? 'daily' : undefined;
+  const tab = new URLSearchParams(window.location.search).get('tab') ?? pathTab ?? 'daily';
+  return <ReportsContent key={`${id}-${tab}`} tab={tab}/>;
 }
-function ReportsContent({weekly}:{weekly:boolean}){
+function ReportsContent({tab}:{tab:string}){
+  const weekly = tab === 'weekly';
   const {canDo}=useActionAccess();
   const { id } = useParams(); const [params, setParams] = useSearchParams(); const navigate = useNavigate(); const { message } = App.useApp();
   const { data, dispatch } = useBusinessStore(); const { currentRole, currentUser } = useAppStore();
@@ -34,7 +38,8 @@ function ReportsContent({weekly}:{weekly:boolean}){
   const save = (submit: boolean) => { try { if(!canEditReport||!canDo(weekly?'save-weekly':'save-daily',weekly?selectedWeek?.id:p.id))throw new Error('当前策略或报告状态不允许保存及提交');if (weekly) dispatch({ type: 'save-weekly', id: selectedWeek!.id, submit, summary: completed, nextPlan, coordination }, actor); else dispatch({ type: 'save-daily', projectId: p.id, submit, progress, hasProgress, completed, reason, nextPlan, coordination, linkedIds }, actor); setEditing(false); message.success(submit ? weekly ? '已模拟上报指定范围，未发送外部消息' : '日报已提交，待办同步完成' : '草稿已保存'); } catch (e) { message.error((e as Error).message); } };
   const matches = (text: string) => !params.get('search') || text.includes(params.get('search')!);
   const milestones = data.milestones.filter((m) => m.projectId === id); const milestone = milestones.find((m) => m.id === milestoneId);const canCompleteMilestone=pm&&!!milestone&&milestone.status!=='已达成'&&canDo('complete-milestone',milestone.id);
-  return <><PageHeader title={weekly ? 'HS-04 项目周报' : 'HS-03 项目日报'} description={`${p.id} · ${p.name} · ${p.phase}/${p.subPhase}`} breadcrumbs={[{ title: '首页', href: '/' }, { title: p.name, href: `/projects/${p.id}` }, { title: weekly ? '周报' : '日报' }]} extra={<Space><Button onClick={() => navigate(`/projects/${p.id}/${weekly ? 'daily-reports' : 'weekly-reports'}`)}>{weekly ? '查看项目日报' : '查看项目周报'}</Button>{weekly ? <Button type="primary" disabled={!pm||!current&&!canDo('create-weekly',p.id)} onClick={() => { try { if (current) setParam('report', current.id); else { if(!pm||!canDo('create-weekly',p.id))throw new Error('当前策略不允许生成周报');const newId = `WR-NEW-${data.weeklyReports.length + 1}`; dispatch({ type: 'create-weekly', projectId: p.id }, actor); setParam('report', newId); message.success('已生成本周快照草稿，可补充后上报'); } } catch (e) { message.error((e as Error).message); } }}>{current ? '打开本周周报' : '生成本周草稿'}</Button> : <Button type="primary" disabled={!canSaveDaily} onClick={openDaily}>{today?.status === '草稿' ? '继续今日日报' : today ? '今日日报已提交' : '填报今日日报'}</Button>}</Space>} />
+  const setTab = (t: string) => { const next = new URLSearchParams(window.location.search); next.set('tab', t); next.delete('report'); setParams(next); };
+  return <><Tabs activeKey={tab} onChange={setTab} items={[{key:'daily',label:'日报'},{key:'weekly',label:'周报'}]} /><PageHeader title={weekly ? 'HS-04 项目周报' : 'HS-03 项目日报'} description={`${p.id} · ${p.name} · ${p.phase}/${p.subPhase}`} breadcrumbs={[{ title: '首页', href: '/' }, { title: p.name, href: `/projects/${p.id}` }, { title: weekly ? '周报' : '日报' }]} extra={<Space>{weekly ? <Button type="primary" disabled={!pm||!current&&!canDo('create-weekly',p.id)} onClick={() => { try { if (current) setParam('report', current.id); else { if(!pm||!canDo('create-weekly',p.id))throw new Error('当前策略不允许生成周报');const newId = `WR-NEW-${data.weeklyReports.length + 1}`; dispatch({ type: 'create-weekly', projectId: p.id }, actor); setParam('report', newId); message.success('已生成本周快照草稿，可补充后上报'); } } catch (e) { message.error((e as Error).message); } }}>{current ? '打开本周周报' : '生成本周草稿'}</Button> : <Button type="primary" disabled={!canSaveDaily} onClick={openDaily}>{today?.status === '草稿' ? '继续今日日报' : today ? '今日日报已提交' : '填报今日日报'}</Button>}</Space>} />
     <Alert type="info" showIcon style={{ marginBottom: 16 }} message={weekly ? `演示规则 ${REPORT_RULES.version}：本周${week.start}至${week.end}，仅汇集截至${AS_OF_DATE}的事实；${REPORT_RULES.weeklyDeadline}前上报PMO及主责部门，重大项目追加PMC。` : `演示规则 ${REPORT_RULES.version}：执行中项目每日生成一项主PM日报待办，截止${REPORT_RULES.dailyDeadline}；${AS_OF_DATE} ${dailyNeeded(data, p.id) ? '尚待提交' : '已提交或不适用'}。PM填报比例单独保留，WBS实际完成率仍由任务加权。`} />
     <PageSection title={weekly?`本周 ${week.start} 至 ${week.end}`:`今日填报 · ${AS_OF_DATE}`} extra={<Tag>{weekly?(current?.status??'尚未生成'):(today?.status??(dailyNeeded(data,p.id)?'待填报':'当前不适用'))}</Tag>}><Descriptions size="small" column={3} items={[{ key: 'progress', label: 'WBS实际 / 计划', children: `${snapshot.actualProgress}% / ${snapshot.plannedProgress.toFixed(1)}%` }, { key: 'risk', label: '未关闭问题 / 监控风险', children: `${snapshot.issueIds.length} / ${snapshot.riskIds.length}` }, { key: 'date', label: '数据截至', children: AS_OF_DATE }, { key: 'budget', label: '预算（万元）', children: <MoneyText value={snapshot.budget}/> }, { key: 'actual', label: '实际成本（万元）', children: <MoneyText value={snapshot.actualCost}/> }, { key: 'rolling', label: '滚动成本（万元）', children: <MoneyText value={snapshot.rollingCost}/> }]} /></PageSection>
     <PageToolbar><Input aria-label="报告查询" placeholder="日期、编号或进展" value={params.get('search') ?? ''} onChange={(e) => setParam('search', e.target.value)} style={{ width: 280 }} /><Button onClick={() => setParams({})}>重置查询</Button><Button onClick={() => navigate(`/projects/${p.id}/progress`)}>查看WBS及里程碑</Button><Button onClick={() => navigate(`/projects/${p.id}/deliverables`)}>维护必交材料</Button><Button onClick={() => navigate(`/issues-risks?projectId=${p.id}`)}>新增或查看问题风险</Button></PageToolbar>
