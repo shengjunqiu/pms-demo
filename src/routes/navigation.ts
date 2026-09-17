@@ -89,8 +89,9 @@ export const GLOBAL_NAV_SECTIONS: GlobalNavSection[] = [
         label: '系统与规则配置',
         icon: 'settings',
         entries: [
-          { pageId: 'CF-01' }, { pageId: 'CF-02' }, { pageId: 'CF-03' }, { pageId: 'CF-04' },
-          { pageId: 'CF-05' }, { pageId: 'CF-06' }, { pageId: 'CF-07' }, { pageId: 'CF-08' },
+          { pageId: 'CF-01' }, { pageId: 'CF-02' }, { pageId: 'CF-03' },
+          { route: '/settings/finance-config', label: '财务配置', permissionPageId: 'CF-04' },
+          { pageId: 'CF-07' }, { pageId: 'CF-08' },
         ],
       },
     ],

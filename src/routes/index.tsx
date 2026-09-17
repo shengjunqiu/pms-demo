@@ -104,7 +104,7 @@ export const AppRouter: React.FC = () => {
           if (budgetRoutes.some(r=>r.path===relativeRoute)) return null;
           if (settlementRoutes.some(r=>r.path===relativeRoute)) return null;
           if (opportunityRoutes.some(r=>r.path===relativeRoute)) return null;
-          if (['workbench/project-manager', 'projects/:id/stage-switch', 'projects/:id/labor-cost', 'projects/:id/reports', 'projects/:id/daily-reports', 'projects/:id/weekly-reports', 'projects/:id/deliverables', 'projects/:id/costs', 'projects/:id/procurement', 'projects/:id/outsourcing', 'projects/:id/expenses', 'tickets', 'tickets/:id', 'requirements-bugs', 'requirements-bugs/:id', 'issues-risks', 'issues-risks/:id', 'workbench/todos', 'projects/:id/progress', 'projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions', 'executive/decisions'].includes(relativeRoute)) {
+          if (['workbench/project-manager', 'projects/:id/stage-switch', 'projects/:id/labor-cost', 'projects/:id/reports', 'projects/:id/daily-reports', 'projects/:id/weekly-reports', 'projects/:id/deliverables', 'projects/:id/costs', 'projects/:id/procurement', 'projects/:id/outsourcing', 'projects/:id/expenses', 'tickets', 'tickets/:id', 'requirements-bugs', 'requirements-bugs/:id', 'issues-risks', 'issues-risks/:id', 'workbench/todos', 'projects/:id/progress', 'projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions', 'executive/decisions', 'settings/finance-config'].includes(relativeRoute)) {
             return null;
           }
           return (
