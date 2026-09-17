@@ -418,7 +418,7 @@ function buildDemoBusinessState(): BusinessState {
   }
   const changeApproval = state.approvals.find((a) => a.projectId === 'P-005')!;
   const change = state.changes.find((c) => c.projectId === 'P-005')!;
-  change.type = '成本变更'; change.scheduleImpactDays = 0; change.status = 'PMC审议中';
+  change.type = '成本/资源变更'; change.scheduleImpactDays = 0; change.status = 'PMC审议中';
   change.costImpact = money(changeApproval.budget.totalAmount - changeApproval.baseline.budgetAmount);
   changeApproval.kind = 'change'; changeApproval.sourceChangeId = change.id;
   const changeDecision = state.decisions.find((d) => d.id === changeApproval.id)!;
