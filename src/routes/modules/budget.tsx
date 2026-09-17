@@ -1,17 +1,20 @@
-import {InitiationApplyPage} from '@/pages/initiation/InitiationApplyPage';
-import {InitiationReviewPage} from '@/pages/initiation/InitiationReviewPage';
-import {InitiationRiskPage} from '@/pages/initiation/InitiationRiskPage';
-import {InitiationDecisionPage} from '@/pages/initiation/InitiationDecisionPage';
-import {ChangesPage} from '@/pages/changes/ChangesPage';
-import {ChangeFormPage} from '@/pages/changes/ChangeFormPage';
-import {TeamPage} from '@/pages/budget/TeamPage';
-import {BudgetEditorPage} from '@/pages/budget/BudgetEditorPage';
-import {EstimateBudgetPage} from '@/pages/budget/EstimateBudgetPage';
-import {ProjectBudgetReviewPage} from '@/pages/budget/ProjectBudgetReviewPage';
-import {BaselinePage} from '@/pages/budget/BaselinePage';
-import { WbsPlanningPage } from '@/pages/budget/WbsPlanningPage';
-import { MilestonePlanningPage } from '@/pages/budget/MilestonePlanningPage';
-import { PlanReviewPage } from '@/pages/budget/PlanReviewPage';
+import { lazyPage } from '@/routes/lazyPage';
+
+const InitiationApplyPage = lazyPage(() => import('@/pages/initiation/InitiationApplyPage'), 'InitiationApplyPage');
+const InitiationReviewPage = lazyPage(() => import('@/pages/initiation/InitiationReviewPage'), 'InitiationReviewPage');
+const InitiationRiskPage = lazyPage(() => import('@/pages/initiation/InitiationRiskPage'), 'InitiationRiskPage');
+const InitiationDecisionPage = lazyPage(() => import('@/pages/initiation/InitiationDecisionPage'), 'InitiationDecisionPage');
+const ChangesPage = lazyPage(() => import('@/pages/changes/ChangesPage'), 'ChangesPage');
+const ChangeFormPage = lazyPage(() => import('@/pages/changes/ChangeFormPage'), 'ChangeFormPage');
+const TeamPage = lazyPage(() => import('@/pages/budget/TeamPage'), 'TeamPage');
+const BudgetEditorPage = lazyPage(() => import('@/pages/budget/BudgetEditorPage'), 'BudgetEditorPage');
+const EstimateBudgetPage = lazyPage(() => import('@/pages/budget/EstimateBudgetPage'), 'EstimateBudgetPage');
+const ProjectBudgetReviewPage = lazyPage(() => import('@/pages/budget/ProjectBudgetReviewPage'), 'ProjectBudgetReviewPage');
+const BaselinePage = lazyPage(() => import('@/pages/budget/BaselinePage'), 'BaselinePage');
+const WbsPlanningPage = lazyPage(() => import('@/pages/budget/WbsPlanningPage'), 'WbsPlanningPage');
+const MilestonePlanningPage = lazyPage(() => import('@/pages/budget/MilestonePlanningPage'), 'MilestonePlanningPage');
+const PlanReviewPage = lazyPage(() => import('@/pages/budget/PlanReviewPage'), 'PlanReviewPage');
+
 export const budgetRoutes=[
  {path:'initiation/apply',element:<InitiationApplyPage/>},
  {path:'initiation/review',element:<InitiationReviewPage/>},

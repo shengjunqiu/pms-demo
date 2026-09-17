@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { useAppStore } from '@/store/useAppStore';
@@ -6,7 +6,7 @@ import { ROLE_HOME } from '@/routes/navigation';
 import { PAGE_MANIFEST } from '@/routes/manifest';
 import { Spin } from 'antd';
 
-// 模块路由（体积小，保持静态导入）
+// 模块路由（页面组件已在模块内部懒加载）
 import { accessConfigurationRoutes } from '@/routes/modules/configuration-access';
 import {financeConfigurationRoutes} from '@/routes/modules/configuration-finance';
 import {unsignedRoutes} from '@/routes/modules/unsigned';
@@ -17,13 +17,7 @@ import { opportunityRoutes } from '@/routes/modules/opportunities';
 import { RoutesManifestPage } from '@/pages/manifest/RoutesManifestPage';
 import { PagePlaceholder } from '@/pages/common/PagePlaceholder';
 import { StateView } from '@/components/common/StateView';
-
-// 页面级动态导入
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type LazyModule = Record<string, React.ComponentType<any>>;
-const lazyPage = <T extends LazyModule>(importer: () => Promise<T>, exportName: keyof T) =>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  lazy(() => importer().then(m => ({ default: m[exportName] as React.ComponentType<any> })));
+import { lazyPage } from '@/routes/lazyPage';
 
 const ProjectManagerWorkbenchPage = lazyPage(() => import('@/pages/workbench/ProjectManagerWorkbenchPage'), 'ProjectManagerWorkbenchPage');
 const LaborCostPage = lazyPage(() => import('@/pages/execution/LaborCostPage'), 'LaborCostPage');

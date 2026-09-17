@@ -1,15 +1,18 @@
 import { OpportunityScope } from '@/pages/opportunities/OpportunityScope';
-import { EarlyInvestmentPage } from '@/pages/opportunities/EarlyInvestmentPage';
-import { EarlyInvestmentsPage } from '@/pages/opportunities/EarlyInvestmentsPage';
-import { EstimatePage } from '@/pages/opportunities/EstimatePage';
-import { EstimateComparePage } from '@/pages/opportunities/EstimateComparePage';
-import { SolutionPage } from '@/pages/opportunities/SolutionPage';
-import { TechCostPage } from '@/pages/opportunities/TechCostPage';
-import { PresalesReviewPage } from '@/pages/opportunities/PresalesReviewPage';
-import { OpportunitiesPage } from '@/pages/opportunities/OpportunitiesPage';
-import { OpportunityFormPage } from '@/pages/opportunities/OpportunityFormPage';
-import { OpportunityDetailPage } from '@/pages/opportunities/OpportunityDetailPage';
-import { OpportunityAssessmentPage } from '@/pages/opportunities/OpportunityAssessmentPage';
+import { lazyPage } from '@/routes/lazyPage';
+
+const EarlyInvestmentPage = lazyPage(() => import('@/pages/opportunities/EarlyInvestmentPage'), 'EarlyInvestmentPage');
+const EarlyInvestmentsPage = lazyPage(() => import('@/pages/opportunities/EarlyInvestmentsPage'), 'EarlyInvestmentsPage');
+const EstimatePage = lazyPage(() => import('@/pages/opportunities/EstimatePage'), 'EstimatePage');
+const EstimateComparePage = lazyPage(() => import('@/pages/opportunities/EstimateComparePage'), 'EstimateComparePage');
+const SolutionPage = lazyPage(() => import('@/pages/opportunities/SolutionPage'), 'SolutionPage');
+const TechCostPage = lazyPage(() => import('@/pages/opportunities/TechCostPage'), 'TechCostPage');
+const PresalesReviewPage = lazyPage(() => import('@/pages/opportunities/PresalesReviewPage'), 'PresalesReviewPage');
+const OpportunitiesPage = lazyPage(() => import('@/pages/opportunities/OpportunitiesPage'), 'OpportunitiesPage');
+const OpportunityFormPage = lazyPage(() => import('@/pages/opportunities/OpportunityFormPage'), 'OpportunityFormPage');
+const OpportunityDetailPage = lazyPage(() => import('@/pages/opportunities/OpportunityDetailPage'), 'OpportunityDetailPage');
+const OpportunityAssessmentPage = lazyPage(() => import('@/pages/opportunities/OpportunityAssessmentPage'), 'OpportunityAssessmentPage');
+
 export const opportunityRoutes = [
   { path:'opportunities/:id/early-investment', element:<OpportunityScope><EarlyInvestmentPage/></OpportunityScope> },
   { path:'early-investments', element:<OpportunityScope><EarlyInvestmentsPage/></OpportunityScope> },

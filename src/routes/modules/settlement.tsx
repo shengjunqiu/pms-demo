@@ -1,12 +1,15 @@
-import {OperationHandoverPage} from '@/pages/settlement/OperationHandoverPage';
-import {OperationsPage} from '@/pages/settlement/OperationsPage';
-import {ProjectClosePage} from '@/pages/settlement/ProjectClosePage';
-import { PostEvaluationPage } from '@/pages/settlement/PostEvaluationPage';
-import { ArchivePage } from '@/pages/settlement/ArchivePage';
-import { SettlementPage } from '@/pages/settlement/SettlementPage';
-import { SettlementAnalysisPage } from '@/pages/settlement/SettlementAnalysisPage';
-import { AcceptancePage } from '@/pages/settlement/AcceptancePage';
-import { ReportAcceptancePage } from '@/pages/settlement/ReportAcceptancePage';
+import { lazyPage } from '@/routes/lazyPage';
+
+const OperationHandoverPage = lazyPage(() => import('@/pages/settlement/OperationHandoverPage'), 'OperationHandoverPage');
+const OperationsPage = lazyPage(() => import('@/pages/settlement/OperationsPage'), 'OperationsPage');
+const ProjectClosePage = lazyPage(() => import('@/pages/settlement/ProjectClosePage'), 'ProjectClosePage');
+const PostEvaluationPage = lazyPage(() => import('@/pages/settlement/PostEvaluationPage'), 'PostEvaluationPage');
+const ArchivePage = lazyPage(() => import('@/pages/settlement/ArchivePage'), 'ArchivePage');
+const SettlementPage = lazyPage(() => import('@/pages/settlement/SettlementPage'), 'SettlementPage');
+const SettlementAnalysisPage = lazyPage(() => import('@/pages/settlement/SettlementAnalysisPage'), 'SettlementAnalysisPage');
+const AcceptancePage = lazyPage(() => import('@/pages/settlement/AcceptancePage'), 'AcceptancePage');
+const ReportAcceptancePage = lazyPage(() => import('@/pages/settlement/ReportAcceptancePage'), 'ReportAcceptancePage');
+
 export const settlementRoutes = [
  {path:'projects/:id/operation-handover',element:<OperationHandoverPage/>},
  {path:'operations/:id',element:<OperationsPage/>},
