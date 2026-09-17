@@ -1,8 +1,8 @@
 import { useActionAccess } from '@/hooks/useActionAccess';
 import { constructionLockReason } from '@/mock/construction-lock';
 import { useState } from 'react';
-import { Alert, App, Button, Card, Col, Descriptions, Drawer, Input, InputNumber, Modal, Row, Select, Space, Statistic, Table, Tag, Timeline } from 'antd';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Alert, App, Button, Card, Col, Descriptions, Drawer, Input, InputNumber, Modal, Row, Select, Space, Statistic, Table, Tag, Tabs, Timeline } from 'antd';
+import { useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom';
 import { useBusinessStore } from '@/mock/business';
 import { costAvailability, costOrderLabels, isCostSubject, type CostOrderAction, type CostOrderKind } from '@/mock/cost-orders';
 import { selectFourCalculations, visibleProjects } from '@/mock/selectors';
@@ -15,9 +15,20 @@ import { StateView } from '@/components/common/StateView';
 import { MoneyText } from '@/components/common/MoneyText';
 type Operation = Extract<CostOrderAction, { type: 'process-cost-order' }>['operation'];
 const operationLabels: Record<Operation, string> = { approve: '批准申请', reject: '驳回申请', progress: '更新履约进度', accept: '确认验收通过', book: '确认实际入账' };
+const kindTabs: { key: CostOrderKind; label: string }[] = [
+  { key: 'procurement', label: '采购成本' },
+  { key: 'outsource', label: '外包成本' },
+  { key: 'expense', label: '项目费用' },
+];
 
-export function CostSourcesPage({ kind }: { kind: CostOrderKind }) {
-  const {id}=useParams();return <CostSourcesContent key={`${id}-${kind}`} kind={kind}/>;
+export function CostSourcesPage() {
+  const {id}=useParams();const location=useLocation();
+  const pathKind = location.pathname.includes('outsourcing') ? 'outsource' as const
+    : location.pathname.includes('expenses') ? 'expense' as const
+    : location.pathname.includes('procurement') || location.pathname.includes('costs') ? 'procurement' as const
+    : undefined;
+  const kind = (new URLSearchParams(window.location.search).get('kind') as CostOrderKind | null) ?? pathKind ?? 'procurement';
+  return <CostSourcesContent key={`${id}-${kind}`} kind={kind}/>;
 }
 function CostSourcesContent({ kind }: { kind: CostOrderKind }) {
   const { canDo } = useActionAccess();
@@ -39,10 +50,18 @@ function CostSourcesContent({ kind }: { kind: CostOrderKind }) {
   const filter = (s: string, status: string) => (!params.get('search') || s.includes(params.get('search')!)) && (!params.get('status') || status === params.get('status'));
   const setParam = (key: string, value?: string) => { const next = new URLSearchParams(window.location.search); if (value) next.set(key, value); else next.delete(key); setParams(next); };
   const actor = { id: currentUser.id, name: currentUser.name, role: currentRole }; const label = costOrderLabels[kind];
-  return <><PageHeader title={`${kind === 'procurement' ? 'HS-10 采购成本' : kind === 'outsource' ? 'HS-11 外包成本' : 'HS-12 项目费用'}`} description={`${p.id} · ${p.name} · 基准日 ${AS_OF_DATE} · 单位：万元`} breadcrumbs={[{ title: '首页', href: '/' }, { title: p.name, href: `/projects/${p.id}` }, { title: `${label}成本` }]} extra={<Space wrap><Button onClick={() => navigate(`/projects/${p.id}/dynamic-accounting`)}>查看动态核算</Button><Button type="primary" disabled={!canSubmit} onClick={() => { setTitle(''); setScope(''); setContractNo(''); setSupplier(''); setAmount(1); setTaskId(undefined); setOpen(true); }}>新建{label}申请</Button></Space>} />
+  const setKind = (k: string) => { const next = new URLSearchParams(window.location.search); next.set('kind', k); next.delete('source'); setParams(next); };
+  // Summary across all three cost kinds
+  const allKinds: CostOrderKind[] = ['procurement', 'outsource', 'expense'];
+  const summaryData = allKinds.map((k) => {
+    const s = calc.subjects.filter((sub) => isCostSubject(k, sub.subjectId));
+    const c = data.costs.filter((co) => co.projectId === p.id && co.type === k);
+    return { kind: k, label: costOrderLabels[k], budget: sumMoney(s.map((sub) => sub.budget)), actual: sumMoney(c.map((co) => co.amount)), committed: sumMoney(s.map((sub) => sub.committed)), available: sumMoney(s.map((sub) => costAvailability(data, p.id, sub.subjectId).available)) };
+  });
+  return <><Tabs activeKey={kind} onChange={setKind} items={kindTabs} /><PageHeader title={`${label}成本`} description={`${p.id} · ${p.name} · 基准日 ${AS_OF_DATE} · 单位：万元`} breadcrumbs={[{ title: '首页', href: '/' }, { title: p.name, href: `/projects/${p.id}` }, { title: `${label}成本` }]} extra={<Space wrap><Button onClick={() => navigate(`/projects/${p.id}/dynamic-accounting`)}>查看动态核算</Button><Button type="primary" disabled={!canSubmit} onClick={() => { setTitle(''); setScope(''); setContractNo(''); setSupplier(''); setAmount(1); setTaskId(undefined); setOpen(true); }}>新建{label}申请</Button></Space>} />
     <Alert showIcon type={locked ? 'warning' : 'info'} message={locked ? '建设期已结束或成本锁定，仅可查看原始单据；运维费用须进入独立周期。' : `演示规则 COST-1：财务审批后形成承诺；${kind === 'expense' ? '财务确认发生后入账' : '主PM登记到货/履约100%并验收后，财务入账'}。超科目预算或未签额度时阻断，先完成额度审批。`} style={{ marginBottom: 16 }} />
     <Row gutter={[12,12]} style={{ marginBottom: 16 }}>{[['有效科目预算', sumMoney(subjects.map((s) => s.budget))], ['已确认实际', sumMoney(costs.map((c) => c.amount))], ['未发生承诺', sumMoney(subjects.map((s) => s.committed))], ['科目净余量', sumMoney(subjects.map((s) => costAvailability(data, p.id, s.subjectId).available))]].map(([name, value]) => <Col span={6} key={name}><Card size="small" style={{height:"100%",minHeight:110}}><Statistic title={name} value={value} formatter={() => <MoneyText value={Number(value)} />} /></Card></Col>)}</Row>
-
+    <details style={{ marginBottom: 16, color: '#64748b', fontSize: 13 }}><summary style={{ cursor: 'pointer' }}>全部成本类型汇总（万元）</summary><Row gutter={[12, 12]} style={{ marginTop: 8 }}>{summaryData.map((s) => <Col span={8} key={s.kind}><Card size="small" title={s.label}><Statistic title="预算" value={s.budget} formatter={() => <MoneyText value={s.budget} />} /><Statistic title="已发生" value={s.actual} formatter={() => <MoneyText value={s.actual} />} style={{ marginTop: 8 }} /><Statistic title="承诺" value={s.committed} formatter={() => <MoneyText value={s.committed} />} style={{ marginTop: 8 }} /><Statistic title="可用" value={s.available} formatter={() => <MoneyText value={s.available} />} style={{ marginTop: 8 }} /></Card></Col>)}</Row></details>
     <PageToolbar><Input aria-label="成本申请搜索" placeholder="申请、合同、供应商或凭证" value={params.get('search') ?? ''} onChange={(e) => setParam('search', e.target.value)} style={{ width: 290 }} /><Select aria-label="成本申请状态" allowClear placeholder="全部状态" value={params.get('status') ?? undefined} onChange={(v) => setParam('status', v)} style={{ width: 160 }} options={['待审批', '驳回', '已批准', '验收通过', '已入账'].map((value) => ({ value, label: value }))} /><Button onClick={() => setParams({})}>重置查询</Button></PageToolbar>
     <Card size="small" title={`${label}申请与${kind === 'expense' ? '财务确认' : '合同履约'}`}><Table rowKey="id" size="small" dataSource={orders.filter((o) => filter(`${o.id} ${o.title} ${o.contractNo} ${o.supplier}`, o.status))} scroll={{ x: 1120 }} pagination={{ pageSize: 5, showSizeChanger: false }} columns={[{ title: '原申请 / 合同', width: 240, fixed: 'left', render: (_, o) => <Button type="link" style={{ height: 'auto', whiteSpace: 'normal', display: 'block', textAlign: 'left', padding: 0 }} onClick={() => setParam('source', o.id)}>{o.id} · {o.title}<br />{o.contractNo}</Button> }, { title: '供应商 / 收款方', dataIndex: 'supplier', width: 190 }, { title: '状态', dataIndex: 'status', width: 100, render: (v) => <Tag color={v==='驳回'?'red':v==='已入账'?'green':v==='待审批'?'orange':'blue'}>{v}</Tag> }, { title: '金额（万元）', dataIndex: 'amount', align:'right',width:120,render:v=><MoneyText value={v}/> }, { title: '已发生 / 未发生', width:170,align:'right',render:(_,o)=><><MoneyText value={o.recognized}/> / <MoneyText value={['已批准','验收通过'].includes(o.status)?money(o.amount-o.recognized):0}/></> }, { title: kind === 'procurement' ? '到货 / 验收' : '履约 / 验收', width: 140, render: (_, o) => kind === 'expense' ? '财务确认口径' : `${o.progress}% / ${o.acceptance ? '通过' : '待验收'}` }, { title: '计划日期', dataIndex: 'dueDate', width: 130 }, { title: '预算科目', dataIndex: 'subjectName', width: 130 }]} /></Card>
     <PageSection title="预算使用与申请控制" description="按生效科目分别控制，剩余预测不重复占用申请额度。"><Table size="small" rowKey="subjectId" pagination={false} dataSource={subjects.map((s) => ({ ...s, ...costAvailability(data, p.id, s.subjectId) }))} scroll={{ x: 760 }} columns={[{ title: '科目 / 生效版本', render: (_, s) => <>{s.subjectName}<div>{calc.budget?.version}</div></> }, ...(['budget', 'actual', 'committed', 'pending', 'available'] as const).map((key, i) => ({ title: ['预算', '已用', '已承诺', '待批占用', '可申请'][i], dataIndex: key, align:'right' as const, render: (v: number) => <MoneyText value={v} /> }))]} /><p>可申请 = 预算 − 已用 − 未发生承诺 − 待批占用。期初承诺按预算科目分摊，新批准合同按对应科目记录；剩余预测不重复占用申请额度；各科目独立控制，不相互抵扣。{p.isUnsigned && `未签投入上限 ${p.unsignedLimitQuota}，当前实际与承诺 ${money(p.actualCost + p.committedCost)}。`}</p></PageSection>
