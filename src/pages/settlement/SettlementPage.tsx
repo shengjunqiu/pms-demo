@@ -892,6 +892,26 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
           </Form.Item>
         </Form>
       </Modal>
+      {final && (
+        <Alert
+          type="success"
+          showIcon
+          style={{ marginBottom: 16 }}
+          message="结算已锁定"
+          description={
+            <Space>
+              <span>结算已完成，可进入下一步。</span>
+              <Button
+                type="primary"
+                size="small"
+                onClick={() => navigate(`/projects/${p.id}/post-evaluation`)}
+              >
+                下一步：项目后评价
+              </Button>
+            </Space>
+          }
+        />
+      )}
       <Drawer
         width={880}
         title="结算取数原始来源"

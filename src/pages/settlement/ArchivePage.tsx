@@ -639,6 +639,26 @@ export function ArchivePage() {
           onChange={(e) => setNote(e.target.value)}
         />
       </Modal>
+      {archive && (
+        <Alert
+          type="success"
+          showIcon
+          style={{ marginBottom: 16 }}
+          message="正式归档已确认"
+          description={
+            <Space>
+              <span>归档已完成，可进入下一步。</span>
+              <Button
+                type="primary"
+                size="small"
+                onClick={() => navigate(`/projects/${p.id}/operation-handover`)}
+              >
+                下一步：运维移交
+              </Button>
+            </Space>
+          }
+        />
+      )}
       <Modal
         title="确认正式归档并锁定本版本"
         open={confirm}

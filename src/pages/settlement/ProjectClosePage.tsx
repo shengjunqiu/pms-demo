@@ -10,6 +10,7 @@ import {
   Modal,
   Row,
   Space,
+  Steps,
   Table,
   Tag,
 } from "antd";
@@ -56,6 +57,44 @@ export function ProjectClosePage() {
   const operationPath = cycle
     ? `/operations/${cycle.id}`
     : `/projects/${p.id}/operation-handover`;
+  const settlementLocked = !!data.settlements.find(
+    (s) => s.projectId === p.id && s.status === "已锁定已生效",
+  );
+  const evaluationDone = !!data.postEvaluations[p.id];
+  const archiveDone = !!data.projectArchives[p.id];
+  const handoverDone = data.operationHandovers[p.id]?.status === "已接收";
+  const receiptsCleared = receiptSummary.outstanding === 0;
+  const closeSteps = [
+    {
+      title: "结算锁定",
+      status: settlementLocked ? "finish" as const : (closure ? "finish" as const : "wait" as const),
+      onClick: () => navigate(`/projects/${p.id}/settlement`),
+    },
+    {
+      title: "后评价",
+      status: evaluationDone ? "finish" as const : (closure ? "finish" as const : "wait" as const),
+      onClick: () => navigate(`/projects/${p.id}/post-evaluation`),
+    },
+    {
+      title: "正式归档",
+      status: archiveDone ? "finish" as const : (closure ? "finish" as const : "wait" as const),
+      onClick: () => navigate(`/projects/${p.id}/archive`),
+    },
+    {
+      title: "运维移交",
+      status: handoverDone ? "finish" as const : (closure ? "finish" as const : "wait" as const),
+      onClick: () => navigate(`/projects/${p.id}/operation-handover`),
+    },
+    {
+      title: "应收结清",
+      status: receiptsCleared ? "finish" as const : (closure ? "finish" as const : "wait" as const),
+      onClick: () => navigate(`/projects/${p.id}/business-result`),
+    },
+    {
+      title: "PMO确认关闭",
+      status: closure ? "finish" as const : "wait" as const,
+    },
+  ];
   const paths: Record<string, string> = {
     管理决策事项已办理: management
       ? `/management-approvals/${management.id}`
@@ -89,6 +128,25 @@ export function ProjectClosePage() {
             PMO确认关闭
           </Button>
         }
+      />
+      <Steps
+        size="small"
+        current={closeSteps.findIndex((s) => s.status === "wait")}
+        style={{ marginBottom: 16 }}
+        items={closeSteps.map((s) => ({
+          title: (
+            <Button
+              type="link"
+              size="small"
+              style={{ padding: 0, height: "auto" }}
+              disabled={!s.onClick}
+              onClick={s.onClick}
+            >
+              {s.title}
+            </Button>
+          ),
+          status: s.status,
+        }))}
       />
       <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
         <Col xs={12} xl={6}>

@@ -888,6 +888,26 @@ export function PostEvaluationPage() {
           </Form.Item>
         </Form>
       </Modal>
+      {e?.status === "已完成" && (
+        <Alert
+          type="success"
+          showIcon
+          style={{ marginBottom: 16 }}
+          message="后评价已完成"
+          description={
+            <Space>
+              <span>后评价已确认，可进入下一步。</span>
+              <Button
+                type="primary"
+                size="small"
+                onClick={() => navigate(`/projects/${p.id}/archive`)}
+              >
+                下一步：资料归档
+              </Button>
+            </Space>
+          }
+        />
+      )}
       <Modal
         title={confirm ? "确认后评价完成" : "退回后评价"}
         open={confirm !== undefined}
