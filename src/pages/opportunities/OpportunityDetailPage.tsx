@@ -24,7 +24,7 @@ import { PAGE_MANIFEST } from '@/routes/manifest';
 import { OpportunityActions } from './OpportunityActions';
 export function OpportunityDetailPage() {
  const {canDo}=useActionAccess();
-  const {id}=useParams();const {data,dispatch}=useBusinessStore();const actor=useAppStore(s=>s.currentUser);const {message}=App.useApp();const [follow,setFollow]=useState(false);const [form]=Form.useForm();
+  const {id}=useParams();const {data,dispatch}=useBusinessStore();const actor=useAppStore(s=>s.currentUser);const {message}=App.useApp();const [follow,setFollow]=useState(false);const [activeTab, setActiveTab] = useState('overview');const [form]=Form.useForm();
   const o=data.opportunities.find(o=>o.id===id);if(!o)return <StateView type="404"/>;if(!canViewOpportunity(data,o,actor))return <StateView type="403"/>;
   const showMargin=canViewSensitiveField(data,actor,'margin');const m=opportunityMeta(data,o);const presales=presalesWorkspace(data,o.id);const latestReview=presales.reviews.at(-1);const s=assessmentSummary(o,m);const missing=initiationPrerequisites(data,o);const estimate=data.estimates.find(e=>e.id===o.currentEstimateVersionId);const project=data.projects.find(p=>p.opportunityId===o.id);const sensitive=actor.role!=='project-manager';
   const basic=<Descriptions size="small" column={3} items={[{key:'customer',label:'客户',children:o.customerName},{key:'owner',label:'商机负责人',children:o.ownerName},{key:'dept',label:'主办部门',children:o.departmentName},{key:'type',label:'项目类型',children:m.projectType},{key:'source',label:'商机来源',children:m.source},{key:'region',label:'区域 / 业务线',children:`${m.region} / ${m.businessLine}`},{key:'amount',label:'预计金额',children:<><MoneyText value={o.estimatedAmount}/> 万元</>},{key:'sign',label:'预计签约',children:o.expectedSignDate||'未确定'},{key:'desc',label:'业务背景与需求',span:3,children:m.description},{key:'comp',label:'竞争情况',span:3,children:m.competition},{key:'files',label:'客户材料',span:3,children:m.attachments.join('、')||'尚未提交附件'}]}/>;
@@ -38,7 +38,7 @@ export function OpportunityDetailPage() {
       {key:'date',label:'预计签约',children:o.expectedSignDate||'未确定'},
       {key:'owner',label:'主办部门',children:o.departmentName},
     ]}/></PageSection>
-    <PageSection><Tabs defaultActiveKey="overview" items={[
+    <PageSection><Tabs activeKey={activeTab} onChange={setActiveTab} items={[
       {
         key: 'overview',
         label: '概览',

@@ -3,7 +3,7 @@ import { canViewSensitiveField } from "@/mock/configuration-access";
 import { constructionLockReason } from "@/mock/construction-lock";
 import { marginReason } from "@/utils/sensitive";
 import { useState } from "react";
-import { Alert, App, Button, Card, Checkbox, Col, Descriptions, Input, InputNumber, Modal, Row, Select, Space, Table, Collapse, Tag, Timeline, } from "antd";
+import { Alert, App, Button, Card, Checkbox, Col, Descriptions, Input, InputNumber, Modal, Row, Select, Space, Steps, Table, Collapse, Tag, Timeline, } from "antd";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useBusinessStore } from "@/mock/business";
 import { useAppStore } from "@/store/useAppStore";
@@ -185,6 +185,30 @@ function ChangeFormContent() {
             ? marginReason(proposal.reasons.join("；"), showMargin)
             : "按演示规则属于较小影响变更，仍须完成专业评估和PMO分级"} description={`${CHANGE_RULE.version}：成本绝对影响≥${CHANGE_RULE.largeCost}万元、工期≥${CHANGE_RULE.largeShiftDays}天、毛利率<${CHANGE_RULE.minGrossMarginPercent}%或重大风险，进入PMC；禁止普通审批绕过。`}/>
           <Card title="当前处理 · 专业评估与审批" style={{ marginBottom: 16 }} size="small">
+            <Steps
+              size="small"
+              current={(() => {
+                if (!request) return 0;
+                const map: Record<string, number> = {
+                  "草稿": 0,
+                  "影响评估中": 1,
+                  "待分级": 2,
+                  "待审批": 3,
+                  "通过": 4,
+                  "驳回": 4,
+                };
+                return map[request.status] ?? 0;
+              })()}
+              status={request?.status === "驳回" ? "error" : request?.status === "通过" ? "finish" : "process"}
+              items={[
+                { title: "编制申请" },
+                { title: "专业评估" },
+                { title: "PMO分级" },
+                { title: "审批决策" },
+                { title: "完成" },
+              ]}
+              style={{ marginBottom: 16 }}
+            />
             <p>{!request || request.status === "草稿" ? "由项目主PM保存完整材料后提交专业评估。" : request.status === "待审批" ? `当前审批角色：${request.requiredRole === "executive" ? "集团领导 / PMC" : "PMO"}` : ["通过", "驳回"].includes(request.status) ? "本轮已处理，审批结果与版本留痕保留。" : "技术、财务、市场完成意见后，由PMO确认分级。"}</p>
             {request && ["影响评估中", "待分级"].includes(request.status) && (<>
                 <Select aria-label="专业评估领域" style={{ width: 220 }} disabled={!canSelectAssessment} value={assessmentArea} onChange={setAssessmentArea} options={["技术", "财务", "市场"].map((value) => ({
