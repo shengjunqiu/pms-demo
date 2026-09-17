@@ -21,7 +21,18 @@ export default defineConfig({
           if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/') || id.includes('node_modules/scheduler') || id.includes('node_modules/react-router')) {
             return 'vendor-react';
           }
-          if (id.includes('node_modules/@ant-design/icons')) {
+          // 注意：vendor-icons 必须自包含（只依赖 vendor-react）。
+  // @ant-design/icons 顶层会执行 setTwoToneColor(blue.primary)，
+  // 若 @ant-design/colors 或其工具依赖被分到 vendor-antd，
+  // 会形成 vendor-antd <-> vendor-icons 循环依赖，
+  // 初始化顺序导致 blue 为 undefined，页面白屏卡在骨架屏。
+          if (
+            id.includes('node_modules/@ant-design/icons') ||
+            id.includes('node_modules/@ant-design/colors') ||
+            id.includes('node_modules/rc-util') ||
+            id.includes('node_modules/classnames') ||
+            id.includes('node_modules/@babel/runtime')
+          ) {
             return 'vendor-icons';
           }
           if (id.includes('node_modules/antd/')) {
