@@ -104,6 +104,7 @@ export function globalNavKey(pathname: string): string {
   if (pathname === '/opportunities' || pathname.startsWith('/opportunities/')) return '/opportunities';
   if (pathname.startsWith('/initiation/')) return '/initiation/review';
   if (pathname.startsWith('/unsigned-projects/')) return '/unsigned-projects';
+  if (pathname.startsWith('/projects/') && (pathname.includes('/reports') || pathname.includes('/costs'))) return '/projects';
   if (pathname.startsWith('/requirements-bugs/')) return '/requirements-bugs';
   if (pathname.startsWith('/issues-risks/')) return '/issues-risks';
   if (pathname.startsWith('/project-changes/')) return '/project-changes';

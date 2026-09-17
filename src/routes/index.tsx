@@ -70,12 +70,14 @@ export const AppRouter: React.FC = () => {
         <Route path="executive/exceptions" element={<GL05ExceptionsPage />} />
         <Route path="projects/:id/stage-switch" element={<PlanRequestPage stageEntry />} />
         <Route path="projects/:id/labor-cost" element={<LaborCostPage />} />
-        <Route path="projects/:id/daily-reports" element={<ReportsPage key="daily" />} />
-        <Route path="projects/:id/weekly-reports" element={<ReportsPage key="weekly" weekly />} />
+        <Route path="projects/:id/reports" element={<ReportsPage />} />
+        <Route path="projects/:id/daily-reports" element={<ReportsPage />} />
+        <Route path="projects/:id/weekly-reports" element={<ReportsPage />} />
         <Route path="projects/:id/deliverables" element={<DeliverablesPage />} />
-        <Route path="projects/:id/procurement" element={<CostSourcesPage key="procurement" kind="procurement" />} />
-        <Route path="projects/:id/outsourcing" element={<CostSourcesPage key="outsource" kind="outsource" />} />
-        <Route path="projects/:id/expenses" element={<CostSourcesPage key="expense" kind="expense" />} />
+        <Route path="projects/:id/costs" element={<CostSourcesPage />} />
+        <Route path="projects/:id/procurement" element={<CostSourcesPage />} />
+        <Route path="projects/:id/outsourcing" element={<CostSourcesPage />} />
+        <Route path="projects/:id/expenses" element={<CostSourcesPage />} />
         <Route path="projects/:id/dynamic-accounting" element={<DynamicAccountingPage />} />
         <Route path="requirements-bugs" element={<TicketsPage family="quality" />} />
         <Route path="requirements-bugs/:id" element={<TicketDetailPage family="quality" />} />
@@ -100,7 +102,7 @@ export const AppRouter: React.FC = () => {
           if (budgetRoutes.some(r=>r.path===relativeRoute)) return null;
           if (settlementRoutes.some(r=>r.path===relativeRoute)) return null;
           if (opportunityRoutes.some(r=>r.path===relativeRoute)) return null;
-          if (['workbench/project-manager', 'projects/:id/stage-switch', 'projects/:id/labor-cost', 'projects/:id/daily-reports', 'projects/:id/weekly-reports', 'projects/:id/deliverables', 'projects/:id/procurement', 'projects/:id/outsourcing', 'projects/:id/expenses', 'requirements-bugs', 'requirements-bugs/:id', 'issues-risks', 'issues-risks/:id', 'workbench/todos', 'projects/:id/progress', 'projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions', 'executive/decisions'].includes(relativeRoute)) {
+          if (['workbench/project-manager', 'projects/:id/stage-switch', 'projects/:id/labor-cost', 'projects/:id/reports', 'projects/:id/daily-reports', 'projects/:id/weekly-reports', 'projects/:id/deliverables', 'projects/:id/costs', 'projects/:id/procurement', 'projects/:id/outsourcing', 'projects/:id/expenses', 'requirements-bugs', 'requirements-bugs/:id', 'issues-risks', 'issues-risks/:id', 'workbench/todos', 'projects/:id/progress', 'projects/:id', 'projects/:id/dynamic-accounting', 'executive/dashboard', 'executive/project-drilldown', 'executive/portfolio', 'executive/exceptions', 'executive/decisions'].includes(relativeRoute)) {
             return null;
           }
           return (
