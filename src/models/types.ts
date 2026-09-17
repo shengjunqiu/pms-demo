@@ -552,7 +552,7 @@ export interface ProjectChange {
   projectId: string;
   code: string;
   title: string;
-  type: '范围变更' | '工期变更' | '成本变更' | '资源变更' | '合同变更' | '综合重大变更';
+  type: '范围/进度变更' | '成本/资源变更' | '合同/综合变更';
   costImpact: number; // 万元
   scheduleImpactDays: number;
   status: '草稿' | 'PMO审批中' | 'PMC审议中' | '已批准' | '已否决';

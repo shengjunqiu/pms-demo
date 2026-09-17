@@ -787,7 +787,7 @@ export const mockChanges: ProjectChange[] = Array.from({ length: 55 }).map((_, i
     projectId: p.id,
     code: `CR-2026-${String(i + 1).padStart(3, '0')}`,
     title: `项目第${i + 1}次需求及工期变更`,
-    type: i % 3 === 0 ? '综合重大变更' : '工期变更',
+    type: i % 3 === 0 ? '合同/综合变更' : '范围/进度变更',
     costImpact: 15.0 + (i % 5) * 5,
     scheduleImpactDays: 14,
     status: i % 2 === 0 ? '已批准' : 'PMO审批中',

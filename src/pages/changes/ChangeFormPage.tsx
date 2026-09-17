@@ -295,12 +295,9 @@ function ChangeFormContent() {
                 <label>
                   变更类型
                   <Select style={{ width: "100%" }} disabled={!canEdit} value={input.type} onChange={(type) => update({ type })} options={[
-            "范围变更",
-            "工期变更",
-            "成本变更",
-            "资源变更",
-            "合同变更",
-            "综合重大变更",
+            "范围/进度变更",
+            "成本/资源变更",
+            "合同/综合变更",
         ].map((value) => ({ value, label: value }))}/>
                 </label>
               </Col>

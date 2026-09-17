@@ -9,7 +9,7 @@ import {assertConstructionWritable} from './construction-lock';
 import {money,percentage,sumMoney} from '@/utils/money';
 export const CHANGE_RULE={version:'CHANGE-2026-01',largeCost:100,largeShiftDays:30,minGrossMarginPercent:20};
 export function defaultChangeInput(state:BusinessState,id:string):ChangeInput {
- const p=state.projects.find(p=>p.id===id)!;return {type:'范围变更',title:'',reason:'',scope:planningSnapshot(state,id).scope,customerBasis:'',contractBasis:'',urgency:'一般',shiftDays:0,proposedIncome:p.revenueAmount??p.contractAmount,adjustments:{},resourceHours:{},newWorkPackage:'',newTaskOwnerId:p.pmId,risk:'',majorRisk:false,procurementImpact:'',outsourceImpact:'',attachments:[]};
+ const p=state.projects.find(p=>p.id===id)!;return {type:'范围/进度变更',title:'',reason:'',scope:planningSnapshot(state,id).scope,customerBasis:'',contractBasis:'',urgency:'一般',shiftDays:0,proposedIncome:p.revenueAmount??p.contractAmount,adjustments:{},resourceHours:{},newWorkPackage:'',newTaskOwnerId:p.pmId,risk:'',majorRisk:false,procurementImpact:'',outsourceImpact:'',attachments:[]};
 }
 export function proposeChange(state:BusinessState,id:string,input:ChangeInput){
  const p=state.projects.find(p=>p.id===id);if(!p)throw new Error('项目不存在');const original=state.baselines.find(b=>b.projectId===id&&b.status==='已生效');const currentBudget=state.budgets.find(b=>b.projectId===id&&b.status==='已生效'),estimate=projectEstimate(p,state.estimates);if(!original||!currentBudget||!estimate)throw new Error('变更须引用生效基线、预算和冻结概算');
