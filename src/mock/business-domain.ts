@@ -148,6 +148,7 @@ export function createBusinessState(): BusinessState {
   return state;
 }
 export type BusinessAction = AccessConfigurationAction | ReceiptAction | FinanceConfigurationAction | UnsignedAction | OperationsAction | ConfigurationAction | InitiationAction | CloseoutAction | ProjectChangeAction | EarlyInvestmentAction | SettlementAction | EstimateAction | TeamAction | BudgetDraftAction | PresalesAction | BudgetPlanningAction | AcceptanceAction | OpportunityAction | LaborAction | DeliverableAction | ReportAction | CostOrderAction | TicketAction
+ | { type: 'update-project-phase'; projectId: string; phase: string; subPhase: string }
   | { type: 'submit-budget'; projectId: string; budget: BudgetVersion; reason: string }
   | { type: 'review'; approvalId: string; approve: boolean; opinion: string }
   | { type: 'review-management'; id: string; approve: boolean; opinion: string }
@@ -367,6 +368,13 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     p.phase = STAGE_RULE.targetPhase; p.subPhase = STAGE_RULE.targetSubPhase; p.releasedBudgetPercent = action.ruleSnapshot?.releasePercent??stageSnapshot(state,p.id).releasePercent;
   } else if (action.type === 'settle') {
     throw new Error('请通过项目结算申请、财务核算与PMO评审完成正式结算，不允许直接锁定');
+  } else if (action.type === 'update-project-phase') {
+    const p = state.projects.find((p) => p.id === action.projectId);
+    if (!p) throw new Error('项目不存在');
+    if (actor.role !== 'pmo') throw new Error('仅PMO可切换项目阶段');
+    p.phase = action.phase as typeof p.phase;
+    p.subPhase = action.subPhase as typeof p.subPhase;
+    target = action.projectId;
   } else if (action.type === 'confirm-cost') {
     requireRole('finance'); const p = project(action.cost.projectId); target = p.id;
     if (!Number.isFinite(action.cost.amount) || action.cost.amount <= 0 || !action.cost.sourceId) throw new Error('成本金额及来源无效');

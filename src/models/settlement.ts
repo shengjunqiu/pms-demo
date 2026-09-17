@@ -29,6 +29,10 @@ export interface SettlementRequest {
   id: string; projectId: string; version: number; previousId?: string; supersededBy?: string; status: '草稿'|'财务核算'|'PMO审核'|'结算评审'|'待最终锁定'|'材料整改'|'金额退回'|'已锁定';
   note: string; files: string[]; submittedBy: string; createdAt: string; snapshot: SettlementSnapshot;
   finance?: { actor: string; date: string; invoicedAmount: number; taxAmount: number; opinion: string };
+  financeConfirmedAt?: string;
+  pmoAuditedAt?: string;
+  reviewPassedAt?: string;
+  lockedAt?: string;
   history: { actor: string; date: string; action: string; opinion: string }[];
 }
 export interface SettlementCostReview { id: string; projectId: string; sourceId: string; disposition: '已有凭证'|'取消不发生'; ledgerId?: string; amount: number; evidence: string; actor: string; date: string }

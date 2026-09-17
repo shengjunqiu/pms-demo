@@ -81,6 +81,9 @@ function ReceiptsTabContent({ projectId, role, receipt, data }: { projectId: str
       { title: '实收（万元）', dataIndex: 'paidAmount', render: (v: number) => <MoneyText value={v} /> },
       { title: '状态', width: 110, render: (_: unknown, r: (typeof receipt.plans)[number]) => {
           if (r.paidAmount >= r.amount) return <Tag color="success">已收清</Tag>;
+          if (r.collectionStatus === '待收款') return <Tag color="blue">待收款</Tag>;
+          if (r.collectionStatus === '已逾期') return <Tag color="red">已逾期</Tag>;
+          if (r.collectionStatus === '已核销') return <Tag color="green">已核销</Tag>;
           if (hasConfirmedAcceptance) return <Tag color="blue">待收款</Tag>;
           return <Tag>待验收</Tag>;
         } },

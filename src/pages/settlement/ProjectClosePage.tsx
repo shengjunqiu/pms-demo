@@ -64,6 +64,7 @@ export function ProjectClosePage() {
   const archiveDone = !!data.projectArchives[p.id];
   const handoverDone = data.operationHandovers[p.id]?.status === "已接收";
   const receiptsCleared = receiptSummary.outstanding === 0;
+  const isOpsProject = p.isMaintenance || p.phase === '运维';
   const closeSteps = [
     {
       title: "结算锁定",
@@ -75,16 +76,15 @@ export function ProjectClosePage() {
       status: evaluationDone ? "finish" as const : (closure ? "finish" as const : "wait" as const),
       onClick: () => navigate(`/projects/${p.id}/post-evaluation`),
     },
-    {
-      title: "正式归档",
-      status: archiveDone ? "finish" as const : (closure ? "finish" as const : "wait" as const),
-      onClick: () => navigate(`/projects/${p.id}/archive`),
-    },
-    {
+    ...(isOpsProject ? [{
       title: "运维移交",
       status: handoverDone ? "finish" as const : (closure ? "finish" as const : "wait" as const),
       onClick: () => navigate(`/projects/${p.id}/operation-handover`),
-    },
+    }] : [{
+      title: "正式归档",
+      status: archiveDone ? "finish" as const : (closure ? "finish" as const : "wait" as const),
+      onClick: () => navigate(`/projects/${p.id}/archive`),
+    }]),
     {
       title: "应收结清",
       status: receiptsCleared ? "finish" as const : (closure ? "finish" as const : "wait" as const),
@@ -120,13 +120,33 @@ export function ProjectClosePage() {
           { title: "项目关闭" },
         ]}
         extra={
-          <Button
-            type="primary"
-            disabled={!canClose}
-            onClick={() => setConfirm(true)}
-          >
-            PMO确认关闭
-          </Button>
+          <Space>
+            {p.isMaintenance && p.phase !== '运维' && settlementLocked && !closure && (
+              <Button
+                type="default"
+                onClick={() => {
+                  try {
+                    dispatch(
+                      { type: "update-project-phase", projectId: p.id, phase: "运维", subPhase: "质保运维" },
+                      { id: currentUser.id, name: currentUser.name, role: currentRole },
+                    );
+                    message.success("项目已转入运维阶段");
+                  } catch (e) {
+                    message.error((e as Error).message);
+                  }
+                }}
+              >
+                进入运维阶段
+              </Button>
+            )}
+            <Button
+              type="primary"
+              disabled={!canClose}
+              onClick={() => setConfirm(true)}
+            >
+              PMO确认关闭
+            </Button>
+          </Space>
         }
       />
       <Steps

@@ -545,6 +545,26 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
                   label: "提交人",
                   children: request.submittedBy,
                 },
+                ...(request.financeConfirmedAt ? [{
+                  key: "financeConfirmedAt",
+                  label: "财务核算确认时间",
+                  children: request.financeConfirmedAt,
+                }] : []),
+                ...(request.pmoAuditedAt ? [{
+                  key: "pmoAuditedAt",
+                  label: "PMO审核通过时间",
+                  children: request.pmoAuditedAt,
+                }] : []),
+                ...(request.reviewPassedAt ? [{
+                  key: "reviewPassedAt",
+                  label: "结算评审通过时间",
+                  children: request.reviewPassedAt,
+                }] : []),
+                ...(request.lockedAt ? [{
+                  key: "lockedAt",
+                  label: "财务锁定时间",
+                  children: request.lockedAt,
+                }] : []),
               ]}
             />
             <Space wrap style={{ marginBottom: 16 }}>

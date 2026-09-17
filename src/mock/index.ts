@@ -905,7 +905,7 @@ export const mockAuditLogs: AuditLog[] = Array.from({ length: 315 }).map((_, i) 
 });
 
 export const mockReceiptPlans = mockContracts.flatMap((contract) => [
-  { id: `RCPT-${contract.id}-1`, projectId: contract.projectId, contractId: contract.id, title: '合同首付款', dueDate: '2026-05-15', amount: contract.paidAmount, paidAmount: contract.paidAmount },
+  { id: `RCPT-${contract.id}-1`, projectId: contract.projectId, contractId: contract.id, title: '合同首付款', dueDate: '2026-05-15', amount: contract.paidAmount, paidAmount: contract.paidAmount, collectionStatus: contract.paidAmount >= contract.amount ? '已核销' as const : '已逾期' as const },
   { id: `RCPT-${contract.id}-2`, projectId: contract.projectId, contractId: contract.id, title: '验收结算款', dueDate: contract.projectId === 'P-002' ? '2026-09-01' : contract.projectId === 'P-003' ? '2026-08-30' : '2026-12-31', amount: contract.unpaidAmount, paidAmount: 0 },
 ]);
 

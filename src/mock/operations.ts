@@ -84,7 +84,8 @@ export type OperationsAction =
       archive: string;
       confirm: boolean;
     }
-  | { type: "confirm-project-close"; projectId: string; note: string };
+  | { type: "confirm-project-close"; projectId: string; note: string }
+  | { type: "update-project-phase"; projectId: string; phase: string; subPhase: string };
 export const operationsActions = new Set([
   "submit-operation-cost",
   "reject-operation-cost",
@@ -98,6 +99,7 @@ export const operationsActions = new Set([
   "renew-operation",
   "exit-operation",
   "confirm-project-close",
+  "update-project-phase",
 ]);
 export function initOperationsFixture(state: BusinessState) {
   const p = state.projects.find((p) => p.id === "P-007");
@@ -565,7 +567,13 @@ export function applyOperationsAction(
       const previous = cycle(c.previousId);
       if (previous.status === "服务中") delete previous.renewedById;
     }
-  } else {
+  } else if (action.type === "update-project-phase") {
+    pmo();
+    const validPhases = ['运维', '收尾', '已关闭'];
+    if (!validPhases.includes(action.phase)) throw Error('无效的阶段值');
+    p.phase = action.phase as typeof p.phase;
+    p.subPhase = action.subPhase as typeof p.subPhase;
+  } else if (action.type === "confirm-project-close") {
     pmo();
     text(action.note);
     const failed = closeChecks(state, p.id).filter((c) => !c.ok);

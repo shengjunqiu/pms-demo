@@ -70,6 +70,12 @@ function ChangeFormContent() {
         !["草稿", "通过", "驳回"].includes(request.status) &&
         ["pmo", "executive"].includes(currentRole) &&
         canDo("review-project-change", request.id);
+    const canFinanceSignoff = !lockReason && !!request &&
+        currentRole === "finance" &&
+        ["影响评估中", "待分级", "待审批"].includes(request.status) &&
+        !request.financeSignoff?.signed &&
+        request.input.type === "成本/资源变更" &&
+        canDo("finance-signoff-change", request.id);
     const canDecide = decision === true ? canApprove : decision === false ? canReject : false;
     const update = (patch: Partial<ChangeInput>) => {
         if (!editableState || !canDo("save-project-change", request?.id ?? p.id))
@@ -189,24 +195,31 @@ function ChangeFormContent() {
               size="small"
               current={(() => {
                 if (!request) return 0;
+                const isCost = request.input.type === "成本/资源变更";
                 const map: Record<string, number> = {
                   "草稿": 0,
                   "影响评估中": 1,
                   "待分级": 2,
-                  "待审批": 3,
-                  "通过": 4,
-                  "驳回": 4,
+                  "待审批": isCost ? 4 : 3,
+                  "通过": isCost ? 5 : 4,
+                  "驳回": isCost ? 5 : 4,
                 };
                 return map[request.status] ?? 0;
               })()}
               status={request?.status === "驳回" ? "error" : request?.status === "通过" ? "finish" : "process"}
-              items={[
-                { title: "编制申请" },
-                { title: "专业评估" },
-                { title: "PMO分级" },
-                { title: "审批决策" },
-                { title: "完成" },
-              ]}
+              items={(() => {
+                const base = [
+                  { title: "编制申请" },
+                  { title: "专业评估" },
+                  { title: "PMO分级" },
+                ];
+                if (request?.input.type === "成本/资源变更") {
+                  base.push({ title: "财务会签" });
+                }
+                base.push({ title: "审批决策" });
+                base.push({ title: "完成" });
+                return base;
+              })()}
               style={{ marginBottom: 16 }}
             />
             <p>{!request || request.status === "草稿" ? "由项目主PM保存完整材料后提交专业评估。" : request.status === "待审批" ? `当前审批角色：${request.requiredRole === "executive" ? "集团领导 / PMC" : "PMO"}` : ["通过", "驳回"].includes(request.status) ? "本轮已处理，审批结果与版本留痕保留。" : "技术、财务、市场完成意见后，由PMO确认分级。"}</p>
@@ -233,6 +246,21 @@ function ChangeFormContent() {
                 opinion,
             })}>
                   PMO确认分级
+                </Button>)}
+              {request?.input.type === "成本/资源变更" && request.financeSignoff?.signed && (
+                <Tag color="green">财务已会签：{request.financeSignoff.actor} · {request.financeSignoff.date}</Tag>
+              )}
+              {canFinanceSignoff && (<Button type="primary" ghost onClick={() => {
+                if (!opinion.trim()) { message.error('会签意见必填'); return; }
+                run({ type: "finance-signoff-change", id: request!.id, approve: true, opinion });
+              }}>
+                  财务会签通过
+                </Button>)}
+              {canFinanceSignoff && (<Button danger onClick={() => {
+                if (!opinion.trim()) { message.error('会签意见必填'); return; }
+                run({ type: "finance-signoff-change", id: request!.id, approve: false, opinion });
+              }}>
+                  财务会签驳回
                 </Button>)}
               {request?.status === "待审批" && (<Button type="primary" disabled={!canApprove} onClick={() => setDecision(true)}>
                   通过并追加新基线
