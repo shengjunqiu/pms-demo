@@ -1,13 +1,13 @@
 import { canViewSensitiveField } from '@/mock/configuration-access';
 import { marginReason } from '@/utils/sensitive';
 import { useState } from 'react';
-import { Alert, Button, Card, Col, Descriptions, Drawer, Empty, Progress, Row, Select, Space, Statistic, Table, Tabs, Tag, Timeline, Typography } from 'antd';
+import { Alert, App, Button, Card, Col, Descriptions, Drawer, Empty, Form, Input, InputNumber, Modal, Progress, Row, Select, Space, Statistic, Table, Tabs, Tag, Timeline, Typography } from 'antd';
 import { ArrowRightOutlined, DollarOutlined, FundOutlined, LineChartOutlined } from '@ant-design/icons';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useBusinessStore } from '@/mock/business';
 import { useAppStore } from '@/store/useAppStore';
 import { fourStage, selectFourCalculations, selectReceipts, visibleProjects } from '@/mock/selectors';
-import { mockUsers, mockProcurements, mockOutsources, mockDepartments } from '@/mock';
+import { mockUsers, mockProcurements, mockOutsources, mockDepartments, AS_OF_DATE } from '@/mock';
 import { formatPercent } from '@/utils/money';
 import { StateView } from '@/components/common/StateView';
 import { ProjectQualityPanel } from '@/components/common/ProjectQualityPanel';
@@ -16,6 +16,99 @@ import { ContractLedgerPanel } from '@/pages/execution/ContractLedgerPanel';
 import { ProjectCostPanel } from '@/pages/execution/ProjectCostPanel';
 import { HealthBadge, BusinessStageBadge, DeliveryStageBadge } from '@/components/common/Badges';
 import { MetricStatCard } from '@/components/common/MetricStatCard';
+import type { BusinessState } from '@/mock/business-domain';
+
+function ReceiptsTabContent({ projectId, role, receipt, data }: { projectId: string; role: string; receipt: ReturnType<typeof selectReceipts>; data: BusinessState }) {
+  const { message } = App.useApp();
+  const [showModal, setShowModal] = useState(false);
+  const [contractId, setContractId] = useState<string>();
+  const [sourceNo, setSourceNo] = useState('');
+  const [receivedDate, setReceivedDate] = useState(AS_OF_DATE);
+  const [amount, setAmount] = useState(0);
+  const [evidenceFiles, setEvidenceFiles] = useState('');
+  const [note, setNote] = useState('');
+  const isFinance = role === 'finance';
+  const contracts = data.contracts.filter((c) => c.projectId === projectId);
+  const plans = data.receiptPlans.filter((p) => p.projectId === projectId && (p.amount - p.paidAmount) > 0);
+  const hasConfirmedAcceptance = data.acceptances.some((a) => a.projectId === projectId && a.type === '客户终验' && a.status === '已通过') && data.acceptanceDetails && Object.values(data.acceptanceDetails).some((d) => d.confirmedAt);
+  const openModal = (cId?: string) => {
+    setContractId(cId ?? contracts[0]?.id);
+    setSourceNo('');
+    setReceivedDate(AS_OF_DATE);
+    setAmount(0);
+    setEvidenceFiles('');
+    setNote('');
+    setShowModal(true);
+  };
+  const submitReceipt = () => {
+    try {
+      useBusinessStore.getState().dispatch({
+        type: 'confirm-project-receipt',
+        projectId,
+        contractId: contractId!,
+        sourceNo,
+        receivedDate,
+        allocations: [{ receiptPlanId: plans[0]?.id ?? '', amount }],
+        evidenceFiles: evidenceFiles.split('\n').map((f) => f.trim()).filter(Boolean),
+        note,
+      }, useAppStore.getState().currentUser);
+      message.success('回款已登记');
+      setShowModal(false);
+    } catch (e) {
+      message.error((e as Error).message);
+    }
+  };
+  return <>
+    {hasConfirmedAcceptance && <Alert style={{ marginBottom: 12 }} type="success" showIcon message="客户验收已通过，关联回款计划已就绪，可办理收款。" />}
+    <Space size={24} style={{ marginBottom: 12 }}>
+      <Statistic title="签约金额（万元）" value={receipt.signed} formatter={() => <MoneyText value={receipt.signed} />} />
+      <Statistic title="已收（万元）" value={receipt.paid} formatter={() => <MoneyText value={receipt.paid} />} />
+      <Statistic title="合同剩余应收（万元）" value={receipt.outstanding} formatter={() => <MoneyText value={receipt.outstanding} />} />
+      {isFinance && <Button type="primary" onClick={() => openModal()}>登记回款</Button>}
+    </Space>
+    <Table rowKey="id" size="small" dataSource={receipt.contracts} columns={[
+      { title: '合同编号', dataIndex: 'code' },
+      { title: '合同名称', dataIndex: 'name' },
+      { title: '实收（万元）', dataIndex: 'paidAmount', render: (v: number) => <MoneyText value={v} /> },
+      ...(isFinance ? [{ title: '操作', width: 100, render: (_: unknown, r: (typeof receipt.contracts)[number]) => <Button size="small" onClick={() => openModal(r.id)}>登记回款</Button> }] : []),
+    ]} />
+    <Table rowKey="id" size="small" pagination={false} dataSource={receipt.plans} columns={[
+      { title: '计划编号', dataIndex: 'id' },
+      { title: '回款节点', dataIndex: 'title' },
+      { title: '到期日期', dataIndex: 'dueDate' },
+      { title: '应收（万元）', dataIndex: 'amount', render: (v: number) => <MoneyText value={v} /> },
+      { title: '实收（万元）', dataIndex: 'paidAmount', render: (v: number) => <MoneyText value={v} /> },
+      { title: '状态', width: 110, render: (_: unknown, r: (typeof receipt.plans)[number]) => {
+          if (r.paidAmount >= r.amount) return <Tag color="success">已收清</Tag>;
+          if (hasConfirmedAcceptance) return <Tag color="blue">待收款</Tag>;
+          return <Tag>待验收</Tag>;
+        } },
+    ]} />
+    <Text type="secondary">未签项目的预计收入不计入合同及回款；剩余应收不等同于逾期应收。</Text>
+    <Modal title="登记回款" open={showModal} onCancel={() => setShowModal(false)} onOk={submitReceipt} okButtonProps={{ disabled: !isFinance || !contractId || !sourceNo || !amount }}>
+      <Form layout="vertical">
+        <Form.Item label="收款合同" required>
+          <Select value={contractId} onChange={setContractId} options={contracts.map((c) => ({ value: c.id, label: `${c.code} · ${c.name}` }))} />
+        </Form.Item>
+        <Form.Item label="收款流水编号" required>
+          <Input value={sourceNo} onChange={(e) => setSourceNo(e.target.value)} placeholder="银行回单号等" />
+        </Form.Item>
+        <Form.Item label="到账日期" required>
+          <Input type="date" value={receivedDate} onChange={(e) => setReceivedDate(e.target.value)} />
+        </Form.Item>
+        <Form.Item label="收款金额（万元）" required>
+          <InputNumber min={0.01} precision={2} value={amount} onChange={(v) => setAmount(v ?? 0)} style={{ width: '100%' }} />
+        </Form.Item>
+        <Form.Item label="凭证文件名（每行一份）" required>
+          <Input.TextArea rows={2} value={evidenceFiles} onChange={(e) => setEvidenceFiles(e.target.value)} placeholder="银行回单.pdf" />
+        </Form.Item>
+        <Form.Item label="收款说明" required>
+          <Input.TextArea rows={2} value={note} onChange={(e) => setNote(e.target.value)} />
+        </Form.Item>
+      </Form>
+    </Modal>
+  </>;
+}
 
 type Detail = { title: string; fields: { label: string; value: string }[] };
 const { Text } = Typography;
@@ -187,8 +280,8 @@ export function ProjectOverviewPage() {
     { key: 'supply', label: '采购外包', children: <><Space style={{ marginBottom: 12 }}><Button onClick={() => navigate(`/projects/${p.id}/procurement`)}>进入采购申请与归集</Button><Button onClick={() => navigate(`/projects/${p.id}/outsourcing`)}>进入外包履约与归集</Button><Button onClick={() => navigate(`/projects/${p.id}/expenses`)}>进入项目费用</Button></Space><Table rowKey="id" size="small" dataSource={[...data.costOrders.filter((r) => r.projectId === p.id && r.kind !== 'expense').map((r) => ({ ...r, title: `${r.title} · ${r.supplier}` })), ...mockProcurements.filter((r) => r.projectId === p.id).map((r) => ({ ...r, title: r.supplierName })), ...mockOutsources.filter((r) => r.projectId === p.id).map((r) => ({ ...r, title: r.vendorName }))]} columns={[...baseColumns, { title: '单据金额（万元）', dataIndex: 'amount', render: (v: number) => <MoneyText value={v} /> }]} /></> },
     { key: 'changes', label: '变更', children: <Table rowKey="id" size="small" dataSource={data.changes.filter((c) => c.projectId === p.id)} columns={[...baseColumns, { title: '成本影响（万元）', dataIndex: 'costImpact', render: (v: number) => <MoneyText value={v} signed /> }, { title: '工期影响（天）', dataIndex: 'scheduleImpactDays' }]} /> },
     { key: 'deliverables', label: '交付物', children: <Table rowKey="id" size="small" pagination={false} dataSource={materials} columns={[{ title: '材料', dataIndex: 'name' }, { title: '要求', dataIndex: 'required', render: (required: boolean) => required ? '必交' : '可选' }, { title: '审核状态', dataIndex: 'status', render: marker }]} /> },
-    { key: 'acceptance', label: '验收结算', children: <><Table rowKey="id" size="small" pagination={false} dataSource={acceptances} columns={[{ title: '验收类型', dataIndex: 'type' }, { title: '轮次', dataIndex: 'round' }, { title: '状态', dataIndex: 'status', render: marker }, { title: '确认日期', dataIndex: 'acceptanceDate', render: (v?: string) => v ?? '尚未确认' }]} /><p>建设期成本：{data.lockedProjects.includes(p.id) ? <Tag color="success">已冻结</Tag> : <Tag>未结算</Tag>}</p></> },
-    { key: 'receipts', label: '回款', children: <><Space size={24}><Statistic title="签约金额（万元）" value={receipt.signed} formatter={() => <MoneyText value={receipt.signed} />} /><Statistic title="已收（万元）" value={receipt.paid} formatter={() => <MoneyText value={receipt.paid} />} /><Statistic title="合同剩余应收（万元）" value={receipt.outstanding} formatter={() => <MoneyText value={receipt.outstanding} />} /></Space><Table rowKey="id" size="small" dataSource={receipt.contracts} columns={[{ title: '合同编号', dataIndex: 'code' }, { title: '合同名称', dataIndex: 'name' }, { title: '实收（万元）', dataIndex: 'paidAmount', render: (v: number) => <MoneyText value={v} /> }]} /><Table rowKey="id" size="small" pagination={false} dataSource={receipt.plans} columns={[{ title: '计划编号', dataIndex: 'id' }, { title: '回款节点', dataIndex: 'title' }, { title: '到期日期', dataIndex: 'dueDate' }, { title: '应收（万元）', dataIndex: 'amount', render: (v: number) => <MoneyText value={v} /> }, { title: '实收（万元）', dataIndex: 'paidAmount', render: (v: number) => <MoneyText value={v} /> }]} /><Text type="secondary">未签项目的预计收入不计入合同及回款；剩余应收不等同于逾期应收。</Text></> },
+    { key: 'acceptance', label: '验收结算', children: <><Space wrap style={{ marginBottom: 12 }}><Button type="primary" onClick={() => navigate(`/projects/${p.id}/internal-acceptance`)}>内部初验</Button><Button onClick={() => navigate(`/projects/${p.id}/supplier-acceptance`)}>供应商验收</Button><Button onClick={() => navigate(`/projects/${p.id}/customer-acceptance`)}>客户终验</Button></Space><Table rowKey="id" size="small" pagination={false} dataSource={acceptances} columns={[{ title: '验收类型', dataIndex: 'type' }, { title: '轮次', dataIndex: 'round' }, { title: '状态', dataIndex: 'status', render: marker }, { title: '确认日期', dataIndex: 'acceptanceDate', render: (v?: string) => v ?? '尚未确认' }, { title: '操作', width: 100, render: (_, r) => { const path = r.type === '内部初验' ? 'internal-acceptance' : r.type === '供应商验收' ? 'supplier-acceptance' : 'customer-acceptance'; return <Button size="small" onClick={() => navigate(`/projects/${p.id}/${path}`)}>办理</Button>; } }]} /><p>建设期成本：{data.lockedProjects.includes(p.id) ? <Tag color="success">已冻结</Tag> : <Tag>未结算</Tag>}</p></> },
+    { key: 'receipts', label: '回款', children: <ReceiptsTabContent projectId={p.id} role={role} receipt={receipt} data={data} /> },
     { key: 'contract-ledger', label: '合同台账', children: <ContractLedgerPanel projectId={p.id} /> },
     { key: 'project-cost', label: '项目成本', children: <ProjectCostPanel projectId={p.id} /> },
     { key: 'audit', label: '操作记录', children: <Timeline items={[...data.audit.filter((a) => a.target === p.id).map((a) => ({ children: `${a.date} ${a.actor} · ${a.action}` })), ...data.baselines.filter((b) => b.projectId === p.id).map((b) => ({ children: `${b.createdAt} 基线 ${b.version} · ${b.status} · ${b.scopeDesc}` }))]} /> },

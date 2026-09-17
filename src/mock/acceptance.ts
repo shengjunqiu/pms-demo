@@ -101,7 +101,14 @@ export function applyAcceptanceAction(state: BusinessState, action: AcceptanceAc
     if (!action.proofFiles.length || action.proofFiles.some((f) => !/\.(pdf|docx|jpg|png)$/i.test(f))) throw new Error('必须登记客户签署验收报告/确认函（pdf/docx/jpg/png）');
     if (action.type==='confirm-acceptance' && (!detail.proofFiles.length || JSON.stringify(detail.proofFiles)!==JSON.stringify(action.proofFiles))) throw new Error('须由主PM先登记客户签署证明，PMO按已登记原件确认');
     detail.proofFiles=[...action.proofFiles];
-    if (action.type==='confirm-acceptance') {if (!action.opinion.trim()) throw new Error('确认意见必填'); detail.confirmedAt=AS_OF_DATE;detail.confirmedBy=actor.name;p.subPhase='项目结算';history(detail,'PMO确认客户验收完成',action.opinion);} else history(detail,'登记签署证明',action.proofFiles.join('、'));
+    if (action.type==='confirm-acceptance') {if (!action.opinion.trim()) throw new Error('确认意见必填'); detail.confirmedAt=AS_OF_DATE;detail.confirmedBy=actor.name;p.subPhase='项目结算';history(detail,'PMO确认客户验收完成',action.opinion);
+      // 验收通过联动：将关联回款计划标记为可收款状态（通过更新title添加标识）
+      const confirmedAcceptance = state.acceptances.filter((a) => a.projectId === p.id && a.type === '客户终验' && a.status === '已通过');
+      if (confirmedAcceptance.length === 1) {
+        state.receiptPlans.filter((rp) => rp.projectId === p.id && rp.paidAmount < rp.amount).forEach((rp) => {
+          if (!rp.title.includes('【待收款】')) rp.title = rp.title + '【待收款】';
+        });
+      }} else history(detail,'登记签署证明',action.proofFiles.join('、'));
     state.acceptanceDetails[record.id]=detail;
   } else if (action.type==='save-acceptance-report') {
     if (!pm) throw new Error('仅项目主PM可编制报验');
