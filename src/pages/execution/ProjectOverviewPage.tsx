@@ -15,6 +15,7 @@ import { MoneyText } from '@/components/common/MoneyText';
 import { ContractLedgerPanel } from '@/pages/execution/ContractLedgerPanel';
 import { ProjectCostPanel } from '@/pages/execution/ProjectCostPanel';
 import { HealthBadge, BusinessStageBadge, DeliveryStageBadge } from '@/components/common/Badges';
+import { UnsignedProjectTab } from '@/pages/unsigned/UnsignedProjectTab';
 import { MetricStatCard } from '@/components/common/MetricStatCard';
 import type { BusinessState } from '@/mock/business-domain';
 
@@ -280,7 +281,7 @@ export function ProjectOverviewPage() {
     { key: 'deliverables', label: '交付物', children: <Table rowKey="id" size="small" pagination={false} dataSource={materials} columns={[{ title: '材料', dataIndex: 'name' }, { title: '要求', dataIndex: 'required', render: (required: boolean) => required ? '必交' : '可选' }, { title: '审核状态', dataIndex: 'status', render: marker }]} /> },
     { key: 'acceptance', label: '验收结算', children: <><Space wrap style={{ marginBottom: 12 }}><Button type="primary" onClick={() => navigate(`/projects/${p.id}/internal-acceptance`)}>内部初验</Button><Button onClick={() => navigate(`/projects/${p.id}/supplier-acceptance`)}>供应商验收</Button><Button onClick={() => navigate(`/projects/${p.id}/customer-acceptance`)}>客户终验</Button></Space><Table rowKey="id" size="small" pagination={false} dataSource={acceptances} columns={[{ title: '验收类型', dataIndex: 'type' }, { title: '轮次', dataIndex: 'round' }, { title: '状态', dataIndex: 'status', render: marker }, { title: '确认日期', dataIndex: 'acceptanceDate', render: (v?: string) => v ?? '尚未确认' }, { title: '操作', width: 100, render: (_, r) => { const path = r.type === '内部初验' ? 'internal-acceptance' : r.type === '供应商验收' ? 'supplier-acceptance' : 'customer-acceptance'; return <Button size="small" onClick={() => navigate(`/projects/${p.id}/${path}`)}>办理</Button>; } }]} /><p>建设期成本：{data.lockedProjects.includes(p.id) ? <Tag color="success">已冻结</Tag> : <Tag>未结算</Tag>}</p></> },
     { key: 'receipts', label: '回款', children: <ReceiptsTabContent projectId={p.id} role={role} receipt={receipt} data={data} /> },
-    ...(p.isUnsigned ? [{ key: 'unsigned', label: '未签管控', children: <><Button onClick={() => navigate(`/unsigned-projects/${p.id}`)}>进入未签项目详情</Button><p>此项目尚未签订合同，未签管控详情请点击上方按钮查看。</p></> }] : []),
+    ...(p.isUnsigned ? [{ key: 'unsigned', label: '未签管控', children: <UnsignedProjectTab projectId={p.id} /> }] : []),
     { key: 'contract-ledger', label: '合同台账', children: <ContractLedgerPanel projectId={p.id} /> },
     { key: 'project-cost', label: '项目成本', children: <ProjectCostPanel projectId={p.id} /> },
     { key: 'audit', label: '操作记录', children: <Timeline items={[...data.audit.filter((a) => a.target === p.id).map((a) => ({ children: `${a.date} ${a.actor} · ${a.action}` })), ...data.baselines.filter((b) => b.projectId === p.id).map((b) => ({ children: `${b.createdAt} 基线 ${b.version} · ${b.status} · ${b.scopeDesc}` }))]} /> },
