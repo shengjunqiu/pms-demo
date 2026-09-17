@@ -11,30 +11,29 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { PageSection } from '@/components/common/PageSection';
 import { MetricStatCard } from '@/components/common/MetricStatCard';
 
-type Family = 'quality' | 'risk';
+const ALL_KINDS: TicketKind[] = ['requirement', 'bug', 'issue', 'risk'];
 const finished = (status: string) => ['已关闭', '已缓解', '已转问题'].includes(status);
 const awaiting = (status: string) => ['待验证', '待复测', '已解决'].includes(status);
 
-export function TicketsPage({ family }: { family: Family }) {
+export function TicketsPage() {
   const [params] = useSearchParams();
-  // A new project or type is a new creation context; unfinished form inputs never cross it.
-  return <TicketsContent key={`${family}-${params.get('projectId') ?? params.get('project') ?? ''}-${params.get('kind') ?? ''}`} family={family} />;
+  return <TicketsContent key={`tickets-${params.get('projectId') ?? params.get('project') ?? ''}-${params.get('kind') ?? ''}`} />;
 }
 
-function TicketsContent({ family }: { family: Family }) {
+function TicketsContent() {
   const { canDo } = useActionAccess();
   const { data } = useBusinessStore();
   const { currentRole, currentUser } = useAppStore();
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
-  const kinds: TicketKind[] = family === 'quality' ? ['requirement', 'bug'] : ['issue', 'risk'];
-  const base = family === 'quality' ? '/requirements-bugs' : '/issues-risks';
+  const kinds: TicketKind[] = ALL_KINDS;
+  const base = '/tickets';
   const projectFilter = params.get('projectId') ?? params.get('project');
   const projects = visibleProjects(currentRole, data.projects, data);
   const ids = new Set(projects.map((p) => p.id));
-  const eligibleProjects = projects.filter((p) => !data.lockedProjects.includes(p.id) && (family === 'risk' ? p.pmId === currentUser.id : p.pmId === currentUser.id || p.memberIds?.includes(currentUser.id)) && canDo('create-ticket', p.id));
-  const writers = family === 'quality' ? ['project-manager', 'solution-tech'] : ['project-manager'];
+  const eligibleProjects = projects.filter((p) => !data.lockedProjects.includes(p.id) && (p.pmId === currentUser.id || p.memberIds?.includes(currentUser.id)) && canDo('create-ticket', p.id));
+  const writers = ['project-manager', 'solution-tech'];
   const canCreate = writers.includes(currentRole) && canDo('create-ticket');
   const all = kinds.flatMap((kind) => ticketTable(data, kind).filter((t) => ids.has(t.projectId)).map((t) => ({ ...t, kind, meta: ticketMeta(data, kind, t.id), rank: 'priority' in t ? t.priority : 'severity' in t ? t.severity : t.level })));
   const scope = all.filter((t) => (!projectFilter || t.projectId === projectFilter) && (!params.get('status') || t.status === params.get('status')) && (!params.get('owner') || t.meta.ownerId === params.get('owner')) && (!params.get('rank') || t.rank === params.get('rank')) && (!params.get('search') || `${t.id} ${t.title}`.includes(params.get('search')!)) && (params.get('overdue') !== 'true' || !finished(t.status) && t.meta.deadline < AS_OF_DATE));
@@ -46,8 +45,11 @@ function TicketsContent({ family }: { family: Family }) {
     if (key === 'projectId') next.delete('project');
     next.delete('page'); setParams(next);
   };
+  const activeKind = params.get('kind');
+  const hasRisk = activeKind === 'risk' || (!activeKind && scope.some((t) => t.kind === 'risk'));
+  const hasQuality = activeKind === 'requirement' || activeKind === 'bug' || (!activeKind && scope.some((t) => ['requirement', 'bug'].includes(t.kind)));
   return <>
-    <PageHeader title={family === 'quality' ? '需求与BUG' : '问题与风险'} description={`项目权限范围内的原事项 · 基准日 ${AS_OF_DATE}`} breadcrumbs={[{ title: '首页', href: '/' }, { title: '业务台账' }]} extra={<Button type="primary" disabled={!canCreate || !eligibleProjects.length} onClick={() => setCreating(true)}>新建事项</Button>} />
+    <PageHeader title="事项管理" description={`项目权限范围内的需求/BUG/问题/风险 · 基准日 ${AS_OF_DATE}`} breadcrumbs={[{ title: '首页', href: '/' }, { title: '业务台账' }]} extra={<Button type="primary" disabled={!canCreate || !eligibleProjects.length} onClick={() => setCreating(true)}>新建事项</Button>} />
     <PageSection title="筛选事项">
       <Space wrap>
         <Select aria-label="事项项目" placeholder="全部项目" allowClear showSearch optionFilterProp="label" style={{ width: 250 }} value={projectFilter ?? undefined} options={projects.map((p) => ({ value: p.id, label: p.name }))} onChange={(v) => update('projectId', v)} />
@@ -68,11 +70,11 @@ function TicketsContent({ family }: { family: Family }) {
       <Row gutter={16}>{[
         { title: '当前筛选事项', value: filtered.length },
         { title: '持续处理中', value: filtered.filter((t) => !finished(t.status) && !awaiting(t.status)).length },
-        { title: family === 'quality' ? '待发起人验证' : '待PM确认问题', value: filtered.filter((t) => awaiting(t.status)).length },
+        { title: hasQuality ? '待发起人验证' : '待PM确认问题', value: filtered.filter((t) => awaiting(t.status)).length },
         { title: '超期未结束', value: filtered.filter((t) => !finished(t.status) && t.meta.deadline < AS_OF_DATE).length },
       ].map((metric) => <Col span={6} key={metric.title}><MetricStatCard variant="flat" title={metric.title} value={String(metric.value)} unit="项" /></Col>)}</Row>
     </PageSection>
-    <PageSection title="事项台账" description={family === 'quality' ? '责任人处理，发起人验证关闭；转办保留发起人。' : '问题由主PM最终关闭；风险发生后转问题，原记录保留。'}>
+    <PageSection title="事项台账" description="责任人处理，发起人验证关闭；转办保留发起人。问题由主PM最终关闭；风险发生后转问题，原记录保留。">
       <Tabs activeKey={params.get('kind') ?? 'all'} onChange={(key) => update('kind', key === 'all' ? undefined : key)} items={[{ key: 'all', label: `全部事项（${scope.length}）` }, ...kinds.map((kind) => ({ key: kind, label: `${ticketLabels[kind]}（${scope.filter((t) => t.kind === kind).length}）` }))]} />
       <Table rowKey="id" size="small" dataSource={filtered} scroll={{ x: 1280 }} pagination={{ pageSize: 10, current: Number(params.get('page')) || 1, showSizeChanger: false, onChange: (page) => { const next = new URLSearchParams(window.location.search); next.set('page', String(page)); setParams(next); } }} columns={[
         { title: '编号 / 事项', width: 270, fixed: 'left', render: (_, t) => <Button type="link" style={{ whiteSpace: 'normal', overflowWrap: 'anywhere', textAlign: 'left', display: 'block', height: 'auto', padding: 0 }} onClick={() => navigate(`${base}/${t.id}${window.location.search}`)}><span style={{ fontSize: 12, color: '#64748b' }}>{t.id}</span><div style={{ fontWeight: 600 }}>{t.title}</div></Button> },
@@ -80,15 +82,15 @@ function TicketsContent({ family }: { family: Family }) {
         { title: '类型 / 等级', width: 115, render: (_, t) => <>{ticketLabels[t.kind]}<div><Tag color={['致命', '严重', '重大', '特大'].includes(t.rank) ? 'red' : undefined}>{t.rank}</Tag></div></> },
         { title: '目标时间 / 提醒', width: 170, render: (_, t) => <>{t.meta.deadline}<div style={{ color: !finished(t.status) && t.meta.deadline < AS_OF_DATE ? '#b91c1c' : '#64748b' }}>{finished(t.status) ? t.status : t.meta.deadline < AS_OF_DATE ? '已超期，持续督办' : '按目标跟踪'}</div></> },
         { title: '项目', width: 220, render: (_, t) => <><div style={{ fontSize: 12, color: '#64748b' }}>{t.projectId}</div>{projects.find((p) => p.id === t.projectId)?.name}</> },
-        { title: family === 'quality' ? '跟踪 / 最新进展' : '升级 / 最新进展', width: 260, render: (_, t) => <><Tag>{t.meta.escalatedTo ?? (t.kind === 'risk' && ['重大', '特大'].includes(t.rank) || t.kind === 'issue' && t.rank === '重大' ? 'PMO' : '项目内跟踪')}</Tag><div style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{t.meta.history.at(-1)?.detail}</div></> },
+        { title: '跟踪 / 最新进展', width: 260, render: (_, t) => <><Tag>{t.meta.escalatedTo ?? (t.kind === 'risk' && ['重大', '特大'].includes(t.rank) || t.kind === 'issue' && t.rank === '重大' ? 'PMO' : '项目内跟踪')}</Tag><div style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{t.meta.history.at(-1)?.detail}</div></> },
       ]} />
     </PageSection>
-    <details style={{ color: '#64748b', fontSize: 12 }}><summary style={{ cursor: 'pointer' }}>处理与统计口径</summary><p>摘要取当前全部筛选结果；页签计数沿用项目及其他筛选条件，不含类型筛选。需求按优先级、BUG按严重性跟踪，超期以期望日期计算。</p>{family === 'risk' && <p>演示规则 CASE-1：风险评分=概率×影响，6/12/20分对应中等/重大/特大；重大事项进入PMO视野。问题风险超期1/3/7天依次提示部门负责人/PMO/PMC；已解决问题仍须PM确认。</p>}</details>
-    {creating && <NewTicketModal key={`${currentUser.id}-${family}`} family={family} initialKind={kinds.find((k) => k === params.get('kind')) ?? kinds[0]} initialProjectId={eligibleProjects.find((p) => p.id === projectFilter)?.id ?? eligibleProjects[0]?.id} onCancel={() => setCreating(false)} onCreated={(id) => { setCreating(false); navigate(`${base}/${id}${window.location.search}`); }} />}
+    <details style={{ color: '#64748b', fontSize: 12 }}><summary style={{ cursor: 'pointer' }}>处理与统计口径</summary><p>摘要取当前全部筛选结果；页签计数沿用项目及其他筛选条件，不含类型筛选。需求按优先级、BUG按严重性跟踪，超期以期望日期计算。</p>{hasRisk && <p>演示规则 CASE-1：风险评分=概率×影响，6/12/20分对应中等/重大/特大；重大事项进入PMO视野。问题风险超期1/3/7天依次提示部门负责人/PMO/PMC；已解决问题仍须PM确认。</p>}</details>
+    {creating && <NewTicketModal key={`${currentUser.id}-tickets`} initialKind={kinds.find((k) => k === params.get('kind')) ?? kinds[0]} initialProjectId={eligibleProjects.find((p) => p.id === projectFilter)?.id ?? eligibleProjects[0]?.id} onCancel={() => setCreating(false)} onCreated={(id) => { setCreating(false); navigate(`${base}/${id}${window.location.search}`); }} />}
   </>;
 }
 
-function NewTicketModal({ family, initialKind, initialProjectId, onCancel, onCreated }: { family: Family; initialKind: TicketKind; initialProjectId?: string; onCancel: () => void; onCreated: (id: string) => void }) {
+function NewTicketModal({ initialKind, initialProjectId, onCancel, onCreated }: { initialKind: TicketKind; initialProjectId?: string; onCancel: () => void; onCreated: (id: string) => void }) {
   const { canDo } = useActionAccess();
   const { data, dispatch } = useBusinessStore();
   const { currentRole, currentUser } = useAppStore();
@@ -98,9 +100,9 @@ function NewTicketModal({ family, initialKind, initialProjectId, onCancel, onCre
   const empty = () => ({ title: '', description: '', category: '', rank: '', owner: currentUser.id, deadline: AS_OF_DATE, product: '', impactBaseline: false, probability: 3, impact: 3, measures: '' });
   const [draft, setDraft] = useState(empty);
   const field = <K extends keyof typeof draft>(key: K, value: typeof draft[K]) => setDraft((previous) => ({ ...previous, [key]: value }));
-  const kinds: TicketKind[] = family === 'quality' ? ['requirement', 'bug'] : ['issue', 'risk'];
-  const writers = family === 'quality' ? ['project-manager', 'solution-tech'] : ['project-manager'];
-  const eligible = visibleProjects(currentRole, data.projects, data).filter((p) => !data.lockedProjects.includes(p.id) && (family === 'risk' ? p.pmId === currentUser.id : p.pmId === currentUser.id || p.memberIds?.includes(currentUser.id)) && canDo('create-ticket', p.id));
+  const kinds: TicketKind[] = ALL_KINDS;
+  const writers = ['project-manager', 'solution-tech'];
+  const eligible = visibleProjects(currentRole, data.projects, data).filter((p) => !data.lockedProjects.includes(p.id) && (p.pmId === currentUser.id || p.memberIds?.includes(currentUser.id)) && canDo('create-ticket', p.id));
   const canSubmit = writers.includes(currentRole) && eligible.some((p) => p.id === projectId) && canDo('create-ticket', projectId);
   const ranks = kind === 'requirement' ? ['高', '中', '低'] : kind === 'bug' ? ['致命', '严重', '一般', '轻微'] : ['重大', '重要', '一般'];
   const labelStyle = { display: 'block', marginBottom: 6, fontWeight: 500 };

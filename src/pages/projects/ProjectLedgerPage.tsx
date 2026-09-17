@@ -33,6 +33,7 @@ export function ProjectLedgerPage() {
   const [keyword, setKeyword] = useState('');
   const [phase, setPhase] = useState<string>();
   const [health, setHealth] = useState<string>();
+  const [unsignedOnly, setUnsignedOnly] = useState(false);
 
   const accessibleProjects = useMemo(
     () => data.projects.filter((project) => canAccessProject(data, currentUser, project)),
@@ -45,9 +46,10 @@ export function ProjectLedgerPage() {
       (!normalized || [project.name, project.code, project.customerName, project.pmName, project.departmentName]
         .some((value) => value.toLowerCase().includes(normalized))) &&
       (!phase || project.phase === phase) &&
-      (!health || project.health === health),
+      (!health || project.health === health) &&
+      (!unsignedOnly || project.isUnsigned),
     );
-  }, [accessibleProjects, health, keyword, phase]);
+  }, [accessibleProjects, health, keyword, phase, unsignedOnly]);
 
   const totalAmount = accessibleProjects.reduce((sum, project) => sum + (project.contractAmount || project.revenueAmount || 0), 0);
   const warningCount = accessibleProjects.filter((project) => project.health !== 'green').length;
