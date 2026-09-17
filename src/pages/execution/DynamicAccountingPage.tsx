@@ -1,6 +1,6 @@
 import { canViewSensitiveField } from '@/mock/configuration-access';
 import { useState } from 'react';
-import { Alert, Button, Card, Col, Descriptions, Drawer, Empty, Input, Row, Select, Space, Statistic, Table, Tabs, Tag, Typography } from 'antd';
+import { Alert, Button, Card, Col, Descriptions, Drawer, Empty, Form, Input, InputNumber, message, Modal, Row, Select, Space, Statistic, Table, Tabs, Tag, Typography } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useBusinessStore } from '@/mock/business';
@@ -29,10 +29,13 @@ function DynamicAccountingContent() {
   const [params, setParams] = useSearchParams();
   const data = useBusinessStore((s) => s.data);
   const role = useAppStore((s) => s.currentRole);
+  const currentUser = useAppStore((s) => s.currentUser);
   const showMargin = canViewSensitiveField(data, { role }, 'margin');
   const healthReason = (reason: string) => showMargin ? reason : reason.replace(/毛利[^，。；]*/g, '毛利信息已隐藏');
   const [source, setSource] = useState<CostItem>();
   const [query, setQuery] = useState('');
+  const [forecastOpen, setForecastOpen] = useState(false);
+  const [forecastForm] = Form.useForm();
   const p = data.projects.find((project) => project.id === id);
   if (!p) return <StateView type="404" title="项目不存在" />;
   if (!['executive', 'pmo', 'finance', 'project-manager', 'admin'].includes(role) || !visibleProjects(role, data.projects, data).some((project) => project.id === id)) return <StateView type="403" />;
@@ -46,6 +49,7 @@ function DynamicAccountingContent() {
   const historical = mockCostSnapshots.filter((s) => s.projectId === p.id);
   const current = { projectId: p.id, date: AS_OF_DATE, budget: calc.budget.totalAmount, actual: calc.actual, rolling: calc.rolling };
   const points = [...historical.filter((s) => s.date !== AS_OF_DATE), current];
+  const dispatch = useBusinessStore((s) => s.dispatch);
   const metrics = [
     ['有效预算', calc.budget.totalAmount], ['已发生成本', calc.actual], ['未发生承诺', p.committedCost], ['剩余预测', p.forecastRemainingCost],
     ['实时滚动成本', calc.rolling], ['预测成本偏差', calc.variance], ['预测毛利', calc.grossMargin], ['剩余预算', sumMoney([calc.budget.totalAmount, -calc.actual])],
@@ -66,7 +70,7 @@ function DynamicAccountingContent() {
       <Space wrap size={16}><Text strong>{p.departmentName}</Text><span>项目经理：{p.pmName}</span><Tag color={healthColors[p.health]}>{healthNames[p.health]}</Tag><Tag>预算 {calc.budget.version}</Tag><Tag>科目映射 DEMO-1</Tag><Tag>{p.isUnsigned ? '未签立项' : '合同已签'}</Tag></Space>
       <div style={{ marginTop: 8, color: '#666' }}>滚动 = 已发生 + 未发生承诺 + 剩余预测；实际取已确认凭证，历史基线不回写。单位：万元。</div>
     </Card>
-    <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>{metrics.map(([name, value]) => <Col span={6} key={name}><Card size="small" style={{height:"100%",minHeight:108}}><Statistic title={name} value={value} formatter={() => !showMargin && name === '预测毛利' ? '已隐藏' : <MoneyText value={value} signed={name === '预测成本偏差'} />} valueStyle={{ fontSize: 21, color: name === '预测成本偏差' && value > 0 ? '#cf1322' : undefined }} /></Card></Col>)}</Row>
+    <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>{metrics.map(([name, value]) => <Col span={6} key={name}><Card size="small" style={{height:"100%",minHeight:108}} extra={name === '剩余预测' && role === 'project-manager' && p.phase === '执行' && !data.lockedProjects.includes(p.id) ? <Button size="small" onClick={() => { forecastForm.setFieldsValue({ forecastRemainingCost: p.forecastRemainingCost }); setForecastOpen(true); }}>更新</Button> : undefined}><Statistic title={name} value={value} formatter={() => !showMargin && name === '预测毛利' ? '已隐藏' : <MoneyText value={value} signed={name === '预测成本偏差'} />} valueStyle={{ fontSize: 21, color: name === '预测成本偏差' && value > 0 ? '#cf1322' : undefined }} /></Card></Col>)}</Row>
     <PageToolbar><span>预算执行率：<b>{formatPercent(percentage(calc.actual, calc.budget.totalAmount))}</b></span><span>滚动偏差率：<b>{formatPercent(percentage(calc.variance, calc.budget.totalAmount))}</b></span><span>预测毛利率：<b>{showMargin ? formatPercent(calc.grossMarginRate) : '已隐藏'}</b></span><span>拟签/预计收入：<MoneyText value={calc.income} /> 万元</span></PageToolbar>
     <Alert showIcon type={calc.variance > 0 ? 'warning' : 'success'} message={healthReason(p.healthReason)} description={`演示规则 ${selectAlertRules(data,p).get('cost')?.id??'成本预警已停用'}：滚动偏差达到 ${selectAlertRules(data,p).get('cost')?.warningThreshold??'—'}% 为预警、${selectAlertRules(data,p).get('cost')?.highThreshold??'—'}% 为高风险；点击科目查看构成，判断原因需结合原始凭证。`} style={{ marginBottom: 16 }} />
     <PageSection title="核算分析"><Tabs activeKey={tab} onChange={(key) => update('tab', key)} items={[
@@ -84,6 +88,24 @@ function DynamicAccountingContent() {
       <PageToolbar><Select aria-label="成本科目" allowClear placeholder="全部科目" value={subjectId ?? undefined} onChange={(value) => update('subject', value)} style={{ width: 190 }} options={calc.subjects.map((s) => ({ value: s.subjectId, label: s.subjectName }))} /><Input aria-label="搜索来源凭证" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索来源凭证或摘要" allowClear style={{ width: 230 }} /><Text>{costs.length} 笔 · 合计 <MoneyText value={sumMoney(costs.map((c) => c.amount))} /> 万元</Text></PageToolbar>
       <Table rowKey="id" columns={costColumns} dataSource={costs} size="small" pagination={{ pageSize: 5, showSizeChanger: false }} scroll={{ x: 750 }} locale={{ emptyText: <Empty description="当前科目没有已确认成本" /> }} />
     </Card>
+    <Modal title="更新剩余预测" open={forecastOpen} onCancel={() => setForecastOpen(false)} onOk={async () => { try { const values = await forecastForm.validateFields(); dispatch({ type: 'update-forecast', projectId: p.id, forecastRemainingCost: values.forecastRemainingCost, forecastBySubject: values.forecastBySubject, reason: values.reason }, { id: currentUser.id, name: currentUser.name, role }); setForecastOpen(false); message.success('剩余预测已更新'); } catch (e) { if (e instanceof Error) message.error(e.message); } }} destroyOnClose>
+      <Form form={forecastForm} layout="vertical" initialValues={{ forecastRemainingCost: p.forecastRemainingCost, forecastBySubject: calc.subjects.map((s) => ({ subjectId: s.subjectId, subjectName: s.subjectName, amount: s.remaining })) }}>
+        <Form.Item name="forecastRemainingCost" label="总剩余预测（万元）" rules={[{ required: true, type: 'number', min: 0, message: '请输入非负数' }]}>
+          <InputNumber style={{ width: '100%' }} min={0} precision={2} />
+        </Form.Item>
+        <Form.Item name="reason" label="调整原因" rules={[{ required: true, whitespace: true, message: '请说明调整原因' }]}>
+          <Input.TextArea rows={3} placeholder="例如：客户新增需求预计增加 50 万外包成本" />
+        </Form.Item>
+        <Form.Item label="按科目明细（可选）">
+          <Form.List name="forecastBySubject">
+            {(fields) => <Table size="small" pagination={false} dataSource={fields} rowKey="key" columns={[
+              { title: '科目', dataIndex: 'name', width: 200, render: (_, { key, name, ...rest }) => <Form.Item {...rest} name={[name, 'subjectName']} noStyle><Input disabled /></Form.Item> },
+              { title: '金额（万元）', dataIndex: 'amount', render: (_, { key, name, ...rest }) => <Form.Item {...rest} name={[name, 'amount']} rules={[{ required: true, type: 'number', min: 0, message: '请输入金额' }]}><InputNumber min={0} precision={2} style={{ width: '100%' }} /></Form.Item> },
+            ]} />}
+          </Form.List>
+        </Form.Item>
+      </Form>
+    </Modal>
     <Drawer title="原始成本凭证" open={!!source} onClose={() => setSource(undefined)} width={560}>{source && <>
       <Descriptions bordered column={1} size="small" items={[
         { key: 'project', label: '关联项目', children: `${p.id} ${p.name}` }, { key: 'id', label: '凭证编号', children: source.sourceId },

@@ -45,7 +45,7 @@ import { applyTicketAction, ticketMeta, type TicketAction, type TicketMeta } fro
 import { AS_OF_DATE, mockOpportunities, mockContracts, mockProjects, mockBudgetVersions, mockBaselineVersions, mockIssues, mockRisks, mockBugs, mockDecisions, mockAcceptances, mockCostItems, mockEstimateVersions, mockMilestones, mockSettlements, mockReceiptPlans, mockChanges, mockWbsTasks, mockRequirements, mockDailyReports, mockWeeklyReports } from '@/mock';
 import type { Opportunity, Contract, ContractLedger, ProjectCostOverview, ReceiptPlan, Project, BudgetVersion, BaselineVersion, Issue, Risk, Bug, CostItem, DecisionItem, AcceptanceRecord, EstimateVersion, Milestone, SettlementRecord, ProjectChange, WbsTask, Requirement, DailyReport, WeeklyReport } from '@/models/types';
 import type { UserRole } from '@/store/useAppStore';
-import { allocateMoney, money, percentage } from '@/utils/money';
+import { allocateMoney, money, percentage, sumMoney } from '@/utils/money';
 import { projectEstimate } from '@/mock/versions';
 import { assertConstructionWritable } from '@/mock/construction-lock';
 import { createMockContractLedgers } from '@/mock/contract-ledger';
@@ -160,7 +160,8 @@ export type BusinessAction = AccessConfigurationAction | ReceiptAction | Finance
   | { type: 'risk-to-issue'; id: string; note?: string }
   | { type: 'stage-gate'; projectId: string; ruleSnapshot?:StageSnapshot }
   | { type: 'settle'; projectId: string }
-  | { type: 'confirm-cost'; cost: CostItem; fromCommitment?: boolean; maintenance?: boolean };
+  | { type: 'confirm-cost'; cost: CostItem; fromCommitment?: boolean; maintenance?: boolean }
+  | { type: 'update-forecast'; projectId: string; forecastRemainingCost: number; forecastBySubject?: Record<string, number>; reason: string };
 
 /** Pure transition: validate first and clone, so failed actions never partially update the shared store. */
 export function transition(previous: BusinessState, action: BusinessAction, actor: Actor): BusinessState {
@@ -375,6 +376,22 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     p.phase = action.phase as typeof p.phase;
     p.subPhase = action.subPhase as typeof p.subPhase;
     target = action.projectId;
+  } else if (action.type === 'update-forecast') {
+    const p = project(action.projectId); target = p.id;
+    requireRole('project-manager');
+    if (actor.id !== p.pmId) throw new Error('仅项目主PM可更新剩余预测');
+    if (p.phase !== '执行' || p.status === '已终止' || state.lockedProjects.includes(p.id)) throw new Error('仅执行中未锁定项目可更新预测');
+    if (!Number.isFinite(action.forecastRemainingCost) || action.forecastRemainingCost < 0) throw new Error('剩余预测须为非负数');
+    if (!action.reason.trim()) throw new Error('预测调整原因必填');
+    if (action.forecastBySubject) {
+      const total = sumMoney(Object.values(action.forecastBySubject));
+      if (Math.abs(total - action.forecastRemainingCost) > 0.01) throw new Error('按科目预测合计须等于总剩余预测');
+      p.forecastBySubject = action.forecastBySubject;
+    }
+    p.forecastRemainingCost = action.forecastRemainingCost;
+    p.rollingCost = money(p.actualCost + p.committedCost + p.forecastRemainingCost);
+    p.costVariance = money(p.rollingCost - p.budgetAmount);
+    p.costVarianceRate = percentage(p.costVariance, p.budgetAmount) ?? 0;
   } else if (action.type === 'confirm-cost') {
     requireRole('finance'); const p = project(action.cost.projectId); target = p.id;
     if (!Number.isFinite(action.cost.amount) || action.cost.amount <= 0 || !action.cost.sourceId) throw new Error('成本金额及来源无效');
