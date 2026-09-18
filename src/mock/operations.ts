@@ -136,6 +136,10 @@ export function closeChecks(state: BusinessState, id: string) {
   const receiptSummary = selectReceipts([p], state);
   return [
     {
+      label: "项目处于收尾阶段",
+      ok: p.phase === "收尾",
+    },
+    {
       label: "管理决策事项已办理",
       ok: !state.managementApprovals.some((a) => a.projectId === id && a.status === "待审批"),
     },

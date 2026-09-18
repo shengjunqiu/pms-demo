@@ -12,7 +12,11 @@ export const BUDGET_SUBJECTS=CANONICAL_SUBJECTS.filter(s=>s.id!=='SUB-04');
 export const lineAmount=(line:BudgetLine)=>line.kind==='labor'?money(line.plannedDays*BUDGET_RULE.workingHoursPerDay*(line.hourlyYuan??hourlyRate(line.userId??''))/10000):line.subjectId==='SUB-04-2'&&line.travelDays>0&&line.expenseDailyYuan!==undefined?money(line.travelDays*line.expenseDailyYuan/10000):money(line.amount);
 export function budgetOverruns(budget:BudgetVersion,estimate:EstimateVersion){
  const reasons:string[]=[];if(budget.totalAmount>estimate.totalCost)reasons.push(`总成本超过概算${money(budget.totalAmount-estimate.totalCost)}万元`);
- for(const id of BUDGET_RULE.majorSubjects){const proposed=sumMoney(budget.items.filter(i=>i.subjectId===id).map(i=>i.amount));const limit=sumMoney(estimate.items.filter(i=>i.subjectId===id).map(i=>i.amount));if(proposed>limit*(1+BUDGET_RULE.allowMajorSubjectIncreasePercent/100))reasons.push(`${BUDGET_SUBJECTS.find(s=>s.id===id)?.name}超过概算科目${BUDGET_RULE.allowMajorSubjectIncreasePercent}%阈值`);}
+ const subjectIds=[...BUDGET_RULE.majorSubjects];
+ // SUB-04 期间费用包含子科目（SUB-04-1~4），检查时汇总子科目到父级
+ const sub04Children=budget.items.filter(i=>i.subjectId.startsWith('SUB-04-')).map(i=>i.subjectId);
+ if(sub04Children.length)subjectIds.push('SUB-04');
+ for(const id of subjectIds){const proposed=sumMoney(budget.items.filter(i=>i.subjectId===id||i.subjectId.startsWith(id+'-')).map(i=>i.amount));const limit=sumMoney(estimate.items.filter(i=>i.subjectId===id||i.subjectId.startsWith(id+'-')).map(i=>i.amount));if(proposed>limit*(1+BUDGET_RULE.allowMajorSubjectIncreasePercent/100))reasons.push(`${BUDGET_SUBJECTS.find(s=>s.id===id)?.name??id}超过概算科目${BUDGET_RULE.allowMajorSubjectIncreasePercent}%阈值`);}
  return reasons;
 }
 export function getBudgetDraft(state:BusinessState,id:string):BudgetDraft {

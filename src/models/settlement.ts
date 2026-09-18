@@ -18,7 +18,7 @@ export interface AcceptanceReport {
 
 export interface SettlementSnapshot {
   capturedAt: string; acceptanceId: string; confirmedAt: string; estimateId: string; estimateVersion: string; budgetId: string; budgetVersion: string; baselineId: string;
-  income: number; cost: number; receipts: number; receivable: number; overdue: number; lastRolling: number; lastRollingDate: string;
+  income: number; cost: number; committedCost: number; forecastRemainingCost: number; receipts: number; receivable: number; overdue: number; lastRolling: number; lastRollingDate: string;
   subjects: { subjectId: string; subjectName: string; estimate: number; budget: number; actual: number; rolling: number }[];
   contracts: { id: string; code: string; amount: number; status: string }[];
   receiptPlans: { id: string; contractId: string; amount: number; paidAmount: number; dueDate: string }[];

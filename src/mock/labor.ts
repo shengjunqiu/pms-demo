@@ -58,7 +58,7 @@ export function applyLaborAction(state: BusinessState, action: LaborAction, acto
     if (!action.opinion.trim()) throw new Error('审核意见必填');
     const e = entry!;
     if (action.approve) {
-      limit(e.amount, e.id, false);
+      limit(e.amount, e.id, true);
       if (state.costs.some((c) => c.sourceId === e.id)) throw new Error('工时已计费，不可重复归集');
       p.commitmentBySubject ??= Object.fromEntries(selectFourCalculations(p,state).subjects.map((s) => [s.subjectId,s.committed]));
       const consumed = Math.min(e.amount, p.commitmentBySubject['SUB-01'] ?? 0);

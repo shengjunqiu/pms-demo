@@ -58,7 +58,7 @@ export function applyProjectChangeAction(state:BusinessState,action:ProjectChang
   if(actor.role!=='pmo'||r.status!=='待分级')throw new Error('专业评估齐全后由PMO分级');if(!action.opinion.trim())throw new Error('分级依据必填');r.requiredRole=r.ruleReasons.length?'executive':'pmo';r.status='待审批';r.classifiedBy=actor.name;r.classificationOpinion=action.opinion;summary.status=r.requiredRole==='executive'?'PMC审议中':'PMO审批中';
   state.decisions.push({id:`DEC-${r.id}`,projectId:p.id,projectName:p.name,type:'重大变更审批',title:r.input.title,impactAmount:summary.costImpact,level:r.requiredRole==='executive'?'PMC决策会':'PMO立项会',status:'待决策',targetRoute:`/project-changes/new?changeId=${r.id}`,createdAt:AS_OF_DATE});
  }else if(action.type==='finance-signoff-change'){
-  if(actor.role!=='finance')throw new Error('仅财务可办理会签');if(!['影响评估中','待分级','待审批'].includes(r.status))throw new Error('变更须在评估或审批阶段办理会签');if(!action.opinion.trim())throw new Error('会签意见必填');
+  if(actor.role!=='finance')throw new Error('仅财务可办理会签');if(r.status!=='待审批')throw new Error('变更须在审批阶段办理会签');if(!action.opinion.trim())throw new Error('会签意见必填');
   r.financeSignoff={signed:action.approve,actor:actor.name,date:AS_OF_DATE,opinion:action.opinion};
  }else if(action.type==='review-project-change'){
   if(!action.opinion.trim())throw new Error('审批意见必填');if(['草稿','通过','驳回'].includes(r.status))throw new Error('变更尚未提交或已处理');if(action.approve&&(r.status!=='待审批'||actor.role!==r.requiredRole))throw new Error('须完成评估与分级，并由指定层级审批');if(!action.approve&&!['pmo','executive'].includes(actor.role))throw new Error('仅PMO或集团领导可退回变更');

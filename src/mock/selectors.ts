@@ -4,6 +4,7 @@ import type { BusinessState } from '@/mock/business';
 import type { Project } from '@/models/types';
 import type { UserRole } from '@/store/useAppStore';
 import { allocateMoney, percentage, sumMoney } from '@/utils/money';
+import { CANONICAL_SUBJECTS } from '@/mock/configuration-finance';
 import { projectEstimate } from '@/mock/versions';
 
 export interface ProjectFilter {
@@ -51,7 +52,7 @@ export function selectFourCalculations(project: Project, data: Pick<BusinessStat
   const costs = data.costs.filter((c) => c.projectId === project.id);
   // A project awaiting its first budget still has estimate/cost subjects. Preserve every leaf.
   const subjectIds = [...new Set([...(budget?.items ?? []).map(i=>i.subjectId), ...(estimate?.items ?? []).map(i=>i.subjectId), ...costs.map(i=>i.subjectId), ...Object.keys(project.commitmentBySubject ?? {}), ...Object.keys(project.forecastBySubject ?? {})])];
-  const leafItems = subjectIds.map(subjectId=>({subjectId, subjectName: budget?.items.find(i=>i.subjectId===subjectId)?.subjectName ?? estimate?.items.find(i=>i.subjectId===subjectId)?.subjectName ?? costs.find(i=>i.subjectId===subjectId)?.subjectName ?? subjectId, amount:budget?.items.find(i=>i.subjectId===subjectId)?.amount ?? 0}));
+  const leafItems = subjectIds.map(subjectId=>({subjectId, subjectName: budget?.items.find(i=>i.subjectId===subjectId)?.subjectName ?? estimate?.items.find(i=>i.subjectId===subjectId)?.subjectName ?? costs.find(i=>i.subjectId===subjectId)?.subjectName ?? CANONICAL_SUBJECTS.find(s=>s.id===subjectId)?.name ?? subjectId, amount:budget?.items.find(i=>i.subjectId===subjectId)?.amount ?? 0}));
   const weights = leafItems.map((item) => item.amount);
   const allocationWeights = weights.some((w) => w > 0) ? weights : weights.map(() => 1);
   const committed = project.commitmentBySubject ? leafItems.map((item) => project.commitmentBySubject![item.subjectId] ?? 0) : allocationWeights.length ? allocateMoney(project.committedCost, allocationWeights) : [];
@@ -65,10 +66,10 @@ export function selectFourCalculations(project: Project, data: Pick<BusinessStat
   });
   const actual = sumMoney(costs.map((c) => c.amount));
   const rolling = sumMoney([actual, project.committedCost, project.forecastRemainingCost]);
-  const income = project.revenueAmount ?? project.contractAmount;
+  const income = project.revenueAmount ?? project.contractAmount ?? 0;
   const grossMargin = sumMoney([income, -rolling]);
   return { estimate, budget, settlement, subjects, costs, actual, rolling, income, grossMargin,
-    grossMarginRate: percentage(grossMargin, income), variance: sumMoney([rolling, -(budget?.totalAmount ?? 0)]) };
+    grossMarginRate: percentage(grossMargin, income), variance: sumMoney([rolling, -(budget?.totalAmount ?? 0)]), costVarianceRate: percentage(sumMoney([rolling, -(budget?.totalAmount ?? 0)]), budget?.totalAmount ?? 0) };
 }
 export function selectReceipts(projects: Project[], data: Pick<BusinessState, 'contracts' | 'receiptPlans'> = { contracts: mockContracts, receiptPlans: mockReceiptPlans }) {
   const ids = new Set(projects.filter((p) => !p.isUnsigned).map((p) => p.id));

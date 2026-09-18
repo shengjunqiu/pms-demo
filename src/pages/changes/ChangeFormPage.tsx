@@ -525,7 +525,7 @@ function ChangeFormContent() {
           </Card>
         </Col>
       </Row>
-      <Modal title={decision ? "确认批准并生成新基线" : "确认退回，保留当前生效基线"} open={decision !== undefined} okButtonProps={{ disabled: !canDecide }} onCancel={() => setDecision(undefined)} onOk={() => {
+      <Modal title={decision ? "确认批准并生成新基线" : "确认退回，保留当前生效基线"} open={decision !== undefined} okButtonProps={{ disabled: !canDecide || !opinion.trim() }} onCancel={() => setDecision(undefined)} onOk={() => {
             if (!canDecide || !canDo("review-project-change", request?.id))
                 return;
             if (request &&

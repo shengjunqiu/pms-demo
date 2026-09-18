@@ -624,7 +624,7 @@ export function ConfigurationPage({ kind }: { kind: Kind }) {
         width={880}
         open={!!editing}
         title={`另存新版本 · ${editing?.name ?? ""}`}
-        onClose={() => setEditing(undefined)}
+        onClose={() => { if (form.isFieldsTouched()) { modal.confirm({ title: '放弃未保存修改？', content: '当前修改尚未保存，关闭后将丢失。', onOk: () => setEditing(undefined) }); } else { setEditing(undefined); } } }
         extra={
           <Button type="primary" disabled={!canSave} onClick={save}>
             保存草稿版本

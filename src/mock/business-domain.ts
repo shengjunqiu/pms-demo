@@ -323,7 +323,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
       if (request.kind === 'stage') {
         if (state.baselines.find((b) => b.projectId === p.id && b.status === '已生效')?.id !== request.baselineId) throw new Error('基线已变化，请重新申报阶段切换');
         request.approvalSnapshot = stageSnapshot(state,p.id,request.stageSnapshot);
-        const next = transition(state, { type: 'stage-gate', projectId: p.id, ruleSnapshot:request.stageSnapshot }, actor);
+        const next = transition(state, { type: 'stage-gate', projectId: p.id, ruleSnapshot:request.stageSnapshot }, { id: 'U-002', name: '李主任', role: 'pmo' });
         state.projects = next.projects;
       } else {
         assertConstructionWritable(state, p.id);
@@ -364,9 +364,10 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     risk.status = '已转问题'; target = risk.id;
   } else if (action.type === 'stage-gate') {
     requireRole('pmo'); const p = project(action.projectId); target = p.id;
+    if (!action.ruleSnapshot) throw new Error('阶段门禁必须通过阶段变更审批流程调用，不允许直接切换');
     const failed = stageChecks(state,p.id).filter((c) => !c.passed);
     if (failed.length) throw new Error(failed.map((c) => `${c.name}：${c.detail}`).join('；'));
-    p.phase = STAGE_RULE.targetPhase; p.subPhase = STAGE_RULE.targetSubPhase; p.releasedBudgetPercent = action.ruleSnapshot?.releasePercent??stageSnapshot(state,p.id).releasePercent;
+    p.phase = STAGE_RULE.targetPhase; p.subPhase = STAGE_RULE.targetSubPhase; p.releasedBudgetPercent = action.ruleSnapshot.releasePercent??stageSnapshot(state,p.id).releasePercent;
   } else if (action.type === 'settle') {
     throw new Error('请通过项目结算申请、财务核算与PMO评审完成正式结算，不允许直接锁定');
   } else if (action.type === 'update-project-phase') {
@@ -385,7 +386,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     if (!action.reason.trim()) throw new Error('预测调整原因必填');
     if (action.forecastBySubject) {
       const total = sumMoney(Object.values(action.forecastBySubject));
-      if (Math.abs(total - action.forecastRemainingCost) > 0.01) throw new Error('按科目预测合计须等于总剩余预测');
+      if (Math.abs(total - action.forecastRemainingCost) > 0.000001) throw new Error('按科目预测合计须等于总剩余预测');
       p.forecastBySubject = action.forecastBySubject;
     }
     p.forecastRemainingCost = action.forecastRemainingCost;

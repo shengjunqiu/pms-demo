@@ -17,7 +17,7 @@ import {
   Table,
   Tag,
 } from "antd";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import { useBusinessStore } from "@/mock/business";
 import { useAppStore } from "@/store/useAppStore";
@@ -40,6 +40,7 @@ export function InitiationDecisionPage() {
  const {canDo}=useActionAccess();
   const { id } = useParams();
   const { data, dispatch } = useBusinessStore();
+  const navigate = useNavigate();
   const actor = useAppStore((s) => s.currentUser);
   const { go } = useInitiationNavigation();
   const viewMargin = canViewSensitiveField(data, actor, "margin");
@@ -515,6 +516,10 @@ export function InitiationDecisionPage() {
                       actor,
                     );
                     message.success("决策已记录");
+                    if (result === "通过") {
+                      const createdProject = useBusinessStore.getState().data.projects.find(p => p.opportunityId === app.input.opportunityId);
+                      if (createdProject) navigate(`/projects/${createdProject.id}`);
+                    }
                   } catch (e) {
                     message.error((e as Error).message);
                     return Promise.reject(e);

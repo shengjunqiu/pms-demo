@@ -26,7 +26,7 @@ export function canViewOpportunity(state: BusinessState, o: Opportunity, actor: 
   return isInitiationParticipant(state, actor, o.id) || state.projects.some(p => p.opportunityId === o.id && (p.pmId === actor.id || p.memberIds?.includes(actor.id)));
 }
 export function canManageOpportunity(state: BusinessState, o: Opportunity, actor: Actor) { return actor.role === 'market' && canViewOpportunity(state, o, actor); }
-export function opportunityLocked(state: BusinessState, o: Opportunity) { return ['拟立项', '方案评审中', '已转立项', '已终止'].includes(o.status) || state.estimates.some(e => e.opportunityId === o.id && e.isFrozen); }
+export function opportunityLocked(state: BusinessState, o: Opportunity) { return ['拟立项', '方案评审中', '已转立项', '暂缓', '已终止'].includes(o.status) || state.estimates.some(e => e.opportunityId === o.id && e.isFrozen); }
 export function basicMissing(o: Opportunity, m: OpportunityMeta) { return [!o.name.trim() && '商机名称', !o.customerId && '客户', !o.departmentId && '主办部门', !o.ownerId && '负责人', !(o.estimatedAmount > 0) && '预计金额', !m.source.trim() && '商机来源', !m.projectType.trim() && '项目类型', !m.description.trim() && '业务背景与需求'].filter(Boolean) as string[]; }
 export function assessmentSummary(o: Opportunity, m: OpportunityMeta) {
   const round = m.assessments.at(-1); const rule=round?.ruleSnapshot??OPPORTUNITY_RULE; const opinions = round?.opinions ?? {};
