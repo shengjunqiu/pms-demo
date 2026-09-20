@@ -1,5 +1,5 @@
 import { canAccessProject, type AccessState } from '@/mock/configuration-access';
-import { mockProjects, mockDepartments, mockCustomers, mockContracts, mockCostItems, mockBudgetVersions, mockEstimateVersions, mockSettlements, mockReceiptPlans, AS_OF_DATE } from '@/mock';
+import { mockProjects, mockCustomers, mockContracts, mockCostItems, mockBudgetVersions, mockEstimateVersions, mockSettlements, mockReceiptPlans, AS_OF_DATE } from '@/mock';
 import type { BusinessState } from '@/mock/business';
 import type { Project } from '@/models/types';
 import type { UserRole } from '@/store/useAppStore';

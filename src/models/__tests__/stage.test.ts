@@ -20,6 +20,6 @@ it('实际时间、重大风险、任务与材料在审批时重验，失败原�
  expect(()=>transition(s,approve,pmo)).toThrow(/实际/);expect(s.planRequests[0].reviews).toHaveLength(0);
  s=transition(s,{...approve,approve:false,opinion:'实际时间缺失，退回补齐'},pmo);expect(s.projects[0].phase).toBe('执行');expect(s.planRequests[0].status).toBe('驳回');
  const bad=ready();bad.risks.find((r)=>r.projectId==='P-001')!.level='重大';expect(stageChecks(bad,'P-001').find((c)=>c.key==='quality')?.passed).toBe(false);
- const tasks=ready();tasks.tasks.find((t)=>t.projectId==='P-001')!.progress=50;expect(()=>transition(tasks,{type:'stage-gate',projectId:'P-001'},pmo)).toThrow(/任务/);
+ const tasks=ready();tasks.tasks.find((t)=>t.projectId==='P-001')!.progress=50;expect(()=>transition(tasks,{type:'stage-gate',projectId:'P-001'},pmo)).toThrow('阶段门禁必须通过阶段变更审批流程调用，不允许直接切换');
  const stale=transition(ready(),request,pm);stale.baselines.find((b)=>b.projectId==='P-001'&&b.status==='已生效')!.id='CHANGED';expect(()=>transition(stale,approve,pmo)).toThrow(/基线/);
 });

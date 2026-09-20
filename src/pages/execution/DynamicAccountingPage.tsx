@@ -28,6 +28,7 @@ function DynamicAccountingContent() {
   const { id } = useParams(); const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const data = useBusinessStore((s) => s.data);
+  const dispatch = useBusinessStore((s) => s.dispatch);
   const role = useAppStore((s) => s.currentRole);
   const currentUser = useAppStore((s) => s.currentUser);
   const showMargin = canViewSensitiveField(data, { role }, 'margin');
@@ -49,7 +50,6 @@ function DynamicAccountingContent() {
   const historical = mockCostSnapshots.filter((s) => s.projectId === p.id);
   const current = { projectId: p.id, date: AS_OF_DATE, budget: calc.budget.totalAmount, actual: calc.actual, rolling: calc.rolling };
   const points = [...historical.filter((s) => s.date !== AS_OF_DATE), current];
-  const dispatch = useBusinessStore((s) => s.dispatch);
   const metrics = [
     ['有效预算', calc.budget.totalAmount], ['已发生成本', calc.actual], ['未发生承诺', p.committedCost], ['剩余预测', p.forecastRemainingCost],
     ['实时滚动成本', calc.rolling], ['预测成本偏差', calc.variance], ['预测毛利', calc.grossMargin], ['剩余预算', sumMoney([calc.budget.totalAmount, -calc.actual])],
@@ -99,8 +99,8 @@ function DynamicAccountingContent() {
         <Form.Item label="按科目明细（可选）">
           <Form.List name="forecastBySubject">
             {(fields) => <Table size="small" pagination={false} dataSource={fields} rowKey="key" columns={[
-              { title: '科目', dataIndex: 'name', width: 200, render: (_, { key, name, ...rest }) => <Form.Item {...rest} name={[name, 'subjectName']} noStyle><Input disabled /></Form.Item> },
-              { title: '金额（万元）', dataIndex: 'amount', render: (_, { key, name, ...rest }) => <Form.Item {...rest} name={[name, 'amount']} rules={[{ required: true, type: 'number', min: 0, message: '请输入金额' }]}><InputNumber min={0} precision={2} style={{ width: '100%' }} /></Form.Item> },
+              { title: '科目', dataIndex: 'name', width: 200, render: (_, { name, ...rest }) => <Form.Item {...rest} name={[name, 'subjectName']} noStyle><Input disabled /></Form.Item> },
+              { title: '金额（万元）', dataIndex: 'amount', render: (_, { name, ...rest }) => <Form.Item {...rest} name={[name, 'amount']} rules={[{ required: true, type: 'number', min: 0, message: '请输入金额' }]}><InputNumber min={0} precision={2} style={{ width: '100%' }} /></Form.Item> },
             ]} />}
           </Form.List>
         </Form.Item>
