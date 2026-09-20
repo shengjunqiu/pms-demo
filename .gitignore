@@ -4,3 +4,5 @@ tsconfig.tsbuildinfo
 test-results/
 playwright-report/
 .pms-loop/.lock
+/src/mock/business-init.ts
+/src/models/__tests__/trace.test.ts
