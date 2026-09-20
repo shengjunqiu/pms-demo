@@ -1,4 +1,5 @@
 import { useActionAccess } from "@/hooks/useActionAccess";
+import { useBusinessAction } from "@/hooks/useBusinessAction";
 import { canViewSensitiveField } from "@/mock/configuration-access";
 import { constructionLockReason } from "@/mock/construction-lock";
 import { marginReason } from "@/utils/sensitive";
@@ -21,6 +22,7 @@ function ChangeFormContent() {
     const { data, dispatch } = useBusinessStore(), { currentRole, currentUser } = useAppStore(), navigate = useNavigate(), { message, modal } = App.useApp();
     const { canDo } = useActionAccess();
     const [params, setParams] = useSearchParams();
+    const runAction = useBusinessAction({ successMessage: "原变更事项状态已更新" });
     const request = data.changeRequests.find((r) => r.id === params.get("changeId"));
     const projectId = request?.projectId ?? params.get("projectId") ?? "P-001";
     const p = data.projects.find((p) => p.id === projectId);
@@ -98,19 +100,14 @@ function ChangeFormContent() {
     catch (e) {
         error = (e as Error).message;
     }
-    const run = (action: Parameters<typeof dispatch>[0]) => {
-        if (!canDo(action.type, "id" in action && action.id ? action.id : p.id))
-            return false;
-        try {
-            dispatch(action, useAppStore.getState().currentUser);
-            message.success("原变更事项状态已更新");
-            return true;
-        }
-        catch (e) {
-            message.error((e as Error).message);
-            return false;
-        }
-    };
+    const run = (action: Parameters<typeof dispatch>[0]) =>
+        runAction(
+            () => {
+                dispatch(action, useAppStore.getState().currentUser);
+                return true;
+            },
+            () => canDo(action.type, "id" in action && action.id ? action.id : p.id),
+        );
     const save = () => {
         if (!editableState || !canDo("save-project-change", request?.id ?? p.id))
             return false;

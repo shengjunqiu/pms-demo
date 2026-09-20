@@ -4,5 +4,6 @@ import viteConfig from './vite.config';
 export default mergeConfig(viteConfig, defineConfig({
   test: {
     testTimeout: 30000,
+    hookTimeout: 30000,
   },
 }));

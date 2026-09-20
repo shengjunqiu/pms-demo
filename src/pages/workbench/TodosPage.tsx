@@ -17,6 +17,8 @@ export function TodosPage() {
   const rows = selectTodos(data, currentUser).filter((r) => (!params.get('project') || r.projectId === params.get('project')) && (!params.get('type') || r.type === params.get('type')) && (!params.get('search') || `${r.id} ${r.title}`.includes(params.get('search')!)) && (params.get('due') !== 'overdue' || r.due < AS_OF_DATE) && (params.get('due') !== 'upcoming' || r.due >= AS_OF_DATE && r.due <= dayjs(AS_OF_DATE).add(7, 'day').format('YYYY-MM-DD')));
   const history = params.get('status') === 'done'; const filtered = rows.filter((r) => r.done === history);
   const update = (key: string, value?: string) => { const next = new URLSearchParams(window.location.search); if (value) next.set(key, value); else next.delete(key); next.delete('page'); setParams(next); };
+  // 🔵6 空态引导：区分“筛选过严”与“确实无待办”，并给出可达去向
+  const hasFilters = ['project', 'type', 'due', 'search'].some((k) => params.get(k));
   return <><PageHeader title="WK-02 我的待办中心" description={`${currentUser.name} · ${AS_OF_DATE} · 原业务状态实时聚合`} breadcrumbs={[{ title: '首页', href: '/' }, { title: '我的待办' }]} />
     <PageSection className="pms-record-summary"><Row gutter={16}>{[
       {title:'当前筛选待办',value:rows.filter(r=>!r.done).length},
@@ -32,6 +34,16 @@ export function TodosPage() {
       { title: '业务类型 / 当前节点', width: 180, render: (_, r) => <>{r.type}<div>{r.node}</div></> }, { title: '责任人', width: 90, dataIndex: 'owner' },
       { title: '到期 / 状态', width: 180, render: (_, r) => <><span className="font-mono text-xs">{r.due}</span><div><Tag color={!r.done && r.due < AS_OF_DATE ? 'error' : 'blue'}>{r.status}{!r.done && r.due < AS_OF_DATE ? ' · 已超期' : ''}</Tag></div></> },
       { title: '办理意见', width: 170, render: (_, r) => r.opinion ?? '尚无办理意见' }, { title: '原业务', width: 120, fixed: 'right', render: (_, r) => <Button type="link" size="small" onClick={() => navigate(r.route)}>进入原业务</Button> },
-    ]} /></PageSection><details style={{color:"#64748b",fontSize:12}}><summary style={{cursor:"pointer"}}>到期与会签口径</summary>    <p>演示规则 TODO-1：配置审批按提交快照节点时限，普通审批为提交后3天，任务使用计划截止日；超期在此提醒，不发送外部通知。会签中本人已处理节点进入已办，原单仍等待其他节点。</p></details>
+    ]} locale={{ emptyText: history ? (
+      <div style={{ padding: '24px 0', color: '#64748b' }}>暂无已办记录：您会签处理过的节点会在此留痕。</div>
+    ) : (
+      <div style={{ padding: '16px 0' }}>
+        <div style={{ color: '#64748b', marginBottom: 12 }}>{hasFilters ? '筛选条件下无待办：可重置筛选查看全部事项。' : '当前角色暂无待办：无需您处理的审批与办理节点，可前往项目台账查看进展。'}</div>
+        <Space>
+          {hasFilters && <Button size="small" onClick={() => setParams({})}>重置筛选</Button>}
+          <Button type="primary" size="small" onClick={() => navigate('/projects')}>前往项目台账</Button>
+        </Space>
+      </div>
+    ) } } /></PageSection><details style={{color:"#64748b",fontSize:12}}><summary style={{cursor:"pointer"}}>到期与会签口径</summary>    <p>演示规则 TODO-1：配置审批按提交快照节点时限，普通审批为提交后3天，任务使用计划截止日；超期在此提醒，不发送外部通知。会签中本人已处理节点进入已办，原单仍等待其他节点。</p></details>
   </>;
 }

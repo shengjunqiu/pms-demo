@@ -1,9 +1,9 @@
 import { useActionAccess } from "@/hooks/useActionAccess";
+import { useBusinessAction } from "@/hooks/useBusinessAction";
 import { canViewSensitiveField } from "@/mock/configuration-access";
 import { useState } from "react";
 import {
   Alert,
-  App,
   Button,
   Card,
   Col,
@@ -57,13 +57,13 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
   const { data, dispatch } = useBusinessStore();
   const { currentRole, currentUser } = useAppStore();
   const { canDo } = useActionAccess();
+  const runAction = useBusinessAction({ successMessage: "结算原单与状态已更新" });
   const viewMargin = canViewSensitiveField(data, currentUser, "margin");
   const hiddenMargin = "毛利字段无查看权限";
   const displayText = (value?: string) =>
     !viewMargin && /毛利|gross.?margin/i.test(value ?? "")
       ? hiddenMargin
       : value;
-  const { message } = App.useApp();
   const [edit, setEdit] = useState(false);
   const [note, setNote] = useState("");
   const [files, setFiles] = useState("");
@@ -132,18 +132,14 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
     finance && !frozen && canDo("resolve-settlement-source", p.id);
   const canDispose =
     finance && !frozen && canDo("dispose-settlement-balance", p.id);
-  const run = (action: SettlementAction) => {
-    if (!canDo(action.type, "id" in action ? (action.id ?? p.id) : p.id))
-      return false;
-    try {
-      dispatch(action, actor);
-      message.success("结算原单与状态已更新");
-      return true;
-    } catch (e) {
-      message.error((e as Error).message);
-      return false;
-    }
-  };
+  const run = (action: SettlementAction) =>
+    runAction(
+      () => {
+        dispatch(action, actor);
+        return true;
+      },
+      () => canDo(action.type, "id" in action ? (action.id ?? p.id) : p.id),
+    );
   const beginEdit = () => {
     if (!canEdit) return;
     setNote(

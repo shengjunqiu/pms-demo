@@ -1,8 +1,8 @@
 import { useActionAccess } from "@/hooks/useActionAccess";
+import { useBusinessAction } from "@/hooks/useBusinessAction";
 import { useState } from "react";
 import {
   Alert,
-  App,
   Button,
   Card,
   Col,
@@ -40,7 +40,7 @@ export function ArchivePage() {
   const { data, dispatch } = useBusinessStore();
   const { currentRole, currentUser } = useAppStore();
   const { canDo } = useActionAccess();
-  const { message } = App.useApp();
+  const runAction = useBusinessAction({ successMessage: "项目正式档案状态已更新" });
   const [upload, setUpload] = useState(false);
   const [category, setCategory] = useState<ArchiveCategory>("方案");
   const [sourceId, setSourceId] = useState<string>();
@@ -81,17 +81,14 @@ export function ArchivePage() {
     settled &&
     checks.every((c) => c.passed) &&
     canDo("confirm-project-archive", p.id);
-  const run = (action: CloseoutAction) => {
-    if (!canDo(action.type, "id" in action ? action.id : p.id)) return false;
-    try {
-      dispatch(action, actor);
-      message.success("项目正式档案状态已更新");
-      return true;
-    } catch (e) {
-      message.error((e as Error).message);
-      return false;
-    }
-  };
+  const run = (action: CloseoutAction) =>
+    runAction(
+      () => {
+        dispatch(action, actor);
+        return true;
+      },
+      () => canDo(action.type, "id" in action ? action.id : p.id),
+    );
   const setParam = (key: string, value?: string) => {
     const next = new URLSearchParams(params);
     if (value) next.set(key, value);

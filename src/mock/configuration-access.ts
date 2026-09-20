@@ -13,7 +13,7 @@ export type AccessState=Pick<BusinessState,'projects'|'projectTeams'|'opportunit
 const ids=(prefix:string,numbers:number[])=>numbers.map(n=>`${prefix}-${String(n).padStart(2,'0')}`);
 const range=(end:number)=>Array.from({length:end},(_,i)=>i+1);
 export const SENSITIVE_FIELD_LABELS:Record<SensitiveField,string>={'labor-rate':'人员成本单价',margin:'毛利与收益',evaluation:'经营评价与绩效',contact:'联系方式'};
-const execution=['update-task','request-plan','create-ticket','update-ticket','close-issue','close-bug','risk-to-issue','submit-labor','save-daily','create-weekly','save-weekly','submit-cost-order','document-action','quality-plan','quality-check','complete-milestone'];
+const execution=['update-task','request-plan','create-ticket','update-ticket','risk-to-issue','submit-labor','save-daily','create-weekly','save-weekly','submit-cost-order','document-action','quality-plan','quality-check','complete-milestone'];
 const initiation=['save-initiation','submit-initiation'];
 const operations=['submit-operation-cost','activate-operation','configure-operation','save-operation-handover','accept-operation-handover','record-operation-event','resolve-operation-event','renew-operation','exit-operation','confirm-project-close'];
 const defaultActions:Record<UserRole,string[]>={

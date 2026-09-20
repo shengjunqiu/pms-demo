@@ -1,4 +1,5 @@
 import { useActionAccess } from "@/hooks/useActionAccess";
+import { useBusinessAction } from "@/hooks/useBusinessAction";
 import { useState } from "react";
 import {
   Alert,
@@ -36,6 +37,7 @@ export function OperationsPage() {
   const { currentRole, currentUser } = useAppStore();
   const { canDo, canEditField } = useActionAccess();
   const { message } = App.useApp();
+  const runAction = useBusinessAction({ successMessage: "已更新运维状态" });
   const [modal, setModal] = useState<
     "event" | "cost" | "renew" | "exit" | "resolve" | "config" | "reject"
   >();
@@ -106,25 +108,19 @@ export function OperationsPage() {
       confirm: false,
     });
   };
-  const run = (action: OperationsAction) => {
-    if (
-      !canDo(
-        action.type,
-        "operationId" in action
-          ? action.operationId
-          : "id" in action
-            ? action.id
-            : p.id,
-      )
-    )
-      return;
-    try {
-      dispatch(action, actor);
-      message.success("已更新运维状态");
-    } catch (e) {
-      message.error((e as Error).message);
-    }
-  };
+  const run = (action: OperationsAction) =>
+    runAction(
+      () => dispatch(action, actor),
+      () =>
+        canDo(
+          action.type,
+          "operationId" in action
+            ? action.operationId
+            : "id" in action
+              ? action.id
+              : p.id,
+        ),
+    );
   const submit = async () => {
     if (!canSubmitModal) return;
     try {

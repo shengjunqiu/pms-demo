@@ -1,4 +1,5 @@
 import { useActionAccess } from '@/hooks/useActionAccess';
+import { useBusinessAction } from '@/hooks/useBusinessAction';
 import { canViewSensitiveField } from "@/mock/configuration-access";
 import { configuredApprovalTimeout } from "@/mock/configuration";
 import { canViewInitiation } from "@/mock/initiation";
@@ -84,6 +85,7 @@ export function InitiationDecisionPage() {
   const [costDisposition, setCostDisposition] = useState("");
   const [trackingOwnerId, setTrackingOwnerId] = useState("");
   const { message, modal } = App.useApp();
+  const run = useBusinessAction();
   if (!app) {
     return (
       <StateView
@@ -107,14 +109,6 @@ export function InitiationDecisionPage() {
         <Alert message="请先提交申请并完成风险报告" />
       </>
     );
-  const run = (fn: () => void) => {
-    try {
-      fn();
-      message.success("办理已记录");
-    } catch (e) {
-      message.error((e as Error).message);
-    }
-  };
   const ended = ["通过", "整改", "否决", "暂缓"].includes(round.status);
   const approval = round.approvalProgress;
   const activeNode = approval?.snapshot.nodes[approval.node];

@@ -155,8 +155,6 @@ export type BusinessAction = AccessConfigurationAction | ReceiptAction | Finance
   | { type: 'update-task'; id: string; progress: number; actualStartDate: string; actualEndDate?: string; note: string }
   | { type: 'request-plan'; projectId: string; kind: 'schedule' | 'stage'; reason: string; shiftDays: number; sourceRequirementId?: string }
   | { type: 'review-plan'; id: string; approve: boolean; opinion: string }
-  | { type: 'close-issue'; id: string }
-  | { type: 'close-bug'; id: string }
   | { type: 'risk-to-issue'; id: string; note?: string }
   | { type: 'stage-gate'; projectId: string; ruleSnapshot?:StageSnapshot }
   | { type: 'settle'; projectId: string }
@@ -322,7 +320,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     if (action.approve && allPassed) {
       if (request.kind === 'stage') {
         if (state.baselines.find((b) => b.projectId === p.id && b.status === '已生效')?.id !== request.baselineId) throw new Error('基线已变化，请重新申报阶段切换');
-        request.approvalSnapshot = stageSnapshot(state,p.id,request.stageSnapshot);
+        request.approvalSnapshot = stageSnapshot(state,p.id,request.stageSnapshot,request.stageSnapshot&&{targetPhase:request.stageSnapshot.targetPhase,targetSubPhase:request.stageSnapshot.targetSubPhase});
         const next = transition(state, { type: 'stage-gate', projectId: p.id, ruleSnapshot:request.stageSnapshot }, { id: 'U-002', name: '李主任', role: 'pmo' });
         state.projects = next.projects;
       } else {
@@ -340,16 +338,6 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
       }
     }
     request.status = !action.approve ? '驳回' : allPassed ? '通过' : '待审批'; request.opinion = action.opinion; request.reviewedAt = AS_OF_DATE;
-  } else if (action.type === 'close-issue') {
-    const issue = state.issues.find((i) => i.id === action.id);
-    if (!issue) throw new Error('问题不存在');
-    requireRole('project-manager');
-    if (actor.id !== project(issue.projectId).pmId || issue.status !== '已解决') throw new Error('问题解决后仅主PM可最终关闭');
-    issue.status = '已关闭'; target = issue.id;
-  } else if (action.type === 'close-bug') {
-    const bug = state.bugs.find((b) => b.id === action.id);
-    if (!bug || bug.status !== '待复测' || bug.creator !== actor.name) throw new Error('仅发起人复测确认后可关闭BUG');
-    bug.status = '已关闭'; target = bug.id;
   } else if (action.type === 'risk-to-issue') {
     const risk = state.risks.find((r) => r.id === action.id);
     if (!risk || risk.status !== '监控中') throw new Error('风险不存在或已处理');
@@ -365,9 +353,9 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
   } else if (action.type === 'stage-gate') {
     requireRole('pmo'); const p = project(action.projectId); target = p.id;
     if (!action.ruleSnapshot) throw new Error('阶段门禁必须通过阶段变更审批流程调用，不允许直接切换');
-    const failed = stageChecks(state,p.id).filter((c) => !c.passed);
+    const failed = stageChecks(state,p.id,{targetPhase:action.ruleSnapshot.targetPhase,targetSubPhase:action.ruleSnapshot.targetSubPhase}).filter((c) => !c.passed);
     if (failed.length) throw new Error(failed.map((c) => `${c.name}：${c.detail}`).join('；'));
-    p.phase = STAGE_RULE.targetPhase; p.subPhase = STAGE_RULE.targetSubPhase; p.releasedBudgetPercent = action.ruleSnapshot.releasePercent??stageSnapshot(state,p.id).releasePercent;
+    p.phase = action.ruleSnapshot.targetPhase ?? STAGE_RULE.targetPhase; p.subPhase = (action.ruleSnapshot.targetSubPhase ?? STAGE_RULE.targetSubPhase) as typeof p.subPhase; p.releasedBudgetPercent = action.ruleSnapshot.releasePercent??stageSnapshot(state,p.id).releasePercent;
   } else if (action.type === 'settle') {
     throw new Error('请通过项目结算申请、财务核算与PMO评审完成正式结算，不允许直接锁定');
   } else if (action.type === 'update-project-phase') {

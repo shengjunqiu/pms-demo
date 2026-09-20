@@ -79,15 +79,8 @@ describe('审批、权限及成本锁定', () => {
     expect(result.projects[0].budgetAmount).toBe(original.projects[0].budgetAmount);
     expect(original.approvals).toHaveLength(0);
   });
-  it('BUG仅发起人确认，问题仅所属主PM关闭，风险转问题保留来源且防重复', () => {
+  it('风险转问题保留来源且防重复', () => {
     let state = createBusinessState();
-    state.issues[0].status = '已解决';
-    expect(() => transition(state, { type: 'close-issue', id: state.issues[0].id }, leader)).toThrow('角色');
-    state = transition(state, { type: 'close-issue', id: state.issues[0].id }, pm);
-    expect(state.issues[0].status).toBe('已关闭');
-    expect(() => transition(state, { type: 'close-bug', id: state.bugs[0].id }, pm)).toThrow('发起人');
-    state = transition(state, { type: 'close-bug', id: state.bugs[0].id }, { ...pm, name: state.bugs[0].creator });
-    expect(state.bugs[0].status).toBe('已关闭');
     const riskId = state.risks[0].id;
     state = transition(state, { type: 'risk-to-issue', id: riskId }, pm);
     expect(state.risks[0].status).toBe('已转问题');

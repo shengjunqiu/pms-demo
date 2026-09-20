@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { useBusinessStore } from '@/mock/store';
 import { useAppStore } from '@/store/useAppStore';
 import { useActionAccess } from '@/hooks/useActionAccess';
+import { useBusinessAction } from '@/hooks/useBusinessAction';
+import { ReviewManagementConfirm } from '@/components/common/ReviewManagementConfirm';
 import { MoneyText } from '@/components/common/MoneyText';
 import { AS_OF_DATE } from '@/mock';
 import { canManageUnsigned, unsignedSummary, type ContractRegistration } from '@/mock/unsigned';
@@ -16,6 +18,7 @@ import { canManageUnsigned, unsignedSummary, type ContractRegistration } from '@
  */
 export function UnsignedProjectTab({ projectId }: { projectId: string }) {
   const { canDo } = useActionAccess();
+  const run = useBusinessAction();
   const { data, dispatch } = useBusinessStore();
   const actor = useAppStore(s => s.currentUser);
   const go = useNavigate();
@@ -35,6 +38,7 @@ export function UnsignedProjectTab({ projectId }: { projectId: string }) {
   const [registration, setRegistration] = useState<ContractRegistration>({ code: '', name: '', amount: 0, signDate: AS_OF_DATE, acceptanceDueDate: '', source: '', attachment: '', receiptPlans: [] });
   const [registerNew, setRegisterNew] = useState(true);
   const [exit, setExit] = useState({ reason: '', resources: '', recoverableAssets: '', responsibility: '', recommendation: '', terminated: true, reactivationPossible: false });
+  const [reviewConfirm, setReviewConfirm] = useState<{ id: string; approve: boolean }>();
 
   if (!p) return <Alert type="error" message="项目不存在" />;
   const manage = canManageUnsigned(data, p, actor);
@@ -42,8 +46,8 @@ export function UnsignedProjectTab({ projectId }: { projectId: string }) {
   const control = s.control;
   const writable = p.isUnsigned && !control.exit?.terminated;
   const approvals = data.managementApprovals.filter(a => a.projectId === p.id && a.type === '未签额外投入');
-  const run = (fn: () => void) => { try { fn(); message.success('办理已记录'); } catch (e) { message.error((e as Error).message); } };
   const confirmAction = (title: string, fn: () => void, allowed: () => boolean) => modal.confirm({ title, content: '请核对原始业务依据，提交后保留办理记录。', onOk: () => { try { if (!allowed()) throw new Error('当前策略不允许此操作'); fn(); message.success('办理已记录'); } catch (e) { message.error((e as Error).message); return; } } });
+  const pendingReview = reviewConfirm ? data.managementApprovals.find(a => a.id === reviewConfirm.id) : undefined;
 
   const summaryItems = [
     { key: 'state', label: '合同状态', children: p.isUnsigned ? <Tag color="orange">未签</Tag> : <Tag color="green">已签转换</Tag> },
@@ -151,8 +155,8 @@ export function UnsignedProjectTab({ projectId }: { projectId: string }) {
               { title: '办理', render: (_, a) => <Space>
                 <Button type="link" onClick={() => go(`/management-approvals/${a.id}`)}>原审批</Button>
                 {actor.role === 'executive' && a.status === '待审批' && <>
-                  <Button disabled={!canDo('review-management', a.id)} onClick={() => confirmAction('批准当前额度申请？', () => dispatch({ type: 'review-management', id: a.id, approve: true, opinion }, actor), () => canDo('review-management', a.id))}>批准</Button>
-                  <Button danger disabled={!canDo('review-management', a.id)} onClick={() => confirmAction('驳回当前额度申请？', () => dispatch({ type: 'review-management', id: a.id, approve: false, opinion }, actor), () => canDo('review-management', a.id))}>驳回</Button>
+                  <Button disabled={!canDo('review-management', a.id)} onClick={() => setReviewConfirm({ id: a.id, approve: true })}>批准</Button>
+                  <Button danger disabled={!canDo('review-management', a.id)} onClick={() => setReviewConfirm({ id: a.id, approve: false })}>驳回</Button>
                 </>}
               </Space>},
             ]} />
@@ -268,6 +272,7 @@ export function UnsignedProjectTab({ projectId }: { projectId: string }) {
         description={<details><summary style={{ cursor: 'pointer' }}>投入管控口径与授权规则</summary>{`规则 ${control.ruleVersion}。费用及工时原始凭证形成实际投入，不允许手工覆盖成本；更新跟进不能自动延长投入授权。`}</details>}
       />
       <Tabs defaultActiveKey="follow" items={tabItems} />
+      <ReviewManagementConfirm open={!!reviewConfirm} approve={reviewConfirm?.approve === true} approvalId={reviewConfirm?.id ?? ''} opinion={opinion} reason={pendingReview?.reason} onClose={() => setReviewConfirm(undefined)} />
     </>
   );
 }

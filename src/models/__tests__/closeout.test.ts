@@ -355,12 +355,16 @@ describe("后评价与正式归档", () => {
     const original = structuredClone(s.projectArchives["P-008"]);
     const issue = s.issues.find((i) => i.projectId === "P-008")!;
     expect(() =>
-      transition(s, { type: "close-issue", id: issue.id }, pm),
+      transition(
+        s,
+        { type: "update-ticket", kind: "issue", id: issue.id, operation: "feedback", note: "归档后跟踪" },
+        pm,
+      ),
     ).toThrow("归档");
     expect(() =>
       transition(
         s,
-        { type: "close-issue", id: issue.id },
+        { type: "update-ticket", kind: "issue", id: issue.id, operation: "feedback", note: "归档后跟踪" },
         { id: "ADMIN", name: "管理员", role: "admin" },
       ),
     ).toThrow("归档");

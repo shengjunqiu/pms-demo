@@ -1,6 +1,6 @@
 import { useActionAccess } from '@/hooks/useActionAccess';
 import { useState } from 'react';
-import { Alert, App, Button, Card, Descriptions, Input, Modal, Space, Tag } from 'antd';
+import { Alert, App, Button, Card, Descriptions, Input, Space, Tag } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useBusinessStore } from '@/mock/store';
 import { useAppStore } from '@/store/useAppStore';
@@ -8,11 +8,12 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { StateView } from '@/components/common/StateView';
 import { MoneyText } from '@/components/common/MoneyText';
 import { visibleProjects } from '@/mock/selectors';
+import { ReviewManagementConfirm } from '@/components/common/ReviewManagementConfirm';
 
 export function ManagementApprovalPage() {
   const { canDo } = useActionAccess();
   const { id } = useParams(); const navigate = useNavigate(); const { message } = App.useApp();
-  const { data, dispatch } = useBusinessStore(); const { currentRole, currentUser } = useAppStore();
+  const { data } = useBusinessStore(); const { currentRole } = useAppStore();
   const [opinion, setOpinion] = useState(''); const [decision, setDecision] = useState<boolean>();
   const approval = data.managementApprovals.find((a) => a.id === id);
   if (!approval) return <StateView type="404" />;
@@ -38,9 +39,6 @@ export function ManagementApprovalPage() {
     </Card>
     <Alert type="info" showIcon message={approval.proposedQuota ? '通过后仅增加未签投入额度，实际成本须另行确认。' : '通过表示同意组织上述协调或复核；风险关闭、客户终验和结算生效仍遵循各自原流程。'} />
     {approval.status === '待审批' && <Card size="small" title="审批意见" style={{ marginTop: 16 }}><Input.TextArea aria-label="审批意见" rows={3} maxLength={500} value={opinion} disabled={!permitted} onChange={(e) => setOpinion(e.target.value)} /><Space style={{ marginTop: 12 }}><Button type="primary" disabled={!permitted} onClick={() => opinion.trim() ? setDecision(true) : message.error('请填写审批意见')}>同意申请</Button><Button danger disabled={!permitted} onClick={() => opinion.trim() ? setDecision(false) : message.error('请填写审批意见')}>驳回申请</Button>{!permitted && <span>当前角色只读；须集团领导审批。</span>}</Space></Card>}
-    <Modal title={decision ? '确认同意申请' : '确认驳回申请'} open={decision !== undefined} okButtonProps={{disabled:!permitted}} onCancel={() => setDecision(undefined)} onOk={() => {
-      if(!permitted || !canDo('review-management',approval.id)) return;
-      try { dispatch({ type: 'review-management', id: approval.id, approve: decision!, opinion }, { id: currentUser.id, name: currentUser.name, role: currentRole }); setDecision(undefined); message.success('审批已记录，待决策事项已联动'); } catch (error) { message.error((error as Error).message); }
-    }}><p>{approval.reason}</p><p>审批意见：{opinion}</p></Modal>
+    <ReviewManagementConfirm open={decision !== undefined} approve={decision === true} approvalId={approval.id} opinion={opinion} reason={approval.reason} onClose={() => setDecision(undefined)} />
   </>;
 }

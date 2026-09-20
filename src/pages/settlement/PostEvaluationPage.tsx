@@ -1,8 +1,8 @@
 import { useActionAccess } from "@/hooks/useActionAccess";
+import { useBusinessAction } from "@/hooks/useBusinessAction";
 import { useState } from "react";
 import {
   Alert,
-  App,
   Button,
   Card,
   Col,
@@ -42,7 +42,7 @@ export function PostEvaluationPage() {
   const { data, dispatch } = useBusinessStore();
   const { currentRole, currentUser } = useAppStore();
   const { canDo, canEditField } = useActionAccess();
-  const { message } = App.useApp();
+  const runAction = useBusinessAction({ successMessage: "后评价原任务已更新" });
   const [draft, setDraft] = useState<PostEvaluation>();
   const [person, setPerson] = useState<string>();
   const [templateRow, setTemplateRow] = useState<string>();
@@ -105,22 +105,19 @@ export function PostEvaluationPage() {
     !archive &&
     e?.status === "待确认" &&
     canDo("confirm-post-evaluation", p.id);
-  const run = (action: CloseoutAction) => {
-    if (!canDo(action.type, p.id)) return false;
-    if (
-      ["save-post-evaluation", "score-post-evaluation"].includes(action.type) &&
-      !canEditField("evaluation")
-    )
-      return false;
-    try {
-      dispatch(action, actor);
-      message.success("后评价原任务已更新");
-      return true;
-    } catch (err) {
-      message.error((err as Error).message);
-      return false;
-    }
-  };
+  const run = (action: CloseoutAction) =>
+    runAction(
+      () => {
+        dispatch(action, actor);
+        return true;
+      },
+      () =>
+        canDo(action.type, p.id) &&
+        !(
+          ["save-post-evaluation", "score-post-evaluation"].includes(action.type) &&
+          !canEditField("evaluation")
+        ),
+    );
   const save = (submit: boolean) => {
     if (!canEdit || !viewEvaluation || !draft) return;
     if (

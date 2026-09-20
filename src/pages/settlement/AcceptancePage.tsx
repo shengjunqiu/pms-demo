@@ -245,7 +245,13 @@ export function AcceptancePage({ kind }: { kind: AcceptanceType }) {
         if (next) setParam("record", next.id);
       }
       setOperation(undefined);
-      message.success("验收原单已更新，历史轮次保留");
+      if (action.type === "confirm-acceptance" && kind === "客户终验") {
+        // 🔵4 链路关键节点成功后导向：客户终验确认→结算申请（JS-05，项目经理可达）
+        message.success("客户终验已确认，可发起结算申请");
+        navigate(`/projects/${p.id}/settlement/apply`);
+      } else {
+        message.success("验收原单已更新，历史轮次保留");
+      }
     } catch (e) {
       message.error((e as Error).message);
     }

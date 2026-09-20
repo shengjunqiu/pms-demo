@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
 import { createBusinessState, transition } from '@/mock/business-domain';
-import { stageChecks } from '@/mock/stage';
+import { stageChecks, stageSnapshot } from '@/mock/stage';
 import { laborAvailability } from '@/mock/labor';
 const pm={id:'U-001',name:'张建国',role:'project-manager' as const};
 const pmo={id:'U-002',name:'李主任',role:'pmo' as const};
@@ -22,4 +22,24 @@ it('实际时间、重大风险、任务与材料在审批时重验，失败原�
  const bad=ready();bad.risks.find((r)=>r.projectId==='P-001')!.level='重大';expect(stageChecks(bad,'P-001').find((c)=>c.key==='quality')?.passed).toBe(false);
  const tasks=ready();tasks.tasks.find((t)=>t.projectId==='P-001')!.progress=50;expect(()=>transition(tasks,{type:'stage-gate',projectId:'P-001'},pmo)).toThrow('阶段门禁必须通过阶段变更审批流程调用，不允许直接切换');
  const stale=transition(ready(),request,pm);stale.baselines.find((b)=>b.projectId==='P-001'&&b.status==='已生效')!.id='CHANGED';expect(()=>transition(stale,approve,pmo)).toThrow(/基线/);
+});
+it('门禁目标参数化：缺省口径与既有行为一致（向后兼容）',()=>{
+ const s=ready();
+ expect(stageChecks(s,'P-001')).toEqual(stageChecks(s,'P-001',{}));
+ expect(stageChecks(s,'P-001',{targetPhase:'收尾',targetSubPhase:'客户终验'})).toEqual(stageChecks(s,'P-001'));
+ const snap=stageSnapshot(s,'P-001');
+ expect(snap.targetPhase).toBe('收尾');expect(snap.targetSubPhase).toBe('客户终验');
+ expect(snap.checks).toEqual(stageChecks(s,'P-001'));
+ expect(stageChecks(s,'P-001').find((c)=>c.key==='phase')?.detail).toBe(`${s.projects[0].phase}/${s.projects[0].subPhase} → 收尾/客户终验`);
+});
+it('门禁目标参数化：按目标阶段装配来源阶段与里程碑检查项',()=>{
+ const s=ready();
+ const ops=stageChecks(s,'P-001',{targetPhase:'运维',targetSubPhase:'运维交接'});
+ expect(ops.find((c)=>c.key==='phase')).toMatchObject({passed:false});
+ expect(ops.find((c)=>c.key==='phase')?.detail).toContain('→ 运维/运维交接');
+ expect(ops.find((c)=>c.key==='milestone')?.name).toBe('客户终验里程碑');
+ expect(ops.find((c)=>c.key==='milestone')?.passed).toBe(false);
+ const snap=stageSnapshot(s,'P-001',undefined,{targetPhase:'运维',targetSubPhase:'运维交接'});
+ expect(snap.targetPhase).toBe('运维');expect(snap.targetSubPhase).toBe('运维交接');
+ expect(snap.checks).toEqual(ops);
 });
