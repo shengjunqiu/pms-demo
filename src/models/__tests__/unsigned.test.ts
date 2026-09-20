@@ -10,7 +10,7 @@ import {
 } from '@/mock/unsigned';
 import { selectTodos } from '@/mock/todos';
 import { canAccessAction, selectAccessPolicy } from '@/mock/configuration-access';
-import { inOrganization } from '@/mock/selectors';
+import { inOrganization } from '@/mock/org-utils';
 
 const market: Actor = { id: 'U-006', name: '陈亮', role: 'market' };
 const pmo: Actor = { id: 'U-002', name: '李主任', role: 'pmo' };

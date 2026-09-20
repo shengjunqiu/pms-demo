@@ -9,7 +9,8 @@ import {
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AS_OF_DATE, mockCustomers, mockDepartments } from '@/mock';
 import { useBusinessStore } from '@/mock/store';
-import { fourStage, inOrganization, selectFourCalculations, selectProjects, selectReceipts } from '@/mock/selectors';
+import { fourStage, selectFourCalculations, selectProjects, selectReceipts } from '@/mock/selectors';
+import { inOrganization } from '@/mock/org-utils';
 import { useAppStore } from '@/store/useAppStore';
 import { PageSection } from '@/components/common/PageSection';
 import { PageHeader } from '@/components/common/PageHeader';

@@ -1,6 +1,7 @@
 import { beforeAll, expect, it } from 'vitest';
 import { mockProjects, mockDepartments } from '@/mock';
-import { selectProjects, inOrganization, selectFourCalculations } from '@/mock/selectors';
+import { selectProjects, selectFourCalculations } from '@/mock/selectors';
+import { inOrganization } from '@/mock/org-utils';
 import { createDemoBusinessState } from '@/mock/business-domain';
 import { sumMoney } from '@/utils/money';
 

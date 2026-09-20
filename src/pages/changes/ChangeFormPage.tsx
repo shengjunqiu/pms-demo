@@ -63,16 +63,16 @@ function ChangeFormContent() {
     const canClassify = !lockReason && request?.status === "待分级" &&
         currentRole === "pmo" &&
         canDo("classify-project-change", request.id);
-    const canApprove = !lockReason && request?.status === "待审批" &&
+    const canApprove = !lockReason && (request?.status === "PMO审批中" || request?.status === "PMC审议中") &&
         currentRole === request.requiredRole &&
         canDo("review-project-change", request.id);
     const canReject = !lockReason && !!request &&
-        !["草稿", "通过", "驳回"].includes(request.status) &&
+        !["草稿", "已批准", "已否决"].includes(request.status) &&
         ["pmo", "executive"].includes(currentRole) &&
         canDo("review-project-change", request.id);
     const canFinanceSignoff = !lockReason && !!request &&
         currentRole === "finance" &&
-        ["影响评估中", "待分级", "待审批"].includes(request.status) &&
+        ["影响评估中", "待分级", "PMO审批中", "PMC审议中"].includes(request.status) &&
         !request.financeSignoff?.signed &&
         request.input.type === "成本/资源变更" &&
         canDo("finance-signoff-change", request.id);
@@ -206,7 +206,7 @@ function ChangeFormContent() {
                 };
                 return map[request.status] ?? 0;
               })()}
-              status={request?.status === "驳回" ? "error" : request?.status === "通过" ? "finish" : "process"}
+              status={request?.status === "已否决" ? "error" : request?.status === "已批准" ? "finish" : "process"}
               items={(() => {
                 const base = [
                   { title: "编制申请" },
@@ -222,7 +222,7 @@ function ChangeFormContent() {
               })()}
               style={{ marginBottom: 16 }}
             />
-            <p>{!request || request.status === "草稿" ? "由项目主PM保存完整材料后提交专业评估。" : request.status === "待审批" ? `当前审批角色：${request.requiredRole === "executive" ? "集团领导 / PMC" : "PMO"}` : ["通过", "驳回"].includes(request.status) ? "本轮已处理，审批结果与版本留痕保留。" : "技术、财务、市场完成意见后，由PMO确认分级。"}</p>
+            <p>{!request || request.status === "草稿" ? "由项目主PM保存完整材料后提交专业评估。" : ["PMO审批中", "PMC审议中"].includes(request.status) ? `当前审批角色：${request.requiredRole === "executive" ? "集团领导 / PMC" : "PMO"}` : ["已批准", "已否决"].includes(request.status) ? "本轮已处理，审批结果与版本留痕保留。" : "技术、财务、市场完成意见后，由PMO确认分级。"}</p>
             {request && ["影响评估中", "待分级"].includes(request.status) && (<>
                 <Select aria-label="专业评估领域" style={{ width: 220 }} disabled={!canSelectAssessment} value={assessmentArea} onChange={setAssessmentArea} options={["技术", "财务", "市场"].map((value) => ({
                 value,
@@ -262,11 +262,11 @@ function ChangeFormContent() {
               }}>
                   财务会签驳回
                 </Button>)}
-              {request?.status === "待审批" && (<Button type="primary" disabled={!canApprove} onClick={() => setDecision(true)}>
+              {request && (request?.status === "PMO审批中" || request?.status === "PMC审议中") && (<Button type="primary" disabled={!canApprove} onClick={() => setDecision(true)}>
                   通过并追加新基线
                 </Button>)}
               {request &&
-            !["草稿", "通过", "驳回"].includes(request.status) && (<Button danger disabled={!canReject} onClick={() => setDecision(false)}>
+            !["草稿", "已批准", "已否决"].includes(request.status) && (<Button danger disabled={!canReject} onClick={() => setDecision(false)}>
                     否决 / 退回补充
                   </Button>)}
             </Space>

@@ -92,9 +92,11 @@ function noop(): never {
 export const useBusinessStore: UseBoundStore<StoreApi<StoreType>> = new Proxy(noop as unknown as UseBoundStore<StoreApi<StoreType>>, {
   get(_target, prop: string | symbol) {
     if (typeof prop === 'symbol') return undefined;
-    return (init() as UseBoundStore<StoreApi<StoreType>>)[prop];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (init() as any)[prop];
   },
   apply(_target, _thisArg, args: unknown[]) {
-    return (init() as UseBoundStore<StoreApi<StoreType>>)(...args);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (init() as any)(...args);
   },
 });
