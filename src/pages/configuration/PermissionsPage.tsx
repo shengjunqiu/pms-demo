@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Alert, App, Button, Card, Checkbox, Col, Descriptions, Drawer, Form, Input, Row, Select, Space, Switch, Table, Tabs, Tag } from 'antd';
 import { Link } from 'react-router-dom';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { AS_OF_DATE,mockDepartments } from '@/mock';
 import { ACCESS_ACTIONS,EDITABLE_SENSITIVE_FIELDS,SENSITIVE_FIELD_LABELS,canAccessAction,canAccessPage,canAccessProject,createAccessConfiguration,selectAccessPolicy,type AccessState } from '@/mock/configuration-access';
 import type { AccessConfigurationAction,AccessPolicyVersion } from '@/models/configuration-access';

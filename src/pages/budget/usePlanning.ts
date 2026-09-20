@@ -1,5 +1,5 @@
 import {useParams} from 'react-router-dom';
-import {useBusinessStore} from '@/mock/business';
+import {useBusinessStore} from '@/mock/store';
 import {planningSnapshot} from '@/mock/budget';
 import {useAppStore} from '@/store/useAppStore';
 import {visibleProjects} from '@/mock/selectors';

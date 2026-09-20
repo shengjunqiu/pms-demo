@@ -10,7 +10,7 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { assessmentSummary, canViewOpportunity, opportunityMeta } from '@/mock/opportunities';
 import { useAppStore } from '@/store/useAppStore';
 import type { Opportunity } from '@/models/types';

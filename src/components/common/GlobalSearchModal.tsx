@@ -7,7 +7,7 @@ import {
   ArrowRightOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { MoneyText } from './MoneyText';
 
 interface GlobalSearchModalProps {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button, Descriptions, Drawer, Input, Select, Table, Tag } from 'antd';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { useAppStore } from '@/store/useAppStore';
 import { visibleProjects } from '@/mock/selectors';
 import { PageHeader } from '@/components/common/PageHeader';

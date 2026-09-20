@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Alert, App, Button, Col, DatePicker, Descriptions, Form, Input, InputNumber, Modal, Popconfirm, Row, Select, Space, Table, Tabs, Tag, Upload } from 'antd';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { canViewOpportunity } from '@/mock/opportunities';
 import { costLineAmount, costTotal, presalesSubjects, presalesWorkspace, solutionFingerprint } from '@/mock/presales';
 import { selectCostRate } from '@/mock/configuration-finance';

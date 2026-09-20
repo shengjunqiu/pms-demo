@@ -3,7 +3,7 @@ import { stageChecks, stageSnapshot } from '@/mock/stage';
 import { useState } from 'react';
 import { Alert, App, Button, Col, Row, Tag, Descriptions, Input, InputNumber, Modal, Space, Table } from 'antd';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { visibleProjects } from '@/mock/selectors';
 import { useAppStore } from '@/store/useAppStore';
 import { PageSection } from '@/components/common/PageSection';

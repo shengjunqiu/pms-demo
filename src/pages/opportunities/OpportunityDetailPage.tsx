@@ -12,7 +12,7 @@ import {
 } from '@ant-design/icons';
 import { Link, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { assessmentSummary, canManageOpportunity, canViewOpportunity, DIMENSIONS, opportunityMeta } from '@/mock/opportunities';
 import { initiationPrerequisites } from '@/mock/initiation';
 import { useAppStore } from '@/store/useAppStore';

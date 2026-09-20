@@ -19,7 +19,7 @@ import {
 } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import { useBusinessStore } from "@/mock/business";
+import { useBusinessStore } from "@/mock/store";
 import { useAppStore } from "@/store/useAppStore";
 import { mockUsers } from "@/mock";
 import {

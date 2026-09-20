@@ -1,5 +1,6 @@
 import { describe,expect,it } from 'vitest';
-import { createBusinessState,transition,useBusinessStore,type Actor } from '@/mock/business';
+import { createBusinessState, transition, type Actor } from '@/mock/business-domain';
+import { useBusinessStore } from '@/mock/store';
 import { estimateFreezeMissing,estimateTotals } from '@/mock/estimates';
 import type { CostVersion,SolutionVersion } from '@/models/presales';
 const tech:Actor={id:'U-005',name:'赵工',role:'solution-tech'},pmo:Actor={id:'U-002',name:'李主任',role:'pmo'};

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Alert, App, Button, Checkbox, Descriptions, Drawer, Input, InputNumber, Modal, Select, Space, Table, Tag, Tabs } from 'antd';
 import { useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom';
 import { AS_OF_DATE } from '@/mock';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { currentWeek, dailyNeeded, reportSnapshot, REPORT_RULES } from '@/mock/reports';
 import { visibleProjects } from '@/mock/selectors';
 import { useAppStore } from '@/store/useAppStore';

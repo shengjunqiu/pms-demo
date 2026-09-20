@@ -2,7 +2,7 @@ import { ApartmentOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Select, Space } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { canAccessPage, canAccessProject } from '@/mock/configuration-access';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { PAGE_MAP, type RouteItem } from '@/routes/manifest';
 import { useAppStore } from '@/store/useAppStore';
 

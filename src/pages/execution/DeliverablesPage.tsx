@@ -2,7 +2,7 @@ import { useActionAccess } from '@/hooks/useActionAccess';
 import { useState } from 'react';
 import { Alert, App, Button, Col, Row, Descriptions, Drawer, Input, Modal, Select, Space, Table, Tabs, Tag, Timeline } from 'antd';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { documentPhase, qualityPlan, type DeliverableAction } from '@/mock/deliverables';
 import { visibleProjects } from '@/mock/selectors';
 import { useAppStore } from '@/store/useAppStore';

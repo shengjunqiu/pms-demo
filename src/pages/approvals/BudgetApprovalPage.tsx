@@ -2,7 +2,7 @@ import { useActionAccess } from '@/hooks/useActionAccess';
 import { useState } from 'react';
 import { Alert, Button, Card, Descriptions, Input, Modal, Space, Table, Tag, Timeline, App } from 'antd';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { useAppStore } from '@/store/useAppStore';
 import { PageHeader } from '@/components/common/PageHeader';
 import { StateView } from '@/components/common/StateView';

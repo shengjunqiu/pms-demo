@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { App, Button, Checkbox, Col, Input, InputNumber, Modal, Row, Select, Space, Table, Tabs, Tag } from 'antd';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AS_OF_DATE, mockUsers } from '@/mock';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { ticketLabels, ticketMeta, ticketTable, type TicketKind } from '@/mock/tickets';
 import { visibleProjects } from '@/mock/selectors';
 import { useAppStore } from '@/store/useAppStore';

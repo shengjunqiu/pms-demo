@@ -18,7 +18,7 @@ import {
 } from "antd";
 import { useSearchParams } from "react-router-dom";
 import dayjs from "dayjs";
-import { useBusinessStore } from "@/mock/business";
+import { useBusinessStore } from "@/mock/store";
 import { useAppStore } from "@/store/useAppStore";
 import {
   defaultInitiationInput,

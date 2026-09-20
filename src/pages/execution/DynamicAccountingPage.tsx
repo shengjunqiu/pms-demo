@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Alert, Button, Card, Col, Descriptions, Drawer, Empty, Form, Input, InputNumber, message, Modal, Row, Select, Space, Statistic, Table, Tabs, Tag, Typography } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { selectFourCalculations, visibleProjects, inOrganization } from '@/mock/selectors';
 import { useAppStore } from '@/store/useAppStore';
 import { AS_OF_DATE, mockCostSources, mockDepartments, mockProcurements, mockOutsources, mockExpenses, mockTimesheets } from '@/mock';

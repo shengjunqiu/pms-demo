@@ -423,7 +423,7 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
 }
 
 /** Pending approvals quote real budget, estimate and baseline objects; no dashboard-only fake decisions. */
-function buildDemoBusinessState(): BusinessState {
+export function buildDemoBusinessState(): BusinessState {
   let state = createBusinessState();
   state.decisions = [];
   const candidates = state.projects.filter((p) => !p.isMaintenance && !state.lockedProjects.includes(p.id) && state.budgets.some(b=>b.projectId===p.id&&b.status==='已生效')).slice(0, 45);

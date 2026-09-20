@@ -1,5 +1,6 @@
 import { expect, it } from 'vitest';
-import { createBusinessState, transition, useBusinessStore } from '@/mock/business';
+import { createBusinessState, transition } from '@/mock/business-domain';
+import { useBusinessStore } from '@/mock/store';
 import { visibleProjects } from '@/mock/selectors';
 import { canAccessPage, canEditSensitiveField, canViewSensitiveField } from '@/mock/configuration-access';
 import { actionTarget } from '@/mock/access';

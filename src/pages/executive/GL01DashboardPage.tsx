@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Alert, Button, Card, Col, Popover, Radio, Row, Space, Table, Tabs, Tag } from 'antd';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AS_OF_DATE } from '@/mock';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { selectFourCalculations, selectProjects } from '@/mock/selectors';
 import { useAppStore } from '@/store/useAppStore';
 import { percentage, sumMoney } from '@/utils/money';

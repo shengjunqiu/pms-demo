@@ -3,7 +3,7 @@ import { marginReason } from '@/utils/sensitive';
 import { useState } from 'react';
 import { Alert, Button, Descriptions, Drawer, Space, Table, Tabs, type TableColumnsType } from 'antd';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { EXCEPTION_TABS, projectExceptions } from '@/mock/exceptions';
 import { fourStage, selectProjects } from '@/mock/selectors';
 import { mockDepartments, AS_OF_DATE } from '@/mock';

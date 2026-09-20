@@ -25,7 +25,7 @@ import { MetricStatCard } from "@/components/common/MetricStatCard";
 import { PageSection } from "@/components/common/PageSection";
 import { StateView } from "@/components/common/StateView";
 import { MoneyText } from "@/components/common/MoneyText";
-import { useBusinessStore } from "@/mock/business";
+import { useBusinessStore } from "@/mock/store";
 import { canViewSensitiveField } from "@/mock/configuration-access";
 import { visibleProjects } from "@/mock/selectors";
 import {

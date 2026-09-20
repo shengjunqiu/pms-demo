@@ -1,5 +1,5 @@
 import { Descriptions, Table, Tag, Typography } from 'antd';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 
 /** Overview of the current quality plan and its linked evidence, without approval controls. */
 export function ProjectQualityPanel({ projectId }: { projectId: string }) {

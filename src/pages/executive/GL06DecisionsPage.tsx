@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button, Descriptions, Drawer, Select, Space, Table, Tabs, Tag, type TableColumnsType } from 'antd';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AS_OF_DATE, mockUsers } from '@/mock';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { selectProjects } from '@/mock/selectors';
 import { useAppStore } from '@/store/useAppStore';
 import { PageSection } from '@/components/common/PageSection';

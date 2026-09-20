@@ -26,7 +26,7 @@ import { PageHeader } from "@/components/common/PageHeader";
 import { MetricStatCard } from "@/components/common/MetricStatCard";
 import { PageSection, PageToolbar } from "@/components/common/PageSection";
 import { StateView } from "@/components/common/StateView";
-import { useBusinessStore } from "@/mock/business";
+import { useBusinessStore } from "@/mock/store";
 import {
   acceptanceConditions,
   confirmedReportedAmount,

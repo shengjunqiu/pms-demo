@@ -11,7 +11,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { MoneyText } from '@/components/common/MoneyText';
 import { MetricStatCard } from '@/components/common/MetricStatCard';
 import { AS_OF_DATE } from '@/mock';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { selectFourCalculations, selectReceipts, visibleProjects } from '@/mock/selectors';
 import { selectTodos } from '@/mock/todos';
 import { useAppStore } from '@/store/useAppStore';

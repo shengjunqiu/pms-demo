@@ -23,7 +23,7 @@ import { PageHeader } from "@/components/common/PageHeader";
 import { MetricStatCard } from "@/components/common/MetricStatCard";
 import { PageSection } from "@/components/common/PageSection";
 import { StateView } from "@/components/common/StateView";
-import { useBusinessStore } from "@/mock/business";
+import { useBusinessStore } from "@/mock/store";
 import { mockUsers, AS_OF_DATE } from "@/mock";
 import { visibleProjects } from "@/mock/selectors";
 import { useAppStore } from "@/store/useAppStore";

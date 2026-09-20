@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { Alert, App, Button, Col, DatePicker, Descriptions, Drawer, Form, Input, InputNumber, Modal, Row, Select, Space, Table, Tag, Tooltip } from 'antd';
 import { Link,useSearchParams } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { canViewOpportunity } from '@/mock/opportunities';
 import { earlyInvestmentWarnings,EARLY_INVESTMENT_RULE } from '@/mock/early-investments';
 import { presalesSubjects } from '@/mock/presales';

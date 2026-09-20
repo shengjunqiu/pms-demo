@@ -3,7 +3,7 @@ import { App, Alert, Button, Col, DatePicker, Form, Input, InputNumber, Row, Sel
 import { UploadOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { canManageOpportunity, canViewOpportunity, opportunityLocked, opportunityMeta } from '@/mock/opportunities';
 import type { OpportunityInput } from '@/models/opportunities';
 import { useAppStore } from '@/store/useAppStore';

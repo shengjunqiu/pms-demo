@@ -3,7 +3,7 @@ import { Alert, App, Button, Col, Input, InputNumber, Row, Select, Space, Table,
 import { useParams } from 'react-router-dom';
 import { useActionAccess } from '@/hooks/useActionAccess';
 import { canViewInitiation, riskScore } from '@/mock/initiation';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { useAppStore } from '@/store/useAppStore';
 import { mockUsers } from '@/mock';
 import type { InitiationRisk } from '@/models/initiation';

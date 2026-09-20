@@ -4,7 +4,7 @@ import type { Project } from '@/models/types';
 import type { ConfigurationVersion } from '@/models/configuration';
 import type { AlertKind,AlertRuleVersion,CanonicalSubject,ConfiguredAlert,CostRateVersion,FinanceConfigurationState,SubjectMappingVersion } from '@/models/configuration-finance';
 import { effectiveVersions } from '@/mock/configuration';
-import { inOrganization } from '@/mock/selectors';
+import { inOrganization } from '@/mock/org-utils';
 import { assessHealth, DEMO_HEALTH_RULES } from '@/utils/health';
 import { money,percentage,sumMoney } from '@/utils/money';
 const base=(key:string,name:string):ConfigurationVersion=>({id:`${key}-V1`,key,version:1,name,status:'已发布',enabled:true,effectiveDate:'2026-01-01',orgId:'all',projectType:'all',changeReason:'初始演示规则，历史来源保持',createdBy:'集团财务',createdAt:'2026-01-01',publishedBy:'集团财务',publishedAt:'2026-01-01'});

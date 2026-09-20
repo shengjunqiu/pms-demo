@@ -3,7 +3,7 @@ import { constructionLockReason } from '@/mock/construction-lock';
 import { useState } from 'react';
 import { Alert, App, Button, Card, Col, Descriptions, Drawer, Input, InputNumber, Modal, Row, Select, Space, Statistic, Table, Tag, Tabs, Timeline } from 'antd';
 import { useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { costAvailability, costOrderLabels, isCostSubject, type CostOrderAction, type CostOrderKind } from '@/mock/cost-orders';
 import { selectFourCalculations, visibleProjects } from '@/mock/selectors';
 import { AS_OF_DATE, mockCostSources, mockProcurements, mockOutsources, mockExpenses } from '@/mock';

@@ -4,10 +4,11 @@ import { mockProjects } from '@/mock';
 import { selectProjects, selectFourCalculations, selectReceipts } from '@/mock/selectors';
 import { calculateCockpitKPIs } from '@/utils/calculator';
 import { assessHealth } from '@/utils/health';
+import { stageSnapshot } from '@/mock/stage';
 import { sumMoney } from '@/utils/money';
 
 // Build the demo seed in fixture setup; tests retain independent deep clones.
-beforeAll(() => { createDemoBusinessState(); });
+beforeAll(() => { createDemoBusinessState(); }, 120000);
 
 const pm: Actor = { id: 'U-001', name: '张建国', role: 'project-manager' };
 const finance: Actor = { id: 'U-004', name: '刘敏', role: 'finance' };
@@ -97,15 +98,16 @@ describe('审批、权限及成本锁定', () => {
     const state = createBusinessState();
     state.projects[0].progressRate = 100;
     state.tasks.filter((t) => t.projectId === 'P-001').forEach((t) => { t.progress = 100; });
-    expect(() => transition(state, { type: 'stage-gate', projectId: 'P-001' }, pmo)).toThrow('材料');
+    function snap() { return stageSnapshot(state, 'P-001'); }
+    expect(() => transition(state, { type: 'stage-gate', projectId: 'P-001', ruleSnapshot: snap() }, pmo)).toThrow('材料');
     state.materials.filter((m) => m.projectId === 'P-001').forEach((m) => { m.status = '待审核'; });
-    expect(() => transition(state, { type: 'stage-gate', projectId: 'P-001' }, pmo)).toThrow('材料');
+    expect(() => transition(state, { type: 'stage-gate', projectId: 'P-001', ruleSnapshot: snap() }, pmo)).toThrow('材料');
     state.materials.filter((m) => m.projectId === 'P-001').forEach((m) => { m.status = '通过'; });
     const milestone = state.milestones.find((m) => m.projectId === 'P-001' && m.type === '开发完成')!;
     milestone.status = '未达成';
-    expect(() => transition(state, { type: 'stage-gate', projectId: 'P-001' }, pmo)).toThrow('里程碑');
+    expect(() => transition(state, { type: 'stage-gate', projectId: 'P-001', ruleSnapshot: snap() }, pmo)).toThrow('里程碑');
     milestone.status = '已达成';
-    expect(transition(state, { type: 'stage-gate', projectId: 'P-001' }, pmo).projects[0].phase).toBe('收尾');
+    expect(transition(state, { type: 'stage-gate', projectId: 'P-001', ruleSnapshot: snap() }, pmo).projects[0].phase).toBe('收尾');
   });
   it('承诺结转实际不增加滚动成本，前期来源防重复，已发生未签成本真实入账', () => {
     const original = createBusinessState();

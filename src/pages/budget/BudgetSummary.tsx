@@ -1,5 +1,5 @@
 import { canViewSensitiveField } from '@/mock/configuration-access';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { useAppStore } from '@/store/useAppStore';
 import { Alert, Col, Row, Statistic, Table } from 'antd';
 import type { BudgetVersion, EstimateVersion } from '@/models/types';

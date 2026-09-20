@@ -4,7 +4,7 @@ import type { Actor, BusinessState } from './business';
 import type { Opportunity } from '@/models/types';
 import type { AuditEvent } from '@/models/configuration-access';
 import { canAccessProject, DEMO_TENANT, selectAccessPolicy } from './configuration-access';
-import { inOrganization } from './selectors';
+import { inOrganization } from '@/mock/org-utils';
 
 /** Applies the published organization boundary independently of business-role duties. */
 export function canAccessOrganization(state: BusinessState, actor: Actor, departmentId: string, related: boolean) {

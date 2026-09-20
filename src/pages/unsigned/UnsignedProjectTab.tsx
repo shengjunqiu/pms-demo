@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Alert, App, Button, Card, Col, DatePicker, Descriptions, Input, InputNumber, Row, Select, Space, Switch, Table, Tabs, Tag, Timeline, Upload } from 'antd';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { useAppStore } from '@/store/useAppStore';
 import { useActionAccess } from '@/hooks/useActionAccess';
 import { MoneyText } from '@/components/common/MoneyText';

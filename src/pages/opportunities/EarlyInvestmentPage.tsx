@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { Alert, App, Button, Col, DatePicker, Descriptions, Form, Input, InputNumber, Row, Select, Space, Steps, Table, Tag } from 'antd';
 import { Link,useNavigate,useParams,useSearchParams } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { canManageOpportunity,canViewOpportunity } from '@/mock/opportunities';
 import { canReviewEarlyInvestment,earlyApprovalRoute,EARLY_INVESTMENT_RULE } from '@/mock/early-investments';
 import { configuredApprovalTimeout, selectGradingRule } from '@/mock/configuration';

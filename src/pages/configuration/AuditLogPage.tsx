@@ -2,7 +2,7 @@ import { visibleAuditEvents } from '@/mock/access-scope';
 import { useState } from 'react';
 import { Alert, Button, Card, Col, Descriptions, Drawer, Input, Row, Select, Space, Table, Tag, Timeline } from 'antd';
 import { Link } from 'react-router-dom';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { auditTargetRoute,canAccessPage,redactAuditEvent,selectAccessPolicy,type AccessState } from '@/mock/configuration-access';
 import { useAppStore } from '@/store/useAppStore';
 import { PAGE_MANIFEST } from '@/routes/manifest';

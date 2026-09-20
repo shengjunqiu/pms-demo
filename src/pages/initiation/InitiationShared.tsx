@@ -4,7 +4,7 @@ import type { InitiationApplication, InitiationSource } from '@/models/initiatio
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSection } from '@/components/common/PageSection';
 import { MoneyText } from '@/components/common/MoneyText';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { useAppStore } from '@/store/useAppStore';
 import { canViewSensitiveField } from '@/mock/configuration-access';
 

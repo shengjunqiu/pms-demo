@@ -5,7 +5,7 @@ import { marginReason } from "@/utils/sensitive";
 import { useState } from "react";
 import { Alert, App, Button, Card, Checkbox, Col, Descriptions, Input, InputNumber, Modal, Row, Select, Space, Steps, Table, Collapse, Tag, Timeline, } from "antd";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useBusinessStore } from "@/mock/business";
+import { useBusinessStore } from "@/mock/store";
 import { useAppStore } from "@/store/useAppStore";
 import { visibleProjects } from "@/mock/selectors";
 import { defaultChangeInput, proposeChange, CHANGE_RULE } from "@/mock/changes";

@@ -27,7 +27,7 @@ import { MetricStatCard } from "@/components/common/MetricStatCard";
 import { PageSection, PageToolbar } from "@/components/common/PageSection";
 import { StateView } from "@/components/common/StateView";
 import { MoneyText } from "@/components/common/MoneyText";
-import { useBusinessStore } from "@/mock/business";
+import { useBusinessStore } from "@/mock/store";
 import {
   pendingSettlementSources,
   settlementChecks,

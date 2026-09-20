@@ -11,7 +11,7 @@ import {
   Tag,
 } from "antd";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { useBusinessStore } from "@/mock/business";
+import { useBusinessStore } from "@/mock/store";
 import { canViewOpportunity } from "@/mock/opportunities";
 import { costLineAmount } from "@/mock/presales";
 import { useAppStore } from "@/store/useAppStore";

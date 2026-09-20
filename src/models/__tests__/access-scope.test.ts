@@ -1,6 +1,7 @@
 import { buildAuditChanges, redactAuditEvent } from '@/mock/configuration-access';
 import { expect, it } from 'vitest';
-import { createBusinessState, useBusinessStore } from '@/mock/business';
+import { createBusinessState } from '@/mock/business-domain';
+import { useBusinessStore } from '@/mock/store';
 import { canViewOpportunity } from '@/mock/opportunities';
 import { businessTargetScope, canAccessTargetScope, visibleAuditEvents } from '@/mock/access-scope';
 import { canViewInitiation } from '@/mock/initiation';

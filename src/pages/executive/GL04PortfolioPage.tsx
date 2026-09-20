@@ -8,7 +8,7 @@ import {
 } from '@ant-design/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AS_OF_DATE, mockCustomers, mockDepartments } from '@/mock';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { fourStage, inOrganization, selectFourCalculations, selectProjects, selectReceipts } from '@/mock/selectors';
 import { useAppStore } from '@/store/useAppStore';
 import { PageSection } from '@/components/common/PageSection';

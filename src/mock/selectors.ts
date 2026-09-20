@@ -6,21 +6,11 @@ import type { UserRole } from '@/store/useAppStore';
 import { allocateMoney, percentage, sumMoney } from '@/utils/money';
 import { CANONICAL_SUBJECTS } from '@/mock/configuration-finance';
 import { projectEstimate } from '@/mock/versions';
+import { inOrganization } from '@/mock/org-utils';
 
 export interface ProjectFilter {
   org?: string; orgExact?: string; stage?: string; region?: string; type?: string; level?: string; industry?: string;
   customer?: string; pm?: string; health?: string; from?: string; to?: string; search?: string;
-}
-export function inOrganization(departmentId: string, root?: string): boolean {
-  if (!root || root === 'all') return true;
-  const seen = new Set<string>();
-  let id: string | undefined = departmentId;
-  while (id && !seen.has(id)) {
-    if (id === root) return true;
-    seen.add(id);
-    id = mockDepartments.find((d) => d.id === id)?.parentId;
-  }
-  return false;
 }
 export function visibleProjects(role: UserRole, projects = mockProjects, accessState?: AccessState): Project[] {
   const all = ['executive', 'pmo', 'finance', 'admin', 'market'];

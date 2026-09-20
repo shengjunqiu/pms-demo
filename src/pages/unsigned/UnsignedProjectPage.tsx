@@ -1,6 +1,6 @@
 import { Button, Space } from 'antd';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { useAppStore } from '@/store/useAppStore';
 import { canViewUnsignedProject } from '@/mock/unsigned';
 import { UnsignedProjectTab } from '@/pages/unsigned/UnsignedProjectTab';

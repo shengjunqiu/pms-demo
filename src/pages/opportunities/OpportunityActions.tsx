@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { App, Button, DatePicker, Dropdown, Form, Input, Modal, Select, Space, Tooltip } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { canManageOpportunity, opportunityLocked, opportunityMeta } from '@/mock/opportunities';
 import { initiationPrerequisites } from '@/mock/initiation';
 import { useAppStore } from '@/store/useAppStore';

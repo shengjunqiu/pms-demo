@@ -1,6 +1,6 @@
 import { Alert, Button, Card, Col, Descriptions, Empty, Input, List, Row, Select, Space, Tabs, Tag } from 'antd';
 import { useSearchParams } from 'react-router-dom';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { useAppStore } from '@/store/useAppStore';
 import { canViewInitiation, INITIATION_SIGNATURES, initiationClassification } from '@/mock/initiation';
 import { PageSection } from '@/components/common/PageSection';

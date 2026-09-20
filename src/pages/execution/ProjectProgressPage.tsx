@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Alert, App, Button, Col, Descriptions, Input, InputNumber, Modal, Row, Space, Table, Tag, Timeline } from 'antd';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { AS_OF_DATE } from '@/mock';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { useAppStore } from '@/store/useAppStore';
 import { visibleProjects } from '@/mock/selectors';
 import { PageSection, PageToolbar } from '@/components/common/PageSection';

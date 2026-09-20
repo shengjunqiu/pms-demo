@@ -22,7 +22,7 @@ import {
   Tag,
 } from "antd";
 import { Link } from "react-router-dom";
-import { useBusinessStore } from "@/mock/business";
+import { useBusinessStore } from "@/mock/store";
 import { AS_OF_DATE } from "@/mock";
 import {
   effectiveVersions,

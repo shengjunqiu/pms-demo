@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { canAccessPage, canAccessProject, selectAccessPolicy } from '@/mock/configuration-access';
 import { projectForTarget } from '@/mock/access';
 import { StateView } from '@/components/common/StateView';

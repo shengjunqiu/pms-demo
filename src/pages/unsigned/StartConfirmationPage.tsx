@@ -14,7 +14,7 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { useActionAccess } from '@/hooks/useActionAccess';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { useAppStore } from '@/store/useAppStore';
 import { AS_OF_DATE } from '@/mock';
 import { startupChecks } from '@/mock/unsigned';

@@ -1,4 +1,4 @@
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import type { BusinessAction } from '@/mock/business';
 import { canAccessAction, canEditSensitiveField } from '@/mock/configuration-access';
 import type { SensitiveField } from '@/models/configuration-access';

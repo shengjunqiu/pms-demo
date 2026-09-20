@@ -4,7 +4,7 @@ import { FolderOpenOutlined, SearchOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import type { ColumnsType } from 'antd/es/table';
 import type { Project } from '@/models/types';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { canAccessProject } from '@/mock/configuration-access';
 import { useAppStore } from '@/store/useAppStore';
 import { PageHeader } from '@/components/common/PageHeader';

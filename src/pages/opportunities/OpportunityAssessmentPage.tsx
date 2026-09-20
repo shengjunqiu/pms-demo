@@ -22,7 +22,7 @@ import {
   Upload,
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
-import { useBusinessStore } from "@/mock/business";
+import { useBusinessStore } from "@/mock/store";
 import {
   assessmentSummary,
   canManageOpportunity,

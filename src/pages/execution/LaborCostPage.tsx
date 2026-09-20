@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Alert, App, Button, Card, Descriptions, Drawer, Input, InputNumber, Modal, Select, Space, Table, Tabs, Tag } from 'antd';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { AS_OF_DATE, mockTimesheets } from '@/mock';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { LABOR_RULE, laborAvailability, type LaborEntry } from '@/mock/labor';
 import { visibleProjects } from '@/mock/selectors';
 import { useAppStore } from '@/store/useAppStore';

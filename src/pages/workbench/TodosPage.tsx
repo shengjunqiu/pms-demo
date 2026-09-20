@@ -3,7 +3,7 @@ import { selectTodos } from '@/mock/todos';
 import { Button, Col, Row, Input, Select, Space, Table, Tabs, Tag } from 'antd';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AS_OF_DATE } from '@/mock';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { useAppStore } from '@/store/useAppStore';
 import { PageSection } from '@/components/common/PageSection';
 import { MetricStatCard } from '@/components/common/MetricStatCard';

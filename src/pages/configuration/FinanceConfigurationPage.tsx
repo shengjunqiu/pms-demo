@@ -3,7 +3,7 @@ import { canViewSensitiveField } from '@/mock/configuration-access';
 import { useState } from 'react';
 import { Alert, App, Button, Card, Col, Descriptions, Drawer, Form, Input, InputNumber, Row, Select, Space, Switch, Table, Tabs, Tag } from 'antd';
 import { Link, useSearchParams } from 'react-router-dom';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { AS_OF_DATE, mockUsers } from '@/mock';
 import { ALERT_LABELS, collectConfiguredAlerts, configuredSubjects, selectCostRate, type FinanceConfigurationAction } from '@/mock/configuration-finance';
 import { effectiveVersions } from '@/mock/configuration';

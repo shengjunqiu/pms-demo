@@ -1,7 +1,7 @@
 import { AS_OF_DATE } from '@/mock';
 import type { Actor,BusinessState } from '@/mock/business';
 import type { ApprovalRuleVersion,ApprovalRoutingSnapshot,ConfigurationState,ConfigurationVersion,GradingVersion,TemplateVersion } from '@/models/configuration';
-import { inOrganization } from '@/mock/selectors';
+import { inOrganization } from '@/mock/org-utils';
 const base=(key:string,name:string):ConfigurationVersion=>({id:`${key}-V1`,key,version:1,name,status:'已发布',enabled:true,effectiveDate:'2026-01-01',orgId:'all',projectType:'all',changeReason:'初始演示规则',createdBy:'集团PMO',createdAt:'2026-01-01',publishedBy:'集团PMO',publishedAt:'2026-01-01'});
 export function createConfigurationState():ConfigurationState{return {
  templates:[{...base('TPL-DELIVERY','项目全周期交付目录'),kind:'deliverable',level:'all',rows:[{id:'implementation',name:'实施计划',phase:'实施',required:true,systemRequired:true,role:'project-manager',timing:'项目启动前',weight:0},{id:'test',name:'测试报告',phase:'实施',required:true,systemRequired:true,role:'solution-tech',timing:'开发完成前',weight:0},{id:'acceptance',name:'验收确认函',phase:'验收',required:true,systemRequired:true,role:'project-manager',timing:'客户验收前',weight:0},{id:'summary',name:'项目总结',phase:'结算',required:false,systemRequired:false,role:'project-manager',timing:'项目关闭前',weight:0}]},

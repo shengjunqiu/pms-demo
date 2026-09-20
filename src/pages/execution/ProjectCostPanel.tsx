@@ -4,7 +4,7 @@
 import { useMemo } from 'react';
 import { Card, Empty, Table, Typography } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { MoneyText } from '@/components/common/MoneyText';
 import { formatPercent } from '@/utils/money';
 import type { ProjectCostOverview } from '@/models/types';

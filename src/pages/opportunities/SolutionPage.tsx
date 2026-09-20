@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Alert, App, Button, Col, DatePicker, Descriptions, Form, Input, Modal, Row, Select, Space, Table, Tabs, Tag, Timeline, Upload } from 'antd';
 import dayjs from 'dayjs';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { canViewOpportunity, opportunityMeta } from '@/mock/opportunities';
 import { presalesWorkspace } from '@/mock/presales';
 import { useAppStore } from '@/store/useAppStore';

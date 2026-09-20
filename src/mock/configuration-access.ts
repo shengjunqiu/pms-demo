@@ -8,7 +8,7 @@ import type { AccessConfigurationAction,AccessConfigurationState,AccessPolicyVer
 import type { UserRole } from '@/store/useAppStore';
 import { PAGE_MANIFEST } from '@/routes/manifest';
 import { effectiveVersions } from '@/mock/configuration';
-import { inOrganization } from '@/mock/selectors';
+import { inOrganization } from '@/mock/org-utils';
 export type AccessState=Pick<BusinessState,'projects'|'projectTeams'|'opportunities'|'approvals'|'audit'> & Partial<Pick<BusinessState,'operationHandovers'|'operationCycles'|'operationEvents'|'planningReviews'|'planningDrafts'|'postEvaluations'|'projectArchives'>> & {accessConfiguration?:AccessConfigurationState;initiations?:{id:string;status:string;rounds:{status:string;approvalProgress?:ApprovalProgress}[]}[];earlyInvestmentRequests?:BusinessState['earlyInvestmentRequests']};
 const ids=(prefix:string,numbers:number[])=>numbers.map(n=>`${prefix}-${String(n).padStart(2,'0')}`);
 const range=(end:number)=>Array.from({length:end},(_,i)=>i+1);

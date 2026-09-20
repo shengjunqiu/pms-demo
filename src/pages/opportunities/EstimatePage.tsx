@@ -3,7 +3,7 @@ import { canViewSensitiveField } from '@/mock/configuration-access';
 import { useState } from 'react';
 import { Alert, App, Button, Col, Descriptions, Empty, Input, InputNumber, Modal, Row, Select, Space, Table, Tabs, Tag } from 'antd';
 import { Link, useParams } from 'react-router-dom';
-import { useBusinessStore } from '@/mock/business';
+import { useBusinessStore } from '@/mock/store';
 import { canViewOpportunity } from '@/mock/opportunities';
 import { costLineAmount, presalesSubjects, presalesWorkspace } from '@/mock/presales';
 import { estimateFreezeMissing, estimateTotals } from '@/mock/estimates';
