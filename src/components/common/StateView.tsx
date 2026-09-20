@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Result, Button, Skeleton } from 'antd';
 import { WarningOutlined, LockOutlined, InboxOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useAppStore } from '@/store/useAppStore';
+import { useBusinessStore } from '@/mock/store';
+import { canAccessPage } from '@/mock/configuration-access';
+import { GLOBAL_NAV_SECTIONS, ROLE_HOME, type GlobalNavEntry } from '@/routes/navigation';
+import { PAGE_MAP } from '@/routes/manifest';
 
 export interface StateViewProps {
   type?: 'empty' | '403' | '404' | 'error' | 'loading';
@@ -19,6 +24,24 @@ export const StateView: React.FC<StateViewProps> = ({
   onAction,
 }) => {
   const navigate = useNavigate();
+  const { currentRole, currentUser } = useAppStore();
+  const { data } = useBusinessStore();
+
+  // 🔵1 403 默认回退：取当前角色页集内首个有权页面，避免“403→首页→403”循环
+  const firstAccessibleRoute = useMemo(() => {
+    for (const section of GLOBAL_NAV_SECTIONS) {
+      for (const group of section.groups) {
+        for (const raw of group.entries) {
+          const entry: GlobalNavEntry = raw;
+          const page = entry.pageId ? PAGE_MAP.get(entry.pageId) : undefined;
+          const route = entry.route ?? page?.route;
+          const permId = entry.permissionPageId ?? entry.pageId;
+          if (route && (!permId || canAccessPage(data, currentUser, permId))) return route;
+        }
+      }
+    }
+    return ROLE_HOME[currentRole];
+  }, [data, currentUser, currentRole]);
 
   if (type === 'loading') return <div role="status" aria-label="正在加载"><Skeleton active paragraph={{ rows: 6 }} /></div>;
 
@@ -30,8 +53,8 @@ export const StateView: React.FC<StateViewProps> = ({
         title={title || '403 无访问权限'}
         subTitle={subTitle || '当前角色没有权限访问该页面或数据，请切换角色或联系管理员'}
         extra={
-          <Button type="primary" onClick={onAction || (() => navigate('/'))}>
-            {actionText || '返回首页'}
+          <Button type="primary" onClick={onAction || (() => navigate(firstAccessibleRoute))}>
+            {actionText || '返回可用页面'}
           </Button>
         }
       />

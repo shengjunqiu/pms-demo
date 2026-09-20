@@ -15,7 +15,7 @@ import {
   CloseCircleFilled,
 } from '@ant-design/icons';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { useAppStore, ROLES, UserRole } from '@/store/useAppStore';
+import { buildUserProfile, useAppStore, ROLES, UserRole } from '@/store/useAppStore';
 import { GLOBAL_NAV_SECTIONS, globalNavKey, ROLE_HOME, type GlobalNavEntry } from '@/routes/navigation';
 import { PAGE_MANIFEST, PAGE_MAP } from '@/routes/manifest';
 import { ProjectWorkspaceNav } from '@/components/layout/ProjectWorkspaceNav';
@@ -93,6 +93,17 @@ export const MainLayout: React.FC = () => {
 
     return items;
   }, [data, currentUser, normalizedKeyword]);
+
+  // 🔵2 切角色：当前页对新角色可见时原地停留，否则回角色首页，避免丢上下文或落 403
+  const handleRoleChange = (val: UserRole) => {
+    const next = val;
+    const nextUser = buildUserProfile(next);
+    const canStay = !!currentPage
+      && canAccessPage(data, nextUser, currentPage.id)
+      && (!routeProject || canAccessProject(data, nextUser, routeProject));
+    setRole(next);
+    navigate(canStay ? `${location.pathname}${location.search}` : ROLE_HOME[next]);
+  };
 
   const isApprovalsDetail = /^\/approvals\/[^/]+$/.test(location.pathname);
   // /approvals/:id 不属于任何 manifest 页，鉴权交给审批页内角色白名单（BudgetApprovalPage/ManagementApprovalPage）
@@ -276,7 +287,7 @@ export const MainLayout: React.FC = () => {
               <Select
                 value={currentRole}
                 aria-label="模拟身份"
-                onChange={(val) => { setRole(val as UserRole); navigate(ROLE_HOME[val as UserRole]); }}
+                onChange={handleRoleChange}
                 style={{ minWidth: 210 }}
                 popupMatchSelectWidth={false}
                 options={ROLES.map((r) => ({
