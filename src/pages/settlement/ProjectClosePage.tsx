@@ -18,6 +18,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { PageHeader } from "@/components/common/PageHeader";
 import { MetricStatCard } from "@/components/common/MetricStatCard";
 import { PageSection } from "@/components/common/PageSection";
+import { MoneyText } from "@/components/common/MoneyText";
 import { StateView } from "@/components/common/StateView";
 import { useBusinessStore } from "@/mock/store";
 import { selectReceipts, visibleProjects } from "@/mock/selectors";
@@ -245,9 +246,9 @@ export function ProjectClosePage() {
           dataSource={receiptSummary.contracts}
           columns={[
             { title: "合同", dataIndex: "name" },
-            { title: "合同金额（万元）", dataIndex: "amount" },
-            { title: "实收（万元）", dataIndex: "paidAmount" },
-            { title: "待收（万元）", dataIndex: "unpaidAmount" },
+            { title: "合同金额（万元）", dataIndex: "amount", render: (v: number | null | undefined) => <MoneyText value={v} /> },
+            { title: "实收（万元）", dataIndex: "paidAmount", render: (v: number | null | undefined) => <MoneyText value={v} /> },
+            { title: "待收（万元）", dataIndex: "unpaidAmount", render: (v: number | null | undefined) => <MoneyText value={v} /> },
           ]}
         />
         <Table

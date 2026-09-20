@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { App, Button, Checkbox, Col, Input, InputNumber, Modal, Row, Select, Space, Table, Tabs, Tag } from 'antd';
+import { App, Button, Checkbox, Col, DatePicker, Input, InputNumber, Modal, Row, Select, Space, Table, Tabs, Tag } from 'antd';
+import dayjs from 'dayjs';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AS_OF_DATE, mockUsers } from '@/mock';
 import { useBusinessStore } from '@/mock/store';
@@ -106,9 +107,18 @@ function NewTicketModal({ initialKind, initialProjectId, onCancel, onCreated }: 
   const canSubmit = writers.includes(currentRole) && eligible.some((p) => p.id === projectId) && canDo('create-ticket', projectId);
   const ranks = kind === 'requirement' ? ['高', '中', '低'] : kind === 'bug' ? ['致命', '严重', '一般', '轻微'] : ['重大', '重要', '一般'];
   const labelStyle = { display: 'block', marginBottom: 6, fontWeight: 500 };
+  const reqMark = <span style={{ color: '#ff4d4f', marginRight: 4 }}>*</span>;
   return <Modal title={`新建${ticketLabels[kind]}`} width={760} maskClosable={false} styles={{ body: { maxHeight: '65vh', overflowY: 'auto', overflowX: 'hidden', paddingRight: 4 } }} open okText="提交责任人" okButtonProps={{ disabled: !canSubmit }} onCancel={onCancel} onOk={() => {
     try {
       if (!canSubmit || !projectId) throw new Error('当前策略或项目范围不允许创建事项');
+      const missing = [
+        !draft.title.trim() && '事项标题',
+        !draft.category.trim() && (kind === 'bug' ? '缺陷类别' : '业务类别'),
+        kind !== 'risk' && !draft.rank && (kind === 'requirement' ? '优先级' : '严重程度'),
+        !draft.description.trim() && '事项描述',
+        kind === 'risk' && !draft.measures.trim() && '应对措施',
+      ].filter(Boolean) as string[];
+      if (missing.length) throw new Error(`请先填写：${missing.join('、')}`);
       const prefix = ({ requirement: 'REQ', bug: 'BUG', issue: 'ISSUE', risk: 'RSK' })[kind];
       const id = `${prefix}-NEW-${ticketTable(data, kind).length + 1}`;
       dispatch({ type: 'create-ticket', kind, projectId, title: draft.title, rank: draft.rank, ownerId: draft.owner, description: draft.description, category: draft.category, deadline: draft.deadline, product: draft.product, baselineImpact: draft.impactBaseline, probability: draft.probability, impact: draft.impact, measures: draft.measures }, { id: currentUser.id, name: currentUser.name, role: currentRole });
@@ -119,14 +129,14 @@ function NewTicketModal({ initialKind, initialProjectId, onCancel, onCreated }: 
     <Row gutter={[16, 16]}>
       <Col span={8}><span style={labelStyle}>事项类型</span><Select aria-label="新建事项类型" style={{ width: '100%' }} value={kind} options={kinds.map((value) => ({ value, label: ticketLabels[value] }))} onChange={(value) => { setKind(value); setDraft(empty()); }} /></Col>
       <Col span={16}><span style={labelStyle}>所属项目</span><Select aria-label="新建事项项目" style={{ width: '100%' }} value={eligible.some((p) => p.id === projectId) ? projectId : undefined} options={eligible.map((p) => ({ value: p.id, label: p.name }))} onChange={(value) => { setProjectId(value); setDraft(empty()); }} /></Col>
-      <Col span={24}><label style={labelStyle} htmlFor="ticket-title">事项标题 · 必填</label><Input id="ticket-title" aria-label="事项标题" value={draft.title} onChange={(e) => field('title', e.target.value)} placeholder="简述需要处理的事项" /></Col>
-      <Col span={12}><label style={labelStyle} htmlFor="ticket-category">{kind === 'bug' ? '缺陷类别' : '业务类别'} · 必填</label><Input id="ticket-category" aria-label="事项类别" value={draft.category} onChange={(e) => field('category', e.target.value)} placeholder={kind === 'bug' ? '功能 / 性能 / 兼容 / 安全等' : '例如功能优化、交付协调'} /></Col>
-      {kind !== 'risk' && <Col span={12}><span style={labelStyle}>{kind === 'requirement' ? '优先级' : '严重程度'} · 必填</span><Select aria-label="新建优先级" style={{ width: '100%' }} placeholder="请选择" value={draft.rank || undefined} options={ranks.map((value) => ({ value, label: value }))} onChange={(value) => field('rank', value)} /></Col>}
-      <Col span={24}><label style={labelStyle} htmlFor="ticket-description">事项描述 · 必填</label><Input.TextArea id="ticket-description" aria-label="事项描述" rows={4} value={draft.description} onChange={(e) => field('description', e.target.value)} placeholder={kind === 'bug' ? '复现步骤：\n预期结果与实际表现：\n运行环境与影响范围：' : kind === 'risk' ? '风险来源、触发条件与可能影响' : '背景与范围、期望结果、当前影响'} /></Col>
+      <Col span={24}><label style={labelStyle} htmlFor="ticket-title">{reqMark}事项标题 · 必填</label><Input id="ticket-title" aria-label="事项标题" value={draft.title} onChange={(e) => field('title', e.target.value)} placeholder="简述需要处理的事项" /></Col>
+      <Col span={12}><label style={labelStyle} htmlFor="ticket-category">{reqMark}{kind === 'bug' ? '缺陷类别' : '业务类别'} · 必填</label><Input id="ticket-category" aria-label="事项类别" value={draft.category} onChange={(e) => field('category', e.target.value)} placeholder={kind === 'bug' ? '功能 / 性能 / 兼容 / 安全等' : '例如功能优化、交付协调'} /></Col>
+      {kind !== 'risk' && <Col span={12}><span style={labelStyle}>{reqMark}{kind === 'requirement' ? '优先级' : '严重程度'} · 必填</span><Select aria-label="新建优先级" style={{ width: '100%' }} placeholder="请选择" value={draft.rank || undefined} options={ranks.map((value) => ({ value, label: value }))} onChange={(value) => field('rank', value)} /></Col>}
+      <Col span={24}><label style={labelStyle} htmlFor="ticket-description">{reqMark}事项描述 · 必填</label><Input.TextArea id="ticket-description" aria-label="事项描述" rows={4} value={draft.description} onChange={(e) => field('description', e.target.value)} placeholder={kind === 'bug' ? '复现步骤：\n预期结果与实际表现：\n运行环境与影响范围：' : kind === 'risk' ? '风险来源、触发条件与可能影响' : '背景与范围、期望结果、当前影响'} /></Col>
       <Col span={12}><span style={labelStyle}>处理责任人</span><Select aria-label="新建责任人" style={{ width: '100%' }} value={draft.owner} showSearch optionFilterProp="label" options={mockUsers.map((u) => ({ value: u.id, label: u.name }))} onChange={(value) => field('owner', value)} /></Col>
-      <Col span={12}><label style={labelStyle} htmlFor="ticket-deadline">{kind === 'risk' ? '措施期限' : '期望解决日期'}</label><Input id="ticket-deadline" aria-label="期望解决日期" value={draft.deadline} placeholder="YYYY-MM-DD" onChange={(e) => field('deadline', e.target.value)} /></Col>
+      <Col span={12}><label style={labelStyle} htmlFor="ticket-deadline">{kind === 'risk' ? '措施期限' : '期望解决日期'}</label><DatePicker id="ticket-deadline" aria-label="期望解决日期" style={{ width: '100%' }} value={draft.deadline ? dayjs(draft.deadline) : undefined} onChange={(_, dateStr) => field('deadline', dateStr as string)} /></Col>
       {kind === 'requirement' && <><Col span={24}><label style={labelStyle} htmlFor="ticket-product">产品线 / 产品名称</label><Input id="ticket-product" aria-label="产品名称" value={draft.product} onChange={(e) => field('product', e.target.value)} /></Col><Col span={24}><Checkbox checked={draft.impactBaseline} onChange={(e) => field('impactBaseline', e.target.checked)}>影响进度基线，须先关联计划变更</Checkbox></Col></>}
-      {kind === 'risk' && <><Col span={12}><label style={labelStyle} htmlFor="ticket-probability">概率评分（1–5）</label><InputNumber id="ticket-probability" aria-label="风险概率" min={1} max={5} value={draft.probability} onChange={(value) => field('probability', value ?? 1)} /></Col><Col span={12}><label style={labelStyle} htmlFor="ticket-impact">影响评分（1–5）</label><InputNumber id="ticket-impact" aria-label="风险影响" min={1} max={5} value={draft.impact} onChange={(value) => field('impact', value ?? 1)} /></Col><Col span={24}><label style={labelStyle} htmlFor="ticket-measures">应对措施 · 必填</label><Input.TextArea id="ticket-measures" aria-label="风险措施" rows={3} value={draft.measures} onChange={(e) => field('measures', e.target.value)} /><p style={{ color: '#64748b', marginBottom: 0 }}>演示规则 CASE-1：概率×影响，6 / 12 / 20分对应中等 / 重大 / 特大。</p></Col></>}
+      {kind === 'risk' && <><Col span={12}><label style={labelStyle} htmlFor="ticket-probability">概率评分（1–5）</label><InputNumber id="ticket-probability" aria-label="风险概率" min={1} max={5} value={draft.probability} onChange={(value) => field('probability', value ?? 1)} /></Col><Col span={12}><label style={labelStyle} htmlFor="ticket-impact">影响评分（1–5）</label><InputNumber id="ticket-impact" aria-label="风险影响" min={1} max={5} value={draft.impact} onChange={(value) => field('impact', value ?? 1)} /></Col><Col span={24}><label style={labelStyle} htmlFor="ticket-measures">{reqMark}应对措施 · 必填</label><Input.TextArea id="ticket-measures" aria-label="风险措施" rows={3} value={draft.measures} onChange={(e) => field('measures', e.target.value)} /><p style={{ color: '#64748b', marginBottom: 0 }}>演示规则 CASE-1：概率×影响，6 / 12 / 20分对应中等 / 重大 / 特大。</p></Col></>}
     </Row>
   </Modal>;
 }

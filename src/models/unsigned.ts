@@ -7,7 +7,6 @@ export interface UnsignedProjectControl {
   expectedSignDate: string;
   validUntil: string;
   ruleVersion: string;
-  autoBlocked?: boolean;
   followups: {
     id: string;
     date: string;

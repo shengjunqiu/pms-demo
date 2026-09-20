@@ -1,6 +1,7 @@
 import { canViewSensitiveField } from '@/mock/configuration-access';
 import { useState } from 'react';
-import { Alert, Button, Card, Col, Descriptions, Drawer, Empty, Form, Input, InputNumber, message, Modal, Row, Select, Space, Statistic, Table, Tabs, Tag, Typography } from 'antd';
+import { Alert, Button, Card, Checkbox, Col, DatePicker, Descriptions, Drawer, Empty, Form, Input, InputNumber, message, Modal, Row, Select, Space, Statistic, Table, Tabs, Tag, Tooltip, Typography } from 'antd';
+import dayjs from 'dayjs';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useBusinessStore } from '@/mock/store';
@@ -8,6 +9,7 @@ import { selectFourCalculations, visibleProjects } from '@/mock/selectors';
 import { inOrganization } from '@/mock/org-utils';
 import { useAppStore } from '@/store/useAppStore';
 import { AS_OF_DATE, mockCostSources, mockDepartments, mockProcurements, mockOutsources, mockExpenses, mockTimesheets } from '@/mock';
+import { constructionLockReason } from '@/mock/construction-lock';
 import { mockCostSnapshots } from '@/mock/cost-history';
 import { formatPercent, percentage, sumMoney } from '@/utils/money';
 import { selectAlertRules } from '@/mock/configuration-finance';
@@ -32,12 +34,15 @@ function DynamicAccountingContent() {
   const dispatch = useBusinessStore((s) => s.dispatch);
   const role = useAppStore((s) => s.currentRole);
   const currentUser = useAppStore((s) => s.currentUser);
+  const asOfDate = useAppStore((s) => s.asOfDate);
   const showMargin = canViewSensitiveField(data, { role }, 'margin');
   const healthReason = (reason: string) => showMargin ? reason : reason.replace(/毛利[^，。；]*/g, '毛利信息已隐藏');
   const [source, setSource] = useState<CostItem>();
   const [query, setQuery] = useState('');
   const [forecastOpen, setForecastOpen] = useState(false);
   const [forecastForm] = Form.useForm();
+  const [costOpen, setCostOpen] = useState(false);
+  const [costForm] = Form.useForm();
   const p = data.projects.find((project) => project.id === id);
   if (!p) return <StateView type="404" title="项目不存在" />;
   if (!['executive', 'pmo', 'finance', 'project-manager', 'admin'].includes(role) || !visibleProjects(role, data.projects, data).some((project) => project.id === id)) return <StateView type="403" />;
@@ -45,6 +50,8 @@ function DynamicAccountingContent() {
   if (!calc.budget) return <StateView type="empty" title="尚无生效预算" subTitle="预算审批通过后即可开展动态核算。" />;
   const subjectId = params.get('subject'); const tab = params.get('tab') ?? 'subjects';
   const update = (key: string, value?: string) => { const next = new URLSearchParams(window.location.search); if (value) next.set(key, value); else next.delete(key); setParams(next); };
+  // 报告 R3：财务直录成本入口；结算冻结/锁定期间 mock 会抛错，按钮同步禁用并给出原因
+  const costLockReason = constructionLockReason(data, p.id);
   const costs = calc.costs.filter((c) => (!subjectId || c.subjectId === subjectId) && (!query || `${c.sourceId} ${c.description} ${c.subjectName}`.includes(query)));
   const sourceVoucher = mockCostSources.find((v) => v.id === source?.sourceId);
   const upstream = [...mockProcurements, ...mockOutsources, ...mockExpenses, ...mockTimesheets].find((record) => record.id === sourceVoucher?.upstreamId);
@@ -85,7 +92,7 @@ function DynamicAccountingContent() {
       { key: 'trend', label: '历史成本趋势', children: <><CostTrendChart points={points} /><Table rowKey="date" size="small" pagination={false} dataSource={points} columns={[{ title: '快照日期', dataIndex: 'date' }, ...(['budget', 'actual', 'rolling'] as const).map((key, i) => ({ title: ['预算', '已发生', '滚动预测'][i], dataIndex: key,align:'right' as const, render: (v: number) => <MoneyText value={v} /> }))]} /><Text type="secondary">历史演示快照只读；最新一行使用当前共享数据。</Text></> },
       { key: 'organizations', label: '业务群成本对比', children: <><Alert type="info" message="同角色可见项目的业务群汇总；每个项目按主责部门全额归属，不重复分摊。" /><Table dataSource={orgRows} rowKey="id" size="small" pagination={false} columns={[{ title: '业务群', dataIndex: 'name' }, { title: '项目数', dataIndex: 'count' }, ...(['budget', 'actual', 'rolling'] as const).map((key, i) => ({ title: ['预算（万元）', '已发生（万元）', '滚动（万元）'][i], dataIndex: key,align:'right' as const, render: (v: number) => <MoneyText value={v} /> }))]} /></> },
     ]} /></PageSection>
-    <Card title="已确认成本来源" size="small" style={{ marginTop: 16 }} extra={<Button onClick={() => { update('subject'); setQuery(''); }}>重置明细筛选</Button>}>
+    <Card title="已确认成本来源" size="small" style={{ marginTop: 16 }} extra={<Space>{role === 'finance' && (costLockReason ? <Tooltip title={costLockReason}><Button disabled>直录成本</Button></Tooltip> : <Button type="primary" onClick={() => { costForm.resetFields(); costForm.setFieldsValue({ occurredDate: dayjs(asOfDate) }); setCostOpen(true); }}>直录成本</Button>)}<Button onClick={() => { update('subject'); setQuery(''); }}>重置明细筛选</Button></Space>}>
       <PageToolbar><Select aria-label="成本科目" allowClear placeholder="全部科目" value={subjectId ?? undefined} onChange={(value) => update('subject', value)} style={{ width: 190 }} options={calc.subjects.map((s) => ({ value: s.subjectId, label: s.subjectName }))} /><Input aria-label="搜索来源凭证" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索来源凭证或摘要" allowClear style={{ width: 230 }} /><Text>{costs.length} 笔 · 合计 <MoneyText value={sumMoney(costs.map((c) => c.amount))} /> 万元</Text></PageToolbar>
       <Table rowKey="id" columns={costColumns} dataSource={costs} size="small" pagination={{ pageSize: 5, showSizeChanger: false }} scroll={{ x: 750 }} locale={{ emptyText: <Empty description="当前科目没有已确认成本" /> }} />
     </Card>
@@ -104,6 +111,39 @@ function DynamicAccountingContent() {
               { title: '金额（万元）', dataIndex: 'amount', render: (_, { name, ...rest }) => <Form.Item {...rest} name={[name, 'amount']} rules={[{ required: true, type: 'number', min: 0, message: '请输入金额' }]}><InputNumber min={0} precision={2} style={{ width: '100%' }} /></Form.Item> },
             ]} />}
           </Form.List>
+        </Form.Item>
+      </Form>
+    </Modal>
+    <Modal title="直录成本确认" open={costOpen} onCancel={() => setCostOpen(false)} okText="确认入账" destroyOnClose onOk={async () => {
+      try {
+        const values = await costForm.validateFields();
+        const subject = calc.subjects.find((s) => s.subjectId === values.subjectId);
+        dispatch({ type: 'confirm-cost', cost: { id: `DIRECT-${Date.now().toString(36)}`, projectId: p.id, type: values.type, subjectId: values.subjectId, subjectName: subject?.subjectName ?? values.subjectId, amount: values.amount, occurredDate: values.occurredDate.format('YYYY-MM-DD'), sourceId: values.sourceId.trim(), description: values.description.trim() }, fromCommitment: !!values.fromCommitment }, { id: currentUser.id, name: currentUser.name, role });
+        setCostOpen(false);
+        message.success('成本已确认入账');
+      } catch (e) { if (e instanceof Error) message.error(e.message); }
+    }}>
+      <Form form={costForm} layout="vertical">
+        <Form.Item name="type" label="成本类型" rules={[{ required: true, message: '请选择成本类型' }]}>
+          <Select options={(['labor', 'procurement', 'outsource', 'expense'] as const).map((value, i) => ({ value, label: ['人力', '采购', '外包', '期间费用'][i] }))} placeholder="请选择成本类型" />
+        </Form.Item>
+        <Form.Item name="subjectId" label="成本科目" rules={[{ required: true, message: '请选择成本科目' }]}>
+          <Select options={calc.subjects.map((s) => ({ value: s.subjectId, label: s.subjectName }))} placeholder="请选择统一成本科目" showSearch optionFilterProp="label" />
+        </Form.Item>
+        <Form.Item name="amount" label="金额（万元）" rules={[{ required: true, type: 'number', min: 0.01, message: '请输入大于 0 的金额' }]}>
+          <InputNumber style={{ width: '100%' }} min={0.01} precision={2} />
+        </Form.Item>
+        <Form.Item name="occurredDate" label="发生日期" rules={[{ required: true, message: '请选择发生日期' }]}>
+          <DatePicker style={{ width: '100%' }} />
+        </Form.Item>
+        <Form.Item name="sourceId" label="来源凭证编号" rules={[{ required: true, whitespace: true, message: '请输入来源凭证编号' }]} extra="同一来源凭证只能入账一次，不能与已有成本重复">
+          <Input placeholder="例如 FINAL-COST" maxLength={40} />
+        </Form.Item>
+        <Form.Item name="description" label="摘要" rules={[{ required: true, whitespace: true, message: '请输入摘要' }]}>
+          <Input placeholder="例如：结算金额退回后补录的成本凭证" maxLength={80} />
+        </Form.Item>
+        <Form.Item name="fromCommitment" valuePropName="checked" extra={<>勾选后金额同时从未发生承诺中扣减；当前未发生承诺 <MoneyText value={p.committedCost} /> 万元。</>}>
+          <Checkbox>从承诺结转（金额从未发生承诺扣减）</Checkbox>
         </Form.Item>
       </Form>
     </Modal>

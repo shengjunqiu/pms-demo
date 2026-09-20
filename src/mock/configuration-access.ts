@@ -27,8 +27,8 @@ const defaultActions:Record<UserRole,string[]>={
 const conditionalActions=['decide-initiation','review-early-investment','reply-planning','score-post-evaluation','accept-operation-handover','submit-operation-cost','record-operation-event','resolve-operation-event'];
 const allowedActions=(role:UserRole)=>Array.from(new Set([...defaultActions[role],...conditionalActions,...(role==='pmo'?['create-ticket']:[])]));
 const defaultPages:Record<UserRole,string[]>={
- executive:[...ids('GL',range(6)),...ids('WK',[2]),...ids('GS',[1,3,4,5,6,7,8,9,10,11]),...ids('YS',range(15)),...ids('HS',range(17)),...ids('JS',range(13))],
- pmo:[...ids('GL',range(6)),...ids('WK',range(2)),...ids('GS',[1,3,4,5,6,7,8,9,10,11]),...ids('YS',range(15)),...ids('HS',range(17)),...ids('JS',range(13)),...ids('CF',[1,2,3,4,6])],
+ executive:[...ids('GL',range(6)),...ids('WK',[2,3]),...ids('GS',[1,3,4,5,6,7,8,9,10,11]),...ids('YS',range(15)),...ids('HS',range(17)),...ids('JS',range(13))],
+ pmo:[...ids('GL',range(6)),...ids('WK',range(3)),...ids('GS',[1,3,4,5,6,7,8,9,10,11]),...ids('YS',range(15)),...ids('HS',range(17)),...ids('JS',range(13)),...ids('CF',[1,2,3,4,6])],
  finance:[...ids('GL',[2]),...ids('WK',[2]),...ids('GS',[1,3,4,5,6,7,8,9,10,11]),...ids('YS',range(15)),...ids('HS',range(17)),...ids('JS',range(13)),...ids('CF',[4,5])],
  market:[...ids('GS',range(11)),...ids('WK',[2]),...ids('YS',[1,2,3,4,13,14]),...ids('HS',[1,13,14,15]),...ids('JS',[1,2,3,4])],
  'project-manager':[...ids('WK',range(2)),...ids('GS',[1,3,4,5,6,7,8,9,10,11]),...ids('YS',range(15)),...ids('HS',range(17)),...ids('JS',range(13))],
@@ -44,7 +44,7 @@ export function canAccessPage(state:Pick<AccessState,'accessConfiguration'>,acto
 export function canAccessAction(state:Partial<AccessState>,actor:Pick<Actor,'role'> & Partial<Pick<Actor,'id'|'name'>>,actionType:string,targetId?:string){
  const p=selectAccessPolicy(state,actor.role);if(!p||p.tenantId!==DEMO_TENANT||!p.actions.includes(actionType))return false;
  const project=state.projects?.find(p=>p.id===targetId);
- if(actionType==='create-ticket'&&actor.role==='pmo')return !!actor.id&&!!project?.memberIds?.includes(actor.id);
+ if(actionType==='create-ticket'&&actor.role==='pmo'){const team=state.projectTeams?.[targetId??''];return !!actor.id&&!!project&&(!!project.memberIds?.includes(actor.id)||!!team?.members.some(m=>m.userId===actor.id));}
  if(actionType==='reply-planning'){
   const review=state.planningReviews?.find(r=>r.id===targetId),draft=review&&state.planningDrafts?.[review.projectId],project=review&&state.projects?.find(p=>p.id===review.projectId);
   return !!actor.id&&review?.status==='整改'&&draft?.status==='整改中'&&draft.reviewId===review.id&&review.rectifications.some(r=>!r.reply?.trim()&&(r.ownerId===actor.id||actor.role==='project-manager'&&project?.pmId===actor.id));

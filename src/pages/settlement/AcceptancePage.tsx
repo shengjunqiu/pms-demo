@@ -7,6 +7,7 @@ import {
   Card,
   Checkbox,
   Col,
+  DatePicker,
   Descriptions,
   Drawer,
   Empty,
@@ -21,9 +22,11 @@ import {
   Tag,
   Timeline,
 } from "antd";
+import dayjs from "dayjs";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { PageHeader } from "@/components/common/PageHeader";
 import { MetricStatCard } from "@/components/common/MetricStatCard";
+import { MoneyText } from "@/components/common/MoneyText";
 import { PageSection, PageToolbar } from "@/components/common/PageSection";
 import { StateView } from "@/components/common/StateView";
 import { useBusinessStore } from "@/mock/store";
@@ -170,6 +173,21 @@ export function AcceptancePage({ kind }: { kind: AcceptanceType }) {
   const execute = () => {
     if (!canOperate(operation)) return;
     try {
+      if (operation === "submit") {
+        const missing = [
+          !draft.scope.trim() && "验收范围",
+          !draft.plannedDate && "计划验收时间",
+          !draft.method.trim() && "验收方式",
+          !draft.participants.trim() && "参与人员",
+          kind === "客户终验" &&
+            !draft.customerContact.trim() &&
+            "客户联系人",
+          kind === "供应商验收" &&
+            !draft.supplierSourceId &&
+            "采购 / 外包原合同",
+        ].filter(Boolean) as string[];
+        if (missing.length) throw new Error(`请先填写：${missing.join("、")}`);
+      }
       let action: AcceptanceAction;
       const proofFiles = files
         .split("\n")
@@ -314,9 +332,9 @@ export function AcceptancePage({ kind }: { kind: AcceptanceType }) {
             .filter((c) => c.projectId === p.id)
             .map((c) => (
               <p key={c.id}>
-                {c.code} · 合同 {c.amount.toLocaleString("zh-CN")} 万元 ·
+                {c.code} · 合同 <MoneyText value={c.amount} /> 万元 ·
                 累计已确认报验{" "}
-                {confirmedReportedAmount(data, c.id).toLocaleString("zh-CN")}{" "}
+                <MoneyText value={confirmedReportedAmount(data, c.id)} />{" "}
                 万元{" "}
                 <Button
                   type="link"
@@ -507,7 +525,13 @@ export function AcceptancePage({ kind }: { kind: AcceptanceType }) {
                           ),
                         },
                         { title: "履约范围", dataIndex: "scope" },
-                        { title: "金额（万元）", dataIndex: "amount" },
+                        {
+                          title: "金额（万元）",
+                          dataIndex: "amount",
+                          render: (v: number | null | undefined) => (
+                            <MoneyText value={v} />
+                          ),
+                        },
                         { title: "履约状态", dataIndex: "status" },
                         {
                           title: "来源",
@@ -765,12 +789,15 @@ export function AcceptancePage({ kind }: { kind: AcceptanceType }) {
               </Form.Item>
               <Space align="start">
                 <Form.Item label="计划验收时间" required>
-                  <Input
-                    type="date"
+                  <DatePicker
                     aria-label="计划验收时间"
-                    value={draft.plannedDate}
-                    onChange={(e) =>
-                      setDraft({ ...draft, plannedDate: e.target.value })
+                    style={{ width: 170 }}
+                    value={
+                      draft.plannedDate ? dayjs(draft.plannedDate) : undefined
+                    }
+                    disabledDate={(d) => d.isBefore(dayjs(AS_OF_DATE), "day")}
+                    onChange={(_, dateStr) =>
+                      setDraft({ ...draft, plannedDate: dateStr as string })
                     }
                   />
                 </Form.Item>

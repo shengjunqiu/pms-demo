@@ -1,5 +1,6 @@
 import { useActionAccess } from "@/hooks/useActionAccess";
 import { canViewSensitiveField } from "@/mock/configuration-access";
+import { MoneyText } from "@/components/common/MoneyText";
 import { useState } from "react";
 import {
   Alert,
@@ -26,7 +27,6 @@ import { PageHeader } from "@/components/common/PageHeader";
 import { MetricStatCard } from "@/components/common/MetricStatCard";
 import { PageSection } from "@/components/common/PageSection";
 import { StateView } from "@/components/common/StateView";
-import { MoneyText } from "@/components/common/MoneyText";
 import { useBusinessStore } from "@/mock/store";
 import {
   selectFourCalculations,
@@ -500,8 +500,8 @@ export function SettlementAnalysisPage({
                           ),
                         },
                         { title: "节点", dataIndex: "title" },
-                        { title: "应收", dataIndex: "amount" },
-                        { title: "已收", dataIndex: "paidAmount" },
+                        { title: "应收", dataIndex: "amount", render: (v: number | null | undefined) => <MoneyText value={v} /> },
+                        { title: "已收", dataIndex: "paidAmount", render: (v: number | null | undefined) => <MoneyText value={v} /> },
                         { title: "到期日", dataIndex: "dueDate" },
                         {
                           title: "状态",
@@ -1072,7 +1072,11 @@ function ReceiptPanel({
                 }
                 options={contracts.map((c) => ({
                   value: c.id,
-                  label: `${c.code} · ${c.name} · 未收 ${c.unpaidAmount} 万元`,
+                  label: (
+                    <>
+                      {c.code} · {c.name} · 未收 <MoneyText value={c.unpaidAmount} /> 万元
+                    </>
+                  ),
                   disabled: c.unpaidAmount <= 0,
                 }))}
               />
@@ -1221,7 +1225,13 @@ function ReceiptPanel({
             </Form.Item>
             <Alert
               type={total > (contract?.unpaidAmount ?? 0) ? "error" : "info"}
-              message={`本次合计 ${total} 万元 · 合同未收 ${contract?.unpaidAmount ?? 0} 万元 · 确认后未收 ${sumMoney([contract?.unpaidAmount ?? 0, -total])} 万元`}
+              message={
+                <>
+                  本次合计 <MoneyText value={total} /> 万元 · 合同未收{" "}
+                  <MoneyText value={contract?.unpaidAmount ?? 0} /> 万元 · 确认后未收{" "}
+                  <MoneyText value={sumMoney([contract?.unpaidAmount ?? 0, -total])} /> 万元
+                </>
+              }
             />
             <Form.Item
               label="收款凭据文件名（每行一份，pdf/png/jpg/xlsx）"
