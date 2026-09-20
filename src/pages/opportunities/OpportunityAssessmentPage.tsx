@@ -6,6 +6,7 @@ import {
   App,
   Button,
   Col,
+  DatePicker,
   Descriptions,
   Empty,
   Form,
@@ -22,6 +23,7 @@ import {
   Upload,
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
+import dayjs from "dayjs";
 import { useBusinessStore } from "@/mock/store";
 import {
   assessmentSummary,
@@ -38,6 +40,7 @@ import { PageHeader } from "@/components/common/PageHeader";
 import { StateView } from "@/components/common/StateView";
 import { MoneyText } from "@/components/common/MoneyText";
 import { PAGE_MANIFEST } from "@/routes/manifest";
+import { mockUsers } from "@/mock";
 import { OpportunityActions } from "./OpportunityActions";
 export function OpportunityAssessmentPage() {
  const {canDo}=useActionAccess();
@@ -56,6 +59,8 @@ export function OpportunityAssessmentPage() {
   const [form] = Form.useForm();
   const [reason, setReason] = useState("");
   const [selectedRound, setSelectedRound] = useState<string>();
+  const [conclusionMode, setConclusionMode] = useState<"暂缓" | "已终止">();
+  const [conclusionForm] = Form.useForm();
   const o = data.opportunities.find((o) => o.id === id);
   if (!o) return <StateView type="404" />;
   if (!canViewOpportunity(data, o, actor)) return <StateView type="403" />;
@@ -69,6 +74,9 @@ export function OpportunityAssessmentPage() {
   const history = round?.id !== latest?.id;
   const manage = canManageOpportunity(data, o, actor);
   const canConclude=manage&&!history&&round?.status==='评估中'&&canDo('conclude-opportunity',o.id);
+  const opportunityReadonly = ["已转立项", "已终止"].includes(o.status);
+  // 暂缓/终止不要求评估轮次进行中（与域规则一致），仅需主办权限、非终态及动作权限。
+  const canSetOpportunityConclusion = manage && !opportunityReadonly && canDo("conclude-opportunity", o.id);
   const canSaveDimension=!history&&round?.status==='评估中'&&canDo('save-opportunity-dimension',o.id);
   const hiddenOpinion = (key: AssessmentDimension) =>
     !viewMargin &&
@@ -405,9 +413,32 @@ export function OpportunityAssessmentPage() {
                 </>
               )
             )}
-            {manage && !history && (
+            {manage && !history && canSetOpportunityConclusion && (
               <div style={{ marginTop: 16 }}>
-                <OpportunityActions opportunity={o} />
+                <Space wrap>
+                  <Button
+                    disabled={!canSetOpportunityConclusion}
+                    onClick={() => {
+                      conclusionForm.resetFields();
+                      setConclusionMode("暂缓");
+                    }}
+                  >
+                    暂缓
+                  </Button>
+                  <Button
+                    danger
+                    disabled={!canSetOpportunityConclusion}
+                    onClick={() => {
+                      conclusionForm.resetFields();
+                      setConclusionMode("已终止");
+                    }}
+                  >
+                    终止
+                  </Button>
+                </Space>
+                <p style={{ marginTop: 8, color: "#8c8c8c", fontSize: 12 }}>
+                  暂缓/终止不要求本轮评估完成，但需填写决策原因及后续安排，确认后商机状态与历史记录同步更新。
+                </p>
               </div>
             )}
             {m.solutionTask && (
@@ -517,6 +548,73 @@ export function OpportunityAssessmentPage() {
               <Button>选择附件</Button>
             </Upload>
           </Form.Item>
+        </Form>
+      </Modal>
+      <Modal
+        title={conclusionMode === "暂缓" ? "商机暂缓与复评安排" : "商机终止与成本处置"}
+        open={!!conclusionMode}
+        okButtonProps={{ disabled: !canSetOpportunityConclusion }}
+        onCancel={() => setConclusionMode(undefined)}
+        onOk={async () => {
+          try {
+            const v = await conclusionForm.validateFields();
+            dispatch(
+              {
+                type: "conclude-opportunity",
+                id: o.id,
+                conclusion: conclusionMode!,
+                reason: v.reason,
+                reviewDate: v.reviewDate?.format("YYYY-MM-DD"),
+                reviewOwnerId: v.reviewOwnerId,
+                costDisposition: v.costDisposition,
+                retrospective: v.retrospective,
+              },
+              actor,
+            );
+            setConclusionMode(undefined);
+            message.success("商机状态及历史记录已更新");
+          } catch (e) {
+            if (e instanceof Error) message.error(e.message);
+          }
+        }}
+        okText="确认并记录"
+      >
+        <Form form={conclusionForm} layout="vertical" disabled={!canSetOpportunityConclusion}>
+          <Form.Item name="reason" label="决策原因" rules={[{ required: true, whitespace: true }]}>
+            <Input.TextArea rows={3} />
+          </Form.Item>
+          {conclusionMode === "暂缓" ? (
+            <>
+              <Form.Item name="reviewDate" label="下次复评日期" rules={[{ required: true }]}>
+                <DatePicker minDate={dayjs("2026-09-10")} />
+              </Form.Item>
+              <Form.Item name="reviewOwnerId" label="复评责任人" rules={[{ required: true }]}>
+                <Select
+                  showSearch
+                  optionFilterProp="label"
+                  options={mockUsers.map((u) => ({ value: u.id, label: u.name }))}
+                />
+              </Form.Item>
+            </>
+          ) : (
+            <>
+              <p>已发生提前投入：{o.earlyInvestmentUsed.toFixed(2)} 万元。终止后保留成本与来源记录。</p>
+              <Form.Item
+                name="costDisposition"
+                label="成本处置说明"
+                rules={[{ required: o.earlyInvestmentUsed > 0, whitespace: true }]}
+              >
+                <Input.TextArea />
+              </Form.Item>
+              <Form.Item
+                name="retrospective"
+                label="退出复盘与沉没成本分析"
+                rules={[{ required: o.earlyInvestmentUsed > 0, whitespace: true }]}
+              >
+                <Input.TextArea />
+              </Form.Item>
+            </>
+          )}
         </Form>
       </Modal>
     </>
