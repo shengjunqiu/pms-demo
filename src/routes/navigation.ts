@@ -3,7 +3,7 @@ import type { UserRole } from '@/store/useAppStore';
 export const ROLE_HOME: Record<UserRole, string> = {
   executive: '/executive/dashboard', pmo: '/executive/dashboard',
   'project-manager': '/workbench/project-manager', market: '/opportunities',
-  finance: '/executive/dashboard', 'solution-tech': '/opportunities',
+  finance: '/executive/four-calculations', 'solution-tech': '/opportunities',
   admin: '/settings/permissions',
 };
 
@@ -54,6 +54,7 @@ export const GLOBAL_NAV_SECTIONS: GlobalNavSection[] = [
         icon: 'executive',
         entries: [
           { pageId: 'GL-01' },
+          { pageId: 'GL-02' },
           { pageId: 'GL-05' },
           { pageId: 'WK-03' },
         ],

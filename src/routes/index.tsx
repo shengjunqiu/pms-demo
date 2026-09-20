@@ -25,6 +25,7 @@ const ReportsPage = lazyPage(() => import('@/pages/execution/ReportsPage'), 'Rep
 const DeliverablesPage = lazyPage(() => import('@/pages/execution/DeliverablesPage'), 'DeliverablesPage');
 const CostSourcesPage = lazyPage(() => import('@/pages/execution/CostSourcesPage'), 'CostSourcesPage');
 const GL01DashboardPage = lazyPage(() => import('@/pages/executive/GL01DashboardPage'), 'GL01DashboardPage');
+const GL02FourCalculationsPage = lazyPage(() => import('@/pages/executive/GL02FourCalculationsPage'), 'GL02FourCalculationsPage');
 const GL03ProjectDrilldownPage = lazyPage(() => import('@/pages/executive/GL03ProjectDrilldownPage'), 'GL03ProjectDrilldownPage');
 const GL04PortfolioPage = lazyPage(() => import('@/pages/executive/GL04PortfolioPage'), 'GL04PortfolioPage');
 const GL05ExceptionsPage = lazyPage(() => import('@/pages/executive/GL05ExceptionsPage'), 'GL05ExceptionsPage');
@@ -61,7 +62,7 @@ export const AppRouter: React.FC = () => {
         {opportunityRoutes.map(r=><Route key={r.path} path={r.path} element={r.element}/>)}
         {/* Phase 2: GL 驾驶舱与专题分析 */}
         <Route path="executive/dashboard" element={<GL01DashboardPage />} />
-        {/* <Route path="executive/four-calculations" element={<GL02FourCalculationsPage />} /> */}
+        <Route path="executive/four-calculations" element={<GL02FourCalculationsPage />} />
         <Route path="executive/project-drilldown" element={<GL03ProjectDrilldownPage />} />
         <Route path="executive/portfolio" element={<GL04PortfolioPage />} />
         <Route path="executive/decisions" element={<GL06DecisionsPage />} />

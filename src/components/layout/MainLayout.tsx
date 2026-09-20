@@ -94,10 +94,12 @@ export const MainLayout: React.FC = () => {
     return items;
   }, [data, currentUser, normalizedKeyword]);
 
-  const currentPage = PAGE_MANIFEST.find((p) => {
+  const isApprovalsDetail = /^\/approvals\/[^/]+$/.test(location.pathname);
+  // /approvals/:id 不属于任何 manifest 页，鉴权交给审批页内角色白名单（BudgetApprovalPage/ManagementApprovalPage）
+  const currentPage = isApprovalsDetail ? undefined : PAGE_MANIFEST.find((p) => {
     if (p.route === location.pathname) return true;
     const pattern = p.route.replace(/:[a-zA-Z]+/g, '[^/]+');
-    return new RegExp(`^${pattern}$`).test(location.pathname) || /^\/approvals\/[^/]+$/.test(location.pathname);
+    return new RegExp(`^${pattern}$`).test(location.pathname);
   });
   const targetId = location.pathname.split('/')[2] ?? '';
   const routeProject = projectForTarget(data, targetId);
@@ -107,6 +109,7 @@ export const MainLayout: React.FC = () => {
   const selectedGlobalKey = globalNavKey(location.pathname);
   const activeGroup = allGroups.find((group) => group.entries.some((entry) => resolveNavEntry(entry).route === selectedGlobalKey))?.key;
   const isWorkspace = !!currentPage && ['WK', 'GL', 'GS', 'YS', 'HS', 'JS', 'CF'].includes(currentPage.id.split('-')[0])
+    || isApprovalsDetail
     || /^\/projects\/[^/]+\/plan-requests\/[^/]+$/.test(location.pathname);
 
   // 自由展开/收起多分组
