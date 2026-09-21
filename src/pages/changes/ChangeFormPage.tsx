@@ -187,7 +187,8 @@ function ChangeFormContent() {
       <Alert style={{ marginBottom: 16 }} showIcon type={proposal?.reasons.length ? "warning" : "info"} message={proposal?.reasons.length
             ? marginReason(proposal.reasons.join("；"), showMargin)
             : "按演示规则属于较小影响变更，仍须完成专业评估和PMO分级"} description={`${CHANGE_RULE.version}：成本绝对影响≥${CHANGE_RULE.largeCost}万元、工期≥${CHANGE_RULE.largeShiftDays}天、毛利率<${CHANGE_RULE.minGrossMarginPercent}%或重大风险，进入PMC；禁止普通审批绕过。`}/>
-          <Card title="当前处理 · 专业评估与审批" style={{ marginBottom: 16 }} size="small">
+          {/* 步骤进度条 */}
+          <Card size="small" style={{ marginBottom: 16 }}>
             <Steps
               size="small"
               current={(() => {
@@ -217,66 +218,15 @@ function ChangeFormContent() {
                 base.push({ title: "完成" });
                 return base;
               })()}
-              style={{ marginBottom: 16 }}
+              style={{ marginBottom: 12 }}
             />
-            <p>{!request || request.status === "草稿" ? "由项目主PM保存完整材料后提交专业评估。" : ["PMO审批中", "PMC审议中"].includes(request.status) ? `当前审批角色：${request.requiredRole === "executive" ? "集团领导 / PMC" : "PMO"}` : ["已批准", "已否决"].includes(request.status) ? "本轮已处理，审批结果与版本留痕保留。" : "技术、财务、市场完成意见后，由PMO确认分级。"}</p>
-            {request && ["影响评估中", "待分级"].includes(request.status) && (<>
-                <Select aria-label="专业评估领域" style={{ width: 220 }} disabled={!canSelectAssessment} value={assessmentArea} onChange={setAssessmentArea} options={["技术", "财务", "市场"].map((value) => ({
-                value,
-                label: `${value}专业评估`,
-            }))}/>
-                <p>意见须明确范围、工期、成本、资源、供应与合同影响。</p>
-              </>)}
-            <Input.TextArea aria-label="变更处理意见" disabled={!(canAssess || canClassify || canApprove || canReject)} rows={2} value={opinion} onChange={(e) => setOpinion(e.target.value)} placeholder="评估 / 分级 / 审批意见"/>
-            <Space wrap style={{ width: "100%", marginTop: 16 }}>
-              {request && ["影响评估中", "待分级"].includes(request.status) && (<Button disabled={!canAssess} onClick={() => run({
-                type: "assess-project-change",
-                id: request.id,
-                area: assessmentArea,
-                opinion,
-            })}>
-                  提交专业评估
-                </Button>)}
-              {request?.status === "待分级" && (<Button disabled={!canClassify} onClick={() => run({
-                type: "classify-project-change",
-                id: request.id,
-                opinion,
-            })}>
-                  PMO确认分级
-                </Button>)}
-              {request?.input.type === "成本/资源变更" && request.financeSignoff?.signed && (
-                <Tag color="green">财务已会签：{request.financeSignoff.actor} · {request.financeSignoff.date}</Tag>
-              )}
-              {canFinanceSignoff && (<Button type="primary" ghost onClick={() => {
-                if (!opinion.trim()) { message.error('会签意见必填'); return; }
-                run({ type: "finance-signoff-change", id: request!.id, approve: true, opinion });
-              }}>
-                  财务会签通过
-                </Button>)}
-              {canFinanceSignoff && (<Button danger onClick={() => {
-                if (!opinion.trim()) { message.error('会签意见必填'); return; }
-                run({ type: "finance-signoff-change", id: request!.id, approve: false, opinion });
-              }}>
-                  财务会签驳回
-                </Button>)}
-              {request && (request?.status === "PMO审批中" || request?.status === "PMC审议中") && (<Button type="primary" disabled={!canApprove} onClick={() => setDecision(true)}>
-                  通过并追加新基线
-                </Button>)}
-              {request &&
-            !["草稿", "已批准", "已否决"].includes(request.status) && (<Button danger disabled={!canReject} onClick={() => setDecision(false)}>
-                    否决 / 退回补充
-                  </Button>)}
-            </Space>
-            {request?.opinion && (<p>
-                {request.reviewedBy}：{request.opinion}
-              </p>)}
-            {request?.sourceApprovalId && (<Button onClick={() => navigate(`/approvals/${request.sourceApprovalId}?${params}`)}>
-                查看已办原审批
-              </Button>)}
+            <p style={{ marginBottom: 0, color: "rgba(0,0,0,0.45)", fontSize: 13 }}>
+              {!request || request.status === "草稿" ? "由项目主PM保存完整材料后提交专业评估。" : ["PMO审批中", "PMC审议中"].includes(request.status) ? `当前审批角色：${request.requiredRole === "executive" ? "集团领导 / PMC" : "PMO"}` : ["已批准", "已否决"].includes(request.status) ? "本轮已处理，审批结果与版本留痕保留。" : "技术、财务、市场完成意见后，由PMO确认分级。"}
+            </p>
           </Card>
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-        <Col xs={24} xl={17}>
-          <Card title="申请材料 · 01 依据与内容" size="small">
+        <Col xs={24} xl={16}>
+          <Card title="申请材料 · 01 依据与内容" size="small" style={{ marginBottom: 16 }}>
             <Row gutter={[16, 16]}>
               <Col span={16}>
                 <label>
@@ -313,131 +263,186 @@ function ChangeFormContent() {
                 </label>
               </Col>
             </Row>
-            <Collapse ghost defaultActiveKey={["scope", "budget", "resource", "risk"]} items={[
-            {
-                key: "scope",
-                label: "02 · 范围与进度",
-                children: (<>
-                      <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                        <span>目标范围</span>
-                        <Input.TextArea aria-label="目标范围" rows={3} disabled={!canEdit} value={input.scope} onChange={(e) => update({ scope: e.target.value })}/>
-                      </label>
-                      <Space style={{ marginTop: 16 }}>
-                        <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                          <span>未完成计划顺延天数</span>
-                          <InputNumber aria-label="未完成计划顺延天数" min={-365} max={365} disabled={!canEdit} value={input.shiftDays} onChange={(v) => update({ shiftDays: v ?? 0 })}/>
-                        </label>
-                        <Select aria-label="变更紧急程度" disabled={!canEdit} value={input.urgency} onChange={(urgency) => update({ urgency })} options={["一般", "紧急"].map((value) => ({
-                        value,
-                        label: value,
-                    }))}/>
-                      </Space>
-                      <p>
-                        已完成任务和已达成里程碑保留原计划日期；实际完成率、日期、成本不随本申请修改。
-                      </p>
-                      <Input disabled={!canEdit} aria-label="新增范围工作包" placeholder="新增范围工作包（可选）" value={input.newWorkPackage} onChange={(e) => update({ newWorkPackage: e.target.value })}/>
-                      <Select aria-label="新增工作包责任人" style={{ width: "100%", marginTop: 12 }} disabled={!canEdit} value={input.newTaskOwnerId} onChange={(newTaskOwnerId) => update({ newTaskOwnerId })} options={(data.projectTeams[p.id]?.members ?? [])
-                        .filter((m) => m.active)
-                        .map((m) => ({
-                        value: m.userId,
-                        label: `新增工作包责任人：${m.name}`,
-                    }))}/>
-                    </>),
-            },
-            {
-                key: "budget",
-                label: "03 · 预算与收入影响",
-                children: (<>
-                      <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                        <span>变更后预计收入（万元）</span>
-                        <InputNumber disabled={!canEdit} min={0} precision={2} value={input.proposedIncome} onChange={(v) => update({ proposedIncome: v ?? 0 })}/>
-                      </label>
-                      <Table rowKey="subjectId" style={{ marginTop: 12 }} size="small" pagination={false} dataSource={adjustments} columns={[
-                        { title: "科目", dataIndex: "subjectName" },
-                        { title: "原预算万元", dataIndex: "amount" },
-                        {
-                            title: "本次核增/核减万元",
-                            render: (_, i) => (<InputNumber aria-label={`${i.subjectName}预算调整`} disabled={!canEdit} precision={2} value={input.adjustments[i.subjectId] ?? 0} onChange={(v) => update({
-                                    adjustments: {
-                                        ...input.adjustments,
-                                        [i.subjectId]: v ?? 0,
-                                    },
-                                })}/>),
-                        },
-                        {
-                            title: "变更后万元",
-                            render: (_, i) => (i.amount + (input.adjustments[i.subjectId] ?? 0)).toFixed(2),
-                        },
-                    ]}/>
-                    </>),
-            },
-            {
-                key: "resource",
-                label: "04 · 资源与供应影响",
-                children: (<>
-                      <Table rowKey="userId" size="small" pagination={false} dataSource={proposal?.proposed.resources ?? []} columns={[
-                        { title: "资源", dataIndex: "name" },
-                        { title: "岗位", dataIndex: "role" },
-                        {
-                            title: "变更后计划工时",
-                            render: (_, r) => (<InputNumber aria-label={`${r.name}计划工时`} min={1} disabled={!canEdit} value={input.resourceHours[r.userId] ??
-                                    r.plannedHours} onChange={(v) => update({
-                                    resourceHours: {
-                                        ...input.resourceHours,
-                                        [r.userId]: v ?? 1,
-                                    },
-                                })}/>),
-                        },
-                    ]}/>
-                      <label style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 16 }}>
-                        <span>采购影响</span>
-                        <Input.TextArea aria-label="采购影响" disabled={!canEdit} value={input.procurementImpact} onChange={(e) => update({ procurementImpact: e.target.value })}/>
-                      </label>
-                      <label style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 16 }}>
-                        <span>外包影响</span>
-                        <Input.TextArea aria-label="外包影响" disabled={!canEdit} value={input.outsourceImpact} onChange={(e) => update({ outsourceImpact: e.target.value })}/>
-                      </label>
-                    </>),
-            },
-            {
-                key: "risk",
-                label: "05 · 风险与附件",
-                children: (<>
-                      <Checkbox disabled={!canEdit} checked={input.majorRisk} onChange={(e) => update({ majorRisk: e.target.checked })}>
-                        涉及重大风险
-                      </Checkbox>
-                      <Input.TextArea rows={3} disabled={!canEdit} aria-label="风险影响与应对" placeholder="风险影响与应对" value={input.risk} onChange={(e) => update({ risk: e.target.value })}/>
-                      <Space.Compact style={{ width: "100%", margin: "16px 0" }}>
-                        <Input disabled={!canEdit} aria-label="附件文件名" placeholder="附件文件名（前端模拟登记，如客户签证.pdf）" value={filename} onChange={(e) => setFilename(e.target.value)}/>
-                        <Button disabled={!canEdit} onClick={() => {
-                        if (!/\.(pdf|docx|xlsx|png|jpg)$/i.test(filename)) {
-                            message.error("支持PDF、Word、Excel和图片文件名");
-                            return;
-                        }
-                        update({
-                            attachments: [
-                                ...new Set([...input.attachments, filename]),
-                            ],
-                        });
-                        setFilename("");
-                    }}>
-                          登记附件
-                        </Button>
-                      </Space.Compact>
-                      {input.attachments.map((name) => (<Tag key={name} closable={canEdit} onClose={() => update({
-                            attachments: input.attachments.filter((x) => x !== name),
-                        })}>
-                          {name}
-                        </Tag>))}
-                    </>),
-            },
-        ]}/>
           </Card>
-
+          <Collapse ghost defaultActiveKey={["scope", "budget", "resource", "risk"]} items={[
+          {
+              key: "scope",
+              label: "02 · 范围与进度",
+              children: (<>
+                    <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <span>目标范围</span>
+                      <Input.TextArea aria-label="目标范围" rows={3} disabled={!canEdit} value={input.scope} onChange={(e) => update({ scope: e.target.value })}/>
+                    </label>
+                    <Space style={{ marginTop: 16 }}>
+                      <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <span>未完成计划顺延天数</span>
+                        <InputNumber aria-label="未完成计划顺延天数" min={-365} max={365} disabled={!canEdit} value={input.shiftDays} onChange={(v) => update({ shiftDays: v ?? 0 })}/>
+                      </label>
+                      <Select aria-label="变更紧急程度" disabled={!canEdit} value={input.urgency} onChange={(urgency) => update({ urgency })} options={["一般", "紧急"].map((value) => ({
+                      value,
+                      label: value,
+                  }))}/>
+                    </Space>
+                    <p>
+                      已完成任务和已达成里程碑保留原计划日期；实际完成率、日期、成本不随本申请修改。
+                    </p>
+                    <Input disabled={!canEdit} aria-label="新增范围工作包" placeholder="新增范围工作包（可选）" value={input.newWorkPackage} onChange={(e) => update({ newWorkPackage: e.target.value })}/>
+                    <Select aria-label="新增工作包责任人" style={{ width: "100%", marginTop: 12 }} disabled={!canEdit} value={input.newTaskOwnerId} onChange={(newTaskOwnerId) => update({ newTaskOwnerId })} options={(data.projectTeams[p.id]?.members ?? [])
+                      .filter((m) => m.active)
+                      .map((m) => ({
+                      value: m.userId,
+                      label: `新增工作包责任人：${m.name}`,
+                  }))}/>
+                  </>),
+          },
+          {
+              key: "budget",
+              label: "03 · 预算与收入影响",
+              children: (<>
+                    <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <span>变更后预计收入（万元）</span>
+                      <InputNumber disabled={!canEdit} min={0} precision={2} value={input.proposedIncome} onChange={(v) => update({ proposedIncome: v ?? 0 })}/>
+                    </label>
+                    <Table rowKey="subjectId" style={{ marginTop: 12 }} size="small" pagination={false} dataSource={adjustments} columns={[
+                      { title: "科目", dataIndex: "subjectName" },
+                      { title: "原预算万元", dataIndex: "amount" },
+                      {
+                          title: "本次核增/核减万元",
+                          render: (_, i) => (<InputNumber aria-label={`${i.subjectName}预算调整`} disabled={!canEdit} precision={2} value={input.adjustments[i.subjectId] ?? 0} onChange={(v) => update({
+                                  adjustments: {
+                                      ...input.adjustments,
+                                      [i.subjectId]: v ?? 0,
+                                  },
+                              })}/>),
+                      },
+                      {
+                          title: "变更后万元",
+                          render: (_, i) => (i.amount + (input.adjustments[i.subjectId] ?? 0)).toFixed(2),
+                      },
+                  ]}/>
+                  </>),
+          },
+          {
+              key: "resource",
+              label: "04 · 资源与供应影响",
+              children: (<>
+                    <Table rowKey="userId" size="small" pagination={false} dataSource={proposal?.proposed.resources ?? []} columns={[
+                      { title: "资源", dataIndex: "name" },
+                      { title: "岗位", dataIndex: "role" },
+                      {
+                          title: "变更后计划工时",
+                          render: (_, r) => (<InputNumber aria-label={`${r.name}计划工时`} min={1} disabled={!canEdit} value={input.resourceHours[r.userId] ??
+                                  r.plannedHours} onChange={(v) => update({
+                                  resourceHours: {
+                                      ...input.resourceHours,
+                                      [r.userId]: v ?? 1,
+                                  },
+                              })}/>),
+                      },
+                  ]}/>
+                    <label style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 16 }}>
+                      <span>采购影响</span>
+                      <Input.TextArea aria-label="采购影响" disabled={!canEdit} value={input.procurementImpact} onChange={(e) => update({ procurementImpact: e.target.value })}/>
+                    </label>
+                    <label style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 16 }}>
+                      <span>外包影响</span>
+                      <Input.TextArea aria-label="外包影响" disabled={!canEdit} value={input.outsourceImpact} onChange={(e) => update({ outsourceImpact: e.target.value })}/>
+                    </label>
+                  </>),
+          },
+          {
+              key: "risk",
+              label: "05 · 风险与附件",
+              children: (<>
+                    <Checkbox disabled={!canEdit} checked={input.majorRisk} onChange={(e) => update({ majorRisk: e.target.checked })}>
+                      涉及重大风险
+                    </Checkbox>
+                    <Input.TextArea rows={3} disabled={!canEdit} aria-label="风险影响与应对" placeholder="风险影响与应对" value={input.risk} onChange={(e) => update({ risk: e.target.value })}/>
+                    <Space.Compact style={{ width: "100%", margin: "16px 0" }}>
+                      <Input disabled={!canEdit} aria-label="附件文件名" placeholder="附件文件名（前端模拟登记，如客户签证.pdf）" value={filename} onChange={(e) => setFilename(e.target.value)}/>
+                      <Button disabled={!canEdit} onClick={() => {
+                      if (!/\.(pdf|docx|xlsx|png|jpg)$/i.test(filename)) {
+                          message.error("支持PDF、Word、Excel和图片文件名");
+                          return;
+                      }
+                      update({
+                          attachments: [
+                              ...new Set([...input.attachments, filename]),
+                          ],
+                      });
+                      setFilename("");
+                  }}>
+                        登记附件
+                      </Button>
+                    </Space.Compact>
+                    {input.attachments.map((name) => (<Tag key={name} closable={canEdit} onClose={() => update({
+                          attachments: input.attachments.filter((x) => x !== name),
+                      })}>
+                        {name}
+                      </Tag>))}
+                  </>),
+          },
+      ]}/>
         </Col>
-        <Col xs={24} xl={7}>
-
-          <Card title="专业评估意见" size="small">            <Timeline items={(request?.assessments ?? []).map((a) => ({
+        <Col xs={24} xl={8}>
+          {/* 当前处理 — 意见与操作面板 */}
+          <Card title="当前处理" size="small" style={{ marginBottom: 16 }}>
+            <Input.TextArea aria-label="变更处理意见" disabled={!(canAssess || canClassify || canApprove || canReject)} rows={2} value={opinion} onChange={(e) => setOpinion(e.target.value)} placeholder="评估 / 分级 / 审批意见"/>
+            {request && ["影响评估中", "待分级"].includes(request.status) && (<>
+                <Select aria-label="专业评估领域" style={{ width: "100%", marginTop: 12 }} disabled={!canSelectAssessment} value={assessmentArea} onChange={setAssessmentArea} options={["技术", "财务", "市场"].map((value) => ({
+                value,
+                label: `${value}专业评估`,
+            }))}/>
+                <p style={{ marginBottom: 0, fontSize: 12, color: "rgba(0,0,0,0.45)" }}>意见须明确范围、工期、成本、资源、供应与合同影响。</p>
+              </>)}
+            <Space wrap style={{ width: "100%", marginTop: 16 }}>
+              {request && ["影响评估中", "待分级"].includes(request.status) && (<Button disabled={!canAssess} onClick={() => run({
+                type: "assess-project-change",
+                id: request.id,
+                area: assessmentArea,
+                opinion,
+            })}>
+                  提交专业评估
+                </Button>)}
+              {request?.status === "待分级" && (<Button disabled={!canClassify} onClick={() => run({
+                type: "classify-project-change",
+                id: request.id,
+                opinion,
+            })}>
+                  PMO确认分级
+                </Button>)}
+              {canFinanceSignoff && (<Button type="primary" ghost onClick={() => {
+                if (!opinion.trim()) { message.error('会签意见必填'); return; }
+                run({ type: "finance-signoff-change", id: request!.id, approve: true, opinion });
+              }}>
+                  财务会签通过
+                </Button>)}
+              {canFinanceSignoff && (<Button danger onClick={() => {
+                if (!opinion.trim()) { message.error('会签意见必填'); return; }
+                run({ type: "finance-signoff-change", id: request!.id, approve: false, opinion });
+              }}>
+                  财务会签驳回
+                </Button>)}
+              {request && (request?.status === "PMO审批中" || request?.status === "PMC审议中") && (<Button type="primary" disabled={!canApprove} onClick={() => setDecision(true)}>
+                  通过并追加新基线
+                </Button>)}
+              {request &&
+            !["草稿", "已批准", "已否决"].includes(request.status) && (<Button danger disabled={!canReject} onClick={() => setDecision(false)}>
+                    否决 / 退回补充
+                  </Button>)}
+            </Space>
+            {request?.input.type === "成本/资源变更" && request.financeSignoff?.signed && (
+              <Tag color="green" style={{ marginTop: 12 }}>财务已会签：{request.financeSignoff.actor} · {request.financeSignoff.date}</Tag>
+            )}
+            {request?.opinion && (<p style={{ marginTop: 12 }}>
+                {request.reviewedBy}：{request.opinion}
+              </p>)}
+            {request?.sourceApprovalId && (<Button style={{ marginTop: 8 }} onClick={() => navigate(`/approvals/${request.sourceApprovalId}?${params}`)}>
+                查看已办原审批
+              </Button>)}
+          </Card>
+          <Card title="专业评估意见" size="small" style={{ marginBottom: 16 }}>
+            <Timeline items={(request?.assessments ?? []).map((a) => ({
             children: (<>
                     <b>
                       {a.area} · {a.actor}
@@ -447,8 +452,9 @@ function ChangeFormContent() {
                     </p>
                   </>),
         }))}/>
-    {!request?.assessments.length && <p>尚无专业评估意见</p>}{request?.classificationOpinion && <p>分级依据：{request.classificationOpinion}</p>}</Card>
-          <Card title="版本与留痕" size="small" style={{ marginTop: 16 }}>
+    {!request?.assessments.length && <p>尚无专业评估意见</p>}{request?.classificationOpinion && <p>分级依据：{request.classificationOpinion}</p>}
+          </Card>
+          <Card title="版本与留痕" size="small">
             <Descriptions column={1} items={[
             {
                 key: "revision",
