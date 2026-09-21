@@ -182,7 +182,7 @@ function ChangeFormContent() {
           查看原基线
         </Button>
       </Space>
-      {lockReason && <Alert showIcon type="warning" message={lockReason} description="变更材料与审批记录可查看，当前不可修改或办理。" style={{ marginBottom: 16 }} />}
+      {lockReason && <Alert showIcon type="warning" message={lockReason} description="变更材料与审批记录可查看，当前不可修改或办理。" style={{ marginBottom: 20 }} />}
       {error && <Alert type="error" message={error}/>}
       <Alert style={{ marginBottom: 16 }} showIcon type={proposal?.reasons.length ? "warning" : "info"} message={proposal?.reasons.length
             ? marginReason(proposal.reasons.join("；"), showMargin)
@@ -228,7 +228,7 @@ function ChangeFormContent() {
                 <p>意见须明确范围、工期、成本、资源、供应与合同影响。</p>
               </>)}
             <Input.TextArea aria-label="变更处理意见" disabled={!(canAssess || canClassify || canApprove || canReject)} rows={2} value={opinion} onChange={(e) => setOpinion(e.target.value)} placeholder="评估 / 分级 / 审批意见"/>
-            <Space wrap style={{ width: "100%", marginTop: 12 }}>
+            <Space wrap style={{ width: "100%", marginTop: 16 }}>
               {request && ["影响评估中", "待分级"].includes(request.status) && (<Button disabled={!canAssess} onClick={() => run({
                 type: "assess-project-change",
                 id: request.id,
@@ -277,7 +277,7 @@ function ChangeFormContent() {
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
         <Col xs={24} xl={17}>
           <Card title="申请材料 · 01 依据与内容" size="small">
-            <Row gutter={16}>
+            <Row gutter={[16, 16]}>
               <Col span={16}>
                 <label>
                   变更标题
@@ -318,13 +318,13 @@ function ChangeFormContent() {
                 key: "scope",
                 label: "02 · 范围与进度",
                 children: (<>
-                      <label>
-                        目标范围
+                      <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <span>目标范围</span>
                         <Input.TextArea aria-label="目标范围" rows={3} disabled={!canEdit} value={input.scope} onChange={(e) => update({ scope: e.target.value })}/>
                       </label>
-                      <Space style={{ marginTop: 12 }}>
-                        <label>
-                          未完成计划顺延天数
+                      <Space style={{ marginTop: 16 }}>
+                        <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                          <span>未完成计划顺延天数</span>
                           <InputNumber aria-label="未完成计划顺延天数" min={-365} max={365} disabled={!canEdit} value={input.shiftDays} onChange={(v) => update({ shiftDays: v ?? 0 })}/>
                         </label>
                         <Select aria-label="变更紧急程度" disabled={!canEdit} value={input.urgency} onChange={(urgency) => update({ urgency })} options={["一般", "紧急"].map((value) => ({
@@ -336,7 +336,7 @@ function ChangeFormContent() {
                         已完成任务和已达成里程碑保留原计划日期；实际完成率、日期、成本不随本申请修改。
                       </p>
                       <Input disabled={!canEdit} aria-label="新增范围工作包" placeholder="新增范围工作包（可选）" value={input.newWorkPackage} onChange={(e) => update({ newWorkPackage: e.target.value })}/>
-                      <Select aria-label="新增工作包责任人" style={{ width: "100%", marginTop: 8 }} disabled={!canEdit} value={input.newTaskOwnerId} onChange={(newTaskOwnerId) => update({ newTaskOwnerId })} options={(data.projectTeams[p.id]?.members ?? [])
+                      <Select aria-label="新增工作包责任人" style={{ width: "100%", marginTop: 12 }} disabled={!canEdit} value={input.newTaskOwnerId} onChange={(newTaskOwnerId) => update({ newTaskOwnerId })} options={(data.projectTeams[p.id]?.members ?? [])
                         .filter((m) => m.active)
                         .map((m) => ({
                         value: m.userId,
@@ -348,11 +348,11 @@ function ChangeFormContent() {
                 key: "budget",
                 label: "03 · 预算与收入影响",
                 children: (<>
-                      <label>
-                        变更后预计收入（万元）
+                      <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <span>变更后预计收入（万元）</span>
                         <InputNumber disabled={!canEdit} min={0} precision={2} value={input.proposedIncome} onChange={(v) => update({ proposedIncome: v ?? 0 })}/>
                       </label>
-                      <Table rowKey="subjectId" size="small" pagination={false} dataSource={adjustments} columns={[
+                      <Table rowKey="subjectId" style={{ marginTop: 12 }} size="small" pagination={false} dataSource={adjustments} columns={[
                         { title: "科目", dataIndex: "subjectName" },
                         { title: "原预算万元", dataIndex: "amount" },
                         {
@@ -389,12 +389,12 @@ function ChangeFormContent() {
                                 })}/>),
                         },
                     ]}/>
-                      <label>
-                        采购影响
+                      <label style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 16 }}>
+                        <span>采购影响</span>
                         <Input.TextArea aria-label="采购影响" disabled={!canEdit} value={input.procurementImpact} onChange={(e) => update({ procurementImpact: e.target.value })}/>
                       </label>
-                      <label>
-                        外包影响
+                      <label style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 16 }}>
+                        <span>外包影响</span>
                         <Input.TextArea aria-label="外包影响" disabled={!canEdit} value={input.outsourceImpact} onChange={(e) => update({ outsourceImpact: e.target.value })}/>
                       </label>
                     </>),
@@ -407,7 +407,7 @@ function ChangeFormContent() {
                         涉及重大风险
                       </Checkbox>
                       <Input.TextArea rows={3} disabled={!canEdit} aria-label="风险影响与应对" placeholder="风险影响与应对" value={input.risk} onChange={(e) => update({ risk: e.target.value })}/>
-                      <Space.Compact style={{ width: "100%", margin: "12px 0" }}>
+                      <Space.Compact style={{ width: "100%", margin: "16px 0" }}>
                         <Input disabled={!canEdit} aria-label="附件文件名" placeholder="附件文件名（前端模拟登记，如客户签证.pdf）" value={filename} onChange={(e) => setFilename(e.target.value)}/>
                         <Button disabled={!canEdit} onClick={() => {
                         if (!/\.(pdf|docx|xlsx|png|jpg)$/i.test(filename)) {
