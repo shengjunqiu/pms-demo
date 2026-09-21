@@ -71,10 +71,10 @@ export const GLOBAL_NAV_SECTIONS: GlobalNavSection[] = [
         icon: 'business',
         entries: [
           { pageId: 'GS-01' },
-          { route: '/projects', label: '项目台账', permissionPageId: 'HS-01' },
           { pageId: 'YS-02' },
           { pageId: 'GS-11' },
           { pageId: 'YS-13' },
+          { route: '/projects', label: '项目台账', permissionPageId: 'HS-01' },
           { route: '/tickets', label: '事项管理', permissionPageId: 'HS-05' },
           { pageId: 'HS-14' },
         ],
