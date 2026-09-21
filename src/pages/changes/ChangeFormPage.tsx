@@ -4,7 +4,7 @@ import { canViewSensitiveField } from "@/mock/configuration-access";
 import { constructionLockReason } from "@/mock/construction-lock";
 import { marginReason } from "@/utils/sensitive";
 import { useState } from "react";
-import { Alert, App, Button, Card, Checkbox, Col, Descriptions, Input, InputNumber, Modal, Row, Select, Space, Steps, Table, Collapse, Tag, Timeline, } from "antd";
+import { Alert, App, Button, Card, Checkbox, Col, Descriptions, Input, InputNumber, Modal, Row, Select, Space, Steps, Table, Tag, Timeline, } from "antd";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useBusinessStore } from "@/mock/store";
 import { useAppStore } from "@/store/useAppStore";
@@ -226,7 +226,7 @@ function ChangeFormContent() {
           </Card>
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
         <Col xs={24} xl={16}>
-          <Card title="申请材料 · 01 依据与内容" size="small" style={{ marginBottom: 16 }}>
+          <Card title="01 · 依据与内容" size="small" style={{ marginBottom: 16 }}>
             <Row gutter={[16, 16]}>
               <Col span={16}>
                 <label>
@@ -264,125 +264,107 @@ function ChangeFormContent() {
               </Col>
             </Row>
           </Card>
-          <Collapse ghost defaultActiveKey={["scope", "budget", "resource", "risk"]} items={[
-          {
-              key: "scope",
-              label: "02 · 范围与进度",
-              children: (<>
-                    <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      <span>目标范围</span>
-                      <Input.TextArea aria-label="目标范围" rows={3} disabled={!canEdit} value={input.scope} onChange={(e) => update({ scope: e.target.value })}/>
-                    </label>
-                    <Space style={{ marginTop: 16 }}>
-                      <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                        <span>未完成计划顺延天数</span>
-                        <InputNumber aria-label="未完成计划顺延天数" min={-365} max={365} disabled={!canEdit} value={input.shiftDays} onChange={(v) => update({ shiftDays: v ?? 0 })}/>
-                      </label>
-                      <Select aria-label="变更紧急程度" disabled={!canEdit} value={input.urgency} onChange={(urgency) => update({ urgency })} options={["一般", "紧急"].map((value) => ({
-                      value,
-                      label: value,
-                  }))}/>
-                    </Space>
-                    <p>
-                      已完成任务和已达成里程碑保留原计划日期；实际完成率、日期、成本不随本申请修改。
-                    </p>
-                    <Input disabled={!canEdit} aria-label="新增范围工作包" placeholder="新增范围工作包（可选）" value={input.newWorkPackage} onChange={(e) => update({ newWorkPackage: e.target.value })}/>
-                    <Select aria-label="新增工作包责任人" style={{ width: "100%", marginTop: 12 }} disabled={!canEdit} value={input.newTaskOwnerId} onChange={(newTaskOwnerId) => update({ newTaskOwnerId })} options={(data.projectTeams[p.id]?.members ?? [])
-                      .filter((m) => m.active)
-                      .map((m) => ({
-                      value: m.userId,
-                      label: `新增工作包责任人：${m.name}`,
-                  }))}/>
-                  </>),
-          },
-          {
-              key: "budget",
-              label: "03 · 预算与收入影响",
-              children: (<>
-                    <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      <span>变更后预计收入（万元）</span>
-                      <InputNumber disabled={!canEdit} min={0} precision={2} value={input.proposedIncome} onChange={(v) => update({ proposedIncome: v ?? 0 })}/>
-                    </label>
-                    <Table rowKey="subjectId" style={{ marginTop: 12 }} size="small" pagination={false} dataSource={adjustments} columns={[
-                      { title: "科目", dataIndex: "subjectName" },
-                      { title: "原预算万元", dataIndex: "amount" },
-                      {
-                          title: "本次核增/核减万元",
-                          render: (_, i) => (<InputNumber aria-label={`${i.subjectName}预算调整`} disabled={!canEdit} precision={2} value={input.adjustments[i.subjectId] ?? 0} onChange={(v) => update({
-                                  adjustments: {
-                                      ...input.adjustments,
-                                      [i.subjectId]: v ?? 0,
-                                  },
-                              })}/>),
-                      },
-                      {
-                          title: "变更后万元",
-                          render: (_, i) => (i.amount + (input.adjustments[i.subjectId] ?? 0)).toFixed(2),
-                      },
-                  ]}/>
-                  </>),
-          },
-          {
-              key: "resource",
-              label: "04 · 资源与供应影响",
-              children: (<>
-                    <Table rowKey="userId" size="small" pagination={false} dataSource={proposal?.proposed.resources ?? []} columns={[
-                      { title: "资源", dataIndex: "name" },
-                      { title: "岗位", dataIndex: "role" },
-                      {
-                          title: "变更后计划工时",
-                          render: (_, r) => (<InputNumber aria-label={`${r.name}计划工时`} min={1} disabled={!canEdit} value={input.resourceHours[r.userId] ??
-                                  r.plannedHours} onChange={(v) => update({
-                                  resourceHours: {
-                                      ...input.resourceHours,
-                                      [r.userId]: v ?? 1,
-                                  },
-                              })}/>),
-                      },
-                  ]}/>
-                    <label style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 16 }}>
-                      <span>采购影响</span>
-                      <Input.TextArea aria-label="采购影响" disabled={!canEdit} value={input.procurementImpact} onChange={(e) => update({ procurementImpact: e.target.value })}/>
-                    </label>
-                    <label style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 16 }}>
-                      <span>外包影响</span>
-                      <Input.TextArea aria-label="外包影响" disabled={!canEdit} value={input.outsourceImpact} onChange={(e) => update({ outsourceImpact: e.target.value })}/>
-                    </label>
-                  </>),
-          },
-          {
-              key: "risk",
-              label: "05 · 风险与附件",
-              children: (<>
-                    <Checkbox disabled={!canEdit} checked={input.majorRisk} onChange={(e) => update({ majorRisk: e.target.checked })}>
-                      涉及重大风险
-                    </Checkbox>
-                    <Input.TextArea rows={3} disabled={!canEdit} aria-label="风险影响与应对" placeholder="风险影响与应对" value={input.risk} onChange={(e) => update({ risk: e.target.value })}/>
-                    <Space.Compact style={{ width: "100%", margin: "16px 0" }}>
-                      <Input disabled={!canEdit} aria-label="附件文件名" placeholder="附件文件名（前端模拟登记，如客户签证.pdf）" value={filename} onChange={(e) => setFilename(e.target.value)}/>
-                      <Button disabled={!canEdit} onClick={() => {
-                      if (!/\.(pdf|docx|xlsx|png|jpg)$/i.test(filename)) {
-                          message.error("支持PDF、Word、Excel和图片文件名");
-                          return;
-                      }
-                      update({
-                          attachments: [
-                              ...new Set([...input.attachments, filename]),
-                          ],
-                      });
-                      setFilename("");
-                  }}>
-                        登记附件
-                      </Button>
-                    </Space.Compact>
-                    {input.attachments.map((name) => (<Tag key={name} closable={canEdit} onClose={() => update({
-                          attachments: input.attachments.filter((x) => x !== name),
-                      })}>
-                        {name}
-                      </Tag>))}
-                  </>),
-          },
-      ]}/>
+          <Card title="02 · 范围与进度" size="small" style={{ marginBottom: 16 }}>
+            <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <span>目标范围</span>
+              <Input.TextArea aria-label="目标范围" rows={3} disabled={!canEdit} value={input.scope} onChange={(e) => update({ scope: e.target.value })}/>
+            </label>
+            <Space style={{ marginTop: 16 }}>
+              <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <span>未完成计划顺延天数</span>
+                <InputNumber aria-label="未完成计划顺延天数" min={-365} max={365} disabled={!canEdit} value={input.shiftDays} onChange={(v) => update({ shiftDays: v ?? 0 })}/>
+              </label>
+              <Select aria-label="变更紧急程度" disabled={!canEdit} value={input.urgency} onChange={(urgency) => update({ urgency })} options={["一般", "紧急"].map((value) => ({
+              value,
+              label: value,
+          }))}/>
+            </Space>
+            <p>
+              已完成任务和已达成里程碑保留原计划日期；实际完成率、日期、成本不随本申请修改。
+            </p>
+            <Input disabled={!canEdit} aria-label="新增范围工作包" placeholder="新增范围工作包（可选）" value={input.newWorkPackage} onChange={(e) => update({ newWorkPackage: e.target.value })}/>
+            <Select aria-label="新增工作包责任人" style={{ width: "100%", marginTop: 12 }} disabled={!canEdit} value={input.newTaskOwnerId} onChange={(newTaskOwnerId) => update({ newTaskOwnerId })} options={(data.projectTeams[p.id]?.members ?? [])
+              .filter((m) => m.active)
+              .map((m) => ({
+              value: m.userId,
+              label: `新增工作包责任人：${m.name}`,
+          }))}/>
+          </Card>
+          <Card title="03 · 预算与收入影响" size="small" style={{ marginBottom: 16 }}>
+            <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <span>变更后预计收入（万元）</span>
+              <InputNumber disabled={!canEdit} min={0} precision={2} value={input.proposedIncome} onChange={(v) => update({ proposedIncome: v ?? 0 })}/>
+            </label>
+            <Table rowKey="subjectId" style={{ marginTop: 12 }} size="small" pagination={false} dataSource={adjustments} columns={[
+              { title: "科目", dataIndex: "subjectName" },
+              { title: "原预算万元", dataIndex: "amount" },
+              {
+                  title: "本次核增/核减万元",
+                  render: (_, i) => (<InputNumber aria-label={`${i.subjectName}预算调整`} disabled={!canEdit} precision={2} value={input.adjustments[i.subjectId] ?? 0} onChange={(v) => update({
+                          adjustments: {
+                              ...input.adjustments,
+                              [i.subjectId]: v ?? 0,
+                          },
+                      })}/>),
+              },
+              {
+                  title: "变更后万元",
+                  render: (_, i) => (i.amount + (input.adjustments[i.subjectId] ?? 0)).toFixed(2),
+              },
+          ]}/>
+          </Card>
+          <Card title="04 · 资源与供应影响" size="small" style={{ marginBottom: 16 }}>
+            <Table rowKey="userId" size="small" pagination={false} dataSource={proposal?.proposed.resources ?? []} columns={[
+              { title: "资源", dataIndex: "name" },
+              { title: "岗位", dataIndex: "role" },
+              {
+                  title: "变更后计划工时",
+                  render: (_, r) => (<InputNumber aria-label={`${r.name}计划工时`} min={1} disabled={!canEdit} value={input.resourceHours[r.userId] ??
+                          r.plannedHours} onChange={(v) => update({
+                          resourceHours: {
+                              ...input.resourceHours,
+                              [r.userId]: v ?? 1,
+                          },
+                      })}/>),
+              },
+          ]}/>
+            <label style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 16 }}>
+              <span>采购影响</span>
+              <Input.TextArea aria-label="采购影响" disabled={!canEdit} value={input.procurementImpact} onChange={(e) => update({ procurementImpact: e.target.value })}/>
+            </label>
+            <label style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 16 }}>
+              <span>外包影响</span>
+              <Input.TextArea aria-label="外包影响" disabled={!canEdit} value={input.outsourceImpact} onChange={(e) => update({ outsourceImpact: e.target.value })}/>
+            </label>
+          </Card>
+          <Card title="05 · 风险与附件" size="small">
+            <Checkbox disabled={!canEdit} checked={input.majorRisk} onChange={(e) => update({ majorRisk: e.target.checked })}>
+              涉及重大风险
+            </Checkbox>
+            <Input.TextArea rows={3} disabled={!canEdit} aria-label="风险影响与应对" placeholder="风险影响与应对" value={input.risk} onChange={(e) => update({ risk: e.target.value })}/>
+            <Space.Compact style={{ width: "100%", margin: "16px 0" }}>
+              <Input disabled={!canEdit} aria-label="附件文件名" placeholder="附件文件名（前端模拟登记，如客户签证.pdf）" value={filename} onChange={(e) => setFilename(e.target.value)}/>
+              <Button disabled={!canEdit} onClick={() => {
+              if (!/\.(pdf|docx|xlsx|png|jpg)$/i.test(filename)) {
+                  message.error("支持PDF、Word、Excel和图片文件名");
+                  return;
+              }
+              update({
+                  attachments: [
+                      ...new Set([...input.attachments, filename]),
+                  ],
+              });
+              setFilename("");
+          }}>
+                登记附件
+              </Button>
+            </Space.Compact>
+            {input.attachments.map((name) => (<Tag key={name} closable={canEdit} onClose={() => update({
+                  attachments: input.attachments.filter((x) => x !== name),
+              })}>
+                {name}
+              </Tag>))}
+          </Card>
         </Col>
         <Col xs={24} xl={8}>
           {/* 当前处理 — 意见与操作面板 */}
