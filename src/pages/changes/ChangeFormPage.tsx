@@ -274,38 +274,6 @@ function ChangeFormContent() {
                 查看已办原审批
               </Button>)}
           </Card>
-          <Card title="变更前后对比 · 同一口径" size="small" style={{ marginTop: 16 }}>
-            <Table rowKey="name" size="small" pagination={false} dataSource={[
-            {
-                name: "范围",
-                before: base?.scopeDesc,
-                after: proposal?.proposed.scope,
-            },
-            {
-                name: "计划验收日期",
-                before: base?.plannedEndDate,
-                after: proposal?.proposed.plannedEndDate,
-            },
-            {
-                name: "预算万元",
-                before: base?.budgetAmount,
-                after: proposed?.totalAmount,
-            },
-            {
-                name: "预计毛利万元",
-                before: showMargin
-                    ? request && request.originalIncome === undefined ? "原收入未留存快照" : ((request?.originalIncome ?? p.revenueAmount ?? p.contractAmount) - (base?.budgetAmount ?? 0)).toFixed(2)
-                    : "已隐藏",
-                after: showMargin
-                    ? (input.proposedIncome - (proposed?.totalAmount ?? 0)).toFixed(2)
-                    : "已隐藏",
-            },
-        ]} scroll={{ x: 650 }} columns={[
-            { title: "维度", dataIndex: "name", width: 140 },
-            { title: `原基线 ${base?.version ?? ""}`, dataIndex: "before" },
-            { title: "变更后提议", dataIndex: "after" },
-        ]}/>
-          </Card>
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
         <Col xs={24} xl={17}>
           <Card title="申请材料 · 01 依据与内容" size="small">
