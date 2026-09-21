@@ -278,10 +278,13 @@ function ChangeFormContent() {
                     <span>未完成计划顺延天数</span>
                     <InputNumber aria-label="未完成计划顺延天数" min={-365} max={365} disabled={!canEdit} value={input.shiftDays} onChange={(v) => update({ shiftDays: v ?? 0 })}/>
                   </label>
-                  <Select aria-label="变更紧急程度" disabled={!canEdit} value={input.urgency} onChange={(urgency) => update({ urgency })} options={["一般", "紧急"].map((value) => ({
-                  value,
-                  label: value,
-              }))}/>
+                  <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <span>变更紧急程度</span>
+                    <Select aria-label="变更紧急程度" disabled={!canEdit} value={input.urgency} onChange={(urgency) => update({ urgency })} options={["一般", "紧急"].map((value) => ({
+                    value,
+                    label: value,
+                }))}/>
+                  </label>
                 </Space>
               </Col>
               <Col span={24}>
