@@ -28,7 +28,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
     <div className="pms-page-header">
       {breadcrumbs && breadcrumbs.length > 0 && (
         <Breadcrumb
-          style={{ marginBottom: 10, fontSize: 12 }}
+          style={{ marginBottom: 8, fontSize: 12 }}
           items={breadcrumbs.map((b) => ({
             title: b.href ? (
               <Link to={b.href} className="text-slate-500 hover:text-blue-600 transition-colors">
@@ -40,7 +40,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           }))}
         />
       )}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
         <div>
           <Space size={8} align="center">
             <Title level={4} style={{ margin: 0, fontWeight: 700, letterSpacing: '-0.3px' }}>

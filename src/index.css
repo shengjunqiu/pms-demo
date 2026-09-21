@@ -123,7 +123,7 @@ kbd,
 }
 
 /* Shared workspace rhythm: page → business section → content. */
-.pms-page-header { margin-bottom: var(--pms-space-5); }
+.pms-page-header { margin-bottom: var(--pms-space-4); }
 .pms-page-header .ant-typography-secondary { color: var(--pms-text-tertiary); font-size: var(--pms-font-size-sm); }
 .pms-workspace { min-width: 0; }
 .pms-workspace .ant-card-head-title {
