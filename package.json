@@ -10,6 +10,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "typecheck": "tsc -b --noEmit",
     "test:domain": "vitest run src",
+    "test:changed": "vitest run --changed HEAD",
     "test:e2e": "playwright test"
   },
   "dependencies": {
