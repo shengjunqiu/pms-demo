@@ -252,7 +252,7 @@ export const MainLayout: React.FC = () => {
               type="button"
               aria-label="搜索项目、合同、单据"
               onClick={() => setSearchOpen(true)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-400 hover:border-blue-400 hover:text-slate-600 cursor-pointer transition-all w-48 sm:w-64 text-xs select-none"
+              className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-400 hover:border-blue-400 hover:text-slate-600 cursor-pointer transition-all w-48 xl:w-64 text-xs select-none"
             >
               <SearchOutlined className="text-slate-400" />
               <span className="flex-1 truncate">搜索项目、合同、单据...</span>
