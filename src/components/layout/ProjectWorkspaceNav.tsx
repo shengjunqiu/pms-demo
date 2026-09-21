@@ -52,7 +52,7 @@ export function ProjectWorkspaceNav({ projectId }: { projectId: string }) {
       style={{ position: 'sticky', top: 64, zIndex: 90 }}
       aria-label="项目工作区导航"
     >
-      <div className="flex items-center gap-2 px-4 py-1.5">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 px-4 py-1.5">
         {/* 左侧：项目台账 + 切换 */}
         <Space size="small">
           <Button type="text" size="small" icon={<ArrowLeftOutlined />} onClick={() => navigate('/projects')}>
@@ -78,7 +78,7 @@ export function ProjectWorkspaceNav({ projectId }: { projectId: string }) {
         <div className="h-4 w-px bg-slate-200" />
 
         {/* 阶段导航：紧凑的 Dropdown 按钮组 */}
-        <div className="flex items-center gap-1 flex-1 min-w-0">
+        <div className="flex flex-wrap items-center gap-1 flex-1 min-w-[280px]">
           {PROJECT_NAV_TABS.map((tab) => {
             const accessibleChildren = tab.pageIds
               .map((pageId) => ({ pageId, page: PAGE_MAP.get(pageId) }))
