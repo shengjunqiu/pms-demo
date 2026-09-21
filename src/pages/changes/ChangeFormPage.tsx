@@ -265,30 +265,42 @@ function ChangeFormContent() {
             </Row>
           </Card>
           <Card title="02 · 范围与进度" size="small" style={{ marginBottom: 16 }}>
-            <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <span>目标范围</span>
-              <Input.TextArea aria-label="目标范围" rows={3} disabled={!canEdit} value={input.scope} onChange={(e) => update({ scope: e.target.value })}/>
-            </label>
-            <Space style={{ marginTop: 16 }}>
-              <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <span>未完成计划顺延天数</span>
-                <InputNumber aria-label="未完成计划顺延天数" min={-365} max={365} disabled={!canEdit} value={input.shiftDays} onChange={(v) => update({ shiftDays: v ?? 0 })}/>
-              </label>
-              <Select aria-label="变更紧急程度" disabled={!canEdit} value={input.urgency} onChange={(urgency) => update({ urgency })} options={["一般", "紧急"].map((value) => ({
-              value,
-              label: value,
-          }))}/>
-            </Space>
-            <p>
-              已完成任务和已达成里程碑保留原计划日期；实际完成率、日期、成本不随本申请修改。
-            </p>
-            <Input disabled={!canEdit} aria-label="新增范围工作包" placeholder="新增范围工作包（可选）" value={input.newWorkPackage} onChange={(e) => update({ newWorkPackage: e.target.value })}/>
-            <Select aria-label="新增工作包责任人" style={{ width: "100%", marginTop: 12 }} disabled={!canEdit} value={input.newTaskOwnerId} onChange={(newTaskOwnerId) => update({ newTaskOwnerId })} options={(data.projectTeams[p.id]?.members ?? [])
-              .filter((m) => m.active)
-              .map((m) => ({
-              value: m.userId,
-              label: `新增工作包责任人：${m.name}`,
-          }))}/>
+            <Row gutter={[16, 16]}>
+              <Col span={24}>
+                <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <span>目标范围</span>
+                  <Input.TextArea aria-label="目标范围" rows={3} disabled={!canEdit} value={input.scope} onChange={(e) => update({ scope: e.target.value })}/>
+                </label>
+              </Col>
+              <Col span={24}>
+                <Space>
+                  <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <span>未完成计划顺延天数</span>
+                    <InputNumber aria-label="未完成计划顺延天数" min={-365} max={365} disabled={!canEdit} value={input.shiftDays} onChange={(v) => update({ shiftDays: v ?? 0 })}/>
+                  </label>
+                  <Select aria-label="变更紧急程度" disabled={!canEdit} value={input.urgency} onChange={(urgency) => update({ urgency })} options={["一般", "紧急"].map((value) => ({
+                  value,
+                  label: value,
+              }))}/>
+                </Space>
+              </Col>
+              <Col span={24}>
+                <p style={{ margin: 0 }}>
+                  已完成任务和已达成里程碑保留原计划日期；实际完成率、日期、成本不随本申请修改。
+                </p>
+              </Col>
+              <Col span={24}>
+                <Input disabled={!canEdit} aria-label="新增范围工作包" placeholder="新增范围工作包（可选）" value={input.newWorkPackage} onChange={(e) => update({ newWorkPackage: e.target.value })}/>
+              </Col>
+              <Col span={24}>
+                <Select aria-label="新增工作包责任人" style={{ width: "100%" }} disabled={!canEdit} value={input.newTaskOwnerId} onChange={(newTaskOwnerId) => update({ newTaskOwnerId })} options={(data.projectTeams[p.id]?.members ?? [])
+                  .filter((m) => m.active)
+                  .map((m) => ({
+                  value: m.userId,
+                  label: `新增工作包责任人：${m.name}`,
+              }))}/>
+              </Col>
+            </Row>
           </Card>
           <Card title="03 · 预算与收入影响" size="small" style={{ marginBottom: 16 }}>
             <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
