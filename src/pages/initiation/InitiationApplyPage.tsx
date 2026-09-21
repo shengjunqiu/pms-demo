@@ -124,7 +124,7 @@ export function InitiationApplyPage() {
           { key: 'delivery', fields: ['scope', 'customerNeeds', 'plannedStartDate', 'plannedEndDate', 'expectedSignDate'] },
           { key: 'files', fields: ['files'] },
         ].find((group) => group.fields.some((name) => !values[name] || (Array.isArray(values[name]) && !values[name].length)));
-        if (missing) { setTab(missing.key); message.error('请补全当前页签的必填申请资料后提交'); return; }
+        if (missing) { setTab('detail'); message.error('请补全「立项申请详情」页签的必填申请资料后提交'); return; }
       }
       await form.validateFields();
       const v = form.getFieldsValue(true);
@@ -167,7 +167,7 @@ export function InitiationApplyPage() {
           disabled={!!app}
           placeholder="选择拟立项商机"
           onChange={(value) => {
-            const next = new URLSearchParams(query); next.set("opportunityId", value); next.delete("id"); setQuery(next); setTab("basic");
+            const next = new URLSearchParams(query); next.set("opportunityId", value); next.delete("id"); setQuery(next); setTab("detail");
           }}
           options={data.opportunities
             .filter(
