@@ -8,7 +8,7 @@ import { stageSnapshot } from '@/mock/stage';
 import { sumMoney } from '@/utils/money';
 
 // Build the demo seed in fixture setup; tests retain independent deep clones.
-beforeAll(() => { createDemoBusinessState(); }, 120000);
+beforeAll(() => { createDemoBusinessState(); }, 30000);
 
 const pm: Actor = { id: 'U-001', name: '张建国', role: 'project-manager' };
 const finance: Actor = { id: 'U-004', name: '刘敏', role: 'finance' };
