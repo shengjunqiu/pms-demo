@@ -133,6 +133,9 @@ export const mockOpportunities: Opportunity[] = Array.from({ length: 72 }).map((
   };
 });
 
+// 批量项目主PM池：仅交付角色（项目经理/方案架构师）可担任，避免财务、市场、集团领导等职能角色被轮换指派为交付PM（会产生大量不属于自己的待办与工单）
+const deliveryPmPool = mockUsers.filter((u) => u.role === '项目经理' || u.role === '方案架构师');
+
 // 5. 8个固定故事及正式项目 (≥60, 其中未签≥10, 运维≥12)
 const projectSeeds: Project[] = [
   {
@@ -456,8 +459,8 @@ const projectSeeds: Project[] = [
       customerId: mockCustomers[num % mockCustomers.length].id,
       customerName: mockCustomers[num % mockCustomers.length].name,
       opportunityId: `OPP-${String(num).padStart(3, '0')}`,
-      pmId: mockUsers[num % 10].id,
-      pmName: mockUsers[num % 10].name,
+      pmId: deliveryPmPool[num % deliveryPmPool.length].id,
+      pmName: deliveryPmPool[num % deliveryPmPool.length].name,
       departmentId: mockDepartments[(num % 6) + 6].id,
       departmentName: mockDepartments[(num % 6) + 6].name,
       type: prjType,
