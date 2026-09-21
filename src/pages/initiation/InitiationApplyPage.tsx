@@ -172,7 +172,12 @@ export function InitiationApplyPage() {
           options={data.opportunities
             .filter(
               (x) => canViewOpportunity(data, x, actor) &&
-                (canManageOpportunity(data, x, actor) || x.id === selected),
+                (canManageOpportunity(data, x, actor) || x.id === selected) &&
+                // 与保存时域守卫一致：已转立项/已终止/暂缓、已关联项目、已有在途申请的商机不可再发起新立项
+                (x.id === selected ||
+                  (!['已终止', '暂缓', '已转立项'].includes(x.status) &&
+                    !data.projects.some((p) => p.opportunityId === x.id) &&
+                    !data.initiations.some((a) => a.input.opportunityId === x.id && a.status !== '否决'))),
             )
             .map((x) => ({
               value: x.id,

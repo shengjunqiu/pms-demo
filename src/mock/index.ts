@@ -31,6 +31,7 @@ import {
   WarningRecord,
   AuditLog,
 } from '@/models/types';
+import type { OpportunityMeta } from '@/models/opportunities';
 
 export const MOCK_SEED = 20260909;
 // 固定演示基准日: 2026-09-09
@@ -543,6 +544,25 @@ export const mockEstimateVersions: EstimateVersion[] = Array.from({ length: 85 }
     createdAt: '2026-03-10',
   };
 });
+
+// 7.5 补充命名商机：尚未转立项的早期商机（跟进中），用于演示“跟进→初评→拟立项→立项申请”完整链路。
+// 注意：必须放在 mockEstimateVersions 之后追加——85 个概算版本的归属与冻结状态依赖 mockOpportunities.length 取模，此处追加不影响既有映射。
+mockOpportunities.push(
+  { id: 'OPP-073', code: 'OPP-2026-073', name: '海州市智慧交通信号优化平台商机', customerId: 'CUST-009', customerName: '海州市交通运输局', departmentId: 'D-010', departmentName: '市场商务部', ownerId: 'U-006', ownerName: '陈亮', estimatedAmount: 2860.0, status: '跟进中', winRate: 60, expectedSignDate: '2026-11-30', earlyInvestmentQuota: 0, earlyInvestmentUsed: 0, createdAt: '2026-07-06' },
+  { id: 'OPP-074', code: 'OPP-2026-074', name: '临江市工业互联网数据采集平台商机', customerId: 'CUST-014', customerName: '临江市工业和信息化局', departmentId: 'D-010', departmentName: '市场商务部', ownerId: 'U-038', ownerName: '郑晓晨', estimatedAmount: 1150.0, status: '跟进中', winRate: 45, expectedSignDate: '2026-12-20', earlyInvestmentQuota: 0, earlyInvestmentUsed: 0, createdAt: '2026-07-20' },
+  { id: 'OPP-075', code: 'OPP-2026-075', name: '海州市公共数据授权运营监管平台商机', customerId: 'CUST-012', customerName: '海州市公共数据运营中心', departmentId: 'D-010', departmentName: '市场商务部', ownerId: 'U-022', ownerName: '何思齐', estimatedAmount: 5400.0, status: '跟进中', winRate: 35, expectedSignDate: '2027-01-15', earlyInvestmentQuota: 0, earlyInvestmentUsed: 0, createdAt: '2026-08-02' },
+  { id: 'OPP-076', code: 'OPP-2026-076', name: '临江市城投智慧园区运营中心商机', customerId: 'CUST-015', customerName: '临江市城市投资集团', departmentId: 'D-010', departmentName: '市场商务部', ownerId: 'U-006', ownerName: '陈亮', estimatedAmount: 780.0, status: '跟进中', winRate: 75, expectedSignDate: '2026-10-30', earlyInvestmentQuota: 0, earlyInvestmentUsed: 0, createdAt: '2026-08-10' },
+  { id: 'OPP-077', code: 'OPP-2026-077', name: '临江市公共数据资产登记服务商机', customerId: 'CUST-016', customerName: '临江市公共数据运营中心', departmentId: 'D-010', departmentName: '市场商务部', ownerId: 'U-014', ownerName: '沈开发', estimatedAmount: 460.0, status: '跟进中', winRate: 80, expectedSignDate: '2026-09-30', earlyInvestmentQuota: 0, earlyInvestmentUsed: 0, createdAt: '2026-08-18' },
+);
+
+// 上述商机的故事化档案（业务背景、竞争态势、跟进记录），供商机详情页展示；由 createDemoBusinessState 装入 state.opportunityMeta
+export const mockOpportunityMetaSeeds: Record<string, OpportunityMeta> = {
+  'OPP-073': { source: '客户需求', projectType: '软件开发', description: '针对海州市主城区82个信号路口开展联网联调与自适应配时优化，建设交通信号统一管控与运行效果评价平台。', competition: '当地集成商与信号机厂商各占一席，我方以算法与平台能力切入。', businessLine: '智慧交通', region: '广东省', collaborators: ['U-005'], attachments: ['交通信号优化需求说明.pdf'], followups: [{ id: 'FOLLOW-OPP-073-1', date: '2026-08-28', communication: '与海州市交通运输局信息科确认路口清单与现有信号机品牌分布，客户认可自适应配时方案方向。', requirementChange: '新增绿波带协调效果考核指标', commercialProgress: '客户计划10月上报立项预算', nextPlan: '9月中旬提交技术方案初稿并邀请客户考察标杆案例', author: '陈亮' }], assessments: [], pauses: [] },
+  'OPP-074': { source: '客户需求', projectType: '综合集成', description: '面向临江市工业园区企业能耗与生产数据采集，建设边缘网关接入与工业数据中台，支撑园区双碳考核。', competition: '客户已完成两轮方案征集，倾向本地化服务能力强的供应商。', businessLine: '智能制造', region: '四川省', collaborators: ['U-005'], attachments: ['园区数据采集需求清单.xlsx'], followups: [], assessments: [], pauses: [] },
+  'OPP-075': { source: '高层拜访', projectType: '软件开发', description: '承接海州市公共数据授权运营监管需求，建设数据流通全程留痕、收益分配与安全监管平台。', competition: '数商生态尚在组建，客户预算充足但决策链长，需持续经营。', businessLine: '数字政务', region: '北京市', collaborators: ['U-005'], attachments: [], followups: [], assessments: [], pauses: [] },
+  'OPP-076': { source: '客户需求', projectType: '综合集成', description: '为临江市城投集团建设园区一体化运营中心，覆盖招商、资产、能耗与访客管理。', competition: '客户高层已明确立项意向，正在比较总集方案与报价。', businessLine: '智慧园区', region: '福建省', collaborators: ['U-005'], attachments: ['智慧园区运营中心建设方案v1.2.docx'], followups: [{ id: 'FOLLOW-OPP-076-1', date: '2026-09-01', communication: '城投集团分管副总听取方案汇报，要求补充运营分成模式测算，整体反馈积极。', requirementChange: '无变化', commercialProgress: '已进入商务谈判前准备，预计10月底完成招采', nextPlan: '9月10日前提交分成测算模型与总集报价', author: '陈亮' }], assessments: [], pauses: [] },
+  'OPP-077': { source: '客户需求', projectType: '软件开发', description: '为临江市公共数据运营中心提供数据资产登记、确权与目录管理服务，按年度订阅。', competition: '原有服务商合同到期，客户拟引入竞争性磋商。', businessLine: '数字政务', region: '广东省', collaborators: ['U-005'], attachments: [], followups: [], assessments: [], pauses: [] },
+};
 
 // 8. 预算版本 (≥80)
 export const mockBudgetVersions: BudgetVersion[] = Array.from({ length: 85 }).map((_, i) => {
