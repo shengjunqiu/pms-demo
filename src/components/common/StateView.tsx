@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
 import { useBusinessStore } from '@/mock/store';
 import { canAccessPage } from '@/mock/configuration-access';
-import { GLOBAL_NAV_SECTIONS, ROLE_HOME, type GlobalNavEntry } from '@/routes/navigation';
-import { PAGE_MAP } from '@/routes/manifest';
+import { ROLE_HOME } from '@/routes/navigation';
+import { GLOBAL_NAV } from '@/routes/nav-config';
 
 export interface StateViewProps {
   type?: 'empty' | '403' | '404' | 'error' | 'loading';
@@ -29,16 +29,8 @@ export const StateView: React.FC<StateViewProps> = ({
 
   // 🔵1 403 默认回退：取当前角色页集内首个有权页面，避免“403→首页→403”循环
   const firstAccessibleRoute = useMemo(() => {
-    for (const section of GLOBAL_NAV_SECTIONS) {
-      for (const group of section.groups) {
-        for (const raw of group.entries) {
-          const entry: GlobalNavEntry = raw;
-          const page = entry.pageId ? PAGE_MAP.get(entry.pageId) : undefined;
-          const route = entry.route ?? page?.route;
-          const permId = entry.permissionPageId ?? entry.pageId;
-          if (route && (!permId || canAccessPage(data, currentUser, permId))) return route;
-        }
-      }
+    for (const item of GLOBAL_NAV.flatMap((section) => section.items)) {
+      if (item.pageIds.some((pageId) => canAccessPage(data, currentUser, pageId))) return item.key;
     }
     return ROLE_HOME[currentRole];
   }, [data, currentUser, currentRole]);

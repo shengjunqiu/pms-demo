@@ -341,32 +341,9 @@ kbd,
   background: rgba(255, 255, 255, 0.5) !important;
 }
 
-/* 侧边栏搜索框样式精致化 */
-.pms-sider-search.ant-input-affix-wrapper {
-  background: #111827 !important;
-  border-color: #1f293d !important;
-  padding: 5px 10px !important;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.25) !important;
-  transition: all 0.2s ease !important;
-}
-.pms-sider-search.ant-input-affix-wrapper:hover {
-  border-color: #3b82f6 !important;
-  background: #131d31 !important;
-}
-.pms-sider-search.ant-input-affix-wrapper-focused {
-  border-color: #2563eb !important;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25) !important;
-  background: #0f172a !important;
-}
-.pms-sider-search input.ant-input {
-  background: transparent !important;
-  color: #f1f5f9 !important;
-  font-size: 12px !important;
-}
-.pms-sider-search input.ant-input::placeholder {
-  color: #64748b !important;
-  font-size: 12px !important;
-}
+/* 工作区对象切换：标题式选择框 */
+.pms-entity-switch .ant-select-selection-item { font-size: 15px; font-weight: 600; color: #0f172a; }
+.pms-entity-switch.ant-select-borderless .ant-select-selector { padding-left: 4px !important; }
 
 /* 侧边栏一级分组大标题与分割线 */
 .pms-sider .ant-menu-dark .ant-menu-item-group-title {
@@ -450,86 +427,6 @@ kbd,
   box-shadow: none !important;
 }
 
-/* 项目导航 Dropdown 居中 */
-.pms-dropdown-center {
-  min-width: 140px !important;
-}
-
-/* 项目工作区一级分组：分段选择器，强调信息域而不是具体业务页。 */
-.pms-project-groups.ant-tabs-top > .ant-tabs-nav {
-  min-height: 40px;
-  margin: 0 0 10px !important;
-  padding: 4px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-}
-.pms-project-groups.ant-tabs-top > .ant-tabs-nav::before,
-.pms-project-groups.ant-tabs-top > .ant-tabs-nav .ant-tabs-ink-bar {
-  display: none !important;
-}
-.pms-project-groups.ant-tabs-top > .ant-tabs-nav .ant-tabs-nav-wrap {
-  min-height: 30px;
-}
-.pms-project-groups.ant-tabs-top > .ant-tabs-nav .ant-tabs-tab {
-  min-height: 30px;
-  margin: 0 2px 0 0 !important;
-  padding: 5px 14px !important;
-  border-radius: 7px;
-  color: #475569;
-  line-height: 20px;
-  transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
-}
-.pms-project-groups.ant-tabs-top > .ant-tabs-nav .ant-tabs-tab:hover {
-  color: #1d4ed8;
-  background: #f1f5f9;
-}
-.pms-project-groups.ant-tabs-top > .ant-tabs-nav .ant-tabs-tab-active {
-  background: #ffffff;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), inset 0 0 0 1px rgba(148, 163, 184, 0.18);
-}
-.pms-project-groups.ant-tabs-top > .ant-tabs-nav .ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: #1d4ed8;
-  font-weight: 600;
-}
-
-/* 项目工作区二级页签：保留完整高度和底部留白，避免文字/按钮被导航裁切。 */
-.pms-project-subtabs.ant-tabs-top > .ant-tabs-nav {
-  min-height: 40px;
-  margin: 0 0 var(--pms-space-4) !important;
-  border-bottom: 1px solid #e2e8f0;
-}
-.pms-project-subtabs.ant-tabs-top > .ant-tabs-nav::before {
-  display: none !important;
-}
-.pms-project-subtabs.ant-tabs-top > .ant-tabs-nav .ant-tabs-nav-wrap,
-.pms-project-subtabs.ant-tabs-top > .ant-tabs-nav .ant-tabs-nav-list {
-  min-height: 39px;
-}
-.pms-project-subtabs.ant-tabs-top > .ant-tabs-nav .ant-tabs-nav-list {
-  align-items: stretch;
-}
-.pms-project-subtabs.ant-tabs-top > .ant-tabs-nav .ant-tabs-tab {
-  min-height: 39px;
-  margin: 0 16px 0 0 !important;
-  padding: 8px 4px 9px !important;
-  color: #64748b;
-  font-size: 13px;
-  line-height: 20px;
-}
-.pms-project-subtabs.ant-tabs-top > .ant-tabs-nav .ant-tabs-tab:hover {
-  color: #2563eb;
-}
-.pms-project-subtabs.ant-tabs-top > .ant-tabs-nav .ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: #1d4ed8;
-  font-weight: 600;
-}
-.pms-project-subtabs.ant-tabs-top > .ant-tabs-nav .ant-tabs-ink-bar {
-  bottom: -1px;
-  height: 2px;
-  border-radius: 2px 2px 0 0;
-  background: #2563eb;
-}
 .pms-project-tabs .ant-tabs > .ant-tabs-content-holder {
   border-top: 0 !important;
 }

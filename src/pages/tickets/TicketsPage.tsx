@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { App, Button, Checkbox, Col, DatePicker, Input, InputNumber, Modal, Row, Select, Space, Table, Tabs, Tag } from 'antd';
 import dayjs from 'dayjs';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { AS_OF_DATE, mockUsers } from '@/mock';
 import { useBusinessStore } from '@/mock/store';
 import { ticketLabels, ticketMeta, ticketTable, type TicketKind } from '@/mock/tickets';
@@ -18,7 +18,8 @@ const awaiting = (status: string) => ['待验证', '待复测', '已解决'].inc
 
 export function TicketsPage() {
   const [params] = useSearchParams();
-  return <TicketsContent key={`tickets-${params.get('projectId') ?? params.get('project') ?? ''}-${params.get('kind') ?? ''}`} />;
+  const { projectId: scopedProjectId } = useParams();
+  return <TicketsContent key={`tickets-${scopedProjectId ?? params.get('projectId') ?? params.get('project') ?? ''}-${params.get('kind') ?? ''}`} />;
 }
 
 function TicketsContent() {
@@ -29,8 +30,10 @@ function TicketsContent() {
   const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
   const kinds: TicketKind[] = ALL_KINDS;
-  const base = '/tickets';
-  const projectFilter = params.get('projectId') ?? params.get('project');
+  // 项目工作区内 /projects/:projectId/tickets 固定项目范围，详情链接也留在工作区
+  const { projectId: scopedProjectId } = useParams();
+  const base = scopedProjectId ? `/projects/${scopedProjectId}/tickets` : '/tickets';
+  const projectFilter = scopedProjectId ?? params.get('projectId') ?? params.get('project');
   const projects = visibleProjects(currentRole, data.projects, data);
   const ids = new Set(projects.map((p) => p.id));
   const eligibleProjects = projects.filter((p) => !data.lockedProjects.includes(p.id) && (p.pmId === currentUser.id || p.memberIds?.includes(currentUser.id)) && canDo('create-ticket', p.id));
@@ -53,7 +56,7 @@ function TicketsContent() {
     <PageHeader title="事项管理" description={`项目权限范围内的需求/BUG/问题/风险 · 基准日 ${AS_OF_DATE}`} breadcrumbs={[{ title: '首页', href: '/' }, { title: '业务台账' }]} extra={<Button type="primary" disabled={!canCreate || !eligibleProjects.length} onClick={() => setCreating(true)}>新建事项</Button>} />
     <PageSection title="筛选事项">
       <Space wrap>
-        <Select aria-label="事项项目" placeholder="全部项目" allowClear showSearch optionFilterProp="label" style={{ width: 250 }} value={projectFilter ?? undefined} options={projects.map((p) => ({ value: p.id, label: p.name }))} onChange={(v) => update('projectId', v)} />
+        <Select aria-label="事项项目" placeholder="全部项目" allowClear showSearch optionFilterProp="label" style={{ width: 250 }} value={projectFilter ?? undefined} disabled={!!scopedProjectId} options={projects.map((p) => ({ value: p.id, label: p.name }))} onChange={(v) => update('projectId', v)} />
         <Input aria-label="事项搜索" placeholder="编号或标题" style={{ width: 220 }} value={params.get('search') ?? ''} onChange={(e) => update('search', e.target.value)} />
         <Select aria-label="事项状态" placeholder="全部状态" allowClear style={{ width: 150 }} value={params.get('status') ?? undefined} options={[...new Set(all.map((t) => t.status))].map((value) => ({ value, label: value }))} onChange={(v) => update('status', v)} />
         <Button onClick={() => setParams({})}>重置筛选</Button>

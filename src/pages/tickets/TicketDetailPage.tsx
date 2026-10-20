@@ -22,7 +22,7 @@ export function TicketDetailPage() {
 
 function TicketDetailContent() {
   const { canDo } = useActionAccess();
-  const { id } = useParams(); const [params] = useSearchParams(); const navigate = useNavigate(); const { message } = App.useApp();
+  const { id, projectId: scopedProjectId } = useParams(); const [params] = useSearchParams(); const navigate = useNavigate(); const { message } = App.useApp();
   const { data, dispatch } = useBusinessStore(); const { currentRole, currentUser } = useAppStore();
   const [operation, setOperation] = useState<Operation>(); const [note, setNote] = useState(''); const [ownerId, setOwnerId] = useState<string>();
   const kinds: TicketKind[] = ALL_KINDS;
@@ -35,7 +35,7 @@ function TicketDetailContent() {
   const owner = meta.ownerId === currentUser.id || ticket.owner === currentUser.name;
   const creator = meta.creatorId ? meta.creatorId === currentUser.id : 'creator' in ticket && ticket.creator === currentUser.name;
   const awaiting = ticket.status === (kind === 'requirement' ? '待验证' : kind === 'bug' ? '待复测' : '已解决');
-  const closed = ticket.status === '已关闭'; const base = '/tickets';
+  const closed = ticket.status === '已关闭'; const base = scopedProjectId ? `/projects/${scopedProjectId}/tickets` : '/tickets';
   const canOperate = (op: Operation | undefined) => !!op && canDo(op === 'convert' ? 'risk-to-issue' : 'update-ticket', ticket.id) && writer && !closed && (op === 'confirm' || op === 'return' ? awaiting && (kind === 'issue' ? pm : creator) : op === 'convert' ? pm && ticket.status === '监控中' : op === 'escalate' ? pm || currentRole === 'pmo' : op === 'mitigate' ? (owner || pm) && ticket.status === '监控中' : owner || pm);
   const canOperateCurrent = canOperate(operation);
   const sourceRisk = 'fromRiskId' in ticket ? ticket.fromRiskId : undefined;
@@ -88,7 +88,7 @@ function TicketDetailContent() {
       </Col>
       <Col xs={24} lg={9}><PageSection title="处理轨迹" description={`共 ${meta.history.length} 条 · 最新在前，完整历史保留`}><Timeline items={historyItems.slice(0, 4)} />{historyItems.length > 4 && <details><summary style={{ cursor: 'pointer', marginBottom: 16 }}>查看更早的 {historyItems.length - 4} 条记录</summary><Timeline items={historyItems.slice(4)} /></details>}</PageSection></Col>
     </Row>
-    <PageToolbar><Button onClick={() => navigate(`/projects/${p.id}?tab=tickets`)}>查看项目原摘要</Button><span style={{ color: '#64748b', fontSize: 12 }}>项目、台账与原事项共享同一业务状态。</span></PageToolbar>
+    <PageToolbar><Button onClick={() => navigate(`/projects/${p.id}/tickets`)}>查看项目全部事项</Button><span style={{ color: '#64748b', fontSize: 12 }}>项目、台账与原事项共享同一业务状态。</span></PageToolbar>
     <Modal title={operation ? operations[operation] : ''} open={!!operation} okButtonProps={{ disabled: !canOperateCurrent }} onCancel={() => setOperation(undefined)} onOk={() => {
       try {
         if (!canOperate(operation)) throw new Error('当前策略或事项状态不允许此操作');

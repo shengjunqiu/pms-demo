@@ -5,7 +5,7 @@ import { constructionLockReason } from "@/mock/construction-lock";
 import { marginReason } from "@/utils/sensitive";
 import { useState } from "react";
 import { Alert, App, Button, Card, Checkbox, Col, Descriptions, Input, InputNumber, Modal, Row, Select, Space, Steps, Table, Tag, Timeline, } from "antd";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useBusinessStore } from "@/mock/store";
 import { useAppStore } from "@/store/useAppStore";
 import { visibleProjects } from "@/mock/selectors";
@@ -24,7 +24,8 @@ function ChangeFormContent() {
     const [params, setParams] = useSearchParams();
     const runAction = useBusinessAction({ successMessage: "原变更事项状态已更新" });
     const request = data.changeRequests.find((r) => r.id === params.get("changeId"));
-    const projectId = request?.projectId ?? params.get("projectId") ?? "P-001";
+    const { projectId: scopedProjectId } = useParams();
+    const projectId = request?.projectId ?? scopedProjectId ?? params.get("projectId") ?? "P-001";
     const p = data.projects.find((p) => p.id === projectId);
     const [local, setLocal] = useState<{
         projectId: string;
@@ -135,7 +136,7 @@ function ChangeFormContent() {
         : [];
     const returnParams = new URLSearchParams(params);
     returnParams.delete("changeId");
-    const listUrl = `/project-changes?${returnParams}`;
+    const listUrl = `${scopedProjectId ? `/projects/${scopedProjectId}/changes` : '/project-changes'}?${returnParams}`;
     return (<>
       <PageHeader title={request?.input.title ?? "发起项目变更"} description={`${request?.id ?? "新变更"} · ${p.id} · ${p.name}`} breadcrumbs={[
             { title: "首页", href: "/" },

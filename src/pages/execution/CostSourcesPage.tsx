@@ -1,7 +1,7 @@
 import { useActionAccess } from '@/hooks/useActionAccess';
 import { constructionLockReason } from '@/mock/construction-lock';
 import { useState } from 'react';
-import { Alert, App, Button, Card, Col, Descriptions, Drawer, Input, InputNumber, Modal, Row, Select, Space, Statistic, Table, Tag, Tabs, Timeline } from 'antd';
+import { Alert, App, Button, Card, Col, Descriptions, Drawer, Input, InputNumber, Modal, Row, Select, Space, Statistic, Table, Tag, Timeline } from 'antd';
 import { useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom';
 import { useBusinessStore } from '@/mock/store';
 import { costAvailability, costOrderLabels, isCostSubject, type CostOrderAction, type CostOrderKind } from '@/mock/cost-orders';
@@ -15,19 +15,14 @@ import { StateView } from '@/components/common/StateView';
 import { MoneyText } from '@/components/common/MoneyText';
 type Operation = Extract<CostOrderAction, { type: 'process-cost-order' }>['operation'];
 const operationLabels: Record<Operation, string> = { approve: '批准申请', reject: '驳回申请', progress: '更新履约进度', accept: '确认验收通过', book: '确认实际入账' };
-const kindTabs: { key: CostOrderKind; label: string }[] = [
-  { key: 'procurement', label: '采购成本' },
-  { key: 'outsource', label: '外包成本' },
-  { key: 'expense', label: '项目费用' },
-];
-
 export function CostSourcesPage() {
   const {id}=useParams();const location=useLocation();
   const pathKind = location.pathname.includes('outsourcing') ? 'outsource' as const
     : location.pathname.includes('expenses') ? 'expense' as const
     : location.pathname.includes('procurement') || location.pathname.includes('costs') ? 'procurement' as const
     : undefined;
-  const kind = (new URLSearchParams(window.location.search).get('kind') as CostOrderKind | null) ?? pathKind ?? 'procurement';
+  // 路径决定页面（与工作区导航高亮一致）；?kind= 仅兼容旧 /costs 链接
+  const kind = pathKind ?? (new URLSearchParams(window.location.search).get('kind') as CostOrderKind | null) ?? 'procurement';
   return <CostSourcesContent key={`${id}-${kind}`} kind={kind}/>;
 }
 function CostSourcesContent({ kind }: { kind: CostOrderKind }) {
@@ -50,7 +45,6 @@ function CostSourcesContent({ kind }: { kind: CostOrderKind }) {
   const filter = (s: string, status: string) => (!params.get('search') || s.includes(params.get('search')!)) && (!params.get('status') || status === params.get('status'));
   const setParam = (key: string, value?: string) => { const next = new URLSearchParams(window.location.search); if (value) next.set(key, value); else next.delete(key); setParams(next); };
   const actor = { id: currentUser.id, name: currentUser.name, role: currentRole }; const label = costOrderLabels[kind];
-  const setKind = (k: string) => { const next = new URLSearchParams(window.location.search); next.set('kind', k); next.delete('source'); setParams(next); };
   // Summary across all three cost kinds
   const allKinds: CostOrderKind[] = ['procurement', 'outsource', 'expense'];
   const summaryData = allKinds.map((k) => {
@@ -58,7 +52,7 @@ function CostSourcesContent({ kind }: { kind: CostOrderKind }) {
     const c = data.costs.filter((co) => co.projectId === p.id && co.type === k);
     return { kind: k, label: costOrderLabels[k], budget: sumMoney(s.map((sub) => sub.budget)), actual: sumMoney(c.map((co) => co.amount)), committed: sumMoney(s.map((sub) => sub.committed)), available: sumMoney(s.map((sub) => costAvailability(data, p.id, sub.subjectId).available)) };
   });
-  return <><Tabs activeKey={kind} onChange={setKind} items={kindTabs} /><PageHeader title={`${label}成本`} description={`${p.id} · ${p.name} · 基准日 ${AS_OF_DATE} · 单位：万元`} breadcrumbs={[{ title: '首页', href: '/' }, { title: p.name, href: `/projects/${p.id}` }, { title: `${label}成本` }]} extra={<Space wrap><Button onClick={() => navigate(`/projects/${p.id}/dynamic-accounting`)}>查看动态核算</Button><Button type="primary" disabled={!canSubmit} onClick={() => { setTitle(''); setScope(''); setContractNo(''); setSupplier(''); setAmount(1); setTaskId(undefined); setOpen(true); }}>新建{label}申请</Button></Space>} />
+  return <><PageHeader title={`${label}成本`} description={`${p.id} · ${p.name} · 基准日 ${AS_OF_DATE} · 单位：万元`} breadcrumbs={[{ title: '首页', href: '/' }, { title: p.name, href: `/projects/${p.id}` }, { title: `${label}成本` }]} extra={<Space wrap><Button onClick={() => navigate(`/projects/${p.id}/dynamic-accounting`)}>查看动态核算</Button><Button type="primary" disabled={!canSubmit} onClick={() => { setTitle(''); setScope(''); setContractNo(''); setSupplier(''); setAmount(1); setTaskId(undefined); setOpen(true); }}>新建{label}申请</Button></Space>} />
     <Alert showIcon type={locked ? 'warning' : 'info'} message={locked ? '建设期已结束或成本锁定，仅可查看原始单据；运维费用须进入独立周期。' : `演示规则 COST-1：财务审批后形成承诺；${kind === 'expense' ? '财务确认发生后入账' : '主PM登记到货/履约100%并验收后，财务入账'}。超科目预算或未签额度时阻断，先完成额度审批。`} style={{ marginBottom: 16 }} />
     <Row gutter={[12,12]} style={{ marginBottom: 16 }}>{[['有效科目预算', sumMoney(subjects.map((s) => s.budget))], ['已确认实际', sumMoney(costs.map((c) => c.amount))], ['未发生承诺', sumMoney(subjects.map((s) => s.committed))], ['科目净余量', sumMoney(subjects.map((s) => costAvailability(data, p.id, s.subjectId).available))]].map(([name, value]) => <Col span={6} key={name}><Card size="small" style={{height:"100%",minHeight:110}}><Statistic title={name} value={value} formatter={() => <MoneyText value={Number(value)} />} /></Card></Col>)}</Row>
     <details style={{ marginBottom: 16, color: '#64748b', fontSize: 13 }}><summary style={{ cursor: 'pointer' }}>全部成本类型汇总（万元）</summary><Row gutter={[12, 12]} style={{ marginTop: 8 }}>{summaryData.map((s) => <Col span={8} key={s.kind}><Card size="small" title={s.label}><Statistic title="预算" value={s.budget} formatter={() => <MoneyText value={s.budget} />} /><Statistic title="已发生" value={s.actual} formatter={() => <MoneyText value={s.actual} />} style={{ marginTop: 8 }} /><Statistic title="承诺" value={s.committed} formatter={() => <MoneyText value={s.committed} />} style={{ marginTop: 8 }} /><Statistic title="可用" value={s.available} formatter={() => <MoneyText value={s.available} />} style={{ marginTop: 8 }} /></Card></Col>)}</Row></details>

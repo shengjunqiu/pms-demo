@@ -1,13 +1,13 @@
 import { canViewSensitiveField } from '@/mock/configuration-access';
 import { marginReason } from '@/utils/sensitive';
 import { useState } from 'react';
-import { Alert, App, Button, Card, Col, Descriptions, Drawer, Empty, Form, Input, InputNumber, Modal, Progress, Row, Select, Space, Statistic, Table, Tabs, Tag, Timeline, Typography } from 'antd';
+import { Alert, App, Button, Card, Col, Descriptions, Drawer, Empty, Form, Input, InputNumber, Modal, Row, Select, Space, Statistic, Table, Tabs, Tag, Timeline, Typography } from 'antd';
 import { ArrowRightOutlined, DollarOutlined, FundOutlined, LineChartOutlined } from '@ant-design/icons';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useBusinessStore } from '@/mock/store';
 import { useAppStore } from '@/store/useAppStore';
 import { fourStage, selectFourCalculations, selectReceipts, visibleProjects } from '@/mock/selectors';
-import { mockUsers, mockProcurements, mockOutsources, mockDepartments, AS_OF_DATE } from '@/mock';
+import { mockDepartments, AS_OF_DATE } from '@/mock';
 import { formatPercent } from '@/utils/money';
 import { StateView } from '@/components/common/StateView';
 import { ProjectQualityPanel } from '@/components/common/ProjectQualityPanel';
@@ -136,48 +136,35 @@ export function ProjectOverviewPage() {
   const materials = data.materials.filter((m) => m.projectId === p.id);
   const acceptances = data.acceptances.filter((a) => a.projectId === p.id);
   const currentTab = params.get('tab') ?? 'overview';
-  const selectTab = (tab: string, kind?: string) => { const next = new URLSearchParams(params); next.set('tab', tab); if (kind) next.set('kind', kind); else next.delete('kind'); setParams(next); };
+  const selectTab = (tab: string) => { const next = new URLSearchParams(params); if (tab === 'overview') next.delete('tab'); else next.set('tab', tab); next.delete('kind'); setParams(next); };
   const accounting = () => { const next = new URLSearchParams(params); next.delete('tab'); navigate(`/projects/${p.id}/dynamic-accounting?${next}`); };
   const open = (title: string, fields: [string, unknown][]) => setDetail({ title, fields: fields.map(([label, value]) => ({ label, value: Array.isArray(value) ? value.join('、') : String(value ?? '—') })) });
-  const marker = (status: string) => <Tag color={status.includes('通过') || status.includes('完成') || status.includes('已达成') ? 'success' : status.includes('整改') || status.includes('逾期') ? 'error' : 'processing'}>{status}</Tag>;
-  const milestoneView = (
-    <div className="grid grid-cols-5 gap-3 mb-4">
-      {milestones.map((m) => {
-        const isDone = m.status === '已达成';
-        const isOverdue = m.status === '逾期未达成';
-        return (
-          <div
-            key={m.id}
-            className={`rounded-lg border px-3.5 py-3 transition-all cursor-pointer hover:shadow-md ${
-              isOverdue ? 'bg-rose-50/80 border-rose-200 hover:border-rose-300'
-              : isDone ? 'bg-emerald-50/50 border-emerald-200 hover:border-emerald-300'
-              : 'bg-white border-slate-200 hover:border-blue-300'
-            }`}
-            onClick={() => open(m.name, [['编号', m.id], ['计划日期', m.plannedDate], ['实际日期', m.actualDate], ['状态', m.status], ['必交材料', m.requiredDeliverables], ['责任人', p.pmName]])}
-          >
-            <div className="flex items-center justify-between gap-2 mb-1.5">
-              <span className={`text-xs font-semibold truncate ${
-                isDone ? 'text-emerald-700' : isOverdue ? 'text-rose-700' : 'text-slate-700'
-              }`}>{m.name}</span>
-              <Tag color={isOverdue ? 'error' : isDone ? 'success' : 'processing'} className="m-0 text-[9px] leading-none px-1 py-0 flex-shrink-0">
-                {m.status}
-              </Tag>
-            </div>
-            <div className="text-[11px] text-slate-400">
-              {m.plannedDate}{m.actualDate ? ` → ${m.actualDate}` : ''}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
   const counts = [
-    { label: '未关闭问题', value: issues.filter((i) => i.status !== '已关闭').length, tab: 'risks' },
-    { label: '当前风险', value: risks.filter((r) => !['已关闭', '已缓解'].includes(r.status)).length, tab: 'risks' },
-    { label: '未关闭 BUG', value: bugs.filter((b) => b.status !== '已关闭').length, tab: 'requirements', kind: 'BUG' },
-    { label: '未关闭需求', value: requirements.filter((r) => r.status !== '已关闭').length, tab: 'requirements', kind: '需求' },
+    { label: '未关闭问题', value: issues.filter((i) => i.status !== '已关闭').length, kind: 'issue' },
+    { label: '当前风险', value: risks.filter((r) => !['已关闭', '已缓解'].includes(r.status)).length, kind: 'risk' },
+    { label: '未关闭 BUG', value: bugs.filter((b) => b.status !== '已关闭').length, kind: 'bug' },
+    { label: '未关闭需求', value: requirements.filter((r) => r.status !== '已关闭').length, kind: 'requirement' },
   ];
-  const overview = <Row gutter={20}>
+  // 工作区状态卡片：顺序与项目导航分组一致，只取现有业务数据，点击进入对应独立页
+  const changes = data.changes.filter((c) => c.projectId === p.id);
+  const workspaceCards = [
+    { key: 'plan', title: '计划', path: 'milestones', facts: [`里程碑 ${milestones.filter((m) => m.status === '已达成').length}/${milestones.length} 已达成`, `${milestones.filter((m) => m.status === '逾期未达成').length} 项逾期`] },
+    { key: 'cost', title: '预算与成本', path: 'dynamic-accounting', facts: [`有效预算 ${calc.budget?.totalAmount?.toFixed(1) ?? '—'} 万元`, `预测偏差 ${calc.variance > 0 ? '+' : ''}${calc.variance.toFixed(1)} 万元`] },
+    { key: 'collab', title: '执行协作', path: 'tickets', facts: [`未关闭事项 ${counts.reduce((sum, c) => sum + c.value, 0)} 项`, `变更 ${changes.length} 项`, `交付物 ${materials.filter((m) => m.status.includes('通过')).length}/${materials.length} 已审核`] },
+    { key: 'acceptance', title: '验收结算', path: 'internal-acceptance', facts: [`验收记录 ${acceptances.length} 条`, data.lockedProjects.includes(p.id) ? '建设期成本已冻结' : '尚未结算'] },
+  ];
+  const overview = <>
+  <Row gutter={12} style={{ marginBottom: 16 }}>
+    {workspaceCards.map((card) => (
+      <Col span={6} key={card.key}>
+        <button type="button" onClick={() => navigate(`/projects/${p.id}/${card.path}`)} className="w-full text-left rounded-lg border border-slate-200 bg-white px-4 py-3 cursor-pointer hover:border-blue-300 hover:shadow-xs transition-all">
+          <div className="flex items-center justify-between text-sm font-semibold text-slate-800">{card.title}<ArrowRightOutlined className="text-slate-300 text-xs" /></div>
+          <div className="mt-1.5 text-xs text-slate-500 leading-5">{card.facts.join(' · ')}</div>
+        </button>
+      </Col>
+    ))}
+  </Row>
+  <Row gutter={20}>
     <Col span={14}>
       <Card title="项目经营摘要" size="small">
         <Row gutter={[0, 0]} className="pms-summary-metrics">{[
@@ -215,7 +202,7 @@ export function ProjectOverviewPage() {
                 unit="项"
                 statusText={c.value > 0 ? '待处理' : '已清空'}
                 statusType={c.value > 0 ? (c.label.includes('BUG') || c.label.includes('问题') ? 'danger' : 'warning') : 'healthy'}
-                onClick={() => selectTab(c.tab, 'kind' in c ? c.kind : undefined)}
+                onClick={() => navigate(`/projects/${p.id}/tickets?kind=${c.kind}`)}
               />
             </Col>
           ))}
@@ -261,32 +248,14 @@ export function ProjectOverviewPage() {
         </div>
       </Card>
     </Col>
-  </Row>;
-  const riskRows = [...issues.map((i) => ({ id: i.id, kind: '问题', title: i.title, level: i.severity, status: i.status, owner: i.owner, date: i.deadline, source: i.fromRiskId ?? '直接登记' })), ...risks.map((r) => ({ id: r.id, kind: '风险', title: r.title, level: r.level, status: r.status, owner: r.owner, date: r.identifiedDate, source: r.strategy }))];
-  const demandRows = [...requirements.map((r) => ({ ...r, kind: '需求', level: r.priority })), ...bugs.map((b) => ({ ...b, kind: 'BUG', level: b.severity }))];
-  const baseColumns = [{ title: '编号', dataIndex: 'id' }, { title: '名称', dataIndex: 'title' }, { title: '状态', dataIndex: 'status', render: marker }];
+  </Row>
+  </>;
   const tabs = [
     { key: 'overview', label: '项目概览', children: overview },
-    { key: 'team', label: '团队', children: <Table rowKey="id" size="small" pagination={false} dataSource={mockUsers.filter((u) => u.id === p.pmId || (data.projectTeams[p.id]?.members.filter((m) => m.active).map((m) => m.userId) ?? p.memberIds ?? []).includes(u.id))} columns={[{ title: '人员', dataIndex: 'name' }, { title: '角色', render: (_, u) => u.id === p.pmId ? <Tag color="blue">主项目经理</Tag> : u.role }, { title: '所属部门', render: (_, u) => mockDepartments.find((d) => d.id === u.departmentId)?.name ?? '—' }, { title: '联系邮箱', dataIndex: 'email', render: (value: string) => canViewSensitiveField(data,{role},'contact') ? value : '已隐藏' }]} /> },
-    { key: 'progress', label: '计划进度', children: <>{milestoneView}<Table rowKey="id" size="small" dataSource={data.tasks.filter((t) => t.projectId === p.id)} columns={[{ title: '工作包', dataIndex: 'name' }, { title: '责任人', dataIndex: 'ownerName' }, { title: '计划开始', dataIndex: 'startDate' }, { title: '计划完成', dataIndex: 'endDate' }, { title: '进度', dataIndex: 'progress', render: (v: number) => <Progress percent={v} size="small" /> }]} /></> },
-    { key: 'four', label: '四算', children: <><Descriptions bordered column={2} items={[
-      { key: 'estimate', label: `概算 ${calc.estimate?.version ?? '无有效版本'}`, children: <MoneyText value={calc.estimate?.totalCost} /> },
-      { key: 'budget', label: `预算 ${calc.budget?.version ?? '无有效版本'}`, children: <MoneyText value={calc.budget?.totalAmount} /> },
-      { key: 'rolling', label: '动态核算', children: <Button type="link" onClick={accounting}><MoneyText value={calc.rolling} /></Button> },
-      { key: 'settled', label: '已冻结结算', children: calc.settlement ? <MoneyText value={calc.settlement.finalCost} /> : '尚未结算' },
-    ]} /><p>概算引用冻结版本；预算引用当前生效版本；结算未发生时显示“尚未结算”。金额单位：万元。</p></> },
-    { key: 'cost', label: '成本', children: <><Table rowKey="subjectId" size="small" pagination={false} dataSource={calc.subjects} columns={[{ title: '科目', dataIndex: 'subjectName' }, ...(['budget', 'actual', 'rolling', 'variance'] as const).map((key, i) => ({ title: ['预算', '已发生', '滚动成本', '偏差'][i], dataIndex: key, render: (v: number) => <MoneyText value={v} /> }))]} /><Button type="primary" onClick={accounting}>进入动态核算查看凭证</Button></> },
     { key: 'quality', label: '质量', children: <ProjectQualityPanel projectId={p.id} /> },
-    { key: 'reports', label: '项目报告', children: <><Space style={{ marginBottom: 12 }}><Button onClick={() => navigate(`/projects/${p.id}/reports`)}>进入项目报告</Button></Space><Table rowKey="id" size="small" pagination={{ pageSize: 5 }} dataSource={[...data.dailyReports.filter((r) => r.projectId === p.id).map((r) => ({ id: r.id, dateOrSpan: r.date, type: '日报', reporter: r.reporter, summary: r.completedTasks })), ...data.weeklyReports.filter((r) => r.projectId === p.id).map((r) => ({ id: r.id, dateOrSpan: r.weekSpan, type: '周报', reporter: r.reporter, summary: r.progressSummary }))]} columns={[{ title: '日期/周期', dataIndex: 'dateOrSpan' }, { title: '类型', render: (_, r) => <Tag color={r.type === '周报' ? 'blue' : undefined}>{r.type}</Tag> }, { title: '填报人', dataIndex: 'reporter' }, { title: '内容摘要', dataIndex: 'summary' }]} /></> },
-    { key: 'tickets', label: `协作事项（${riskRows.length + demandRows.length}）`, children: <><Space style={{ marginBottom: 12 }}><Button onClick={() => navigate(`/tickets?projectId=${p.id}`)}>进入事项管理台账</Button></Space><Table rowKey="id" size="small" pagination={{ pageSize: 8 }} dataSource={[...riskRows, ...demandRows]} columns={[{ title: '类型', dataIndex: 'kind' }, { title: '标题', dataIndex: 'title', render: (title: string, r) => <Button type="link" onClick={() => open(title, [['编号', r.id], ['类型', r.kind], ['等级', r.level], ['责任人', r.owner], ['状态', r.status]])}>{title}</Button> }, { title: '等级', dataIndex: 'level' }, { title: '责任人', dataIndex: 'owner' }, { title: '状态', dataIndex: 'status', render: marker }]} /></> },
-    { key: 'costs', label: '成本管理', children: <><Space style={{ marginBottom: 12 }}><Button onClick={() => navigate(`/projects/${p.id}/costs?kind=procurement`)}>采购成本</Button><Button onClick={() => navigate(`/projects/${p.id}/costs?kind=outsource`)}>外包成本</Button><Button onClick={() => navigate(`/projects/${p.id}/costs?kind=expense`)}>项目费用</Button></Space><Table rowKey="id" size="small" dataSource={[...data.costOrders.filter((r) => r.projectId === p.id && r.kind !== 'expense').map((r) => ({ ...r, title: `${r.title} · ${r.supplier}` })), ...mockProcurements.filter((r) => r.projectId === p.id).map((r) => ({ ...r, title: r.supplierName })), ...mockOutsources.filter((r) => r.projectId === p.id).map((r) => ({ ...r, title: r.vendorName }))]} columns={[...baseColumns, { title: '单据金额（万元）', dataIndex: 'amount', render: (v: number) => <MoneyText value={v} /> }]} /></> },
-    { key: 'changes', label: '变更', children: <Table rowKey="id" size="small" dataSource={data.changes.filter((c) => c.projectId === p.id)} columns={[...baseColumns, { title: '成本影响（万元）', dataIndex: 'costImpact', render: (v: number) => <MoneyText value={v} signed /> }, { title: '工期影响（天）', dataIndex: 'scheduleImpactDays' }]} /> },
-    { key: 'deliverables', label: '交付物', children: <Table rowKey="id" size="small" pagination={false} dataSource={materials} columns={[{ title: '材料', dataIndex: 'name' }, { title: '要求', dataIndex: 'required', render: (required: boolean) => required ? '必交' : '可选' }, { title: '审核状态', dataIndex: 'status', render: marker }]} /> },
-    { key: 'acceptance', label: '验收结算', children: <><Space wrap style={{ marginBottom: 12 }}><Button type="primary" onClick={() => navigate(`/projects/${p.id}/internal-acceptance`)}>内部初验</Button><Button onClick={() => navigate(`/projects/${p.id}/supplier-acceptance`)}>供应商验收</Button><Button onClick={() => navigate(`/projects/${p.id}/customer-acceptance`)}>客户终验</Button></Space><Table rowKey="id" size="small" pagination={false} dataSource={acceptances} columns={[{ title: '验收类型', dataIndex: 'type' }, { title: '轮次', dataIndex: 'round' }, { title: '状态', dataIndex: 'status', render: marker }, { title: '确认日期', dataIndex: 'acceptanceDate', render: (v?: string) => v ?? '尚未确认' }, { title: '操作', width: 100, render: (_, r) => { const path = r.type === '内部初验' ? 'internal-acceptance' : r.type === '供应商验收' ? 'supplier-acceptance' : 'customer-acceptance'; return <Button size="small" onClick={() => navigate(`/projects/${p.id}/${path}`)}>办理</Button>; } }]} /><p>建设期成本：{data.lockedProjects.includes(p.id) ? <Tag color="success">已冻结</Tag> : <Tag>未结算</Tag>}</p></> },
-    { key: 'receipts', label: '回款', children: <ReceiptsTabContent projectId={p.id} role={role} receipt={receipt} data={data} /> },
+    { key: 'project-cost', label: '成本核算表', children: <ProjectCostPanel projectId={p.id} /> },
+    { key: 'contract', label: '合同与回款', children: <><ContractLedgerPanel projectId={p.id} /><div style={{ marginTop: 16 }}><ReceiptsTabContent projectId={p.id} role={role} receipt={receipt} data={data} /></div></> },
     ...(p.isUnsigned ? [{ key: 'unsigned', label: '未签管控', children: <UnsignedProjectTab projectId={p.id} /> }] : []),
-    { key: 'contract-ledger', label: '合同台账', children: <ContractLedgerPanel projectId={p.id} /> },
-    { key: 'project-cost', label: '项目成本', children: <ProjectCostPanel projectId={p.id} /> },
     { key: 'audit', label: '操作记录', children: <Timeline items={[...data.audit.filter((a) => a.target === p.id).map((a) => ({ children: `${a.date} ${a.actor} · ${a.action}` })), ...data.baselines.filter((b) => b.projectId === p.id).map((b) => ({ children: `${b.createdAt} 基线 ${b.version} · ${b.status} · ${b.scopeDesc}` }))]} /> },
   ];
   const summaryItems = [
@@ -299,16 +268,9 @@ export function ProjectOverviewPage() {
       { key: 'description', label: '项目描述', span: 3, children: p.description ?? '暂无描述' },
       { key: 'actual', label: '已发生成本', children: <><MoneyText value={calc.actual} /> 万元</> }, { key: 'signed', label: '已签合同金额', children: <><MoneyText value={receipt.signed} /> 万元</> },
     ];
-  const groups = [
-    { key: 'overview', label: '项目总览', tabs: ['overview', 'team', 'reports', ...(p.isUnsigned ? ['unsigned'] : []), 'audit'] },
-    { key: 'contract', label: '合同台账', tabs: ['contract-ledger'] },
-    { key: 'project-cost', label: '项目成本', tabs: ['project-cost'] },
-    { key: 'delivery', label: '计划与交付', tabs: ['progress', 'quality', 'deliverables', 'costs'] },
-    { key: 'collaboration', label: '协作事项', tabs: ['tickets', 'changes'] },
-    { key: 'settlement', label: '验收与回款', tabs: ['acceptance', 'receipts'] },
-  ];
-  const activeGroup = groups.find((group) => group.tabs.includes(currentTab)) ?? groups[0];
-  const activeTab = tabs.some((tab) => tab.key === currentTab) ? currentTab : 'overview';
+  // 旧链接 ?tab=contract-ledger / receipts 归并到"合同与回款"；已删除的 Tab 回到概览
+  const legacyTab: Record<string, string> = { 'contract-ledger': 'contract', receipts: 'contract' };
+  const activeTab = tabs.some((tab) => tab.key === (legacyTab[currentTab] ?? currentTab)) ? (legacyTab[currentTab] ?? currentTab) : 'overview';
   return <div>
     {/* 顶部 Hero 实体卡片 */}
     <div className="bg-white border border-slate-200 rounded-xl p-5 mb-3 shadow-2xs">
@@ -413,8 +375,7 @@ export function ProjectOverviewPage() {
     </div>
 
     <div className="pms-project-tabs">
-      <Tabs className="pms-project-groups" activeKey={activeGroup.key} onChange={(key) => selectTab(groups.find((group) => group.key === key)!.tabs[0])} items={groups.map(({ key, label }) => ({ key, label }))} />
-      <Tabs className="pms-project-subtabs" size="small" activeKey={activeTab} onChange={selectTab} items={tabs.filter((tab) => activeGroup.tabs.includes(tab.key))} />
+      <Tabs aria-label="项目概览视图" activeKey={activeTab} onChange={selectTab} items={tabs} />
     </div>
     <Drawer title={detail?.title ?? '原始业务记录'} open={!!detail} onClose={() => setDetail(undefined)} width={560}>{detail ? <Descriptions bordered column={1} items={detail.fields.map((field) => ({ key: field.label, label: field.label, children: field.value }))} /> : <Empty />}</Drawer>
   </div>;

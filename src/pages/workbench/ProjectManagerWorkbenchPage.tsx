@@ -106,6 +106,6 @@ export function ProjectManagerWorkbenchPage() {
     ]} /></Card>
     <Row gutter={[16, 16]}>
     <Col span={12}><Card size="small" title="待验收与整改">{acceptances.length ? acceptances.slice(0, 5).map((a) => <p key={a.id}><Tag color={a.status === '整改中' ? 'warning' : 'blue'}>{a.status}</Tag><Button type="link" onClick={() => navigate(`/projects/${a.projectId}/${a.type === '内部初验' ? 'internal-acceptance' : a.type === '供应商验收' ? 'supplier-acceptance' : 'customer-acceptance'}`)}>{a.projectId} · {a.type} · 第{a.round}轮</Button></p>) : <Empty description="暂无待处理验收" />}</Card></Col>
-    <Col span={12}><Card size="small" title="近期回款与逾期款项">{receipts.length ? receipts.slice(0, 5).map((r) => <p key={r.id}><Tag color={r.dueDate < AS_OF_DATE ? 'error' : 'blue'}>{r.dueDate}</Tag><Button type="link" onClick={() => navigate(`/projects/${r.projectId}?tab=receipts`)}>{r.projectId} · {r.title}</Button><MoneyText value={r.amount - r.paidAmount} /></p>) : <Empty description="近期无待回款事项" />}</Card></Col></Row>
+    <Col span={12}><Card size="small" title="近期回款与逾期款项">{receipts.length ? receipts.slice(0, 5).map((r) => <p key={r.id}><Tag color={r.dueDate < AS_OF_DATE ? 'error' : 'blue'}>{r.dueDate}</Tag><Button type="link" onClick={() => navigate(`/projects/${r.projectId}?tab=contract`)}>{r.projectId} · {r.title}</Button><MoneyText value={r.amount - r.paidAmount} /></p>) : <Empty description="近期无待回款事项" />}</Card></Col></Row>
   </>;
 }

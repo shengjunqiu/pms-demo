@@ -1,109 +1,76 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useBusinessStore } from '@/mock/store';
 import { canAccessPage, canAccessProject, selectAccessPolicy } from '@/mock/configuration-access';
 import { projectForTarget } from '@/mock/access';
 import { StateView } from '@/components/common/StateView';
 import { GlobalSearchModal } from '@/components/common/GlobalSearchModal';
-import { Layout, Menu, Select, Space, Typography, Dropdown, Avatar, Input, type MenuProps } from 'antd';
+import { Layout, Menu, Select, Space, Typography, Dropdown, Avatar, type MenuProps } from 'antd';
 import {
+  AppstoreOutlined,
+  AuditOutlined,
+  BulbOutlined,
   DashboardOutlined,
   ProjectOutlined,
+  SearchOutlined,
   SettingOutlined,
   UserOutlined,
-  AppstoreOutlined,
-  SearchOutlined,
-  CloseCircleFilled,
 } from '@ant-design/icons';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { buildUserProfile, useAppStore, ROLES, UserRole } from '@/store/useAppStore';
-import { GLOBAL_NAV_SECTIONS, globalNavKey, ROLE_HOME, type GlobalNavEntry } from '@/routes/navigation';
-import { PAGE_MANIFEST, PAGE_MAP } from '@/routes/manifest';
-import { ProjectWorkspaceNav } from '@/components/layout/ProjectWorkspaceNav';
+import { ROLE_HOME } from '@/routes/navigation';
+import { GLOBAL_NAV, resolveNav, type NavIcon } from '@/routes/nav-config';
+import { PAGE_MANIFEST } from '@/routes/manifest';
+import { WorkspaceNav } from '@/components/layout/WorkspaceNav';
 
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
 
-const NAV_ICONS = {
+const NAV_ICONS: Record<NavIcon, React.ReactNode> = {
   workspace: <AppstoreOutlined />,
-  business: <ProjectOutlined />,
+  presales: <BulbOutlined />,
+  initiation: <AuditOutlined />,
+  project: <ProjectOutlined />,
   executive: <DashboardOutlined />,
   settings: <SettingOutlined />,
 };
 
-function resolveNavEntry(entry: GlobalNavEntry) {
-  const page = entry.pageId ? PAGE_MAP.get(entry.pageId) : undefined;
-  return {
-    page,
-    route: entry.route ?? page?.route,
-    label: entry.label ?? page?.title,
-    permissionPageId: entry.permissionPageId ?? entry.pageId,
-  };
-}
+const HEADER_HEIGHT = 56;
 
 export const MainLayout: React.FC = () => {
   const [searchOpen, setSearchOpen] = useState(false);
-  const [menuSearch, setMenuSearch] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
   const { currentRole, setRole, currentUser, asOfDate } = useAppStore();
   const { data, recordAccess } = useBusinessStore();
-  const [openGroups, setOpenGroups] = useState<string[]>(['workspace', 'business-center', 'management-center', 'settings']);
 
-  const allGroups = useMemo(() => GLOBAL_NAV_SECTIONS.flatMap((section) => section.groups), []);
-  const normalizedKeyword = menuSearch.trim().toLowerCase();
+  const nav = resolveNav(location.pathname, location.search, {
+    project: (id) => data.projects.find((p) => p.id === id)?.name,
+    opportunity: (id) => data.opportunities.find((o) => o.id === id)?.name,
+    initiation: (id) => data.initiations.find((i) => i.id === id)?.input.name,
+  });
 
-  // 全局菜单只展示无对象上下文也能成立的工作台、台账、分析和配置入口。
+  // 全局菜单只展示无对象上下文也能成立的入口；分区标题不折叠，菜单只有一层。
   const menuItems = useMemo(() => {
-    const items: MenuProps['items'] = [];
-
-    GLOBAL_NAV_SECTIONS.forEach((section) => {
-      const sectionGroupItems: NonNullable<MenuProps['items']> = [];
-
-      section.groups.forEach((group) => {
-        const entries = group.entries
-          .map(resolveNavEntry)
-          .filter((entry) => entry.route && entry.label && (!entry.permissionPageId || canAccessPage(data, currentUser, entry.permissionPageId)))
-          .filter((entry) => !normalizedKeyword || [entry.page?.id, entry.label, entry.route]
-            .filter(Boolean)
-            .some((value) => value!.toLowerCase().includes(normalizedKeyword)));
-
-        if (entries.length > 0) {
-          sectionGroupItems.push({
-            key: group.key,
-            icon: NAV_ICONS[group.icon],
-            label: group.label,
-            children: entries.map((entry) => ({ key: entry.route!, label: entry.label! })),
-          });
-        }
+    const items: NonNullable<MenuProps['items']> = [];
+    GLOBAL_NAV.forEach((section) => {
+      const children = section.items
+        .filter((item) => item.pageIds.some((pageId) => canAccessPage(data, currentUser, pageId)))
+        .map((item) => ({ key: item.key, label: item.label }));
+      if (children.length === 0) return;
+      items.push({
+        key: section.key,
+        type: 'group',
+        label: (
+          <span className="flex items-center gap-2 text-xs font-semibold text-slate-400 select-none">
+            {NAV_ICONS[section.icon]}
+            {section.label}
+          </span>
+        ),
+        children,
       });
-
-      if (sectionGroupItems.length > 0) {
-        items.push({
-          key: `divider-${section.key}`,
-          type: 'group',
-          label: (
-            <div className="text-xs font-semibold text-slate-400/90 tracking-normal px-2 pt-3 pb-1.5 select-none">
-              {section.title}
-            </div>
-          ),
-          children: sectionGroupItems,
-        });
-      }
     });
-
     return items;
-  }, [data, currentUser, normalizedKeyword]);
-
-  // 🔵2 切角色：当前页对新角色可见时原地停留，否则回角色首页，避免丢上下文或落 403
-  const handleRoleChange = (val: UserRole) => {
-    const next = val;
-    const nextUser = buildUserProfile(next);
-    const canStay = !!currentPage
-      && canAccessPage(data, nextUser, currentPage.id)
-      && (!routeProject || canAccessProject(data, nextUser, routeProject));
-    setRole(next);
-    navigate(canStay ? `${location.pathname}${location.search}` : ROLE_HOME[next]);
-  };
+  }, [data, currentUser]);
 
   const isApprovalsDetail = /^\/approvals\/[^/]+$/.test(location.pathname);
   // /approvals/:id 不属于任何 manifest 页，鉴权交给审批页内角色白名单（BudgetApprovalPage/ManagementApprovalPage）
@@ -114,47 +81,36 @@ export const MainLayout: React.FC = () => {
   });
   const targetId = location.pathname.split('/')[2] ?? '';
   const routeProject = projectForTarget(data, targetId);
-  const queryProjectId = new URLSearchParams(location.search).get('projectId');
-  const workspaceProjectId = location.pathname.match(/^\/projects\/([^/]+)/)?.[1] ?? queryProjectId ?? undefined;
   const allowed = (!currentPage || canAccessPage(data, currentUser, currentPage.id)) && (!routeProject || canAccessProject(data, currentUser, routeProject));
-  const selectedGlobalKey = globalNavKey(location.pathname);
-  const activeGroup = allGroups.find((group) => group.entries.some((entry) => resolveNavEntry(entry).route === selectedGlobalKey))?.key;
   const isWorkspace = !!currentPage && ['WK', 'GL', 'GS', 'YS', 'HS', 'JS', 'CF'].includes(currentPage.id.split('-')[0])
     || isApprovalsDetail
-    || /^\/projects\/[^/]+\/plan-requests\/[^/]+$/.test(location.pathname);
+    || nav.context === 'project';
+  const workspaceKind = nav.context === 'project' || nav.context === 'opportunity' ? nav.context : undefined;
 
-  // 自由展开/收起多分组
-  const handleOpenChange = (keys: string[]) => {
-    setOpenGroups(normalizedKeyword ? allGroups.map((g) => g.key) : keys);
+  // 🔵2 切角色：当前页对新角色可见时原地停留，否则回角色首页，避免丢上下文或落 403
+  const handleRoleChange = (val: UserRole) => {
+    const nextUser = buildUserProfile(val);
+    const canStay = !!currentPage
+      && canAccessPage(data, nextUser, currentPage.id)
+      && (!routeProject || canAccessProject(data, nextUser, routeProject));
+    setRole(val);
+    navigate(canStay ? `${location.pathname}${location.search}` : ROLE_HOME[val]);
   };
-
-  // 搜索时自动展开所有包含匹配结果的分组
-  useEffect(() => {
-    if (normalizedKeyword) {
-      const matchedGroupKeys = allGroups
-        .filter((group) => group.entries.some((entry) => {
-          const resolved = resolveNavEntry(entry);
-          return resolved.route && resolved.label &&
-            (!resolved.permissionPageId || canAccessPage(data, currentUser, resolved.permissionPageId)) &&
-            [resolved.page?.id, resolved.label, resolved.route]
-              .filter(Boolean)
-              .some((value) => value!.toLowerCase().includes(normalizedKeyword));
-        }))
-        .map((group) => group.key);
-      setOpenGroups(matchedGroupKeys);
-    }
-  }, [normalizedKeyword, allGroups, data, currentUser, activeGroup]);
 
   const policyId = selectAccessPolicy(data, currentRole)?.id;
   useEffect(() => {
     recordAccess(location.pathname + location.search, allowed, currentUser);
   }, [location.pathname, location.search, allowed, policyId, currentUser, recordAccess]);
 
+  useEffect(() => {
+    document.title = nav.title ? `${nav.title} · 项目管理平台` : '项目管理平台';
+  }, [nav.title]);
+
   return (
     <Layout style={{ minHeight: '100vh', width: '100%', background: '#f8fafc' }}>
       <Sider
         trigger={null}
-        width={240}
+        width={220}
         className="pms-sider"
         style={{
           display: 'flex',
@@ -169,60 +125,23 @@ export const MainLayout: React.FC = () => {
           borderRight: '1px solid #1e293b',
         }}
       >
-        {/* 顶部 Logo 品牌区 */}
         <div
-          style={{
-            height: 64,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            padding: '0 16px',
-            background: '#090d16',
-            color: '#fff',
-            fontWeight: 'bold',
-            fontSize: 15,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            borderBottom: '1px solid #1e293b',
-            flexShrink: 0,
-          }}
+          style={{ height: HEADER_HEIGHT, flexShrink: 0, borderBottom: '1px solid #1e293b', background: '#090d16' }}
+          className="flex items-center px-4 cursor-pointer"
+          onClick={() => navigate(ROLE_HOME[currentRole])}
         >
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-base shadow-sm flex-shrink-0 tracking-tight">
-            S
-          </div>
-          <div className="ml-3 flex flex-col justify-center">
-            <span className="leading-none text-slate-100 font-bold text-sm tracking-tight">项目管理平台</span>
-            <span className="text-[11px] text-slate-400 font-normal mt-1 leading-none">四算联动全生命周期</span>
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-base shadow-sm flex-shrink-0">S</div>
+          <div className="ml-3 flex flex-col justify-center whitespace-nowrap">
+            <span className="leading-none text-slate-100 font-bold text-sm">项目管理平台</span>
+            <span className="text-[11px] text-slate-400 mt-1 leading-none">四算联动全生命周期</span>
           </div>
         </div>
 
-        {/* 搜索过滤框 */}
-        <div className="px-3 py-2.5 border-b border-[#1e293b]/80 flex-shrink-0 bg-[#0b1120]">
-          <Input
-            placeholder="快速搜索功能"
-            prefix={<SearchOutlined className="text-slate-400 text-xs mr-1" />}
-            suffix={
-              menuSearch ? (
-                <CloseCircleFilled
-                  className="text-slate-400 hover:text-slate-200 cursor-pointer text-xs transition-colors"
-                  onClick={() => setMenuSearch('')}
-                />
-              ) : null
-            }
-            value={menuSearch}
-            onChange={(e) => setMenuSearch(e.target.value)}
-            className="pms-sider-search bg-[#111827] border-[#1f293d] text-slate-100 placeholder:text-slate-400 text-xs rounded-lg py-1 hover:border-blue-500 focus:border-blue-500 focus:bg-[#0f172a]"
-          />
-        </div>
-
-        {/* 中间菜单区：可独立悬浮滚动 */}
-        <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }} className="pms-sider-scroll py-1.5">
+        <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }} className="pms-sider-scroll py-1">
           <Menu
             theme="dark"
             mode="inline"
-            selectedKeys={[selectedGlobalKey]}
-            openKeys={openGroups}
-            onOpenChange={handleOpenChange}
+            selectedKeys={nav.globalKey ? [nav.globalKey] : []}
             items={menuItems}
             onClick={({ key }) => navigate(key)}
             style={{ borderRight: 0, background: '#0f172a' }}
@@ -230,7 +149,7 @@ export const MainLayout: React.FC = () => {
         </div>
       </Sider>
 
-      <Layout style={{ marginLeft: 240, transition: 'all 0.2s', minWidth: 0, background: '#f8fafc' }}>
+      <Layout style={{ marginLeft: 220, minWidth: 0, background: '#f8fafc' }}>
         <Header
           style={{
             padding: '0 20px',
@@ -238,57 +157,33 @@ export const MainLayout: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
             borderBottom: '1px solid #e2e8f0',
             position: 'sticky',
             top: 0,
             zIndex: 99,
-            height: 64,
+            height: HEADER_HEIGHT,
           }}
         >
-          <Space size={16} align="center">
-            {/* Spotlight 风格全局搜索入口 */}
-            <button
-              type="button"
-              aria-label="搜索项目、合同、单据"
-              onClick={() => setSearchOpen(true)}
-              className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-400 hover:border-blue-400 hover:text-slate-600 cursor-pointer transition-all w-48 xl:w-64 text-xs select-none"
-            >
-              <SearchOutlined className="text-slate-400" />
-              <span className="flex-1 truncate">搜索项目、合同、单据...</span>
-              <kbd className="hidden sm:inline-block px-1.5 py-0.5 bg-white border border-slate-200 rounded font-mono text-[10px] text-slate-500">
-                ⌘K
-              </kbd>
-            </button>
-
-            {currentPage ? (
-              <div className="hidden lg:flex items-center gap-2 max-w-[280px] xl:max-w-md">
-                <Text
-                  strong
-                  ellipsis={{ tooltip: currentPage.title }}
-                  style={{ fontSize: 14, color: '#1e293b' }}
-                >
-                  {currentPage.title}
-                </Text>
-              </div>
-            ) : (
-              <Text strong style={{ fontSize: 14, color: '#1e293b' }} className="hidden lg:inline-block">
-                项目管理平台
-              </Text>
-            )}
-          </Space>
+          <button
+            type="button"
+            aria-label="搜索项目、合同、单据"
+            onClick={() => setSearchOpen(true)}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-400 hover:border-blue-400 hover:text-slate-600 cursor-pointer transition-all w-64 text-xs select-none"
+          >
+            <SearchOutlined className="text-slate-400" />
+            <span className="flex-1 truncate text-left">搜索项目、合同、单据...</span>
+            <kbd className="hidden sm:inline-block px-1.5 py-0.5 bg-white border border-slate-200 rounded font-mono text-[10px] text-slate-500">⌘K</kbd>
+          </button>
 
           <Space size={16} align="center" className="flex-shrink-0">
-            <span className="hidden xl:inline-block text-xs text-slate-400 select-none">
-              截至 {asOfDate}
-            </span>
+            <span className="hidden xl:inline-block text-xs text-slate-400 select-none">截至 {asOfDate}</span>
             <Space size={6} align="center">
               <Text type="secondary" style={{ fontSize: 12, whiteSpace: 'nowrap' }}>角色:</Text>
               <Select
                 value={currentRole}
                 aria-label="模拟身份"
                 onChange={handleRoleChange}
-                style={{ minWidth: 210 }}
+                style={{ minWidth: 180 }}
                 popupMatchSelectWidth={false}
                 options={ROLES.map((r) => ({
                   value: r.key,
@@ -320,7 +215,7 @@ export const MainLayout: React.FC = () => {
           </Space>
         </Header>
 
-        {allowed && workspaceProjectId && <ProjectWorkspaceNav projectId={workspaceProjectId} />}
+        {allowed && workspaceKind && nav.entityId && <WorkspaceNav kind={workspaceKind} id={nav.entityId} />}
 
         <Content
           className={isWorkspace ? 'pms-workspace' : 'pms-content'}
@@ -330,7 +225,7 @@ export const MainLayout: React.FC = () => {
             background: isWorkspace ? 'transparent' : '#ffffff',
             borderRadius: 12,
             border: isWorkspace ? undefined : '1px solid #e2e8f0',
-            minHeight: 'calc(100vh - 96px)',
+            minHeight: `calc(100vh - ${HEADER_HEIGHT + 40}px)`,
             overflowX: isWorkspace ? 'visible' : 'auto',
           }}
         >

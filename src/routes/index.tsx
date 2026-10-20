@@ -82,6 +82,8 @@ export const AppRouter: React.FC = () => {
         <Route path="projects/:id/dynamic-accounting" element={<DynamicAccountingPage />} />
         <Route path="tickets" element={<TicketsPage />} />
         <Route path="tickets/:id" element={<TicketDetailPage />} />
+        <Route path="projects/:projectId/tickets" element={<TicketsPage />} />
+        <Route path="projects/:projectId/tickets/:id" element={<TicketDetailPage />} />
         <Route path="requirements-bugs" element={<TicketsPage />} />
         <Route path="requirements-bugs/:id" element={<TicketDetailPage />} />
         <Route path="issues-risks" element={<TicketsPage />} />

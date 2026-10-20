@@ -22,6 +22,8 @@ export const budgetRoutes=[
  {path:'initiation/:id/decision',element:<InitiationDecisionPage/>},
  {path:'project-changes',element:<ChangesPage/>},
  {path:'project-changes/new',element:<ChangeFormPage/>},
+ {path:'projects/:projectId/changes',element:<ChangesPage/>},
+ {path:'projects/:projectId/changes/new',element:<ChangeFormPage/>},
  {path:'projects/:id/team',element:<TeamPage/>},
  {path:'projects/:id/budget',element:<BudgetEditorPage/>},
  {path:'projects/:id/estimate-budget',element:<EstimateBudgetPage/>},
