@@ -14,7 +14,6 @@ import { configurationRoutes } from '@/routes/modules/configuration';
 import { budgetRoutes } from '@/routes/modules/budget';
 import { settlementRoutes } from '@/routes/modules/settlement';
 import { opportunityRoutes } from '@/routes/modules/opportunities';
-import { RoutesManifestPage } from '@/pages/manifest/RoutesManifestPage';
 import { PagePlaceholder } from '@/pages/common/PagePlaceholder';
 import { StateView } from '@/components/common/StateView';
 import { lazyPage } from '@/routes/lazyPage';
@@ -57,7 +56,6 @@ export const AppRouter: React.FC = () => {
         {budgetRoutes.map(route=><Route key={route.path} path={route.path} element={route.element}/>)}
         {/* 默认重定向到驾驶舱 */}
         <Route index element={<RoleHome />} />
-        <Route path="/routes-manifest" element={<RoutesManifestPage />} />
 
         {opportunityRoutes.map(r=><Route key={r.path} path={r.path} element={r.element}/>)}
         {/* Phase 2: GL 驾驶舱与专题分析 */}

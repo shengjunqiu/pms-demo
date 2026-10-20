@@ -202,8 +202,6 @@ export const MainLayout: React.FC = () => {
                 items: [
                   { key: 'dept', label: `所属部门: ${currentUser.department}` },
                   { key: 'role', label: `当前权限: ${currentUser.roleName}` },
-                  { type: 'divider' },
-                  { key: 'manifest', label: '72页完整清单', onClick: () => navigate('/routes-manifest') },
                 ],
               }}
             >

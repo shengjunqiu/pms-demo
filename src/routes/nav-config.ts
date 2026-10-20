@@ -167,7 +167,6 @@ const GLOBAL_RULES: GlobalRule[] = [
   { pattern: '/settings/alerts', navKey: '/settings/finance-config' },
   { pattern: '/approvals/:x', navKey: '/workbench/todos', title: '审批详情' },
   { pattern: '/management-approvals/:x', navKey: '/workbench/todos', title: '管理审批详情' },
-  { pattern: '/routes-manifest', navKey: '', title: '页面清单' },
 ];
 
 export interface NameLookup {
