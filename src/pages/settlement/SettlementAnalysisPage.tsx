@@ -21,6 +21,7 @@ import {
   Table,
   Tag,
   Tabs,
+  Tooltip,
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -52,6 +53,8 @@ const categories = [
   "管理问题",
   "其他",
 ];
+const fmtMoney = (value: number) =>
+  value.toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 export function SettlementAnalysisPage({
   result = false,
 }: {
@@ -90,7 +93,13 @@ export function SettlementAnalysisPage({
   const snapshot = request?.snapshot ?? settlementSnapshot(data, p.id);
   const income = final?.finalIncome ?? snapshot.income;
   const cost = final?.finalCost ?? snapshot.cost;
-  const rate = percentage(income - cost, income);
+  // 首屏与四算表共用最后滚动口径：结算后即为冻结成本，未结算为「已入账 + 未发生承诺 + 剩余预测」。
+  const budgetCost = sumMoney(snapshot.subjects.map((s) => s.budget));
+  const headlineCost = final?.finalCost ?? snapshot.lastRolling;
+  const headlineMargin = sumMoney([income, -headlineCost]);
+  const headlineRate = percentage(headlineMargin, income);
+  const costVariance = sumMoney([headlineCost, -budgetCost]);
+  const costVarianceRate = percentage(costVariance, budgetCost);
   const reasons = data.settlementAnalyses[p.id] ?? [];
   const canEdit =
     canDo("save-settlement-analysis", p.id) &&
@@ -114,13 +123,18 @@ export function SettlementAnalysisPage({
         (allocation) => allocation.receiptPlanId === selectedPlan?.id,
       ),
   );
-  const subjects = snapshot.subjects.map((s) => ({
-    ...s,
-    settlement: final ? s.actual : undefined,
-    variance: final ? s.actual - s.budget : undefined,
-    rate: final ? percentage(s.actual - s.budget, s.budget) : null,
-    reason: reasons.find((r) => r.subjectId === s.subjectId),
-  }));
+  const subjects = snapshot.subjects.map((s) => {
+    const variance = sumMoney([s.rolling, -s.budget]);
+    const varianceRate = percentage(variance, s.budget);
+    return {
+      ...s,
+      settlement: final ? s.actual : undefined,
+      variance,
+      rate: varianceRate,
+      significant: Math.abs(variance) >= 100 || Math.abs(varianceRate ?? 0) >= 10,
+      reason: reasons.find((r) => r.subjectId === s.subjectId),
+    };
+  });
   const start = () => {
     if (!canEdit) return;
     setRows(
@@ -161,9 +175,29 @@ export function SettlementAnalysisPage({
               结算原单
             </Button>
             {!result && (
-              <Button type="primary" disabled={!canEdit} onClick={start}>
-                维护差异归因
-              </Button>
+              <Tooltip
+                title={
+                  canEdit
+                    ? undefined
+                    : "仅财务专员可维护差异归因，当前角色无此操作权限"
+                }
+              >
+                <span
+                  style={{
+                    display: "inline-block",
+                    cursor: canEdit ? undefined : "not-allowed",
+                  }}
+                >
+                  <Button
+                    type="primary"
+                    disabled={!canEdit}
+                    style={canEdit ? undefined : { pointerEvents: "none" }}
+                    onClick={start}
+                  >
+                    维护差异归因
+                  </Button>
+                </span>
+              </Tooltip>
             )}
           </Space>
         }
@@ -179,40 +213,56 @@ export function SettlementAnalysisPage({
         }
         description="四算与建设毛利使用统一含税收入/成本口径，财务确认税费单列展示，不再次从建设毛利扣除；运维成本独立核算。回款为演示日实时数据，结算申请保留提交日回款快照。"
       />
-      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+      <Row gutter={[12, 12]} style={{ marginBottom: 8 }}>
         <Col xs={12} xl={6}>
           <MetricStatCard
             title={final ? "结算收入" : "合同收入"}
             value={income}
             unit="万元"
             statusType="info"
+            subtitle="签约后锁定"
           />
         </Col>
         <Col xs={12} xl={6}>
           <MetricStatCard
-            title={final ? "冻结建设成本" : "当前建设成本"}
-            value={cost}
+            title={final ? "冻结建设成本" : "最后滚动成本"}
+            value={headlineCost}
             unit="万元"
-            statusType="info"
+            statusType={costVariance > 0 ? "warning" : "info"}
+            subtitle={final ? "结算已锁定" : "含承诺与预测"}
           />
         </Col>
         <Col xs={12} xl={6}>
           <MetricStatCard
-            title={final ? "结算毛利" : "当前测算毛利"}
-            value={showMargin ? income - cost : "已隐藏"}
+            title={final ? "结算成本偏差" : "滚动成本偏差"}
+            value={costVariance}
             unit="万元"
-            statusType={showMargin && income - cost < 0 ? "danger" : "healthy"}
+            signed
+            statusType={costVariance > 0 ? "danger" : "healthy"}
+            subtitle={`相对预算 ${costVarianceRate === null ? "—" : `${costVarianceRate.toFixed(1)}%`}`}
           />
         </Col>
         <Col xs={12} xl={6}>
           <MetricStatCard
-            title="毛利率"
-            value={showMargin && rate !== null ? `${rate.toFixed(1)}%` : "已脱敏"}
+            title={final ? "结算毛利率" : "毛利率"}
+            value={
+              !showMargin
+                ? "已隐藏"
+                : headlineRate === null
+                  ? "—"
+                  : `${headlineRate.toFixed(1)}%`
+            }
             unit=""
-            statusType="healthy"
+            statusType="info"
+            subtitle={final ? "冻结结算口径" : "最后滚动口径"}
           />
         </Col>
       </Row>
+      <p style={{ margin: "0 0 16px", fontSize: 12, color: "#64748b" }}>
+        {final
+          ? `冻结结算成本 ${fmtMoney(headlineCost)} 万元已锁定；预算成本 ${fmtMoney(budgetCost)} 万元（${snapshot.budgetVersion}）。`
+          : `成本口径：已入账 ${fmtMoney(snapshot.cost)} + 未发生承诺 ${fmtMoney(snapshot.committedCost)} + 剩余预测 ${fmtMoney(snapshot.forecastRemainingCost)} = 最后滚动 ${fmtMoney(snapshot.lastRolling)} 万元；对应预算成本 ${fmtMoney(budgetCost)} 万元（${snapshot.budgetVersion}）。`}
+      </p>
       {!result ? (
         <>
           <PageSection
@@ -252,6 +302,7 @@ export function SettlementAnalysisPage({
                 { title: "指标", dataIndex: "name" },
                 {
                   title: `概算 ${snapshot.estimateVersion}`,
+                  align: "right",
                   render: (_, r) =>
                     !showMargin && r.name === "毛利（万元）" ? (
                       "已隐藏"
@@ -263,6 +314,7 @@ export function SettlementAnalysisPage({
                 },
                 {
                   title: `预算 ${snapshot.budgetVersion}`,
+                  align: "right",
                   render: (_, r) =>
                     !showMargin && r.name === "毛利（万元）" ? (
                       "已隐藏"
@@ -272,6 +324,7 @@ export function SettlementAnalysisPage({
                 },
                 {
                   title: `最后滚动 ${snapshot.lastRollingDate}`,
+                  align: "right",
                   render: (_, r) =>
                     !showMargin && r.name === "毛利（万元）" ? (
                       "已隐藏"
@@ -281,6 +334,7 @@ export function SettlementAnalysisPage({
                 },
                 {
                   title: "冻结结算",
+                  align: "right",
                   render: (_, r) =>
                     !showMargin && r.name === "毛利（万元）" ? (
                       "已隐藏"
@@ -292,6 +346,9 @@ export function SettlementAnalysisPage({
                 },
               ]}
             />
+            <p style={{ marginTop: 8 }}>
+              收入在合同签订后锁定，概算/预算/最后滚动三列同值，冻结结算列待正式结算后回填；成本按科目逐级滚动，最后滚动＝已入账＋未发生承诺＋剩余预测。
+            </p>
           </PageSection>
           <PageSection
             title="科目差异、责任阶段与变更来源"
@@ -355,24 +412,20 @@ export function SettlementAnalysisPage({
                   title: "概算→预算",
                   width: 115,
                   align: "right",
-                  render: (_, s) => <MoneyText value={s.budget - s.estimate} />,
+                  render: (_, s) => (
+                    <MoneyText value={s.budget - s.estimate} signed />
+                  ),
                 },
                 {
-                  title: "预算→结算",
-                  width: 130,
+                  title: "预算→最后滚动",
+                  width: 150,
                   align: "right",
-                  sorter: (a, b) => (a.variance ?? 0) - (b.variance ?? 0),
+                  sorter: (a, b) => a.variance - b.variance,
                   render: (_, s) => (
-                    <>
-                      {s.variance === undefined ? (
-                        "—"
-                      ) : (
-                        <MoneyText value={s.variance} />
-                      )}
-                      <div>
-                        {s.rate === null ? "—" : `${s.rate.toFixed(1)}%`}
-                      </div>
-                    </>
+                    <div className={s.significant ? "text-rose-700" : undefined}>
+                      <MoneyText value={s.variance} signed />
+                      <div>{s.rate === null ? "—" : `${s.rate.toFixed(1)}%`}</div>
+                    </div>
                   ),
                 },
                 {
@@ -398,6 +451,8 @@ export function SettlementAnalysisPage({
                             </Button>
                           )}
                         </>
+                      ) : s.significant ? (
+                        <Tag color="error">尚未归因 · 达阈值必填</Tag>
                       ) : (
                         <Tag color="warning">尚未归因</Tag>
                       )}
@@ -422,7 +477,7 @@ export function SettlementAnalysisPage({
               ]}
             />
             <p style={{ marginTop: 8 }}>
-              差异为后阶段减前阶段；正数表示成本增加。演示规则：金额差异≥100万元或相对预算≥10%的科目必须填写分类、责任阶段及依据。
+              差异为后阶段减前阶段（预算→最后滚动＝已入账＋未发生承诺＋剩余预测）；正数表示成本增加。演示规则：金额差异≥100万元或相对预算≥10%的科目（红字）必须填写分类、责任阶段及依据。
             </p>
           </PageSection>
           <PageSection title="项目变更来源" description="追溯结算成本变动的输入来源与审批状态。" className="mb-4">
@@ -445,7 +500,11 @@ export function SettlementAnalysisPage({
                   ),
                 },
                 { title: "状态", dataIndex: "status" },
-                { title: "成本影响（万元）", dataIndex: "costImpact" },
+                {
+                  title: "成本影响（万元）",
+                  align: "right",
+                  render: (_, c) => <MoneyText value={c.costImpact} signed />,
+                },
               ]}
             />
           </PageSection>
@@ -462,21 +521,21 @@ export function SettlementAnalysisPage({
                     <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
                       <Col span={8}>
                         <MetricStatCard
-                          title="已回款" unit="万元"
+                          title="已回款" unit="万元" variant="flat"
                           value={paid}
                           statusType="healthy"
                         />
                       </Col>
                       <Col span={8}>
                         <MetricStatCard
-                          title="待回款" unit="万元"
+                          title="待回款" unit="万元" variant="flat"
                           value={receivable}
                           statusType="info"
                         />
                       </Col>
                       <Col span={8}>
                         <MetricStatCard
-                          title="逾期回款" unit="万元"
+                          title="逾期回款" unit="万元" variant="flat"
                           value={overdue}
                           statusType={overdue > 0 ? "danger" : "healthy"}
                         />
@@ -504,8 +563,8 @@ export function SettlementAnalysisPage({
                           ),
                         },
                         { title: "节点", dataIndex: "title" },
-                        { title: "应收", dataIndex: "amount", render: (v: number | null | undefined) => <MoneyText value={v} /> },
-                        { title: "已收", dataIndex: "paidAmount", render: (v: number | null | undefined) => <MoneyText value={v} /> },
+                        { title: "应收", align: "right", dataIndex: "amount", render: (v: number | null | undefined) => <MoneyText value={v} /> },
+                        { title: "已收", align: "right", dataIndex: "paidAmount", render: (v: number | null | undefined) => <MoneyText value={v} /> },
                         { title: "到期日", dataIndex: "dueDate" },
                         {
                           title: "状态",
@@ -591,7 +650,7 @@ export function SettlementAnalysisPage({
                           key: "variance",
                           label: "结算对预算成本偏差",
                           children: final ? (
-                            <MoneyText value={cost - p.budgetAmount} />
+                            <MoneyText value={cost - p.budgetAmount} signed />
                           ) : (
                             "尚未结算"
                           ),
@@ -600,7 +659,7 @@ export function SettlementAnalysisPage({
                           key: "forecast",
                           label: "最后滚动对结算差异",
                           children: final ? (
-                            <MoneyText value={cost - snapshot.lastRolling} />
+                            <MoneyText value={cost - snapshot.lastRolling} signed />
                           ) : (
                             "尚未结算"
                           ),
@@ -964,10 +1023,12 @@ function ReceiptPanel({
             },
             {
               title: "合同金额（万元）",
+              align: "right",
               render: (_, c) => <MoneyText value={c.amount} />,
             },
             {
               title: "历史导入实收",
+              align: "right",
               render: (_, c) => (
                 <MoneyText
                   value={sumMoney([
@@ -983,6 +1044,7 @@ function ReceiptPanel({
             },
             {
               title: "本系统确认收款",
+              align: "right",
               render: (_, c) => (
                 <MoneyText
                   value={sumMoney(
@@ -995,10 +1057,12 @@ function ReceiptPanel({
             },
             {
               title: "当前实收",
+              align: "right",
               render: (_, c) => <MoneyText value={c.paidAmount} />,
             },
             {
               title: "当前待收",
+              align: "right",
               render: (_, c) => <MoneyText value={c.unpaidAmount} />,
             },
           ]}
@@ -1032,6 +1096,7 @@ function ReceiptPanel({
             { title: "收款日期", dataIndex: "receivedDate" },
             {
               title: "金额（万元）",
+              align: "right",
               render: (_, r) => <MoneyText value={r.amount} />,
             },
             { title: "分配节点数", render: (_, r) => r.allocations.length },
