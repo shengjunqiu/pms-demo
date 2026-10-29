@@ -150,6 +150,15 @@ kbd,
   box-shadow: var(--pms-shadow-card-hover), var(--pms-shadow-inner-highlight);
 }
 .pms-metric--interactive:focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
+/* 看板指标卡：可下钻时与 .pms-metric--interactive 同一套交互契约，避免用内联样式写死而盖掉 hover */
+.pms-kpi-tile {
+  background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: border-color .2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow .2s cubic-bezier(0.16, 1, 0.3, 1), transform .2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pms-kpi-tile--interactive { cursor: pointer; }
+.pms-kpi-tile--interactive:hover { border-color: #93c5fd; transform: translateY(-2px); box-shadow: var(--pms-shadow-card-hover); }
+.pms-kpi-tile--interactive:focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
 .pms-metric-value {
   font-family: var(--pms-font-mono);
   font-size: var(--pms-font-size-display);
@@ -199,6 +208,8 @@ kbd,
 }
 @media (prefers-reduced-motion: reduce) {
   .pms-metric--interactive { transition: none; }
+  .pms-kpi-tile { transition: none; }
+  .pms-kpi-tile--interactive:hover { transform: none; }
 }
 .pms-focus-row > .pms-stacked-cards > .ant-card { height: auto; }
 .pms-project-name.ant-btn { padding: 0; height: auto; white-space: normal; text-align: left; font-size: var(--pms-font-size-sm); }

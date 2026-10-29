@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { Alert, Button, Card, Col, Popover, Radio, Row, Space, Table, Tabs, Tag } from 'antd';
+import { useRef, useState, type ReactNode } from 'react';
+import { Alert, Button, Card, Popover, Radio, Space, Table, Tabs, Tag } from 'antd';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AS_OF_DATE } from '@/mock';
 import { useBusinessStore } from '@/mock/store';
 import { selectFourCalculations, selectProjects } from '@/mock/selectors';
+import { unsignedSummary } from '@/mock/unsigned';
 import { useAppStore } from '@/store/useAppStore';
 import { percentage, sumMoney } from '@/utils/money';
 import { readProjectFilter } from '@/utils/project-query';
@@ -13,19 +14,82 @@ import { MoneyText } from '@/components/common/MoneyText';
 import { StateView } from '@/components/common/StateView';
 import { FourCalculationsPipeline } from '@/components/common/FourCalculationsPipeline';
 
-const healths = [
-  { key: 'green', name: '健康', color: '#52c41a' },
-  { key: 'yellow', name: '需关注', color: '#d4a017' },
-  { key: 'orange', name: '预警', color: '#fa8c16' },
-  { key: 'red', name: '高风险', color: '#cf1322' },
-];
+// 健康度只留一份文案来源。原 healths 数组还自带一套十六进制色板，其中 yellow=#d4a017 与
+// Tag 的 gold 是两种黄，同一状态两个色；P1-a 删掉分布图后这套色板已无消费方，随死代码移除。
+const HEALTH_LABEL: Record<string, string> = { green: '健康', yellow: '需关注', orange: '预警', red: '高风险' };
+
+// 健康度语义色：黄=需关注→gold、橙=预警→warning、红=高风险→error。
+// 原映射把 yellow 落到 'processing'（蓝色），与「黄=需关注」的语义相反。
+const HEALTH_TAG_COLOR: Record<string, string> = { green: 'success', yellow: 'gold', orange: 'warning', red: 'error' };
+// 风险排序优先级：高风险 → 预警 → 需关注
+const HEALTH_RANK: Record<string, number> = { red: 0, orange: 1, yellow: 2 };
+
+// 正文语义色：取 antd Tag 同一套文字色阶（error #cf1322 / orange #d46b08 / gold #d4b106 / success #389e0d），
+// 使「卡片正文的颜色」和「表格里 Tag 的颜色」说的是同一件事。原先同一「危险」同时用了 #cf1322 和 #d4380d 两种红。
+const TONE = { danger: '#cf1322', warn: '#d46b08', gold: '#d4b106', good: '#389e0d', muted: '#475569' } as const;
+
+/** 金额统一千分位 + 固定两位小数。原先部分单元格用 toFixed(2)，1234.5 会显示成 1234.50 而无千分位。 */
+const money = (v: number) => v.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+/** 偏差率统一带符号两位小数。原先超支金额列无条件拼「+」，负偏差会渲染成「+-3.02」。 */
+const signedPercent = (v: number) => `${v > 0 ? '+' : ''}${v.toFixed(2)}%`;
+/** 偏差率配色阈值只定义一次：超 5% 红、超预算橙、其余绿（原在两个表里各抄了一遍） */
+const deviationTone = (v: number) => (v > 5 ? TONE.danger : v > 0 ? TONE.warn : TONE.good);
+
+interface KpiTileProps {
+  title: string;
+  unit?: string;
+  /** 提供 onDrill 即成为可下钻指标卡：补齐光标、可见焦点环与 Enter/Space 键盘契约（与 MetricStatCard 一致） */
+  onDrill?: () => void;
+  drillTo?: string;
+  children: ReactNode;
+}
+
+function KpiTile({ title, unit, onDrill, drillTo, children }: KpiTileProps) {
+  return (
+    <div
+      className={`pms-kpi-tile${onDrill ? ' pms-kpi-tile--interactive' : ''}`}
+      onClick={onDrill}
+      role={onDrill ? 'button' : undefined}
+      tabIndex={onDrill ? 0 : undefined}
+      aria-label={onDrill ? `${title}，查看${drillTo ?? '明细'}` : undefined}
+      onKeyDown={
+        onDrill
+          ? (event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                onDrill();
+              }
+            }
+          : undefined
+      }
+    >
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+        <span style={{ fontSize: 13, fontWeight: 500, color: '#475569' }}>{title}</span>
+        {unit ? <span style={{ fontSize: 11, color: '#64748b' }}>{unit}</span> : null}
+      </div>
+      {children}
+    </div>
+  );
+}
 
 export function GL01DashboardPage() {
   const data = useBusinessStore((s) => s.data);
   const role = useAppStore((s) => s.currentRole);
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
-  const [refresh, setRefresh] = useState(0);
+  const [recomputed, setRecomputed] = useState(false);
+  // 指标下钻一律走页内清单，不跳台账页：/projects 用本地 useState 存筛选，不读 URL 参数，
+  // 跳过去只会「点了没变」；异常中心的 cost 分类含未签项目，与卡片口径（排除未签）对不上号。
+  const [topTab, setTopTab] = useState('overview');
+  const [ledgerTab, setLedgerTab] = useState('all');
+  const [processTab, setProcessTab] = useState('all-process');
+  const ledgerRef = useRef<HTMLDivElement>(null);
+  const drill = (target: { top?: string; ledger?: string; process?: string }) => {
+    setTopTab(target.top ?? 'overview');
+    if (target.ledger) setLedgerTab(target.ledger);
+    if (target.process) setProcessTab(target.process);
+    ledgerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   const mode = params.get('demo') ?? 'normal';
   const allowed = ['executive', 'pmo', 'admin'].includes(role);
   const scope = mode === 'empty' ? [] : selectProjects(readProjectFilter(params), role, data.projects, data);
@@ -42,29 +106,37 @@ export function GL01DashboardPage() {
 
   const exception = (values: Record<string, string> = {}) => navigate(`/executive/exceptions?${query(values)}`);
   const goProject = (id: string) => navigate(`/projects/${id}`);
-  const health = healths.map((h) => ({ ...h, count: scope.filter((p) => p.health === h.key).length }));
+  const attentionProjects = scope
+    .filter((p) => p.health !== 'green')
+    .sort((a, b) => (HEALTH_RANK[a.health] ?? 9) - (HEALTH_RANK[b.health] ?? 9) || b.costVarianceRate - a.costVarianceRate);
 
-  // 1. 整体项目经营真实计算
-  const totalSignedContract = sumMoney(scope.filter((p) => !p.isUnsigned).map((p) => p.contractAmount));
-  const annualTargetAcceptance = sumMoney(scope.map((p) => p.revenueAmount ?? p.contractAmount));
-  const acceptanceAchievedRate = annualTargetAcceptance > 0 ? ((totalSignedContract / annualTargetAcceptance) * 100).toFixed(2) : '0.00';
+  // 1. 已签约规模：已签项目的合同额合计（数据模型无「年度规划」对象，不出占比）
+  const signedProjects = scope.filter((p) => !p.isUnsigned);
+  const totalSignedContract = sumMoney(signedProjects.map((p) => p.contractAmount));
 
   // 2. 已签在建项目统计
   const signedBuildingProjects = scope.filter((p) => !p.isUnsigned && (p.phase === '执行' || p.phase === '收尾'));
   const weeklyNewSignedProjects = scope.filter((p) => !p.isUnsigned && p.phase === '执行' && p.actualStartDate && p.actualStartDate >= '2026-08-01');
-  const weeklyNewSignedAmount = sumMoney(weeklyNewSignedProjects.slice(0, 3).map((p) => p.contractAmount));
+  const weeklyNewSignedAmount = sumMoney(weeklyNewSignedProjects.map((p) => p.contractAmount));
 
-  // 3. 立项未签项目统计
+  // 3. 立项未签项目统计：额度与占用取自未签投入台账的同一计算，不另立口径。
+  // 额度为逐项目授权值，部分项目未设额度，合计不可比较，故不聚合比值；超限按台账逐项目规则计数
   const unsignedProjects = scope.filter((p) => p.isUnsigned);
-  const totalUnsignedQuota = sumMoney(unsignedProjects.map((p) => p.unsignedLimitQuota ?? 0));
-  const weeklyNewUnsignedProjects = unsignedProjects.filter((p) => p.phase === '立项');
-  const weeklyNewUnsignedAmount = sumMoney(weeklyNewUnsignedProjects.slice(0, 1).map((p) => p.unsignedLimitQuota ?? 0));
+  const unsignedLedger = unsignedProjects.map((p) => unsignedSummary(data, p));
+  const totalUnsignedExposure = sumMoney(unsignedLedger.map((u) => u.exposure));
+  const overLimitUnsignedIds = new Set(
+    unsignedProjects.filter((_, i) => unsignedLedger[i]?.flags.includes('投入超限')).map((p) => p.id),
+  );
+  const overLimitUnsignedCount = overLimitUnsignedIds.size;
 
-  // 4. 成本超支项目细分统计（四算偏差穿透）
+  // 4. 在建成本超支：项目级成本方差。数据不含在建成本科目拆分，故不做科目归因
   const overrunProjects = scope.filter((p) => p.costVariance > 0 && !p.isUnsigned);
   const totalOverrunCost = sumMoney(overrunProjects.map((p) => p.costVariance));
-  const constructionOverrunCost = Number((totalOverrunCost * 0.82).toFixed(2));
-  const feeOverrunCost = Number((totalOverrunCost * 0.18).toFixed(2));
+  const maxOverrunProject = overrunProjects.reduce<(typeof overrunProjects)[number] | undefined>(
+    (max, p) => (!max || p.costVariance > max.costVariance ? p : max),
+    undefined,
+  );
+  const overrunShare = percentage(overrunProjects.length, signedProjects.length)?.toFixed(2) ?? '0.00';
 
   // 5. 顶部动态速报条
   const recentInitiatedProjects = scope.filter((p) => p.phase === '立项');
@@ -88,74 +160,79 @@ export function GL01DashboardPage() {
 
       {/* 整体情况 Dashboard */}
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: '#1e293b', marginBottom: 12 }}>整体经营情况</div>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 12 }}>
+          <span style={{ fontSize: 14, fontWeight: 600, color: '#1e293b' }}>整体经营情况</span>
+          {/* 数据时点常驻：原挂在 PageHeader 的 description 上，而该属性已于 2026-09-21 评审废止，时点因此不可见 */}
+          <span style={{ fontSize: 12, color: '#64748b' }}>
+            数据时点 {AS_OF_DATE} 18:30
+            {recomputed && <span style={{ color: '#1d4ed8' }}> · 已重算，数据源未变化</span>}
+          </span>
+        </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
           {/* 整体项目情况 */}
-          <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#475569' }}>已签约总额 / 签约率</span>
-              <span style={{ fontSize: 11, color: '#64748b' }}>万元</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 8 }}>
-              <span style={{ fontSize: 24, fontWeight: 700, color: '#1d4ed8' }}>{totalSignedContract.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: '#15803d' }}>{acceptanceAchievedRate}%</span>
+          <KpiTile title="已签约总额" unit="万元" onDrill={() => drill({ ledger: 'all' })} drillTo="全部项目合同额清单">
+            <div style={{ marginBottom: 8 }}>
+              <span style={{ fontSize: 24, fontWeight: 700, color: '#1d4ed8' }}>{money(totalSignedContract)}</span>
             </div>
             <div style={{ fontSize: 12, color: '#64748b' }}>
-              年度规划总规模 <span style={{ fontWeight: 600, color: '#475569' }}>{annualTargetAcceptance.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</span>
+              已签约 <span style={{ fontWeight: 600, color: TONE.muted }}>{signedProjects.length}</span> 个 / 在管 <span style={{ fontWeight: 600, color: TONE.muted }}>{scope.length}</span> 个
             </div>
-          </div>
+          </KpiTile>
 
           {/* 已签在建 */}
-          <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#475569' }}>已签在建项目 ({signedBuildingProjects.length}个)</span>
-              <span style={{ fontSize: 11, color: '#64748b' }}>万元</span>
-            </div>
+          <KpiTile
+            title={`已签在建项目 (${signedBuildingProjects.length}个)`}
+            unit="万元"
+            onDrill={() => drill({ ledger: 'signed' })}
+            drillTo="已签在建项目清单"
+          >
             <div style={{ marginBottom: 8 }}>
-              <div style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>近期新增启动</div>
-              <div style={{ fontSize: 20, fontWeight: 700, color: '#fa8c16' }}>{weeklyNewSignedAmount.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</div>
+              <div style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>近期新增启动（{weeklyNewSignedProjects.length}个）</div>
+              <div style={{ fontSize: 20, fontWeight: 700, color: '#0f172a' }}>{money(weeklyNewSignedAmount)}</div>
             </div>
             <div style={{ fontSize: 12, color: '#64748b' }}>
-              累计在建存量 <span style={{ fontWeight: 600, color: '#475569' }}>{sumMoney(signedBuildingProjects.map((p) => p.contractAmount)).toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</span>
+              累计在建存量 <span style={{ fontWeight: 600, color: TONE.muted }}>{money(sumMoney(signedBuildingProjects.map((p) => p.contractAmount)))}</span>
             </div>
-          </div>
+          </KpiTile>
 
           {/* 立项未签项目 */}
-          <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#475569' }}>立项未签控制 ({unsignedProjects.length}个)</span>
-              <span style={{ fontSize: 11, color: '#64748b' }}>万元</span>
-            </div>
+          <KpiTile
+            title={`立项未签控制 (${unsignedProjects.length}个)`}
+            unit="万元"
+            onDrill={() => drill({ ledger: 'unsigned' })}
+            drillTo="立项未签项目清单"
+          >
             <div style={{ marginBottom: 8 }}>
-              <div style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>本期批复额度</div>
-              <div style={{ fontSize: 20, fontWeight: 700, color: '#fa8c16' }}>{weeklyNewUnsignedAmount.toFixed(2)}</div>
+              <div style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>已占用投入</div>
+              <div style={{ fontSize: 20, fontWeight: 700, color: '#0f172a' }}>{money(totalUnsignedExposure)}</div>
             </div>
             <div style={{ fontSize: 12, color: '#64748b' }}>
-              授权累计限额 <span style={{ fontWeight: 600, color: '#475569' }}>{totalUnsignedQuota.toFixed(2)}</span>
+              投入超限 <span style={{ fontWeight: 600, color: overLimitUnsignedCount > 0 ? TONE.danger : TONE.muted }}>{overLimitUnsignedCount}</span> 个（逐项目判定）
             </div>
-          </div>
+          </KpiTile>
 
           {/* 已签在建成本超支项目 */}
-          <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#475569' }}>在建成本超支预警 ({overrunProjects.length}项)</span>
-              <span style={{ fontSize: 11, color: '#64748b' }}>万元</span>
-            </div>
+          <KpiTile
+            title={`在建成本超支预警 (${overrunProjects.length}项)`}
+            unit="万元"
+            onDrill={() => drill({ top: 'process', process: 'construction-overrun' })}
+            drillTo="成本超支重点项目清单"
+          >
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
               <div>
                 <div style={{ fontSize: 11, color: '#64748b', marginBottom: 2 }}>累计超支</div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: '#cf1322' }}>{totalOverrunCost.toFixed(2)}</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: TONE.danger }}>{money(totalOverrunCost)}</div>
               </div>
               <div>
-                <div style={{ fontSize: 11, color: '#64748b', marginBottom: 2 }}>外包采购超支</div>
-                <div style={{ fontSize: 15, fontWeight: 600, color: '#d4380d' }}>{constructionOverrunCost.toFixed(2)}</div>
+                <div style={{ fontSize: 11, color: '#64748b', marginBottom: 2 }}>占已签项目</div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: TONE.muted }}>{overrunShare}%</div>
               </div>
               <div>
-                <div style={{ fontSize: 11, color: '#64748b', marginBottom: 2 }}>费用超支</div>
-                <div style={{ fontSize: 15, fontWeight: 600, color: '#d4380d' }}>{feeOverrunCost.toFixed(2)}</div>
+                <div style={{ fontSize: 11, color: '#64748b', marginBottom: 2 }}>最大单项</div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: TONE.danger, cursor: 'help' }} title={maxOverrunProject ? `${maxOverrunProject.name}（${maxOverrunProject.code}）` : undefined}>{maxOverrunProject ? money(maxOverrunProject.costVariance) : '—'}</div>
               </div>
             </div>
-          </div>
+          </KpiTile>
         </div>
 
         {/* 汇总条 */}
@@ -170,17 +247,47 @@ export function GL01DashboardPage() {
         </div>
       </div>
 
+      {/* 需关注项目：异常识别层，主因作为一等列直接呈现，不埋进页签 */}
+      {attentionProjects.length ? (
+        <Card
+          size="small"
+          style={{ marginTop: 16 }}
+          title={`需关注项目 (${attentionProjects.length})`}
+          extra={
+            <Button type="link" style={{ padding: 0 }} onClick={() => exception()}>
+              全部异常 →
+            </Button>
+          }
+        >
+          <Table
+            rowKey="id"
+            size="small"
+            pagination={{ pageSize: 8, size: 'small', hideOnSinglePage: true }}
+            dataSource={attentionProjects}
+            columns={[
+              { title: '项目名称', dataIndex: 'name', render: (name: string, r) => <Button type="link" style={{ padding: 0 }} onClick={() => goProject(r.id)}>{name}</Button> },
+              { title: '健康度', dataIndex: 'health', width: 90, render: (v: string) => <Tag color={HEALTH_TAG_COLOR[v] ?? 'default'}>{HEALTH_LABEL[v] ?? v}</Tag> },
+              { title: '主要风险与原因', dataIndex: 'healthReason', render: (v: string) => <span style={{ color: v ? '#334155' : '#94a3b8', fontSize: 12 }}>{v || '未登记主因'}</span> },
+              { title: '当前阶段', dataIndex: 'phase', width: 90 },
+              { title: '成本偏差率', dataIndex: 'costVarianceRate', width: 110, align: 'right', render: (v: number) => <span style={{ color: deviationTone(v), fontWeight: 600 }}>{signedPercent(v)}</span> },
+            ]}
+          />
+        </Card>
+      ) : null}
+
       {/* 整体情况 & 项目过程分析 Tabs */}
-      <Card size="small" style={{ marginTop: 16 }}>
+      <Card size="small" style={{ marginTop: 16 }} ref={ledgerRef}>
         <Tabs
-          defaultActiveKey="overview"
+          activeKey={topTab}
+          onChange={setTopTab}
           items={[
             {
               key: 'overview',
               label: '整体情况',
               children: (
                 <Tabs
-                  defaultActiveKey="all"
+                  activeKey={ledgerTab}
+                  onChange={setLedgerTab}
                   size="small"
                   items={[
                     {
@@ -201,7 +308,7 @@ export function GL01DashboardPage() {
                             { title: '合同/预估额(万)', dataIndex: 'contractAmount', align: 'right', render: (v: number, r) => <MoneyText value={r.isUnsigned ? (r.revenueAmount ?? v) : v} /> },
                             { title: '当前阶段', dataIndex: 'phase', width: 90 },
                             { title: '项目经理', dataIndex: 'pmName', width: 90 },
-                            { title: '健康度', dataIndex: 'health', width: 90, render: (v: string) => <Tag color={v === 'green' ? 'success' : v === 'red' ? 'error' : v === 'orange' ? 'warning' : 'processing'}>{healths.find(h => h.key === v)?.name ?? v}</Tag> },
+                            { title: '健康度', dataIndex: 'health', width: 90, render: (v: string) => <Tag color={HEALTH_TAG_COLOR[v] ?? 'default'}>{HEALTH_LABEL[v] ?? v}</Tag> },
                           ]}
                         />
                       ),
@@ -241,7 +348,7 @@ export function GL01DashboardPage() {
                             { title: '序号', width: 60, render: (_, __, i) => i + 1 },
                             { title: '项目名称', dataIndex: 'name', render: (name: string, r) => <Button type="link" style={{ padding: 0 }} onClick={() => goProject(r.id)}>{name}</Button> },
                             { title: '预计合同额(万)', dataIndex: 'revenueAmount', align: 'right', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '未签授权限额(万)', dataIndex: 'unsignedLimitQuota', align: 'right', render: (v?: number) => v != null ? <span style={{ color: '#d4380d', fontWeight: 600 }}>{v.toFixed(2)}</span> : '—' },
+                            { title: '未签授权限额(万)', dataIndex: 'unsignedLimitQuota', align: 'right', render: (v: number | undefined, r) => (v != null ? <span style={{ color: overLimitUnsignedIds.has(r.id) ? TONE.danger : undefined, fontWeight: overLimitUnsignedIds.has(r.id) ? 600 : undefined }}>{money(v)}</span> : '—') },
                             { title: '已发生成本(万)', dataIndex: 'actualCost', align: 'right', render: (v: number) => <MoneyText value={v} /> },
                             { title: '当前阶段', dataIndex: 'phase', width: 90 },
                             { title: '项目经理', dataIndex: 'pmName', width: 90 },
@@ -319,7 +426,8 @@ export function GL01DashboardPage() {
               label: '项目过程与成本偏差分析',
               children: (
                 <Tabs
-                  defaultActiveKey="all-process"
+                  activeKey={processTab}
+                  onChange={setProcessTab}
                   size="small"
                   items={[
                     {
@@ -340,7 +448,7 @@ export function GL01DashboardPage() {
                             { title: '已发生成本(万)', dataIndex: 'actualCost', align: 'right', render: (v: number) => <MoneyText value={v} /> },
                             { title: '预测总成本(万)', dataIndex: 'rollingCost', align: 'right', render: (v: number) => <MoneyText value={v} /> },
                             { title: '成本偏差(万)', dataIndex: 'costVariance', align: 'right', render: (v: number) => <MoneyText value={v} signed /> },
-                            { title: '偏差率', dataIndex: 'costVarianceRate', width: 100, align: 'right', render: (v: number) => <span style={{ color: v > 5 ? '#cf1322' : v > 0 ? '#fa8c16' : '#52c41a', fontWeight: 600 }}>{v > 0 ? `+${v.toFixed(2)}%` : `${v.toFixed(2)}%`}</span> },
+                            { title: '偏差率', dataIndex: 'costVarianceRate', width: 100, align: 'right', render: (v: number) => <span style={{ color: deviationTone(v), fontWeight: 600 }}>{signedPercent(v)}</span> },
                           ]}
                         />
                       ),
@@ -360,7 +468,7 @@ export function GL01DashboardPage() {
                             { title: '合同金额(万)', dataIndex: 'contractAmount', align: 'right', render: (v: number) => <MoneyText value={v} /> },
                             { title: '预算成本(万)', dataIndex: 'budgetAmount', align: 'right', render: (v: number) => <MoneyText value={v} /> },
                             { title: '滚动预测成本(万)', dataIndex: 'rollingCost', align: 'right', render: (v: number) => <MoneyText value={v} /> },
-                            { title: '超支金额(万)', dataIndex: 'costVariance', align: 'right', render: (v: number) => <span style={{ color: '#cf1322', fontWeight: 600 }}>+{v.toFixed(2)}</span> },
+                            { title: '超支金额(万)', dataIndex: 'costVariance', align: 'right', render: (v: number) => <span style={{ color: deviationTone(v), fontWeight: 600 }}>{v > 0 ? '+' : ''}{money(v)}</span> },
                             { title: '超支比例', dataIndex: 'costVarianceRate', width: 100, align: 'right', render: (v: number) => <Tag color="error">+{v.toFixed(2)}%</Tag> },
                             { title: '主要风险与原因', dataIndex: 'healthReason', render: (v: string) => <span style={{ color: '#64748b', fontSize: 12 }}>{v}</span> },
                           ]}
@@ -379,10 +487,10 @@ export function GL01DashboardPage() {
                           columns={[
                             { title: '序号', width: 60, render: (_, __, i) => i + 1 },
                             { title: '项目名称', dataIndex: 'name', render: (name: string, r) => <Button type="link" style={{ padding: 0 }} onClick={() => goProject(r.id)}>{name}</Button> },
-                            { title: '关联需求数', render: (_, r) => data.requirements.filter(req => req.projectId === r.id).length || 8 },
-                            { title: '累计缺陷(BUG)', render: (_, r) => data.bugs.filter(b => b.projectId === r.id).length || 2 },
+                            { title: '关联需求数', render: (_, r) => data.requirements.filter(req => req.projectId === r.id).length },
+                            { title: '累计缺陷(BUG)', render: (_, r) => data.bugs.filter(b => b.projectId === r.id).length },
                             { title: '待闭环缺陷', render: (_, r) => data.bugs.filter(b => b.projectId === r.id && b.status !== '已关闭').length || 0 },
-                            { title: '交付健康状态', dataIndex: 'health', render: (v: string) => <Tag color={v === 'green' ? 'success' : v === 'red' ? 'error' : v === 'orange' ? 'warning' : 'processing'}>{healths.find(h => h.key === v)?.name ?? v}</Tag> },
+                            { title: '交付健康状态', dataIndex: 'health', render: (v: string) => <Tag color={HEALTH_TAG_COLOR[v] ?? 'default'}>{HEALTH_LABEL[v] ?? v}</Tag> },
                             { title: '当前阶段', dataIndex: 'phase' },
                           ]}
                         />
@@ -420,77 +528,6 @@ export function GL01DashboardPage() {
         />
       </Card>
 
-      {/* 项目健康度分布 */}
-      {!scope.length ? null : (
-        <Row gutter={16} style={{ marginTop: 16 }}>
-          <Col span={24}>
-            <Card
-              size="small"
-              title="项目健康度分布"
-              extra={
-                <Button type="link" style={{ padding: 0 }} onClick={() => exception()}>
-                  查看异常原因 →
-                </Button>
-              }
-            >
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 14 }}>
-                {health.map((h) => (
-                  <div
-                    key={h.key}
-                    onClick={() => h.count && exception({ health: h.key })}
-                    style={{
-                      padding: '10px 8px',
-                      borderRadius: 8,
-                      background: '#fafbfc',
-                      border: `1px solid ${h.count ? '#e2e8f0' : '#f1f5f9'}`,
-                      textAlign: 'center',
-                      cursor: h.count ? 'pointer' : 'default',
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 4 }}>
-                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: h.color }} />
-                      <span style={{ fontSize: 13, fontWeight: 500, color: '#334155' }}>{h.name}</span>
-                    </div>
-                    <div style={{ fontSize: 18, fontWeight: 700, fontFamily: 'var(--pms-font-mono)', color: h.color }}>
-                      {h.count}
-                    </div>
-                    <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
-                      {percentage(h.count, scope.length)?.toFixed(1) ?? 0}%
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div style={{ display: 'flex', height: 8, borderRadius: 4, overflow: 'hidden', background: '#f1f5f9', marginBottom: 10 }}>
-                {health.map((h) => {
-                  const pct = percentage(h.count, scope.length) ?? 0;
-                  if (!pct) return null;
-                  return (
-                    <div
-                      key={h.key}
-                      style={{
-                        width: `${pct}%`,
-                        background: h.color,
-                        height: '100%',
-                      }}
-                      title={`${h.name}: ${h.count}个 (${pct.toFixed(1)}%)`}
-                    />
-                  );
-                })}
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, color: '#64748b' }}>
-                <span>
-                  异常项目（需关注/预警/高风险）：
-                  <strong style={{ color: '#cf1322', marginLeft: 4 }}>
-                    {health.filter((h) => h.key !== 'green').reduce((n, h) => n + h.count, 0)}
-                  </strong> 项
-                </span>
-                <span style={{ color: '#64748b', fontSize: 11 }}>最严重因素优先判定</span>
-              </div>
-            </Card>
-          </Col>
-        </Row>
-      )}
     </>
   );
 
@@ -498,7 +535,6 @@ export function GL01DashboardPage() {
     <>
       <PageHeader
         title="GL-01 项目看板"
-        description={`集团经营规模、四算、健康异常与待决策 · 更新至 ${AS_OF_DATE} 18:30 · 金额单位：万元`}
         breadcrumbs={[{ title: '首页', href: '/' }]}
         extra={
           <Space>
@@ -529,9 +565,7 @@ export function GL01DashboardPage() {
                 <Button>演示场景</Button>
               </Popover>
             )}
-            <Button onClick={() => setRefresh((n) => n + 1)}>
-              刷新数据{refresh ? `（已刷新${refresh}次）` : ''}
-            </Button>
+            <Button onClick={() => setRecomputed(true)}>刷新数据</Button>
           </Space>
         }
       />

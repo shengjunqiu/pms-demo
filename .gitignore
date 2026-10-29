@@ -12,3 +12,6 @@ role-sim/
 
 # local skill runtime
 .pi/
+
+# impeccable design review artifacts
+.impeccable/
