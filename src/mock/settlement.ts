@@ -6,6 +6,7 @@ import { mockCostSnapshots } from '@/mock/cost-history';
 import { assertConstructionWritable } from '@/mock/construction-lock';
 import { hourlyRate } from '@/mock/labor';
 import { money, percentage, sumMoney } from '@/utils/money';
+import { majorVariances, missingAttribution } from '@/utils/major-variance';
 
 export function pendingSettlementSources(state: BusinessState, projectId: string) {
   const resolved=new Set(state.settlementCostReviews.filter((r)=>r.projectId===projectId).map((r)=>r.sourceId));
@@ -38,6 +39,14 @@ export type SettlementAction =
  | {type:'resolve-settlement-source';projectId:string;sourceId:string;disposition:'已有凭证'|'取消不发生';ledgerId?:string;differenceReason?:string;evidence:string}
  | {type:'dispose-settlement-balance';projectId:string;subjectId:string;bucket:'承诺'|'预测';disposition:'实际发生'|'取消不发生';amount:number;evidence:string}
  | {type:'save-settlement-analysis';projectId:string;rows:SettlementAnalysis[]};
+export function majorVarianceSubjects(state:BusinessState,projectId:string){
+  const p=state.projects.find((x)=>x.id===projectId);if(!p)return [];
+  return majorVariances(selectFourCalculations(p,state).subjects);
+}
+/** 与结算必填校验同口径（src/utils/major-variance.ts）：达阈值但未完整填写原因、责任阶段与说明的科目。 */
+export function unattributedMajorVariances(state:BusinessState,projectId:string){
+  return missingAttribution(majorVarianceSubjects(state,projectId),state.settlementAnalyses[projectId]??[]);
+}
 export function applySettlementAction(state:BusinessState,action:SettlementAction,actor:Actor){
   const request=action.type==='review-settlement'?state.settlementRequests.find((r)=>r.id===action.id):undefined;const projectId=action.type==='review-settlement'?request?.projectId:action.projectId;const p=state.projects.find((p)=>p.id===projectId);if(!p)throw new Error('项目或结算申请不存在');
   const pm=actor.role==='project-manager'&&actor.id===p.pmId;const finance=actor.role==='finance';const pmo=actor.role==='pmo';
@@ -92,7 +101,7 @@ export function applySettlementAction(state:BusinessState,action:SettlementActio
     }
     request.history.push({actor:actor.name,date:AS_OF_DATE,action:action.operation,opinion:action.opinion});
   }else{
-    if(!pm&&!pmo&&!finance)throw new Error('仅主PM、PMO或财务可维护差异归因');const calc=selectFourCalculations(p,state);const significant=calc.subjects.filter((s)=>Math.abs(s.actual-s.budget)>=100||(s.budget>0&&Math.abs(s.actual-s.budget)/s.budget>=.1));
+    if(!pm&&!pmo&&!finance)throw new Error('仅主PM、PMO或财务可维护差异归因');const calc=selectFourCalculations(p,state);const significant=majorVarianceSubjects(state,p.id);
     if(significant.some((s)=>!action.rows.some((r)=>r.subjectId===s.subjectId&&r.category.trim()&&r.phase.trim()&&r.note.trim())))throw new Error('演示规则：差异≥100万元或≥10%的科目必须完整填写原因与责任阶段');
     if(action.rows.some((r)=>!calc.subjects.some((s)=>s.subjectId===r.subjectId)||(r.changeId&&!state.changes.some((c)=>c.id===r.changeId&&c.projectId===p.id))))throw new Error('科目或关联变更不属于当前项目');state.settlementAnalyses[p.id]=structuredClone(action.rows);
   }

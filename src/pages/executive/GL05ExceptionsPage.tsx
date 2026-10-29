@@ -36,7 +36,7 @@ export function GL05ExceptionsPage() {
     { key: 'amount', align: 'right', title: '项目金额（万元）', width: 130, render: (_, p) => <MoneyText value={p.revenueAmount} /> },
     { key: 'org', title: '责任组织', width: 140, dataIndex: 'departmentName' },
     { key: 'phase', title: '阶段', width: 105, render: (_, p) => fourStage(p) },
-    { key: 'reason', title: '主要异常 / 偏差', width: 240, render: (_, p) => <><div>{marginReason(p.healthReason,showMargin)}</div>{p.overdueReceipt > 0 && <div>到期未收 <MoneyText value={p.overdueReceipt} /></div>}</> },
+    { key: 'reason', title: '主要异常 / 偏差', width: 240, render: (_, p) => <><div>{marginReason(p.healthReason,showMargin)}</div>{p.configuredAlerts.filter((a) => a.kind === 'attribution').map((a) => <div key={a.id} style={{ color: '#d4380d' }}>{a.reason}</div>)}{p.overdueReceipt > 0 && <div>到期未收 <MoneyText value={p.overdueReceipt} /></div>}</> },
     { key: 'duration', title: '首次观测 / 持续', width: 135, render: (_, p) => <>{p.firstObserved}<div>{p.duration} 天（演示快照）</div></> },
     { key: 'variance', align: 'right', title: '成本 / 毛利偏差', width: 145, render: (_, p) => <><MoneyText value={p.calc.variance} signed /><div>{showMargin ? <MoneyText value={p.marginVariance} signed /> : '已隐藏'}</div></>, sortOrder: params.get('exceptionSort') === 'variance' ? (params.get('exceptionOrder') === 'ascend' ? 'ascend' : 'descend') : null, sorter: (a, b) => a.calc.variance - b.calc.variance },
     { key: 'owner', title: 'PM / 总监', width: 150, render: (_, p) => <>{p.pmName}<div>{mockDepartments.find((d) => d.id === mockDepartments.find((d) => d.id === p.departmentId)?.parentId)?.leader ?? '王总'}（演示任命）</div></> },
