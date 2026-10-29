@@ -1,5 +1,6 @@
 import { applyAccessConfiguration, buildAuditChanges, createAccessConfiguration, selectAccessPolicy } from './configuration-access';
 import type { AccessConfigurationAction, AccessConfigurationState, AuditEvent } from '@/models/configuration-access';
+import { hourlyRate } from './labor';
 import { applyReceiptAction } from './receipts';
 import type { ReceiptAction, ReceiptRecord } from '@/models/receipts';
 import {applyFinanceConfiguration,createFinanceConfiguration,selectConfiguredHealth,type FinanceConfigurationAction} from './configuration-finance';
@@ -42,7 +43,7 @@ import { applyDeliverableAction, type DeliverableAction, type DocumentDetails, t
 import { applyReportAction, type ReportAction } from '@/mock/reports';
 import { applyCostOrderAction, type CostOrder, type CostOrderAction } from '@/mock/cost-orders';
 import { applyTicketAction, ticketMeta, type TicketAction, type TicketMeta } from '@/mock/tickets';
-import { AS_OF_DATE, mockOpportunities, mockOpportunityMetaSeeds, mockContracts, mockProjects, mockBudgetVersions, mockBaselineVersions, mockIssues, mockRisks, mockBugs, mockDecisions, mockAcceptances, mockCostItems, mockEstimateVersions, mockMilestones, mockSettlements, mockReceiptPlans, mockChanges, mockWbsTasks, mockRequirements, mockDailyReports, mockWeeklyReports } from '@/mock';
+import { AS_OF_DATE, mockOpportunities, mockOpportunityMetaSeeds, mockContracts, mockProjects, mockBudgetVersions, mockBaselineVersions, mockIssues, mockRisks, mockBugs, mockDecisions, mockAcceptances, mockCostItems, mockEstimateVersions, mockMilestones, mockSettlements, mockReceiptPlans, mockChanges, mockWbsTasks, mockRequirements, mockDailyReports, mockWeeklyReports, mockTimesheets } from '@/mock';
 import type { Opportunity, Contract, ContractLedger, ProjectCostOverview, ReceiptPlan, Project, BudgetVersion, BaselineVersion, Issue, Risk, Bug, CostItem, DecisionItem, AcceptanceRecord, EstimateVersion, Milestone, SettlementRecord, ProjectChange, WbsTask, Requirement, DailyReport, WeeklyReport } from '@/models/types';
 import type { UserRole } from '@/store/useAppStore';
 import { allocateMoney, money, percentage, sumMoney } from '@/utils/money';
@@ -870,6 +871,82 @@ export function buildDemoBusinessState(): BusinessState {
   }
   seedSettlementChain(state);
   seedGoldenInitiation(state);
+  seedGoldenCloseout(state);
+
+  // 黄金演示线路收尾段：P-008 的最终结算 2026-04-10 已锁定，但承诺/预测、历史工时原单和回款计划
+  // 还停在结算前的状态——关闭门禁的「建设期未决成本及承诺预测清零」「应收结清」两项永远过不去，
+  // 演示走到「项目关闭」就断。这里只把「结算锁定」本身已经蕴含的事实补齐，不改金额口径、不新开业务。
+  function seedGoldenCloseout(next: BusinessState) {
+    const p = next.projects.find((x) => x.id === 'P-008');
+    if (!p) return;
+    const settlement = next.settlements.find(
+      (s) => s.projectId === p.id && s.status === '已锁定已生效',
+    );
+    const lockedOn = settlement?.settledDate ?? AS_OF_DATE;
+    for (const t of mockTimesheets.filter(
+      (x) => x.projectId === p.id && x.status === '待审核',
+    )) {
+      if (next.settlementCostReviews.some((r) => r.projectId === p.id && r.sourceId === t.id)) continue;
+      next.settlementCostReviews.push({
+        id: `SCOST-${next.settlementCostReviews.length + 1}`,
+        projectId: p.id,
+        sourceId: t.id,
+        disposition: '取消不发生',
+        amount: money((t.hours * hourlyRate(t.userId)) / 10000),
+        differenceReason: '结算锁定前已确认不构成最终成本',
+        evidence: '最终结算锁定前财务核对：该工时未形成可计费交付量，按取消不发生处理，不重开成本',
+        actor: '刘敏',
+        date: lockedOn,
+      });
+    }
+    p.committedCost = 0;
+    p.forecastRemainingCost = 0;
+    p.rollingCost = money(p.actualCost);
+    p.costVariance = money(p.rollingCost - p.budgetAmount);
+    p.costVarianceRate = percentage(p.costVariance, p.budgetAmount) ?? 0;
+    for (const c of next.contracts.filter((x) => x.projectId === p.id)) {
+      c.paidAmount = c.amount;
+      c.unpaidAmount = 0;
+    }
+    for (const r of next.receiptPlans.filter((x) => x.projectId === p.id)) {
+      r.paidAmount = r.amount;
+      r.collectionStatus = '已核销';
+    }
+    // 归档的「已审核正式文件」：原业务记录不代替文件（见 closeout.archiveChecks），
+    // 现场演示要 6 类各走一遍「提交正式文件 + PMO 审核」，观众会失去耐心，按已审核登记。
+    const formalFiles: [ArchiveCategory, string][] = [
+      ['方案', '数据中台总体方案-v2.pdf'],
+      ['立项材料', '立项申请与批复-2025-02-20.pdf'],
+      ['合同', '数据中台建设合同-HT-2026-0007.pdf'],
+      ['测试与质量资料', '系统测试报告与质量记录-2026-03.pdf'],
+      ['验收资料', '三级验收报告-2026-03-31.pdf'],
+      ['结算材料', '最终结算书与审定表-2026-04-10.pdf'],
+    ];
+    for (const [category, filename] of formalFiles) {
+      if (next.materials.some((m) => m.projectId === p.id && m.archiveCategory === category)) continue;
+      next.materials.push({
+        id: `ARCHIVE-MAT-${next.materials.length + 1}`,
+        projectId: p.id,
+        name: `${category} · ${filename}`,
+        required: true,
+        status: '通过',
+        archiveCategory: category,
+        sourceId: `${p.id}:${category}`,
+        versions: [
+          {
+            version: 1,
+            filename,
+            uploader: '张建国',
+            uploadedAt: '2026-04-15',
+            note: '最终结算锁定后登记正式归档文件',
+            status: '通过',
+            reviewer: '李主任',
+            opinion: '文件与项目原业务记录一致，同意归档',
+          },
+        ],
+      });
+    }
+  }
   // 项目成员以团队台账为准：工时填报、事项办理、资源视图都读 projects.memberIds，
   // 旧种子只建了 projectTeams.members，导致「已在团队成员列表里的人」事报工时被拒。
   for (const p of state.projects) {

@@ -567,6 +567,21 @@ export function applyOperationsAction(
         : {}),
     };
     c.status = action.confirm ? "已结束" : "退出中";
+    // 运维退出确认后项目必须回「收尾」，否则 closeChecks 的「项目处于收尾阶段」永远不过，
+    // 而全站没有任何入口会把 phase 改成「收尾」（update-project-phase 只给到运维/质保运维）。
+    if (
+      action.confirm &&
+      p.phase === "运维" &&
+      !state.operationCycles.some(
+        (o) =>
+          o.projectId === p.id &&
+          o.id !== c.id &&
+          ["服务中", "待生效", "退出中"].includes(o.status),
+      )
+    ) {
+      p.phase = "收尾";
+      p.subPhase = "待关闭";
+    }
     if (action.confirm && c.previousId) {
       const previous = cycle(c.previousId);
       if (previous.status === "服务中") delete previous.renewedById;
