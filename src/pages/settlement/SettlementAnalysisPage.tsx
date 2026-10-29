@@ -184,6 +184,7 @@ export function SettlementAnalysisPage({
           <MetricStatCard
             title={final ? "结算收入" : "合同收入"}
             value={income}
+            unit="万元"
             statusType="info"
           />
         </Col>
@@ -191,6 +192,7 @@ export function SettlementAnalysisPage({
           <MetricStatCard
             title={final ? "冻结建设成本" : "当前建设成本"}
             value={cost}
+            unit="万元"
             statusType="info"
           />
         </Col>
@@ -198,6 +200,7 @@ export function SettlementAnalysisPage({
           <MetricStatCard
             title={final ? "结算毛利" : "当前测算毛利"}
             value={showMargin ? income - cost : "已隐藏"}
+            unit="万元"
             statusType={showMargin && income - cost < 0 ? "danger" : "healthy"}
           />
         </Col>
@@ -205,6 +208,7 @@ export function SettlementAnalysisPage({
           <MetricStatCard
             title="毛利率"
             value={showMargin && rate !== null ? `${rate.toFixed(1)}%` : "已脱敏"}
+            unit=""
             statusType="healthy"
           />
         </Col>
@@ -458,21 +462,21 @@ export function SettlementAnalysisPage({
                     <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
                       <Col span={8}>
                         <MetricStatCard
-                          title="已回款"
+                          title="已回款" unit="万元"
                           value={paid}
                           statusType="healthy"
                         />
                       </Col>
                       <Col span={8}>
                         <MetricStatCard
-                          title="待回款"
+                          title="待回款" unit="万元"
                           value={receivable}
                           statusType="info"
                         />
                       </Col>
                       <Col span={8}>
                         <MetricStatCard
-                          title="逾期回款"
+                          title="逾期回款" unit="万元"
                           value={overdue}
                           statusType={overdue > 0 ? "danger" : "healthy"}
                         />

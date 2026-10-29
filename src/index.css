@@ -188,7 +188,7 @@ kbd,
 .pms-project-summary .ant-descriptions-item-label { font-size: var(--pms-font-size-caption); color: var(--pms-text-tertiary); }
 .pms-project-summary .ant-descriptions-item-content { font-size: var(--pms-font-size-sm); color: var(--pms-text-primary); }
 .pms-project-meta { margin-top: var(--pms-space-3); padding-top: var(--pms-space-3); border-top: 1px solid #f1f5f9; }
-.pms-project-tabs { padding: var(--pms-space-3) var(--pms-space-4) var(--pms-space-4); background: #fff; border: 1px solid #e2e8f0; border-radius: var(--pms-radius-lg); overflow: hidden; }
+.pms-project-tabs { padding: var(--pms-space-1) 0 var(--pms-space-2); background: transparent; border: 0; border-radius: 0; overflow: visible; }
 .pms-summary-metrics .ant-col:nth-child(even) { border-left: 1px solid #f1f5f9; }
 .pms-summary-metrics .ant-col:nth-child(n+3) { border-top: 1px solid #f1f5f9; }
 .pms-filter-secondary { margin-top: var(--pms-space-3); padding-top: var(--pms-space-3); border-top: 1px solid #f1f5f9; }
@@ -217,7 +217,7 @@ kbd,
 .pms-section-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--pms-space-3); padding: 14px var(--pms-space-4); border-bottom: 1px solid #f1f5f9; }
 .pms-section-heading h2 {
   margin: 0;
-  font-size: var(--pms-font-size-base);
+  font-size: var(--pms-font-size-title);
   line-height: var(--pms-line-height-normal);
   font-weight: var(--pms-font-weight-semibold);
   color: var(--pms-text-primary);
@@ -239,11 +239,15 @@ kbd,
 .pms-section-actions { display: flex; flex-wrap: wrap; gap: var(--pms-space-2); }
 .pms-section .ant-table-wrapper { min-width: 0; }
 .ant-table-wrapper .ant-table {
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  border-radius: var(--pms-radius-md);
-  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
   font-size: var(--pms-font-size-sm);
-  box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.02);
+  box-shadow: none;
+}
+.ant-table-wrapper .ant-table-thead > tr > th {
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
 }
 .ant-table-wrapper .ant-table-container {
   overflow-x: auto;
@@ -430,3 +434,44 @@ kbd,
 .pms-project-tabs .ant-tabs > .ant-tabs-content-holder {
   border-top: 0 !important;
 }
+
+/* 语义标签对比度修正：AntD 预设 green/red/orange 的浅底文字低于 WCAG AA。
+   使用双类选择器提升优先级，避免被运行时注入的 CSS-in-JS 覆盖。 */
+.ant-tag.ant-tag-green,
+.ant-tag.ant-tag-success {
+  color: #047857;
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+}
+
+.ant-tag.ant-tag-red,
+.ant-tag.ant-tag-error {
+  color: #be123c;
+  background: #fff1f2;
+  border-color: #fecdd3;
+}
+
+.ant-tag.ant-tag-orange,
+.ant-tag.ant-tag-warning {
+  color: #b45309;
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+/* 选中页签加粗，提升小字号彩色文本的像素对比度与可扫读性 */
+.pms-project-tabs .ant-tabs-tab-active .ant-tabs-tab-btn { font-weight: 600; }
+
+/* 待办顶部指标条：紧凑排布，避免大面积留白 */
+.pms-record-summary .pms-metric--flat { min-height: 68px; }
+
+/* 结算台账指标条与待办保持一致：扁平、紧凑，避免顶部大面积留白 */
+.pms-metric-strip .pms-metric { min-height: 72px; }
+
+/* 页内子区块：用分隔线和标题建立层级，避免卡片套卡片 */
+.pms-subsection { padding: 2px 0 14px; }
+.pms-subsection + .pms-subsection { border-top: 1px solid #eef2f6; padding-top: 16px; }
+.pms-subsection-title { margin: 0 0 12px; color: #0f172a; font-size: 14px; font-weight: 600; line-height: 1.5; }
+/* 工具条属于页签内容的一部分，放在 PageSection 内时不再画第二层卡片 */
+.pms-section .pms-toolbar { margin-bottom: 12px; padding: 0; background: transparent; border: 0; border-radius: 0; box-shadow: none; }
+.pms-section.pms-record-summary { padding: 10px 16px; }
+.pms-section.pms-record-summary .pms-section-body { padding: 0; }

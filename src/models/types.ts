@@ -144,6 +144,27 @@ export interface Contract {
   departmentName?: string;
   pmId?: string;
   pmName?: string;
+  /** 合同正文版本；本原型只读展示，不改写已签署正文。 */
+  versions?: ContractVersion[];
+  /** 用印记录；合同章/法人章分项留痕。 */
+  seals?: ContractSeal[];
+}
+
+export interface ContractVersion {
+  version: string;
+  date: string;
+  operator: string;
+  type: '草稿' | '签署版' | '补充协议';
+  fileName: string;
+  status: '已生效' | '已作废';
+}
+
+export interface ContractSeal {
+  id: string;
+  type: '合同章' | '法人章';
+  status: '已用印' | '待用印';
+  date?: string;
+  operator?: string;
 }
 
 export interface ReceiptPlan {

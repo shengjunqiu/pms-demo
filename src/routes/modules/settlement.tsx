@@ -9,8 +9,10 @@ const SettlementPage = lazyPage(() => import('@/pages/settlement/SettlementPage'
 const SettlementAnalysisPage = lazyPage(() => import('@/pages/settlement/SettlementAnalysisPage'), 'SettlementAnalysisPage');
 const AcceptancePage = lazyPage(() => import('@/pages/settlement/AcceptancePage'), 'AcceptancePage');
 const ReportAcceptancePage = lazyPage(() => import('@/pages/settlement/ReportAcceptancePage'), 'ReportAcceptancePage');
+const SettlementListPage = lazyPage(() => import('@/pages/settlement/SettlementListPage'), 'SettlementListPage');
 
 export const settlementRoutes = [
+ {path:'settlement',element:<SettlementListPage/>},
  {path:'projects/:id/operation-handover',element:<OperationHandoverPage/>},
  {path:'operations/:id',element:<OperationsPage/>},
  {path:'projects/:id/close',element:<ProjectClosePage/>},

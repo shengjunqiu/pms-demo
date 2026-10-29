@@ -63,14 +63,17 @@ export function applyTicketAction(state: BusinessState, action: TicketAction, ac
   const meta = structuredClone(ticketMeta(state, action.kind, ticket.id)); state.ticketMeta[ticket.id] = meta;
   const pm = actor.role === 'project-manager' && actor.id === p.pmId;
   const owner = meta.ownerId === actor.id || ticket.owner === actor.name;
-  const creator = meta.creatorId ? meta.creatorId === actor.id : 'creator' in ticket && ticket.creator === actor.name;
+  const creator = meta.creatorId ? meta.creatorId === actor.id : 'creator' in ticket && !!ticket.creator && ticket.creator === actor.name;
+  // 导入/客户代提事项的发起人不是内部账号，原发起人永远无法登录确认；按《工单模块规划》Q2 由项目主PM或PMO代理确认，并在历史中留原发起人与代理原因。
+  const externalCreator = !meta.creatorId && 'creator' in ticket && !!ticket.creator && !mockUsers.some((u) => u.name === ticket.creator);
+  const proxy = externalCreator && (actor.id === p.pmId || actor.role === 'pmo');
   if (!action.note.trim()) throw new Error('处理说明或评价必填');
   if (ticket.status === '已关闭') throw new Error('已关闭事项不可修改');
   if (action.operation === 'confirm' || action.operation === 'return') {
     if (action.kind === 'risk') throw new Error('风险采用应对或转问题流程');
     const awaiting = action.kind === 'requirement' ? '待验证' : action.kind === 'bug' ? '待复测' : '已解决';
     if (ticket.status !== awaiting) throw new Error('尚未进入最终确认节点');
-    if (action.kind === 'issue' ? !pm : !creator) throw new Error(action.kind === 'issue' ? '问题必须由主PM最终确认' : '仅发起人可以最终确认或退回');
+    if (action.kind === 'issue' ? !pm : !(creator || proxy)) throw new Error(action.kind === 'issue' ? '问题必须由主PM最终确认' : '仅发起人可以最终确认或退回，外部发起的事项由主PM或PMO代理确认');
     if (action.operation === 'confirm') { ticket.status = '已关闭'; meta.closedAt = AS_OF_DATE; }
     else ticket.status = action.kind === 'requirement' ? '开发中' : action.kind === 'bug' ? '修复中' : '处理中';
   } else if (action.operation === 'escalate') {
@@ -92,6 +95,7 @@ export function applyTicketAction(state: BusinessState, action: TicketAction, ac
     } else if (action.operation === 'feedback' && ['待处理', '待修复', '待解决'].includes(ticket.status)) ticket.status = action.kind === 'requirement' ? '开发中' : action.kind === 'bug' ? '修复中' : '处理中';
   }
   if (action.operation === 'feedback' && action.kind === 'risk') meta.measures = action.note;
-  meta.history.push({ date: AS_OF_DATE, actor: actor.name, action: action.operation, detail: action.note });
+  const proxyNote = proxy && !creator && 'creator' in ticket && ticket.creator ? `[代理确认·原发起人 ${ticket.creator}] ` : '';
+  meta.history.push({ date: AS_OF_DATE, actor: actor.name, action: action.operation, detail: `${proxyNote}${action.note}` });
   return ticket.id;
 }

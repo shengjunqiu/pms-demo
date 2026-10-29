@@ -17,6 +17,8 @@ import {
   Table,
   Tag,
   Tabs,
+  Tooltip,
+  Typography,
 } from "antd";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -71,6 +73,8 @@ export function ArchivePage() {
     name: currentUser.name,
     role: currentRole,
   };
+  // 结算前置是领域规则（src/mock/closeout.ts:405 “须先完成正式结算，再开展后评价及正式归档”），
+  // 按钮置灰与本页“结算状态”统计一起交代原因，勿单独放宽。
   const canUpload =
     !archive && settled && (pm || pmo) && canDo("submit-archive-file", p.id);
   const canReview = (materialId?: string) =>
@@ -81,6 +85,32 @@ export function ArchivePage() {
     settled &&
     checks.every((c) => c.passed) &&
     canDo("confirm-project-archive", p.id);
+  // 按钮置灰时必须就近给出原因，避免用户对着灰按钮猜。顺序 = 领域校验顺序（归档已锁定 → 结算前置 → 角色 → 权限 → 缺件）。
+  const uploadBlock = archive
+    ? "已归档：后续补充需另走新版本流程"
+    : !settled
+      ? "未结算：需先完成正式结算才能补档"
+      : !(pm || pmo)
+        ? "仅项目主PM或PMO可补档"
+        : !canDo("submit-archive-file", p.id)
+          ? "当前账号在该项目无补档权限"
+          : null;
+  const confirmBlock = archive
+    ? "已归档：本版本已锁定，不能重复确认"
+    : !pmo
+      ? "仅PMO可确认正式归档"
+      : !settled
+        ? "未结算：需先完成正式结算再确认归档"
+        : !checks.every((c) => c.passed)
+          ? `尚有 ${checks.filter((c) => !c.passed).length} 类缺件，补齐后可确认归档`
+          : !canDo("confirm-project-archive", p.id)
+            ? "当前账号无确认归档权限"
+            : null;
+  // 两个按钮在未结算时同一个原因，页头只给一句，避免重复提示。
+  const blockedReason =
+    !archive && !settled
+      ? "未结算：需先完成正式结算，才能补档或确认归档"
+      : [...new Set([uploadBlock, confirmBlock].filter(Boolean))].join("；");
   const run = (action: CloseoutAction) =>
     runAction(
       () => {
@@ -143,7 +173,12 @@ export function ArchivePage() {
           { title: "资料归档" },
         ]}
         extra={
-          <Space>
+          <Space wrap>
+            {blockedReason ? (
+              <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                {blockedReason}
+              </Typography.Text>
+            ) : null}
             <Button onClick={exportDirectory}>导出目录JSON</Button>
             <Button disabled={!canUpload} onClick={() => begin("方案")}>
               补充正式文件
@@ -181,6 +216,7 @@ export function ArchivePage() {
           <MetricStatCard
             title="归档状态"
             value={archive ? "已确认归档" : "归档准备中"}
+            unit=""
             statusType={archive ? "healthy" : "warning"}
           />
         </Col>
@@ -204,6 +240,7 @@ export function ArchivePage() {
           <MetricStatCard
             title="前置结算"
             value={settled ? "已锁定" : "未结算"}
+            unit=""
             statusType={settled ? "healthy" : "danger"}
           />
         </Col>
@@ -325,12 +362,16 @@ export function ArchivePage() {
                       title: "补充",
                       width: 100,
                       render: (_, c) => (
-                        <Button
-                          disabled={!canUpload}
-                          onClick={() => begin(c.category)}
-                        >
-                          补档
-                        </Button>
+                        <Tooltip title={uploadBlock ?? undefined}>
+                          <span>
+                            <Button
+                              disabled={!canUpload}
+                              onClick={() => begin(c.category)}
+                            >
+                              补档
+                            </Button>
+                          </span>
+                        </Tooltip>
                       ),
                     },
                   ]}

@@ -26,17 +26,17 @@ export function acceptanceConditions(state: BusinessState, projectId: string, ty
   const requirements = state.requirements.filter((r) => r.projectId === projectId && r.priority === '高' && r.status !== '已关闭');
   const checks = qualityPlan(state, projectId).checks;
   const common = [
-    { name: '有效范围基线', passed: state.baselines.some((b) => b.projectId === projectId && b.status === '已生效' && b.scopeDesc.trim()), detail: '引用当前生效范围基线', path: `${base}/baseline` },
-    { name: 'WBS交付任务', passed: tasks.length > 0 && tasks.every((t) => t.status === '已完成'), detail: `${tasks.filter((t) => t.status === '已完成').length}/${tasks.length} 叶子任务完成`, path: `${base}/progress` },
-    { name: '关键需求与BUG', passed: !openBugs.length && !requirements.length, detail: `${requirements.length} 项高优需求、${openBugs.length} 项严重/致命BUG未关闭`, path: `/requirements-bugs?project=${projectId}` },
-    { name: '重大问题处置', passed: !openIssues.length, detail: `${openIssues.length} 项重大问题未关闭`, path: `/issues-risks?project=${projectId}` },
-    { name: '质量检查', passed: !!checks.at(-1)?.passed && !checks.some((c) => c.issueId && state.issues.find((i) => i.id === c.issueId)?.status !== '已关闭'), detail: checks.at(-1)?.passed ? '最近质量复查通过' : '需要检查通过记录', path: `${base}/deliverables?tab=quality` },
-    { name: '必交材料', passed: materials.length > 0 && materials.every((m) => m.status === '通过'), detail: materials.filter((m) => m.status !== '通过').map((m) => `${m.name}：${m.status}`).join('；') || '前置必交材料审核通过', path: `${base}/deliverables` },
+    { name: '有效范围基线', owner: 'PM/PMO', passed: state.baselines.some((b) => b.projectId === projectId && b.status === '已生效' && b.scopeDesc.trim()), detail: '引用当前生效范围基线', path: `${base}/baseline` },
+    { name: 'WBS交付任务', owner: '项目主PM', passed: tasks.length > 0 && tasks.every((t) => t.status === '已完成'), detail: `${tasks.filter((t) => t.status === '已完成').length}/${tasks.length} 叶子任务完成`, path: `${base}/progress` },
+    { name: '关键需求与BUG', owner: 'PM/质控', passed: !openBugs.length && !requirements.length, detail: `${requirements.length} 项高优需求、${openBugs.length} 项严重/致命BUG未关闭`, path: `/requirements-bugs?project=${projectId}` },
+    { name: '重大问题处置', owner: 'PM/PMO', passed: !openIssues.length, detail: `${openIssues.length} 项重大问题未关闭`, path: `/issues-risks?project=${projectId}` },
+    { name: '质量检查', owner: '质控专员', passed: !!checks.at(-1)?.passed && !checks.some((c) => c.issueId && state.issues.find((i) => i.id === c.issueId)?.status !== '已关闭'), detail: checks.at(-1)?.passed ? '最近质量复查通过' : '需要检查通过记录', path: `${base}/deliverables?tab=quality` },
+    { name: '必交材料', owner: 'PM 上传/PMO 审核', passed: materials.length > 0 && materials.every((m) => m.status === '通过'), detail: materials.filter((m) => m.status !== '通过').map((m) => `${m.name}：${m.status}`).join('；') || '前置必交材料审核通过', path: `${base}/documents` },
   ];
-  if (type !== '内部初验') common.unshift({ name: '内部验收', passed: state.acceptances.filter((r) => r.projectId === projectId && r.type === '内部初验').sort((a,b) => b.round-a.round)[0]?.status === '已通过', detail: '最近一轮内部验收须通过', path: `${base}/internal-acceptance` });
+  if (type !== '内部初验') common.unshift({ name: '内部验收', owner: '项目主PM', passed: state.acceptances.filter((r) => r.projectId === projectId && r.type === '内部初验').sort((a,b) => b.round-a.round)[0]?.status === '已通过', detail: '最近一轮内部验收须通过', path: `${base}/internal-acceptance` });
   if (type === '客户终验') {
     const sources = supplierSources(state, projectId);
-    common.push({ name: '供应商履约', passed: sources.every((s) => s.ready || state.acceptances.some((r) => r.projectId === projectId && r.type === '供应商验收' && r.status === '已通过' && state.acceptanceDetails[r.id]?.supplierSourceId === s.id)), detail: sources.length ? `${sources.length} 份采购/外包原单；逐一核对履约节点` : '不适用：无采购、外包或供应商合同', path: `${base}/supplier-acceptance` });
+    common.push({ name: '供应商履约', owner: 'PM/采购', passed: sources.every((s) => s.ready || state.acceptances.some((r) => r.projectId === projectId && r.type === '供应商验收' && r.status === '已通过' && state.acceptanceDetails[r.id]?.supplierSourceId === s.id)), detail: sources.length ? `${sources.length} 份采购/外包原单；逐一核对履约节点` : '不适用：无采购、外包或供应商合同', path: `${base}/supplier-acceptance` });
   }
   return common;
 }
@@ -65,7 +65,7 @@ export function applyAcceptanceAction(state: BusinessState, action: AcceptanceAc
     if (!action.detail.scope.trim() || !action.detail.participants.trim() || !action.detail.method.trim() || !/^\d{4}-\d{2}-\d{2}$/.test(action.detail.plannedDate) || !Number.isFinite(Date.parse(action.detail.plannedDate)) || action.detail.plannedDate < AS_OF_DATE) throw new Error('范围、参与人、方式及有效计划日期必填，计划不得早于演示日');
     if (action.kind === '客户终验' && (!action.detail.customerContact.trim() || !state.contracts.some((c) => c.id === action.detail.contractId && c.projectId === p.id && c.status !== '已终止'))) throw new Error('客户联系人及本项目有效客户合同必填');
     const failed = acceptanceConditions(state, p.id, action.kind).filter((c) => !c.passed);
-    if (failed.length) throw new Error(`验收条件未满足：${failed.map((c) => c.name).join('、')}`);
+    if (failed.length) throw new Error(`验收条件未满足：${failed.map((c) => `${c.name}（责任：${c.owner}；入口 ${c.path}）`).join('、')}`);
     if (action.kind === '供应商验收' && !supplierSources(state,p.id).some((s) => s.id === action.detail.supplierSourceId && s.ready)) throw new Error('请选择已完成履约的采购/外包原合同');
     if (record && detail?.submitted && record.status === '待验收') throw new Error('已有待验收轮次，不可重复提交');
     if (record?.status === '已通过') throw new Error('已通过轮次只读');

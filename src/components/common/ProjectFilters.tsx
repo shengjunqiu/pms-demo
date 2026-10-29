@@ -53,7 +53,7 @@ export function ProjectFilters({ params, onChange, compact = false }: { params: 
         onChange={(_, dates) => set({ from: dates[0], to: dates[1] })}
       />
       <Input
-        prefix={<SearchOutlined className="text-slate-400" />}
+        prefix={<SearchOutlined className="text-slate-500" />}
         aria-label="项目名称或编号"
         placeholder="搜索项目名称或编号"
         value={params.get('search') ?? ''}
@@ -94,7 +94,7 @@ export function ProjectFilters({ params, onChange, compact = false }: { params: 
           {totalActive > 0 && (
             <Button
               type="text"
-              icon={<ReloadOutlined className="text-slate-400" />}
+              icon={<ReloadOutlined className="text-slate-500" />}
               onClick={() => {
                 const next = new URLSearchParams(params);
                 [...keys, 'metric', 'stage', 'projectId', 'page'].forEach((k) => next.delete(k));
@@ -107,7 +107,7 @@ export function ProjectFilters({ params, onChange, compact = false }: { params: 
           )}
         </Space>
         {compact && (
-          <div className="text-[11px] text-slate-400 hidden xl:block select-none">
+          <div className="text-[11px] text-slate-500 hidden xl:block select-none">
             筛选联动经营指标、异常中心与下钻明细
           </div>
         )}

@@ -84,7 +84,7 @@ export function BudgetEditorPage() {
       render: (_: unknown, l: BudgetLine) => (
         <>
           <div>{c.plan?.tasks.find(t => t.id === l.taskId)?.name ?? '独立费用'}</div>
-          <div style={{ color: '#8c8c8c', fontSize: 12 }}>{l.sourceEstimateItemId ? `${estimate.version} / ${l.sourceEstimateItemId}` : '新增测算项'}</div>
+          <div style={{ color: '#64748b', fontSize: 12 }}>{l.sourceEstimateItemId ? `${estimate.version} / ${l.sourceEstimateItemId}` : '新增测算项'}</div>
         </>
       )
     },
@@ -138,8 +138,9 @@ export function BudgetEditorPage() {
   // 基础信息 Tab 内容
   const basicInfoTabContent = (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-      <Card size="small" title="项目基本信息">
-        <Descriptions size="small" bordered column={{ xs: 1, sm: 2, lg: 3 }}>
+      <div className="pms-subsection">
+        <div className="pms-subsection-title">项目基本信息</div>
+        <Descriptions size="small" column={{ xs: 1, sm: 2, lg: 3 }}>
           <Descriptions.Item label="申请单号">
             <Tag color="blue">{`XMYS-${p.id}`}</Tag>
           </Descriptions.Item>
@@ -147,7 +148,7 @@ export function BudgetEditorPage() {
           <Descriptions.Item label="项目编号">{p.code}</Descriptions.Item>
           <Descriptions.Item label="合同甲方">{p.customerName}</Descriptions.Item>
           <Descriptions.Item label="预计中标金额">
-            <span style={{ fontWeight: 600, color: '#1677ff' }}>{incomeAmount.toFixed(2)} 万元</span>
+            <span style={{ fontWeight: 600, color: '#1d4ed8' }}>{incomeAmount.toFixed(2)} 万元</span>
           </Descriptions.Item>
           <Descriptions.Item label="合同签订时间">{p.plannedStartDate}</Descriptions.Item>
           <Descriptions.Item label="纯运维项目">
@@ -160,9 +161,10 @@ export function BudgetEditorPage() {
             <Tag color="default">否</Tag>
           </Descriptions.Item>
         </Descriptions>
-      </Card>
+      </div>
 
-      <Card size="small" title="预算整体情况汇总（经营与毛利指标）">
+      <div className="pms-subsection">
+        <div className="pms-subsection-title">预算整体情况汇总（经营与毛利指标）</div>
         <Row gutter={[16, 16]}>
           <Col xs={12} sm={6}>
             <Statistic title="收入金额（万元）" value={incomeAmount} precision={2} />
@@ -171,10 +173,10 @@ export function BudgetEditorPage() {
             <Statistic title="外部成本（万元）" value={externalCostAmount} precision={2} valueStyle={{ color: '#d4380d' }} />
           </Col>
           <Col xs={12} sm={6}>
-            <Statistic title="外部毛利（万元）" value={externalGrossMargin} precision={2} valueStyle={{ color: '#389e0d' }} />
+            <Statistic title="外部毛利（万元）" value={externalGrossMargin} precision={2} valueStyle={{ color: '#15803d' }} />
           </Col>
           <Col xs={12} sm={6}>
-            <Statistic title="项目外部毛利率" value={externalGrossMarginRate} precision={2} suffix="%" valueStyle={{ color: '#389e0d' }} />
+            <Statistic title="项目外部毛利率" value={externalGrossMarginRate} precision={2} suffix="%" valueStyle={{ color: '#15803d' }} />
           </Col>
         </Row>
         <Divider style={{ margin: '12px 0' }} />
@@ -192,15 +194,16 @@ export function BudgetEditorPage() {
             <Statistic title="税费（6.72%）" value={totalTaxAmount} precision={2} />
           </Col>
           <Col xs={12} sm={4}>
-            <Statistic title="项目净利润空间（万元）" value={netProfitSpace} precision={2} valueStyle={{ color: netProfitSpace > 0 ? '#1677ff' : '#cf1322', fontWeight: 600 }} />
+            <Statistic title="项目净利润空间（万元）" value={netProfitSpace} precision={2} valueStyle={{ color: netProfitSpace > 0 ? '#1d4ed8' : '#cf1322', fontWeight: 600 }} />
           </Col>
           <Col xs={12} sm={4}>
-            <Statistic title="预测净利润率" value={netProfitRate} precision={2} suffix="%" valueStyle={{ color: netProfitRate > 0 ? '#1677ff' : '#cf1322', fontWeight: 600 }} />
+            <Statistic title="预测净利润率" value={netProfitRate} precision={2} suffix="%" valueStyle={{ color: netProfitRate > 0 ? '#1d4ed8' : '#cf1322', fontWeight: 600 }} />
           </Col>
         </Row>
-      </Card>
+      </div>
 
-      <Card size="small" title="里程碑进度计划关联">
+      <div className="pms-subsection">
+        <div className="pms-subsection-title">里程碑进度计划关联</div>
         <Table
           size="small"
           rowKey="id"
@@ -211,12 +214,12 @@ export function BudgetEditorPage() {
             { title: '任务 / 节点名称', dataIndex: 'name', width: 140 },
             { title: '节点类型', dataIndex: 'type', width: 100, render: v => <Tag color="blue">{v}</Tag> },
             { title: '计划达成日期', dataIndex: 'plannedDate', width: 120 },
-            { title: '达成确认条件 / 验收依据', render: (_, r) => <div><div>{r.completionCondition}</div><div style={{ color: '#8c8c8c', fontSize: 12 }}>{r.acceptanceBasis}</div></div> },
+            { title: '达成确认条件 / 验收依据', render: (_, r) => <div><div>{r.completionCondition}</div><div style={{ color: '#64748b', fontSize: 12 }}>{r.acceptanceBasis}</div></div> },
             { title: '必交交付物', dataIndex: 'requiredDeliverables', width: 200, render: (v: string[]) => v?.map(d => <Tag key={d}>{d}</Tag>) },
             { title: '当前状态', dataIndex: 'status', width: 100, render: v => <Tag color={v === '已达成' ? 'success' : v === '逾期未达成' ? 'error' : 'default'}>{v}</Tag> }
           ]}
         />
-      </Card>
+      </div>
     </Space>
   );
 
@@ -234,7 +237,7 @@ export function BudgetEditorPage() {
           <Statistic title="自有软件产品数" value={proprietarySoftwareList.length} suffix="个模块" />
         </Col>
         <Col xs={12} sm={6}>
-          <Statistic title="软件总报价（万元）" value={totalSoftwareQuotation} precision={2} valueStyle={{ color: '#1677ff' }} />
+          <Statistic title="软件总报价（万元）" value={totalSoftwareQuotation} precision={2} valueStyle={{ color: '#1d4ed8' }} />
         </Col>
         <Col xs={12} sm={6}>
           <Statistic title="标准交付成本（万元）" value={totalSoftwareCost} precision={2} />
@@ -245,7 +248,7 @@ export function BudgetEditorPage() {
             value={totalSoftwareQuotation > 0 ? ((totalSoftwareQuotation - totalSoftwareCost) / totalSoftwareQuotation) * 100 : 0}
             precision={2}
             suffix="%"
-            valueStyle={{ color: '#389e0d' }}
+            valueStyle={{ color: '#15803d' }}
           />
         </Col>
       </Row>
@@ -262,7 +265,7 @@ export function BudgetEditorPage() {
             render: (v, r) => (
               <div>
                 <div style={{ fontWeight: 500 }}>{v}</div>
-                <div style={{ color: '#8c8c8c', fontSize: 12 }}>{r.remarks}</div>
+                <div style={{ color: '#64748b', fontSize: 12 }}>{r.remarks}</div>
               </div>
             )
           },
@@ -271,8 +274,8 @@ export function BudgetEditorPage() {
           { title: '定制化', dataIndex: 'isCustomized', width: 90, render: v => <Tag color={v ? 'orange' : 'green'}>{v ? '定制' : '标准'}</Tag> },
           { title: '数量', dataIndex: 'quantity', width: 70, align: 'right' as const, render: (v, r) => `${v} ${r.unit}` },
           { title: '官方目录价 (元)', dataIndex: 'listPriceYuan', width: 130, align: 'right' as const, render: v => Number(v).toLocaleString('zh-CN', { minimumFractionDigits: 2 }) },
-          { title: '项目报价金额 (元)', dataIndex: 'quotationAmountYuan', width: 140, align: 'right' as const, render: v => <span style={{ fontWeight: 600, color: '#1677ff' }}>{Number(v).toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</span> },
-          { title: '毛利率', dataIndex: 'grossMarginRate', width: 90, align: 'right' as const, render: v => <span style={{ color: '#389e0d' }}>{v.toFixed(2)}%</span> }
+          { title: '项目报价金额 (元)', dataIndex: 'quotationAmountYuan', width: 140, align: 'right' as const, render: v => <span style={{ fontWeight: 600, color: '#1d4ed8' }}>{Number(v).toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</span> },
+          { title: '毛利率', dataIndex: 'grossMarginRate', width: 90, align: 'right' as const, render: v => <span style={{ color: '#15803d' }}>{v.toFixed(2)}%</span> }
         ]}
       />
     </Space>

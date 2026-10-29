@@ -16,8 +16,9 @@ export const SENSITIVE_FIELD_LABELS:Record<SensitiveField,string>={'labor-rate':
 const execution=['update-task','request-plan','create-ticket','update-ticket','risk-to-issue','submit-labor','save-daily','create-weekly','save-weekly','submit-cost-order','document-action','quality-plan','quality-check','complete-milestone'];
 const initiation=['save-initiation','submit-initiation'];
 const operations=['submit-operation-cost','activate-operation','configure-operation','save-operation-handover','accept-operation-handover','record-operation-event','resolve-operation-event','renew-operation','exit-operation','confirm-project-close'];
-const defaultActions:Record<UserRole,string[]>={
- market:['presales-research','follow-unsigned','request-unsigned-investment','confirm-project-contract','save-settlement','assess-project-change','save-post-evaluation','save-opportunity','start-opportunity-assessment','save-opportunity-dimension','conclude-opportunity','follow-opportunity','save-early-investment',...initiation],
+/** 默认动作白名单只能包含该角色页面清单内有写入入口的动作：市场只在 GS/YS/HS/JS-01~04 页面内办理；结算由 PM 编制、后评价由 PM/PMO 组织，市场不授予。 */
+export const defaultActions:Record<UserRole,string[]>={
+ market:['presales-research','follow-unsigned','request-unsigned-investment','confirm-project-contract','assess-project-change','save-opportunity','start-opportunity-assessment','save-opportunity-dimension','conclude-opportunity','follow-opportunity','save-early-investment',...initiation],
  'solution-tech':['respond-pm','accept-operation-handover','update-task','sign-initiation','assess-project-change','save-post-evaluation','save-opportunity-dimension','presales-save-solution','presales-save-cost','presales-research','presales-expert-opinion','presales-correction-reply','estimate-create-draft','estimate-save-draft','estimate-publish','submit-labor','save-daily','create-ticket','update-ticket','submit-cost-order','document-action','record-operation-event','resolve-operation-event','submit-operation-cost'],
  'project-manager':['confirm-project-start',...execution,'sign-initiation','save-settlement','review-acceptance','process-cost-order','save-planning','submit-planning','reply-planning','save-team-member','exit-team-member','respond-pm','save-budget-draft','submit-budget-draft','submit-budget','update-forecast','review-labor','save-project-change','submit-project-change','submit-acceptance','reply-acceptance','save-acceptance-proof','save-acceptance-report','submit-archive-file','save-post-evaluation','score-post-evaluation','record-operation-event','resolve-operation-event','submit-operation-cost','configure-operation','save-operation-handover','accept-operation-handover','exit-operation'],
  finance:['confirm-project-receipt','submit-budget','estimate-create-draft','estimate-save-draft','estimate-publish','save-opportunity-dimension','presales-finance-check','presales-expert-opinion','record-early-cost','review-early-investment','sign-initiation','assess-project-change','review-plan','process-cost-order','confirm-cost','review-settlement','resolve-settlement-source','dispose-settlement-balance','save-settlement-analysis','confirm-acceptance-report','record-operation-cost','reject-operation-cost','finance-config-save','finance-config-publish'],
@@ -26,22 +27,26 @@ const defaultActions:Record<UserRole,string[]>={
  admin:['configuration-save','configuration-publish','configuration-apply-template','finance-config-save','finance-config-publish','access-policy-save','access-policy-publish']};
 const conditionalActions=['decide-initiation','review-early-investment','reply-planning','score-post-evaluation','accept-operation-handover','submit-operation-cost','record-operation-event','resolve-operation-event'];
 const allowedActions=(role:UserRole)=>Array.from(new Set([...defaultActions[role],...conditionalActions,...(role==='pmo'?['create-ticket']:[])]));
-const defaultPages:Record<UserRole,string[]>={
+export const defaultPages:Record<UserRole,string[]>={
  executive:[...ids('GL',range(6)),...ids('WK',[2,3]),...ids('GS',[1,3,4,5,6,7,8,9,10,11]),...ids('YS',range(15)),...ids('HS',range(17)),...ids('JS',range(13))],
  pmo:[...ids('GL',range(6)),...ids('WK',range(3)),...ids('GS',[1,3,4,5,6,7,8,9,10,11]),...ids('YS',range(15)),...ids('HS',range(17)),...ids('JS',range(13)),...ids('CF',[1,2,3,4,6])],
- finance:[...ids('GL',[2]),...ids('WK',[2]),...ids('GS',[1,3,4,5,6,7,8,9,10,11]),...ids('YS',range(15)),...ids('HS',range(17)),...ids('JS',range(13)),...ids('CF',[4,5])],
+ // 财务不进入计划编制/WBS/里程碑编辑页（YS-06/07 无财务动作），计划通过 YS-08 评审页与四算台账查看。
+ finance:[...ids('GL',[2]),...ids('WK',[2]),...ids('GS',[1,3,4,5,6,7,8,9,10,11]),...ids('YS',range(15)).filter(id=>!['YS-06','YS-07'].includes(id)),...ids('HS',range(17)),...ids('JS',range(13)),...ids('CF',[4,5,6])],
  market:[...ids('GS',range(11)),...ids('WK',[2]),...ids('YS',[1,2,3,4,13,14]),...ids('HS',[1,13,14,15]),...ids('JS',[1,2,3,4])],
  'project-manager':[...ids('WK',range(2)),...ids('GS',[1,3,4,5,6,7,8,9,10,11]),...ids('YS',range(15)),...ids('HS',range(17)),...ids('JS',range(13))],
  'solution-tech':[...ids('WK',[2]),...ids('GS',[1,3,4,5,6,7,8,9,10,11]),...ids('YS',[2,3,4,5,6,7,8]),...ids('HS',range(17)),...ids('JS',[1,2,3,4,9,10,11,12])],
  admin:PAGE_MANIFEST.map(p=>p.id)};
 export const ACCESS_ACTIONS=Array.from(new Set((Object.keys(defaultActions) as UserRole[]).flatMap(allowedActions))).sort();
 export const DEMO_TENANT='TENANT-DEMO';
+export type RedactedValue = string | number | boolean | null | undefined | RedactedValue[] | { [key: string]: RedactedValue };
 export const EDITABLE_SENSITIVE_FIELDS: SensitiveField[] = ['labor-rate', 'evaluation', 'contact'];
 export function createAccessConfiguration():AccessConfigurationState{return {versions:(Object.keys(defaultActions) as UserRole[]).map(role=>({id:`ACCESS-${role}-V1`,key:`ACCESS-${role}`,version:1,name:`${role} 默认访问策略`,status:'已发布',enabled:true,effectiveDate:'2026-01-01',orgId:'all',projectType:'all',changeReason:'沿用当前业务职责与项目关系；配置只能收紧领域权限',createdBy:'系统管理员',createdAt:'2026-01-01',publishedBy:'系统管理员',publishedAt:'2026-01-01',tenantId:DEMO_TENANT,role,dataScope:['project-manager','solution-tech'].includes(role)?'self':'all',orgIds:[],pages:defaultPages[role].filter(id=>PAGE_MANIFEST.some(p=>p.id===id)),actions:allowedActions(role),editableFields:[...EDITABLE_SENSITIVE_FIELDS],fields:role==='admin'||role==='finance'?['labor-rate','margin','evaluation','contact']:role==='executive'?['margin','evaluation','contact']:role==='pmo'?['margin','evaluation']:role==='market'?['margin','contact']:role==='project-manager'?['margin']:role==='solution-tech'?['labor-rate']:[],projectRelationRequired:['project-manager','solution-tech'].includes(role)}))};}
 export function selectAccessPolicy(state:Pick<AccessState,'accessConfiguration'>,role:UserRole){return effectiveVersions(state.accessConfiguration?.versions??[]).filter(v=>v.role===role).sort((a,b)=>b.version-a.version)[0];}
 export function canAccessPage(state:Pick<AccessState,'accessConfiguration'>,actor:Pick<Actor,'role'>,pageId:string){const p=selectAccessPolicy(state,actor.role);return !!p&&p.tenantId===DEMO_TENANT&&p.pages.includes(pageId);}
 /** Targets: initiation/review/request ids, project id for template scoring/handover/ticket, cycle id for operation entry, event id for resolution. Relationship actions require an exact target and actor id. */
 export function canAccessAction(state:Partial<AccessState>,actor:Pick<Actor,'role'> & Partial<Pick<Actor,'id'|'name'>>,actionType:string,targetId?:string){
+ // 审批节点角色优先于动作白名单：财务复核、集团领导决策等节点角色并不在通用动作表里。
+ if(actionType==='review'){const a=state.approvals?.find(x=>x.id===targetId);const node=a?.nodes?.[a.node??0];if(node&&actor.id&&node.roles.includes(actor.role))return true;}
  const p=selectAccessPolicy(state,actor.role);if(!p||p.tenantId!==DEMO_TENANT||!p.actions.includes(actionType))return false;
  const project=state.projects?.find(p=>p.id===targetId);
  if(actionType==='create-ticket'&&actor.role==='pmo'){const team=state.projectTeams?.[targetId??''];return !!actor.id&&!!project&&(!!project.memberIds?.includes(actor.id)||!!team?.members.some(m=>m.userId===actor.id));}
@@ -62,6 +67,8 @@ export function canAccessAction(state:Partial<AccessState>,actor:Pick<Actor,'rol
   const cycle=state.operationCycles?.find(c=>c.id===(event?event.operationId:targetId)&&(!event||c.projectId===event.projectId));
   return !!actor.id&&!!cycle&&!!state.projects?.some(p=>p.id===cycle.projectId)&&['服务中','退出中'].includes(cycle.status)&&(actor.role==='pmo'||cycle.teamIds.includes(actor.id));
  }
+ if(actionType==='review'){const a=state.approvals?.find(x=>x.id===targetId);const node=a?.nodes?.[a.node??0];if(node)return !!actor.id&&node.roles.includes(actor.role);}
+ if(actionType==='reply-planning')return state.planningReviews?.some(r=>(!targetId||r.id===targetId)&&r.rectifications.some(x=>x.ownerId===actor.id))??false;
  if(defaultActions[actor.role].includes(actionType))return true;
  if(actionType==='decide-initiation')return state.initiations?.some(app=>{const round=app.rounds.at(-1),progress=round?.approvalProgress;return (!targetId||app.id===targetId)&&app.status==='待决策'&&round?.status==='待决策'&&progress?.status==='待审批'&&progress.snapshot.nodes[progress.node]?.roles.includes(actor.role)&&!progress.reviews.some(r=>r.node===progress.node&&r.role===actor.role);})??false;
  if(actionType==='review-early-investment')return state.earlyInvestmentRequests?.some(r=>(!targetId||r.id===targetId)&&canReviewEarlyInvestment(r,{...actor,id:'',name:''}))??false;
@@ -86,13 +93,13 @@ export function redactAuditEvent(event: AuditEvent, policy?: AccessPolicyVersion
   ];
   return rules.some(([field, pattern]) => !can(field) && pattern.test(text)) ? '***（敏感说明已脱敏）' : text;
  };
- const redact = (value: unknown, path: string): unknown => {
+ const redact = (value: unknown, path: string): RedactedValue => {
   const field = sensitivePath(path);
   if (field && !can(field)) return '***（已脱敏）';
   if (value && typeof value === 'object' && 'type' in value && value.type === 'labor' && !can('labor-rate')) return '***（已脱敏）';
   if (Array.isArray(value)) return value.map((v, i) => redact(v, `${path}[${i}]`));
   if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, redact(v, `${path}.${k}`)]));
-  return typeof value === 'string' ? redactText(value) : value;
+  return typeof value === 'string' ? redactText(value) : (value as RedactedValue);
  };
  return { ...structuredClone(event), reason: event.reason ? redactText(event.reason) : event.reason,
   changes: event.changes?.map((c) => ({ ...c, before: c.sensitive && !can(c.sensitive) ? '***（已脱敏）' : redact(c.before, c.path), after: c.sensitive && !can(c.sensitive) ? '***（已脱敏）' : redact(c.after, c.path) })) };

@@ -1,5 +1,4 @@
 import { useActionAccess } from "@/hooks/useActionAccess";
-import { useBusinessAction } from "@/hooks/useBusinessAction";
 import { canViewSensitiveField } from "@/mock/configuration-access";
 import { constructionLockReason } from "@/mock/construction-lock";
 import { marginReason } from "@/utils/sensitive";
@@ -22,7 +21,6 @@ function ChangeFormContent() {
     const { data, dispatch } = useBusinessStore(), { currentRole, currentUser } = useAppStore(), navigate = useNavigate(), { message, modal } = App.useApp();
     const { canDo } = useActionAccess();
     const [params, setParams] = useSearchParams();
-    const runAction = useBusinessAction({ successMessage: "原变更事项状态已更新" });
     const request = data.changeRequests.find((r) => r.id === params.get("changeId"));
     const { projectId: scopedProjectId } = useParams();
     const projectId = request?.projectId ?? scopedProjectId ?? params.get("projectId") ?? "P-001";
@@ -101,14 +99,19 @@ function ChangeFormContent() {
     catch (e) {
         error = (e as Error).message;
     }
-    const run = (action: Parameters<typeof dispatch>[0]) =>
-        runAction(
-            () => {
-                dispatch(action, useAppStore.getState().currentUser);
-                return true;
-            },
-            () => canDo(action.type, "id" in action && action.id ? action.id : p.id),
-        );
+    const run = (action: Parameters<typeof dispatch>[0], successMessage = "原变更事项状态已更新") => {
+        if (!canDo(action.type, "id" in action && action.id ? action.id : p.id))
+            return false;
+        try {
+            dispatch(action, useAppStore.getState().currentUser);
+            message.success(successMessage);
+            return true;
+        }
+        catch (e) {
+            message.error((e as Error).message);
+            return false;
+        }
+    };
     const save = () => {
         if (!editableState || !canDo("save-project-change", request?.id ?? p.id))
             return false;
@@ -117,7 +120,7 @@ function ChangeFormContent() {
             projectId: p.id,
             id: request?.id,
             input,
-        })) {
+        }, "变更草稿已保存")) {
             const latest = useBusinessStore.getState().data.changeRequests.at(-1)!;
             const next = new URLSearchParams(window.location.search);
             next.set("changeId", request?.id ?? latest.id);

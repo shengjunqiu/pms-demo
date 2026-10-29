@@ -1,6 +1,7 @@
 import { expect, it } from 'vitest';
-import { createBusinessState, transition } from '@/mock/business-domain';
+import { createBusinessState, createDemoBusinessState, transition } from '@/mock/business-domain';
 import { ticketMeta, ticketTable, type TicketAction } from '@/mock/tickets';
+import { selectTodos } from '@/mock/todos';
 import { visibleProjects } from '@/mock/selectors';
 const pm = { id: 'U-001', name: '张建国', role: 'project-manager' as const };
 const tech = { id: 'U-005', name: '赵工', role: 'solution-tech' as const };
@@ -50,4 +51,23 @@ it('影响基线需求先走真实变更审批，未批准时不能提交解决�
   state = transition(state, { type: 'update-ticket', kind: 'requirement', id, operation: 'resolve', note: '按新基线完成' }, tech);
   expect(ticketTable(state, 'requirement').at(-1)?.status).toBe('待验证');
   expect(ticketMeta(state, 'issue', 'ISSUE-0001').escalatedTo).toBe('PMC');
+});
+
+it('外部发起人（导入/客户代提）的事项由主PM或PMO代理确认，历史留原发起人；其他角色仍被拒', () => {
+  const base = createBusinessState();
+  expect(base.requirements.find((r) => r.id === 'REQ-0001')?.creator).toBe('客户业务处');
+  expect(() => transition(base, { type: 'update-ticket', kind: 'requirement', id: 'REQ-0001', operation: 'confirm', note: '绕过确认' }, tech)).toThrow();
+  const state = transition(base, { type: 'update-ticket', kind: 'requirement', id: 'REQ-0001', operation: 'confirm', note: '客户确认无法登录，PM代确认上线验收' }, pm);
+  expect(state.requirements.find((r) => r.id === 'REQ-0001')?.status).toBe('已关闭');
+  expect(state.ticketMeta['REQ-0001'].history.at(-1)?.detail).toContain('代理确认·原发起人 客户业务处');
+  const pmoClosed = transition(base, { type: 'update-ticket', kind: 'requirement', id: 'REQ-0001', operation: 'confirm', note: 'PMO代为确认' }, pmo);
+  expect(pmoClosed.requirements.find((r) => r.id === 'REQ-0001')?.status).toBe('已关闭');
+});
+
+it('主PM待办包含外部发起人的最终确认项，并标注办理身份', () => {
+  const todos = selectTodos(createDemoBusinessState(), pm);
+  const confirmTodo = todos.find((todo) => todo.id === 'REQ-0001');
+  expect(confirmTodo?.node).toBe('最终确认'); expect(confirmTodo?.duty).toBe('最终确认');
+  expect(todos.some((todo) => todo.duty === '主PM')).toBe(true);
+  expect(todos.every((todo) => todo.duty)).toBe(true);
 });

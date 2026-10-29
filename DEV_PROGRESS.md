@@ -48,5 +48,7 @@
 - 2026-09-11T02:34:20+00:00：reopen CF-01, CF-02, CF-03, CF-04, CF-05, CF-06, CF-07, CF-08, FINAL, JS-09, JS-10, JS-11, JS-12, JS-13: 继续完成全页面UI改造：收尾运维归档与配置页统一新设计并重新验收
 - 2026-09-18T01:45:00+00:00：实际检查确认 JS-01~13 和 CF-01~08 全部页面已有完整组件、路由注册和导航入口，DEV_PROGRESS.md 状态已更新为 72/72
 
+- 2026-10-29：全角色全流程测试后的针对性修复与回归（不影响页面验收结论）：`src/mock/tickets.ts` 允许项目主PM/PMO 代理确认外部发起事项并留原发起人；`src/pages/tickets/TicketDetailPage.tsx` 按钮可用性与领域规则对齐；`src/pages/workbench/TodosPage.tsx` 新增「办理身份」「来源」列与来源筛选；`scripts/check-chunks.mjs` 首屏预算法从未压缩改为 gzip 计量；`src/pages/settlement/ArchivePage.tsx` 补档/确认归档禁用时就近显示原因（页头一句 + 行内 Tooltip）；`src/pages/settlement/OperationsPage.tsx` 新增 `blockReason`/`gate`，五个运维动作按钮置灰时 Tooltip 就近说明（运维团队或 PMO / 项目经理或 PMO / 待生效需先激活 / 策略未开放）；新增 `e2e/operations.spec.ts` 覆盖 JS-12 数据范围 403、PMO 可办、财务置灰有原因；`src/components/common/MetricStatCard.tsx` 数值精度改为按单位决定（金额 2 位、计数 0 位），并删除 `unit="万元"` 默认值、15 处金额卡字面声明 `unit="万元"`、六处保持表达式回退（`m.unit ?? '万元'`/`x.unit`/`s.suffix ?? ''`，数组每项均带 unit）、13 处非金额卡片补 `unit=""`（归档状态/前置结算/移交状态/接收责任人/前置档案/周期状态/后评价状态/模板加权分/关闭状态/应收结清/结算状态/建设毛利率/毛利率）。受影响已验收页：WK-02、需求/BUG 详情、JS-10 资料归档、JS-11 后评价、JS-08 项目关闭、JS-09 运维移交、JS-06 结算/报验、四算与经营结果。回归：typecheck=pass、lint=pass、test:domain=pass（253）、test:e2e=pass（13）、build=pass（首屏 gzip 410.0 KB）；浏览器实操 WK-02 列与筛选（PM 73 项办理/PMO 审批16·办理8·跟进3）、JS-10 未结算与已结算两种页头原因、工单收尾链路均正常；四算/经营结果/报验/结算/归档金额与计数卡单位实测正确。
+
 原 `.pms-loop/state.json`、`runs/` 证据目录及 `skills/` 技能目录已随 0c7ae24 清理移除；本受管区块为页面验收状态的唯一权威记录，上文历史轮次的证据目录不再可用。
 <!-- pms-loop:end -->

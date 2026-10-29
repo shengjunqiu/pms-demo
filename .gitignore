@@ -6,3 +6,9 @@ playwright-report/
 .pms-loop/.lock
 /src/mock/business-init.ts
 /src/models/__tests__/trace.test.ts
+
+# role simulation scratch (see role-sim/README.md)
+role-sim/
+
+# local skill runtime
+.pi/

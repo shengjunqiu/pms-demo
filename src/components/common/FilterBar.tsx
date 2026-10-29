@@ -64,7 +64,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         <div className="flex items-center gap-2">
           <FilterOutlined className="text-blue-600" />
           <span className="text-sm font-semibold text-slate-800">多维组合筛选器</span>
-          <span className="text-xs text-slate-400">（经营阶段与交付阶段独立双轨筛选）</span>
+          <span className="text-xs text-slate-500">（经营阶段与交付阶段独立双轨筛选）</span>
         </div>
         {onReset && (
           <Button

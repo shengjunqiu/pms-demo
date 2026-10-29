@@ -110,6 +110,7 @@ export function OperationHandoverPage() {
           <MetricStatCard
             title="移交状态"
             value={h ? h.status : "未发起"}
+            unit=""
             statusType={h?.status === "已接收" ? "healthy" : h ? "warning" : "info"}
           />
         </Col>
@@ -125,6 +126,7 @@ export function OperationHandoverPage() {
           <MetricStatCard
             title="接收责任人"
             value={h?.receiverId ? mockUsers.find((u) => u.id === h.receiverId)?.name ?? h.receiverId : "未指定"}
+            unit=""
             statusType="info"
           />
         </Col>
@@ -132,6 +134,7 @@ export function OperationHandoverPage() {
           <MetricStatCard
             title="前置档案"
             value={data.projectArchives[p.id] ? "已归档" : "未归档"}
+            unit=""
             statusType={data.projectArchives[p.id] ? "healthy" : "danger"}
           />
         </Col>

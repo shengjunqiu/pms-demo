@@ -3,6 +3,7 @@ import React from 'react';
 export interface MetricStatCardProps {
   title: string;
   value: string | number;
+  /** 单位显式声明：金额卡传“万元”，计数卡传“项/个/份…”或空串；不再隐式默认金额。 */
   unit?: string;
   icon?: React.ReactNode;
   subtitle?: React.ReactNode;
@@ -22,7 +23,7 @@ export interface MetricStatCardProps {
 export const MetricStatCard: React.FC<MetricStatCardProps> = ({
   title,
   value,
-  unit = '万元',
+  unit,
   icon,
   subtitle,
   trend,
@@ -39,6 +40,11 @@ export const MetricStatCard: React.FC<MetricStatCardProps> = ({
     danger: 'bg-rose-50/90 text-rose-700 ring-1 ring-inset ring-rose-600/20',
     info: 'bg-blue-50/90 text-blue-700 ring-1 ring-inset ring-blue-600/20',
   };
+
+  // 金额保留两位；计数类（项/个/份/类…）不显示小数，避免“0.00 个”这种假精度。
+  const MONEY_UNITS = new Set(['万元', '元', '万']);
+  const decimals =
+    unit && MONEY_UNITS.has(unit) ? 2 : Number.isInteger(value) ? 0 : 2;
 
   return (
     <div
@@ -66,7 +72,12 @@ export const MetricStatCard: React.FC<MetricStatCardProps> = ({
       {/* 2. 卡片核心行：大数值 + 等宽字体 + 单位 */}
       <div className="flex items-baseline space-x-1.5 my-1">
         <span className="pms-metric-value">
-          {typeof value === 'number' ? `${signed && value > 0 ? '+' : ''}${value.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : value}
+          {typeof value === 'number'
+            ? `${signed && value > 0 ? '+' : ''}${value.toLocaleString('zh-CN', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals,
+              })}`
+            : value}
         </span>
         {unit && <span className="text-xs text-slate-500 font-medium">{unit}</span>}
       </div>

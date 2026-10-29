@@ -77,6 +77,11 @@ function planned(plannedStartDate?: string) {
   );
   state = transition(
     state,
+    { type: 'review', approvalId: 'APR-1', approve: true, opinion: '财务口径一致' },
+    { id: 'U-004', name: '刘敏', role: 'finance' },
+  );
+  state = transition(
+    state,
     { type: 'review', approvalId: 'APR-1', approve: true, opinion: '同意预算' },
     pmo,
   );

@@ -86,7 +86,7 @@ export const StateView: React.FC<StateViewProps> = ({
 
   return (
     <div className="py-12 flex flex-col items-center justify-center text-center">
-      <div className="w-14 h-14 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 mb-3 shadow-2xs">
+      <div className="w-14 h-14 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 mb-3 shadow-2xs">
         <InboxOutlined style={{ fontSize: 28 }} />
       </div>
       <div className="text-sm font-semibold text-slate-800 mb-1">

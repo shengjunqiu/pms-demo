@@ -52,7 +52,7 @@ export function OpportunityDetailPage() {
                   className="h-full"
                   title={
                     <Space size={8}>
-                      <SafetyCertificateOutlined style={{ color: '#1677ff' }} />
+                      <SafetyCertificateOutlined style={{ color: '#1d4ed8' }} />
                       <span style={{ fontWeight: 600 }}>转立项准入检查</span>
                     </Space>
                   }
@@ -147,7 +147,7 @@ export function OpportunityDetailPage() {
                   className="h-full"
                   title={
                     <Space size={8}>
-                      <AuditOutlined style={{ color: '#1677ff' }} />
+                      <AuditOutlined style={{ color: '#1d4ed8' }} />
                       <span style={{ fontWeight: 600 }}>评估与经营摘要</span>
                     </Space>
                   }
@@ -199,7 +199,7 @@ export function OpportunityDetailPage() {
                             {estimate.version} · <Tag color={estimate.isFrozen ? 'blue' : 'default'} style={{ margin: 0, fontSize: 11 }}>{estimate.isFrozen ? '已冻结' : '草稿'}</Tag>
                           </Link>
                         ) : (
-                          <span style={{ color: '#94a3b8' }}>尚未指定</span>
+                          <span style={{ color: '#64748b' }}>尚未指定</span>
                         )}
                       </span>
                     </div>
@@ -211,13 +211,13 @@ export function OpportunityDetailPage() {
                             V{presales.solutionVersions.at(-1)!.version}
                           </Tag>
                         ) : (
-                          <span style={{ color: '#94a3b8' }}>尚未提交评审</span>
+                          <span style={{ color: '#64748b' }}>尚未提交评审</span>
                         )}
                       </span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ color: '#64748b' }}>最近专家评审：</span>
-                      <span style={{ fontWeight: 500, color: latestReview?.status === '评审中' ? '#1677ff' : latestReview?.status === '整改后复审' ? '#fa8c16' : latestReview?.status === '不通过' ? '#cf1322' : '#2563eb' }}>
+                      <span style={{ fontWeight: 500, color: latestReview?.status === '评审中' ? '#1d4ed8' : latestReview?.status === '整改后复审' ? '#fa8c16' : latestReview?.status === '不通过' ? '#cf1322' : '#2563eb' }}>
                         {latestReview?.status ?? '尚无结论'}
                       </span>
                     </div>
@@ -255,7 +255,7 @@ export function OpportunityDetailPage() {
                         <Tag color="orange" style={{ margin: 0, fontWeight: 500 }}>
                           {d.name}
                         </Tag>
-                        <span style={{ fontSize: 11, color: '#94a3b8' }}>评估结论: {s.round?.opinions[d.key]?.conclusion ?? '—'}</span>
+                        <span style={{ fontSize: 11, color: '#64748b' }}>评估结论: {s.round?.opinions[d.key]?.conclusion ?? '—'}</span>
                       </div>
                       <div style={{ fontSize: 12, color: '#475569', lineHeight: 1.5 }}>
                         {s.round!.opinions[d.key]!.risk}

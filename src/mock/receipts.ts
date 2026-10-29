@@ -8,10 +8,12 @@ export function applyReceiptAction(state: BusinessState, action: ReceiptAction, 
   const project = state.projects.find((p) => p.id === action.projectId);
   const contract = state.contracts.find((c) => c.id === action.contractId && c.projectId === project?.id);
   if (!project || !contract) throw new Error('项目与客户合同关联无效');
+  // 回款登记不因结算在途/已锁定而阻断：结算锁定只约束成本与开具口径，收取真实欠款仍应可办。
   const sourceNo = action.sourceNo.trim();
   if (!sourceNo || state.receiptRecords.some((r) => r.sourceNo === sourceNo)) throw new Error('原收款流水编号必填且不可重复登记');
   const date = action.receivedDate;
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(Date.parse(date)) || new Date(date).toISOString().slice(0, 10) !== date || date > AS_OF_DATE) throw new Error('收款日期无效或晚于演示日');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(Date.parse(date)) || new Date(date).toISOString().slice(0, 10) !== date) throw new Error('收款日期无效');
+  if (date > AS_OF_DATE) throw new Error(`回款日期不能晚于业务基准日 ${AS_OF_DATE}；未来回款请登记为回款计划`);
   const files = action.evidenceFiles.map((f) => f.trim());
   if (!action.note.trim() || !files.length || files.some((f) => !/\.(pdf|png|jpg|xlsx)$/i.test(f))) throw new Error('收款依据、有效凭据文件名和说明必填');
   if (!action.allocations.length || new Set(action.allocations.map((a) => a.receiptPlanId)).size !== action.allocations.length) throw new Error('回款分配不能为空且同一节点不能重复');

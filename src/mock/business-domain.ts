@@ -6,7 +6,7 @@ import {applyFinanceConfiguration,createFinanceConfiguration,selectConfiguredHea
 import type {FinanceConfigurationState} from '@/models/configuration-finance';
 import {applyUnsignedAction,approveUnsignedInvestment,type UnsignedAction} from './unsigned';
 import type {UnsignedProjectControl,UnsignedInvestmentRequest,StartConfirmation} from '@/models/unsigned';
-import { applyInitiationAction, defaultInitiationInput, INITIATION_SIGNATURES, type InitiationAction } from './initiation';
+import { applyInitiationAction, defaultInitiationInput, initiationSource, INITIATION_SIGNATURES, type InitiationAction } from './initiation';
 import { opportunityMeta } from './opportunities';
 import type {InitiationApplication} from '@/models/initiation';
 import { applyConfigurationAction, createConfigurationState, type ConfigurationAction } from '@/mock/configuration';
@@ -20,15 +20,15 @@ import type {OperationHandover,OperationCycle,OperationEvent,ProjectClosure,Oper
 import { assertArchiveActionWritable } from '@/mock/archive-lock';
 import { applyCloseoutAction, type CloseoutAction } from '@/mock/closeout';
 import type { PostEvaluation, ProjectArchive, ArchiveCategory } from '@/models/closeout';
-import { applySettlementAction, type SettlementAction } from '@/mock/settlement';
+import { applySettlementAction, pendingSettlementSources, settlementChecks, settlementSnapshot, type SettlementAction } from '@/mock/settlement';
 import type { SettlementRequest, SettlementCostReview, SettlementCostDisposition, SettlementAnalysis } from '@/models/settlement';
 import { applyEstimateAction, type EstimateAction } from '@/mock/estimates';
 import type { EstimateDraft, EstimateMetadata } from '@/models/estimates';
 import { applyTeamAction, type TeamAction } from './team';
 import { budgetOverruns, saveBudgetDraft, toBudgetVersion, validateBudgetDraft, type BudgetDraftAction } from './budget-drafts';
 import { createDetailedMockBudgetDrafts } from '@/mock/budget-fixtures';
-import { applyPresalesAction, type PresalesAction } from '@/mock/presales';
-import type { PresalesWorkspace } from '@/models/presales';
+import { applyPresalesAction, costFingerprint, presalesSubjects, solutionFingerprint, type PresalesAction } from '@/mock/presales';
+import type { PresalesWorkspace, CostVersion } from '@/models/presales';
 import { applyBudgetPlanningAction, budgetBaselineProposal, confirmBudgetBaseline, initializePlanning, teamResources, planningSnapshot, type BudgetPlanningAction } from '@/mock/budget';
 import type { PlanningDraft, PlanningReview, ProjectTeam, BudgetDraft } from '@/models/budget';
 import { initAcceptanceFixture } from '@/mock/acceptance-fixture';
@@ -48,6 +48,7 @@ import type { UserRole } from '@/store/useAppStore';
 import { allocateMoney, money, percentage, sumMoney } from '@/utils/money';
 import { projectEstimate } from '@/mock/versions';
 import { assertConstructionWritable } from '@/mock/construction-lock';
+import { selectFourCalculations } from '@/mock/selectors';
 import { createMockContractLedgers } from '@/mock/contract-ledger';
 import { createMockProjectCostOverviews } from '@/mock/project-cost';
 
@@ -57,6 +58,22 @@ export interface Approval {
   budget: BudgetVersion; baseline: BaselineVersion; submittedBy: string; reason: string;
   requiredRole: 'pmo' | 'executive'; opinion?: string;
   estimate: EstimateVersion; sourceChangeId?: string; baselineConfirmedAt?: string; baselineConfirmedBy?: string;
+  /** 审批节点链（按顺序）：财务复核 → PMO 评审 →（超概算或 >5000 万）集团领导决策。历史审批单无该字段，按 requiredRole 单节点处理。 */
+  nodes?: ApprovalNodePlan[]; node?: number;
+  nodeReviews?: { node: number; role: UserRole; by: string; approve: boolean; opinion: string; date: string }[];
+}
+export interface ApprovalNodePlan { name: string; roles: UserRole[]; mode: 'all' | 'any'; timeoutDays: number }
+
+// 预算审批分档：财务复核“钱对不对”始终前置；金额 >5000 万或超概算才上升到集团领导。
+export const BUDGET_APPROVAL_EXECUTIVE_THRESHOLD = 5000;
+const roleLabel = (role: UserRole) => role === 'finance' ? '财务' : role === 'pmo' ? 'PMO' : role === 'executive' ? '集团领导' : role;
+export function budgetApprovalNodes(total: number, isOverEstimate: boolean): ApprovalNodePlan[] {
+  const nodes: ApprovalNodePlan[] = [
+    { name: '财务复核', roles: ['finance'], mode: 'all', timeoutDays: 2 },
+    { name: 'PMO 评审', roles: ['pmo'], mode: 'all', timeoutDays: 3 },
+  ];
+  if (isOverEstimate || total > BUDGET_APPROVAL_EXECUTIVE_THRESHOLD) nodes.push({ name: '集团领导决策', roles: ['executive'], mode: 'all', timeoutDays: 5 });
+  return nodes;
 }
 export interface ManagementApproval {
   id: string; projectId: string; sourceId: string; type: DecisionItem['type'];
@@ -142,7 +159,48 @@ export function createBusinessState(): BusinessState {
       { id: 'APPOINT-P-001-3', userId: 'U-010', name: '钱工程师', status: '已接受', nominatedAt: '2026-01-08', nominatedBy: '张建国', respondedAt: '2026-01-09', opinion: '核心开发主力，负责海防数据接入模块' },
     );
   }
+  // 其他在途项目也补少量团队成员：团队页、工时填报、资源视图需要真实的多人数据。
+  const extraTeams: Record<string, { userId: string; name: string; role: string; departmentId: string; allocation: number; plannedHours: number; keyPosition: boolean }[]> = {
+    'P-006': [
+      { userId: 'U-017', name: '何思齐', role: '开发工程师', departmentId: 'D-007', allocation: 100, plannedHours: 160, keyPosition: true },
+      { userId: 'U-019', name: '许文静', role: '质控专员', departmentId: 'D-012', allocation: 40, plannedHours: 64, keyPosition: false },
+      { userId: 'U-013', name: '冯架构', role: '测试经理', departmentId: 'D-008', allocation: 50, plannedHours: 80, keyPosition: false },
+    ],
+    'P-009': [
+      { userId: 'U-010', name: '钱工程师', role: '高级开发工程师', departmentId: 'D-007', allocation: 80, plannedHours: 128, keyPosition: true },
+      { userId: 'U-015', name: '林志远', role: '高级开发工程师', departmentId: 'D-007', allocation: 60, plannedHours: 96, keyPosition: false },
+    ],
+    'P-010': [
+      { userId: 'U-005', name: '赵工', role: '方案架构师', departmentId: 'D-008', allocation: 40, plannedHours: 64, keyPosition: true },
+      { userId: 'U-021', name: '吴嘉宁', role: 'PMO专员', departmentId: 'D-006', allocation: 20, plannedHours: 32, keyPosition: false },
+    ],
+    'P-012': [
+      { userId: 'U-017', name: '何思齐', role: '开发工程师', departmentId: 'D-007', allocation: 100, plannedHours: 160, keyPosition: true },
+      { userId: 'U-019', name: '许文静', role: '质控专员', departmentId: 'D-012', allocation: 30, plannedHours: 48, keyPosition: false },
+    ],
+  };
+  for (const [projectId, members] of Object.entries(extraTeams)) {
+    const team = state.projectTeams[projectId];
+    if (!team) continue;
+    for (const m of members) {
+      if (team.members.some((x) => x.userId === m.userId)) continue;
+      team.members.push({ ...m, active: true, startDate: '2026-03-01', endDate: '2026-12-31' });
+    }
+  }
   initializePendingChanges(state);
+  // 种子审批与分档规则对齐：历史种子只有单一 requiredRole，没有节点链，财务无法复核“钱对不对”。
+  for (const approval of state.approvals) {
+    if (approval.nodes?.length) continue;
+    const nodes = budgetApprovalNodes(approval.budget.totalAmount, approval.budget.totalAmount > approval.baseline.budgetAmount);
+    approval.nodes = nodes;
+    approval.node = 0;
+    approval.nodeReviews = [];
+    approval.requiredRole = nodes[nodes.length - 1].roles[0] as 'pmo' | 'executive';
+    // 预算审批由主 PM 提交：历史种子写成财务提交，与「预算草稿仅主 PM 可写」矛盾。
+    const owner = state.projects.find((proj) => proj.id === approval.projectId);
+    if (owner?.pmName) approval.submittedBy = owner.pmName;
+  }
+
   initAcceptanceFixture(state);
   initOperationsFixture(state);
   return state;
@@ -235,20 +293,39 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     const baseline = budgetBaselineProposal(state, p.id);
     baseline.snapshot = { ...planningSnapshot(state,p.id), budget: structuredClone(action.budget), estimateVersionId: estimate.id, planningReviewId: state.planningDrafts[p.id]?.reviewId };
     const id = `APR-${state.approvals.length + 1}`;
+    const nodes = budgetApprovalNodes(action.budget.totalAmount, isOverEstimate);
+    const finalRole = nodes[nodes.length - 1].roles[0] as 'pmo' | 'executive';
     state.approvals.push({ id, projectId: p.id, kind: 'budget', status: '待审批', budget: { ...structuredClone(action.budget), isOverEstimate, overEstimateReasons }, estimate: structuredClone(estimate),
       baseline: structuredClone(baseline), submittedBy: actor.id, reason: action.reason,
-      requiredRole: isOverEstimate ? 'executive' : 'pmo' });
+      requiredRole: finalRole, nodes, node: 0, nodeReviews: [] });
     state.decisions.push({ id, projectId: p.id, projectName: p.name, type: '超概算审批', title: `${p.name}预算审批`,
       impactAmount: money(action.budget.totalAmount - p.budgetAmount), level: isOverEstimate ? 'PMC决策会' : 'PMO立项会',
       status: '待决策', targetRoute: `/approvals/${id}`, createdAt: AS_OF_DATE });
   } else if (action.type === 'review') {
     const approval = state.approvals.find((a) => a.id === action.approvalId);
     if (!approval || approval.status !== '待审批') throw new Error('审批不存在或已处理');
-    requireRole(approval.requiredRole);
+    const node = approval.nodes?.[approval.node ?? 0];
+    if (node && !node.roles.includes(actor.role)) throw new Error(`当前节点「${node.name}」须由${node.roles.map(roleLabel).join('/')}办理`);
+
+    if (!node) requireRole(approval.requiredRole);
     if (!action.opinion.trim()) throw new Error('审批意见必填');
+    if (node && approval.nodeReviews?.some((r) => r.node === (approval.node ?? 0) && r.role === actor.role)) throw new Error('本角色已处理当前节点，禁止重复审批');
     const p = project(approval.projectId); target = approval.id;
     assertConstructionWritable(state, p.id);
-    if (action.approve) {
+    // 节点链推进：节点内全部角色通过 → 进下一节点；任一驳回 → 整单驳回。
+    let finalPass = action.approve;
+    if (node) {
+      approval.nodeReviews = [...(approval.nodeReviews ?? []), { node: approval.node ?? 0, role: actor.role, by: actor.name, approve: action.approve, opinion: action.opinion, date: AS_OF_DATE }];
+      const reviews = approval.nodeReviews.filter((r) => r.node === (approval.node ?? 0));
+      const passed = node.mode === 'any' ? reviews.some((r) => r.approve) : node.roles.every((role) => reviews.some((r) => r.role === role && r.approve));
+      const rejected = node.mode === 'all' ? reviews.some((r) => !r.approve) : node.roles.every((role) => reviews.some((r) => r.role === role && !r.approve));
+      if (rejected) { approval.status = '驳回'; finalPass = false; }
+      else if (passed) {
+        if ((approval.node ?? 0) + 1 >= (approval.nodes?.length ?? 1)) { approval.status = '通过'; finalPass = true; }
+        else { approval.node = (approval.node ?? 0) + 1; finalPass = false; }
+      } else finalPass = false;
+    }
+    if (finalPass) {
       if (approval.kind === 'change') confirmBudgetBaseline(state, approval, actor);
       else state.budgets.push({...structuredClone(approval.budget),id:`BUD-PENDING-${approval.id}`,version:`待确认-${approval.id}`,status:'待确认'});
       // Regular budget approval waits for a separate PMO baseline confirmation.
@@ -256,12 +333,13 @@ export function transition(previous: BusinessState, action: BusinessAction, acto
     }
     if (approval.sourceChangeId) {
       const change = state.changes.find((c) => c.id === approval.sourceChangeId)!;
-      change.status = action.approve ? '已批准' : '已否决';
-      if (action.approve) change.newBaselineId = `BASE-${approval.id}`;
+      if (finalPass || approval.status === '驳回') change.status = finalPass ? '已批准' : '已否决';
+      if (finalPass) change.newBaselineId = `BASE-${approval.id}`;
     }
-    approval.status = action.approve ? '通过' : '驳回'; approval.opinion = action.opinion;
+    if (!node) approval.status = action.approve ? '通过' : '驳回';
+    approval.opinion = action.opinion;
     const decision = state.decisions.find((d) => d.id === approval.id);
-    if (decision) decision.status = action.approve ? '已通过' : '已否决';
+    if (decision && approval.status !== '待审批') decision.status = approval.status === '通过' ? '已通过' : '已否决';
   } else if (action.type === 'review-management') {
     requireRole('executive');
     const approval = state.managementApprovals.find((a) => a.id === action.id);
@@ -426,7 +504,7 @@ export function buildDemoBusinessState(): BusinessState {
       } }, { id: 'U-004', name: '刘敏', role: 'finance' });
     const decision = state.decisions[state.decisions.length - 1];
     decision.createdAt = '2026-09-05';
-    if (state.approvals.length > 15) state = transition(state, { type: 'review', approvalId: decision.id, approve: false, opinion: '分项测算与交付范围尚不一致，请补充材料后重新申报。' }, { id: 'U-003', name: '王总', role: 'executive' });
+    if (state.approvals.length > 15) state = transition(state, { type: 'review', approvalId: decision.id, approve: false, opinion: '分项测算与交付范围尚不一致，请补充材料后重新申报。' }, { id: 'U-030', name: '王会计', role: 'finance' });
   }
   const changeApproval = state.approvals.find((a) => a.projectId === 'P-005')!;
   const change = state.changes.find((c) => c.projectId === 'P-005')!;
@@ -504,13 +582,39 @@ export function buildDemoBusinessState(): BusinessState {
         status: '通过',
         method: '专家会',
         plannedDate: '2026-08-25',
-        experts: [],
-        opinions: [],
+        experts: [
+          { userId: initActors.tech.id, name: initActors.tech.name, role: 'solution-tech' as const, dimension: '技术方案、交付与资源' },
+          { userId: initActors.finance.id, name: initActors.finance.name, role: 'finance' as const, dimension: '成本合理性、毛利与商务风险' },
+        ],
+        opinions: [
+          { userId: initActors.tech.id, by: initActors.tech.name, role: 'solution-tech' as const, dimension: '技术方案、交付与资源', conclusion: '通过' as const, opinion: '方案边界清晰，交付里程碑可执行', attachment: '方案评审意见.pdf', date: '2026-08-25' },
+          { userId: initActors.finance.id, by: initActors.finance.name, role: 'finance' as const, dimension: '成本合理性、毛利与商务风险', conclusion: '通过' as const, opinion: '成本口径与毛利率符合要求，同意立项', attachment: '成本复核意见.pdf', date: '2026-08-25' },
+        ],
         createdAt: '2026-08-25',
         createdBy: initActors.pmo.name,
         corrections: [],
       }],
     };
+    // 评审「通过」必须能解析到对应成本版本；否则概算编制会拿到 undefined（estimate-create-draft 崩溃）。
+    const seededCostLines = presalesSubjects(state).slice(0, 3).map((subject, i) => ({
+      id: `CL-${oppId}-${i + 1}`, subjectId: subject.id, name: subject.name,
+      scope: '平台核心功能开发与接口联调', quantity: i === 0 ? 120 : 1, unit: i === 0 ? '人天' : '项',
+      unitPrice: money((amount * 0.6) / (i === 0 ? 120 : 2)), taxRate: 6, taxBasis: '含税' as const,
+      basis: i === 0 ? '按职级人天单价测算' : '按供应商报价测算', risk: '接口联调工期紧张',
+      ...(i === 0 ? { laborUserId: initActors.tech.id, laborGrade: 'P6' } : {}),
+    }));
+    const seededCostVersion: CostVersion = {
+      id: `COST-${oppId}`, version: 1, solutionVersionId: `SOL-${oppId}`,
+      total: money(seededCostLines.reduce((sum, l) => sum + l.quantity * l.unitPrice, 0)),
+      submittedAt: '2026-08-24', submittedBy: initActors.tech.name, solutionFingerprint: '',
+      feasibility: '可行', architecture: '云原生微服务架构', reuse: '复用统一权限与工作流组件',
+      customization: '20 个业务接口定制开发', environment: '客户私有云，双机热备', security: '等保三级',
+      dependencies: '客户网络与接口按期开放', risk: '接口联调延期', lines: seededCostLines, attachments: ['成本测算表.xlsx'],
+    };
+    const seededWorkspace = state.presales[oppId];
+    seededCostVersion.solutionFingerprint = solutionFingerprint(seededWorkspace.solutionVersions[0]);
+    seededCostVersion.financeCheck = { fingerprint: costFingerprint(seededCostVersion), by: initActors.finance.name, date: '2026-08-24', opinion: '成本口径与毛利率符合要求' };
+    seededWorkspace.costVersions = [seededCostVersion];
     state.estimates.push({
       ...structuredClone(state.estimates[0]),
       id: `EST-${oppId}`,
@@ -528,7 +632,7 @@ export function buildDemoBusinessState(): BusinessState {
       income: amount,
       incomeTaxRate: 0,
       incomeTaxBasis: '不含税',
-      lines: [],
+      lines: structuredClone(seededCostVersion.lines),
       changeReason: '已评审版本',
       assumptions: '硬件环境按期提供',
       riskReserveNote: '已计提风险准备金',
@@ -556,6 +660,13 @@ export function buildDemoBusinessState(): BusinessState {
       attachments: ['立项申请书.pdf'],
     },
   }, initActors.market);
+  // 风险报告须覆盖上游评审意见派生的风险（id=RISK-<reviewId>-<i>），否则保存风险报告会被“不能删除上游风险来源”拦下。
+  const initiationRisksFor = (oppId: string) =>
+    initiationSource(state, oppId).risks.map((r) => ({
+      id: r.id, domain: r.domain, description: r.description, sourceId: r.sourceId, sourceRoute: r.sourceRoute,
+      probability: 1, impact: 2, mitigation: '按评审意见纳入交付计划并月度跟踪关闭', ownerId: initActors.pmo.id,
+    }));
+
   state = transition(state, { type: 'submit-initiation', id: 'INIT-1' }, initActors.market);
 
   // 2. INI-002 (重大 / PMC决策会 / 待决策阶段)
@@ -578,6 +689,7 @@ export function buildDemoBusinessState(): BusinessState {
     type: 'assess-initiation-risk',
     id: 'INIT-2',
     risks: [
+      ...initiationRisksFor('OPP-068'),
       { id: 'RISK-01', domain: '技术', description: '数据源接口协议异构风险', sourceId: 'REV-OPP-068', sourceRoute: '/opportunities/OPP-068/review', probability: 3, impact: 3, mitigation: '建立适配转换适配器', ownerId: initActors.tech.id },
       { id: 'RISK-02', domain: '交付', description: '定制化开发周期偏紧', sourceId: 'AR-OPP-068', sourceRoute: '/opportunities/OPP-068/evaluation', probability: 3, impact: 4, mitigation: '分批敏捷迭代发布', ownerId: initActors.pm.id },
     ],
@@ -601,12 +713,99 @@ export function buildDemoBusinessState(): BusinessState {
     },
   }, initActors.market);
   state = transition(state, { type: 'submit-initiation', id: 'INIT-3' }, initActors.market);
-  state = transition(state, { type: 'assess-initiation-risk', id: 'INIT-3', risks: [], level: '低', explanation: '成熟物联标准化方案，交付风险低' }, initActors.pmo);
+  state = transition(state, { type: 'assess-initiation-risk', id: 'INIT-3', risks: [...initiationRisksFor('OPP-069')], level: '低', explanation: '成熟物联标准化方案，交付风险低' }, initActors.pmo);
   state = transition(state, { type: 'classify-initiation', id: 'INIT-3', level: '一般', reason: '金额适中且方案成熟' }, initActors.pmo);
   for (const node of INITIATION_SIGNATURES) {
     const actorRole = node.role as 'pmo' | 'finance' | 'solution-tech' | 'project-manager';
     const actor = ({ pmo: initActors.pmo, finance: initActors.finance, 'solution-tech': initActors.tech, 'project-manager': initActors.pm })[actorRole];
     state = transition(state, { type: 'sign-initiation', id: 'INIT-3', node: node.node, conclusion: '同意', opinion: `${node.node}签署同意` }, actor);
+  }
+
+  // 4. INI-004 草稿：客户经理从商机继续编辑并提交，保证 UI 立项表单有可复现实的完整链路。
+  setupInitOpportunity('OPP-070', 600);
+  state = transition(state, {
+    type: 'save-initiation',
+    input: {
+      ...defaultInitiationInput(state, 'OPP-070'),
+      necessity: '客户希望先完成园区数据治理试点，再逐步推广',
+      scope: '园区数据治理试点与两个业务接口联调',
+      customerNeeds: '试点范围内数据可查、可看、可追溯',
+      recommendation: '先试点后推广，控制首期投入',
+      region: '华东',
+      attachments: ['立项申请草稿.pdf'],
+    },
+  }, initActors.market);
+
+  // 结算种子：直接补齐前置条件后停到「财务核算」，
+  // 使 财务核算 → PMO审核 → 结算评审 → 待最终锁定 → 财务锁定 全链路可达（旧种子只写了状态机不存在的「审核中」）。
+  // 种子阶段直接写状态而不跑 transition，避免每次深拷贝整个业务状态拖慢演示数据构建。
+  function seedSettlementChain(next: BusinessState) {
+    for (const projectId of ['P-007', 'P-023', 'P-025', 'P-019', 'P-029', 'P-031']) {
+      if (next.settlementRequests.filter((r) => !r.supersededBy && ['财务核算', 'PMO审核'].includes(r.status)).length >= 2) break;
+      const p = next.projects.find((x) => x.id === projectId);
+      if (!p || next.lockedProjects.includes(p.id)) continue;
+      // 1. 客户终验确认：验收记录在建设期结束后只读（acceptance.ts 的 assertAcceptanceWritable），这里补登当时已发生的事实。
+      const acceptance = next.acceptances.filter((a) => a.projectId === p.id && a.type === '客户终验').sort((a, b) => b.round - a.round)[0];
+      if (!acceptance || next.acceptanceDetails[acceptance.id]?.confirmedAt) continue;
+      acceptance.status = '已通过';
+      next.acceptanceDetails[acceptance.id] = {
+        submitted: true, scope: '合同约定全部交付物', plannedDate: '2026-08-20', method: '现场验收',
+        customerContact: '客户项目负责人', participants: '客户、PMO、项目组', checks: [], corrections: [],
+        opinion: '客户终验通过', process: '客户签署验收确认函', proofFiles: ['客户终验确认函.pdf'],
+        confirmedBy: initActors.pmo.name, confirmedAt: '2026-08-28',
+        history: [{ date: '2026-08-28', actor: initActors.pmo.name, action: 'PMO确认客户验收完成', note: '客户终验通过' }],
+      };
+      p.subPhase = '项目结算';
+      // 2. 财务核对历史导入未决单（取消不发生）。
+      for (const source of pendingSettlementSources(next, p.id).filter((s) => s.imported)) {
+        next.settlementCostReviews.push({ id: `SCOST-${next.settlementCostReviews.length + 1}`, projectId: p.id, sourceId: source.id, disposition: '取消不发生', amount: source.amount, evidence: '结算前财务已核对历史导入未决单，确认不再发生', actor: initActors.finance.name, date: AS_OF_DATE });
+      }
+      // 3. 逐科目清理未发生承诺与预测；仍有动态未决原单的科目留给财务实际办理。
+      const calc = selectFourCalculations(p, next);
+      p.commitmentBySubject ??= Object.fromEntries(calc.subjects.map((s) => [s.subjectId, s.committed]));
+      p.forecastBySubject ??= Object.fromEntries(calc.subjects.map((s) => [s.subjectId, s.remaining]));
+      next.settlementForecastSnapshots[p.id] ??= { date: AS_OF_DATE, total: calc.rolling, subjects: Object.fromEntries(calc.subjects.map((s) => [s.subjectId, s.rolling])) };
+      for (const subject of calc.subjects) {
+        if (next.costOrders.some((o) => o.projectId === p.id && o.subjectId === subject.subjectId && !['已入账', '驳回'].includes(o.status))) continue;
+        if (subject.subjectId === 'SUB-01' && next.laborEntries.some((e) => e.projectId === p.id && e.status === '待审核')) continue;
+        for (const [bucket, amount] of [['承诺', p.commitmentBySubject[subject.subjectId] ?? 0], ['预测', p.forecastBySubject[subject.subjectId] ?? 0]] as const) {
+          if (!(amount > 0)) continue;
+          (bucket === '承诺' ? p.commitmentBySubject : p.forecastBySubject)[subject.subjectId] = 0;
+          next.settlementCostDispositions.push({ id: `DISPOSE-${next.settlementCostDispositions.length + 1}`, projectId: p.id, subjectId: subject.subjectId, bucket, disposition: '取消不发生', amount, evidence: '结算前确认该科目余额不再发生', date: AS_OF_DATE, actor: initActors.finance.name });
+        }
+      }
+      p.committedCost = sumMoney(Object.values(p.commitmentBySubject));
+      p.forecastRemainingCost = sumMoney(Object.values(p.forecastBySubject));
+      p.rollingCost = sumMoney([p.actualCost, p.committedCost, p.forecastRemainingCost]);
+      p.costVariance = money(p.rollingCost - p.budgetAmount);
+      p.costVarianceRate = percentage(p.costVariance, p.budgetAmount) ?? 0;
+      // 4. 前置条件全部满足才生成正式申请（不满足则保持原状）。
+      if (settlementChecks(next, p.id).some((c) => !c.passed)) continue;
+      const snapshot = settlementSnapshot(next, p.id);
+      if (!snapshot.estimateId || !snapshot.budgetId || !snapshot.baselineId || !snapshot.contracts.length) continue;
+      const actor = { id: p.pmId ?? initActors.pm.id, name: p.pmName ?? initActors.pm.name, role: 'project-manager' as const };
+      const note = '成本已全部明确，客户终验通过，申请进入正式结算核算';
+      const request: SettlementRequest = { id: `SREQ-${next.settlementRequests.length + 1}`, projectId: p.id, version: 1, status: '财务核算', note, files: ['结算报告.pdf', '成本归集与偏差说明.xlsx'], submittedBy: actor.name, createdAt: AS_OF_DATE, snapshot, history: [{ actor: actor.name, date: AS_OF_DATE, action: '提交结算', opinion: note }] };
+      next.settlementRequests.push(request);
+      next.constructionFreezes[p.id] = { requestId: request.id, reason: '结算核算及评审中，建设成本暂停发生；材料整改仍保持冻结' };
+      p.subPhase = '项目结算';
+    }
+    // 第一条申请由财务核算确认，停到「PMO审核」，让结算链的两个在途环节都可演示。
+    const firstRequest = next.settlementRequests.find((r) => r.status === '财务核算');
+    if (firstRequest) {
+      firstRequest.finance = { actor: initActors.finance.name, date: AS_OF_DATE, invoicedAmount: money(firstRequest.snapshot.income * 0.9), taxAmount: money(firstRequest.snapshot.income * 0.06), opinion: '开票、税费与成本口径已核对一致' };
+      firstRequest.financeConfirmedAt = AS_OF_DATE;
+      firstRequest.status = 'PMO审核';
+      firstRequest.history.push({ actor: initActors.finance.name, date: AS_OF_DATE, action: 'finance-confirm', opinion: '开票、税费与成本口径已核对一致' });
+    }
+  }
+  seedSettlementChain(state);
+  // 项目成员以团队台账为准：工时填报、事项办理、资源视图都读 projects.memberIds，
+  // 旧种子只建了 projectTeams.members，导致「已在团队成员列表里的人」事报工时被拒。
+  for (const p of state.projects) {
+    const team = state.projectTeams[p.id];
+    if (!team) continue;
+    p.memberIds = [...new Set([...(p.memberIds ?? []), ...team.members.filter((m) => m.active).map((m) => m.userId), ...team.appointments.filter((a) => a.status === '待接受').map((a) => a.userId)])];
   }
 
   return state;

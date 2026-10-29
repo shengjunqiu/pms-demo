@@ -202,7 +202,7 @@ export function OpportunityAssessmentPage() {
                                 `item-${DIMENSIONS.findIndex((x) => x.key === d.key) + 1}`,
                             )?.weight ?? 1}
                           </div>
-                          <div style={{ fontSize: 12, color: "#8c8c8c" }}>
+                          <div style={{ fontSize: 12, color: "#64748b" }}>
                             {d.role === "market"
                               ? "市场 / 主办"
                               : d.role === "finance"
@@ -258,7 +258,7 @@ export function OpportunityAssessmentPage() {
                               </div>
                             )}
                             {v && (
-                              <div style={{ color: "#8c8c8c", fontSize: 12 }}>
+                              <div style={{ color: "#64748b", fontSize: 12 }}>
                                 {v.by} · {v.date}
                               </div>
                             )}
@@ -324,7 +324,7 @@ export function OpportunityAssessmentPage() {
                 },
               ]}
             />
-            <p style={{ color: "#8c8c8c" }}>
+            <p style={{ color: "#64748b" }}>
               预估毛利＝预计收入−初步成本；此处为初评测算，正式概算以冻结版本为准。
             </p>
           </PageSection>
@@ -436,7 +436,7 @@ export function OpportunityAssessmentPage() {
                     终止
                   </Button>
                 </Space>
-                <p style={{ marginTop: 8, color: "#8c8c8c", fontSize: 12 }}>
+                <p style={{ marginTop: 8, color: "#64748b", fontSize: 12 }}>
                   暂缓/终止不要求本轮评估完成，但需填写决策原因及后续安排，确认后商机状态与历史记录同步更新。
                 </p>
               </div>

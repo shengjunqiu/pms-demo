@@ -1,0 +1,520 @@
+[
+  {
+    "route": "/workbench/project-manager",
+    "ms": 10818,
+    "text": 475,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/workbench/todos",
+    "ms": 10667,
+    "text": 511,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/opportunities",
+    "ms": 9220,
+    "text": 1072,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/opportunities/new",
+    "ms": 8599,
+    "text": 214,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/opportunities/OPP-066",
+    "ms": 11180,
+    "text": 721,
+    "problems": "",
+    "console": 1
+  },
+  {
+    "route": "/opportunities/OPP-066/evaluation",
+    "ms": 9191,
+    "text": 612,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/opportunities/OPP-066/solution",
+    "ms": 10462,
+    "text": 561,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/opportunities/OPP-066/tech-cost",
+    "ms": 10268,
+    "text": 491,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/opportunities/OPP-066/review",
+    "ms": 9418,
+    "text": 860,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/opportunities/OPP-066/estimate",
+    "ms": 10162,
+    "text": 424,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/opportunities/OPP-066/estimate/compare",
+    "ms": 9852,
+    "text": 889,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/opportunities/OPP-066/early-investment",
+    "ms": 10418,
+    "text": 728,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/early-investments",
+    "ms": 9274,
+    "text": 945,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/initiation/apply",
+    "ms": 7574,
+    "text": 209,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/initiation/review",
+    "ms": 10637,
+    "text": 504,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/initiation/INIT-1/risk-assessment",
+    "ms": 10128,
+    "text": 683,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/initiation/INIT-1/decision",
+    "ms": 10660,
+    "text": 559,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/team",
+    "ms": 10376,
+    "text": 1280,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/wbs",
+    "ms": 8559,
+    "text": 1070,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/milestones",
+    "ms": 8953,
+    "text": 937,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/plan-review",
+    "ms": 10356,
+    "text": 1153,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/budget",
+    "ms": 9213,
+    "text": 1060,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/estimate-budget",
+    "ms": 7013,
+    "text": 982,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/budget/review",
+    "ms": 11702,
+    "text": 993,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/baseline",
+    "ms": 7919,
+    "text": 782,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/unsigned-projects",
+    "ms": 11066,
+    "text": 1665,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/unsigned-projects/P-004",
+    "ms": 10432,
+    "text": 425,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/start-confirmation",
+    "ms": 10691,
+    "text": 695,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001",
+    "ms": 17166,
+    "text": 822,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/progress",
+    "ms": 16277,
+    "text": 1218,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/daily-reports",
+    "ms": 13987,
+    "text": 1052,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/weekly-reports",
+    "ms": 12392,
+    "text": 677,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/requirements-bugs",
+    "ms": 9343,
+    "text": 1409,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/requirements-bugs/REQ-0001",
+    "ms": 7888,
+    "text": 638,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/requirements-bugs/BUG-0001",
+    "ms": 7628,
+    "text": 585,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/issues-risks",
+    "ms": 10014,
+    "text": 1409,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/issues-risks/ISSUE-0001",
+    "ms": 9912,
+    "text": 524,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/issues-risks/RSK-0001",
+    "ms": 8591,
+    "text": 600,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/labor-cost",
+    "ms": 9005,
+    "text": 600,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/procurement",
+    "ms": 8933,
+    "text": 997,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/outsourcing",
+    "ms": 12478,
+    "text": 1008,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/expenses",
+    "ms": 12652,
+    "text": 1082,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/dynamic-accounting",
+    "ms": 17745,
+    "text": 1288,
+    "problems": "",
+    "console": 1
+  },
+  {
+    "route": "/project-changes",
+    "ms": 12608,
+    "text": 1054,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/project-changes/new",
+    "ms": 9027,
+    "text": 861,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/stage-switch",
+    "ms": 8376,
+    "text": 746,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/deliverables",
+    "ms": 8782,
+    "text": 722,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/internal-acceptance",
+    "ms": 7825,
+    "text": 583,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/supplier-acceptance",
+    "ms": 8447,
+    "text": 644,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/customer-acceptance",
+    "ms": 8361,
+    "text": 663,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/report-acceptance",
+    "ms": 8973,
+    "text": 630,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/settlement/apply",
+    "ms": 8926,
+    "text": 1646,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/settlement",
+    "ms": 9851,
+    "text": 769,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/four-calculations",
+    "ms": 9933,
+    "text": 1200,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/business-result",
+    "ms": 8240,
+    "text": 899,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/post-evaluation",
+    "ms": 8521,
+    "text": 481,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/archive",
+    "ms": 9798,
+    "text": 1312,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-001/operation-handover",
+    "ms": 11074,
+    "text": 402,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/operations/OPS-007",
+    "ms": 11058,
+    "text": 554,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/projects/P-007/close",
+    "ms": 13397,
+    "text": 791,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/executive/dashboard",
+    "ms": 12737,
+    "text": 1246,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/executive/four-calculations",
+    "ms": 14627,
+    "text": 1519,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/executive/project-drilldown",
+    "ms": 11439,
+    "text": 1202,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/executive/portfolio",
+    "ms": 15712,
+    "text": 1078,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/executive/exceptions",
+    "ms": 10364,
+    "text": 1198,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/executive/decisions",
+    "ms": 8662,
+    "text": 1225,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/settings/deliverables",
+    "ms": 9676,
+    "text": 889,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/settings/project-grading",
+    "ms": 9096,
+    "text": 721,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/settings/approval-rules",
+    "ms": 10066,
+    "text": 978,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/settings/cost-mapping",
+    "ms": 9108,
+    "text": 736,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/settings/cost-baseline",
+    "ms": 9283,
+    "text": 736,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/settings/alerts",
+    "ms": 9812,
+    "text": 736,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/settings/permissions",
+    "ms": 9725,
+    "text": 1005,
+    "problems": "",
+    "console": 0
+  },
+  {
+    "route": "/settings/audit-log",
+    "ms": 9747,
+    "text": 971,
+    "problems": "",
+    "console": 0
+  }
+]

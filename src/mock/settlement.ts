@@ -1,6 +1,6 @@
 import { AS_OF_DATE, mockTimesheets, mockExpenses } from '@/mock';
 import type { Actor, BusinessState } from '@/mock/business';
-import type { SettlementRequest, SettlementSnapshot, SettlementAnalysis } from '@/models/settlement';
+import type { SettlementRequest, SettlementSnapshot, SettlementAnalysis, SettlementCostReview } from '@/models/settlement';
 import { selectFourCalculations, selectReceipts } from '@/mock/selectors';
 import { mockCostSnapshots } from '@/mock/cost-history';
 import { assertConstructionWritable } from '@/mock/construction-lock';
@@ -35,7 +35,7 @@ export function settlementSnapshot(state:BusinessState, projectId:string):Settle
 export type SettlementAction =
  | {type:'save-settlement';projectId:string;id?:string;note:string;files:string[];submit:boolean}
  | {type:'review-settlement';id:string;operation:'finance-confirm'|'pmo-audit'|'review-pass'|'material-return'|'amount-return'|'lock';opinion:string;invoicedAmount?:number;taxAmount?:number}
- | {type:'resolve-settlement-source';projectId:string;sourceId:string;disposition:'已有凭证'|'取消不发生';ledgerId?:string;evidence:string}
+ | {type:'resolve-settlement-source';projectId:string;sourceId:string;disposition:'已有凭证'|'取消不发生';ledgerId?:string;differenceReason?:string;evidence:string}
  | {type:'dispose-settlement-balance';projectId:string;subjectId:string;bucket:'承诺'|'预测';disposition:'实际发生'|'取消不发生';amount:number;evidence:string}
  | {type:'save-settlement-analysis';projectId:string;rows:SettlementAnalysis[]};
 export function applySettlementAction(state:BusinessState,action:SettlementAction,actor:Actor){
@@ -45,8 +45,16 @@ export function applySettlementAction(state:BusinessState,action:SettlementActio
   if(action.type==='resolve-settlement-source'){
     assertConstructionWritable(state,p.id);if(!finance||!action.evidence.trim())throw new Error('财务须核对原单并提供取消或已入账凭证依据');
     const source=pendingSettlementSources(state,p.id).find((s)=>s.id===action.sourceId);if(!source||!source.imported)throw new Error('只允许核对历史导入未决单；动态原单须走其审核入账流程');
-    if(action.disposition==='已有凭证'){const ledger=state.costs.find((c)=>c.id===action.ledgerId&&c.projectId===p.id&&c.type===source.kind);if(!ledger||ledger.amount!==source.amount||!ledger.sourceId)throw new Error('已有凭证必须属于本项目同类成本、金额完全一致且有唯一来源');if(state.settlementCostReviews.some((r)=>r.ledgerId===ledger.id))throw new Error('同一已入账凭证不能重复抵充未决原单');}
-    state.settlementCostReviews.push({id:`SCOST-${state.settlementCostReviews.length+1}`,projectId:p.id,sourceId:source.id,disposition:action.disposition,ledgerId:action.disposition==='已有凭证'?action.ledgerId:undefined,amount:source.amount,evidence:action.evidence,actor:actor.name,date:AS_OF_DATE});
+    let differenceReason:string|undefined;
+    if(action.disposition==='已有凭证'){
+      const ledger=state.costs.find((c)=>c.id===action.ledgerId&&c.projectId===p.id&&c.type===source.kind);if(!ledger||!ledger.sourceId)throw new Error('已有凭证必须属于本项目同类成本且有唯一业务来源');
+      const offset=sumMoney(state.settlementCostReviews.filter((r)=>r.ledgerId===ledger.id).map((r)=>r.amount));const remaining=money(ledger.amount-offset);
+      if(money(source.amount-remaining)>0)throw new Error(`凭证剩余可抵充额度不足：剩余 ${remaining} 万元 / 本单 ${source.amount} 万元`);
+      const difference=money(ledger.amount-money(offset+source.amount));const tolerance=Math.max(money(ledger.amount*0.005),1);
+      differenceReason=action.differenceReason?.trim()||undefined;
+      if(Math.abs(difference)>tolerance&&!differenceReason)throw new Error('凭证金额与原单差额超出容差（容差 max(0.5%, 1万元)），请填写差异说明');
+    }
+    const review:SettlementCostReview={id:`SCOST-${state.settlementCostReviews.length+1}`,projectId:p.id,sourceId:source.id,disposition:action.disposition,ledgerId:action.disposition==='已有凭证'?action.ledgerId:undefined,amount:source.amount,differenceReason,evidence:action.evidence,actor:actor.name,date:AS_OF_DATE};state.settlementCostReviews.push(review);
   }else if(action.type==='dispose-settlement-balance'){
     assertConstructionWritable(state,p.id);if(!finance||!action.evidence.trim())throw new Error('财务填写实际发生或取消依据后逐科目办理');
     const calc=selectFourCalculations(p,state);const subject=calc.subjects.find((s)=>s.subjectId===action.subjectId);if(!subject||!Number.isFinite(action.amount)||action.amount<=0||money(action.amount)!==action.amount)throw new Error('请选择有效科目与精确金额');

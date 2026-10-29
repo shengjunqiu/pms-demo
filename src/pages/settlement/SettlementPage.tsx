@@ -76,6 +76,7 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
     "取消不发生",
   );
   const [ledgerId, setLedgerId] = useState<string>();
+  const [differenceReason, setDifferenceReason] = useState<string>("");
   const [evidence, setEvidence] = useState("");
   const [balance, setBalance] = useState<{
     subjectId: string;
@@ -234,10 +235,10 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
         description="材料退回只补充附件，建设金额继续冻结；财务明确退回金额调整才解除临时冻结。重新提交生成新版本，原数据快照保留。结算通过后项目仍处于收尾，后评价、归档及运维/关闭另行办理。"
       />
       <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
-        <Col xs={12} xl={6}><MetricStatCard title="合同收入" value={snapshot.income} /></Col>
-        <Col xs={12} xl={6}><MetricStatCard title="实际建设成本" value={snapshot.cost} statusType="info" /></Col>
-        <Col xs={12} xl={6}><MetricStatCard title="建设毛利率" value={viewMargin && snapshot.income > 0 ? `${(((snapshot.income - snapshot.cost) / snapshot.income) * 100).toFixed(1)}%` : "已脱敏"} statusType="healthy" /></Col>
-        <Col xs={12} xl={6}><MetricStatCard title="结算状态" value={request?.status ?? (final ? "已锁定" : "待发起")} statusType={frozen ? "warning" : "healthy"} /></Col>
+        <Col xs={12} xl={6}><MetricStatCard variant="flat" title="合同收入" unit="万元" value={snapshot.income} /></Col>
+        <Col xs={12} xl={6}><MetricStatCard variant="flat" title="实际建设成本" unit="万元" value={snapshot.cost} statusType="info" /></Col>
+        <Col xs={12} xl={6}><MetricStatCard variant="flat" title="建设毛利率" unit="" value={viewMargin && snapshot.income > 0 ? `${(((snapshot.income - snapshot.cost) / snapshot.income) * 100).toFixed(1)}%` : "已脱敏"} statusType="healthy" /></Col>
+        <Col xs={12} xl={6}><MetricStatCard variant="flat" title="结算状态" unit="" value={request?.status ?? (final ? "已锁定" : "待发起")} statusType={frozen ? "warning" : "healthy"} /></Col>
       </Row>
       {apply && (
         <>
@@ -275,13 +276,13 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
           </PageSection>
           <PageSection
             title={`待处理成本原单（${pending.length}）`}
-            description="历史导入待审单逐条财务核对；已有凭证须金额一致且唯一绑定。"
+            description="历史导入待审单逐条财务核对；同一凭证可抵充多张原单；差额超出 max(0.5%, 1万元) 需填写差异说明。"
             className="mb-4"
           >
             <Alert
               type="info"
               style={{ marginBottom: 12 }}
-              message="历史导入待审单逐条财务核对；已有凭证须金额一致且唯一绑定。动态工时/采购外包费用须到原单审核入账。取消不发生必须保存原始取消依据。"
+              message="历史导入待审单逐条财务核对；同一凭证可抵充多张原单；差额超出 max(0.5%, 1万元) 需填写差异说明。动态工时/采购外包费用须到原单审核入账。取消不发生必须保存原始取消依据。"
             />
             <Table
               rowKey="id"
@@ -821,6 +822,7 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
               sourceId: sourceId!,
               disposition,
               ledgerId,
+              differenceReason: differenceReason.trim() || undefined,
               evidence,
             })
           )
@@ -840,7 +842,7 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
             />
           </Form.Item>
           {disposition === "已有凭证" && (
-            <Form.Item label="绑定唯一同金额成本凭证">
+            <Form.Item label="绑定已入账成本凭证（同一凭证可多单分摊）">
               <Select
                 showSearch
                 value={ledgerId}
@@ -851,6 +853,15 @@ export function SettlementPage({ apply = false }: { apply?: boolean }) {
                     value: c.id,
                     label: `${c.id} · ${c.amount} 万元 · ${c.description}`,
                   }))}
+              />
+            </Form.Item>
+          )}
+          {disposition === "已有凭证" && (
+            <Form.Item label="差异说明（凭证金额与原单差额超出 max(0.5%, 1万元) 时必填）">
+              <Input
+                aria-label="凭证差额说明"
+                value={differenceReason}
+                onChange={(e) => setDifferenceReason(e.target.value)}
               />
             </Form.Item>
           )}

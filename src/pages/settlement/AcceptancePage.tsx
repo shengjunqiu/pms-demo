@@ -485,6 +485,7 @@ export function AcceptancePage({ kind }: { kind: AcceptanceType }) {
                   dataSource={conditions}
                   columns={[
                     { title: "检查项", dataIndex: "name", width: 150 },
+                    { title: "责任角色", dataIndex: "owner", width: 130 },
                     {
                       title: "当前结果",
                       width: 100,

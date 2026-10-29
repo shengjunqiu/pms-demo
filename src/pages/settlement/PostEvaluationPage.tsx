@@ -187,19 +187,20 @@ export function PostEvaluationPage() {
           <MetricStatCard
             title="后评价状态"
             value={e ? e.status : "未发起"}
+            unit=""
             statusType={archive ? "healthy" : e?.status === "已完成" ? "healthy" : "warning"}
           />
         </Col>
         <Col xs={12} xl={6}>
           <MetricStatCard
-            title="结算收入"
+            title="结算收入" unit="万元"
             value={e ? e.snapshot.income : 0}
             statusType="info"
           />
         </Col>
         <Col xs={12} xl={6}>
           <MetricStatCard
-            title="结算成本"
+            title="结算成本" unit="万元"
             value={e ? e.snapshot.cost : 0}
             statusType="info"
           />
@@ -208,6 +209,7 @@ export function PostEvaluationPage() {
           <MetricStatCard
             title="模板加权分"
             value={viewEvaluation && templateResult?.score !== null && templateResult?.score !== undefined ? `${templateResult.score.toFixed(1)} 分` : "—"}
+            unit=""
             statusType={templateResult?.score ? "healthy" : "info"}
           />
         </Col>

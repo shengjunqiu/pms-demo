@@ -1,12 +1,12 @@
 // 合同台账面板：模仿 BPM「合同台账表单」结构，内含 12 个子标签。
 // 金额口径与项目/合同保持一致（单位：万元），数据来自 BusinessState.contractLedgers。
 import { useMemo } from 'react';
-import { Card, Descriptions, Empty, Statistic, Table, Tabs, Tag, Typography } from 'antd';
+import { Card, Descriptions, Empty, Statistic, Table, Tabs, Tag, Typography, Alert } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useBusinessStore } from '@/mock/store';
 import { MoneyText } from '@/components/common/MoneyText';
 import { formatPercent } from '@/utils/money';
-import type { ContractLedger } from '@/models/types';
+import type { Contract, ContractLedger } from '@/models/types';
 
 const money2 = (value: number) => value.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -39,7 +39,7 @@ export function ContractLedgerPanel({ projectId }: { projectId: string }) {
     return {
       key: ledger.contractId,
       label: contract.code,
-      children: <LedgerBody ledger={ledger} contractCode={contract.code} contractName={contract.name} customerName={project.customerName} />,
+      children: <LedgerBody ledger={ledger} contract={contract} customerName={project.customerName} />,
     };
   });
 
@@ -50,15 +50,21 @@ export function ContractLedgerPanel({ projectId }: { projectId: string }) {
       extra={<Typography.Text type="secondary" className="text-xs">金额单位：万元 · 对齐 BPM 合同台账表单结构</Typography.Text>}
     >
       {items.length === 1
-        ? <LedgerBody ledger={ledgers[0]} contractCode={contracts[0].code} contractName={contracts[0].name} customerName={project.customerName} />
+        ? <LedgerBody ledger={ledgers[0]} contract={contracts[0]} customerName={project.customerName} />
         : <Tabs items={items} />}
     </Card>
   );
 }
 
-function LedgerBody({ ledger, contractCode, contractName, customerName }: { ledger: ContractLedger; contractCode: string; contractName: string; customerName: string }) {
+function LedgerBody({ ledger, contract, customerName }: { ledger: ContractLedger; contract: Contract; customerName: string }) {
+  const contractCode = contract.code;
+  const contractName = contract.name;
+  const versions = contract.versions ?? [];
+  const seals = contract.seals ?? [];
   const subTabs = [
     { key: 'basic', label: '基本信息', children: <BasicTab ledger={ledger} contractCode={contractCode} contractName={contractName} customerName={customerName} /> },
+    { key: 'versions', label: `合同版本（${versions.length}）`, children: <VersionTab contract={contract} /> },
+    { key: 'seals', label: `用印记录（${seals.length}）`, children: <SealTab contract={contract} /> },
     { key: 'attachments', label: `合同附件（${ledger.attachments.length}）`, children: <AttachmentTab ledger={ledger} /> },
     { key: 'changes', label: `合同变更记录（${ledger.changeRecords.length}）`, children: <ChangeTab ledger={ledger} /> },
     { key: 'receipts', label: '回款计划', children: <ReceiptTab ledger={ledger} /> },
@@ -72,6 +78,49 @@ function LedgerBody({ ledger, contractCode, contractName, customerName }: { ledg
     { key: 'letters', label: `项目函件记录（${ledger.letters.length}）`, children: <LetterTab ledger={ledger} /> },
   ];
   return <Tabs size="small" items={subTabs} />;
+}
+
+// ── 合同版本 / 用印 ──────────────────────────────────────────
+function VersionTab({ contract }: { contract: Contract }) {
+  return (
+    <>
+      <Alert type="info" showIcon className="mb-3" message="合同正文版本由合同系统归档，本页只读展示；签署版生效后原草稿自动作废。" />
+      <Table
+        size="small"
+        rowKey="version"
+        pagination={false}
+        dataSource={contract.versions ?? []}
+        columns={[
+          { title: '版本', dataIndex: 'version', width: 80 },
+          { title: '类型', dataIndex: 'type', width: 100, render: (v: string) => <Tag>{v}</Tag> },
+          { title: '文件', dataIndex: 'fileName' },
+          { title: '上传人', dataIndex: 'operator', width: 100 },
+          { title: '日期', dataIndex: 'date', width: 110 },
+          { title: '状态', dataIndex: 'status', width: 90, render: (v: string) => <Tag color={v === '已生效' ? 'success' : 'default'}>{v}</Tag> },
+        ]}
+      />
+    </>
+  );
+}
+
+function SealTab({ contract }: { contract: Contract }) {
+  return (
+    <>
+      <Alert type="info" showIcon className="mb-3" message="用印由法务在合同系统办理；合同章与法人章分别留痕，未用印不得归档。" />
+      <Table
+        size="small"
+        rowKey="id"
+        pagination={false}
+        dataSource={contract.seals ?? []}
+        columns={[
+          { title: '印章', dataIndex: 'type', width: 120 },
+          { title: '状态', dataIndex: 'status', width: 100, render: (v: string) => <Tag color={v === '已用印' ? 'success' : 'processing'}>{v}</Tag> },
+          { title: '用印日期', dataIndex: 'date', width: 120, render: (v?: string) => v ?? '—' },
+          { title: '经办人', dataIndex: 'operator', render: (v?: string) => v ?? '—' },
+        ]}
+      />
+    </>
+  );
 }
 
 // ── 基本信息 ────────────────────────────────────────────────

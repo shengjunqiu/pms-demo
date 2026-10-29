@@ -174,6 +174,7 @@ export function ProjectClosePage() {
           <MetricStatCard
             title="关闭状态"
             value={closure || history ? "已正式关闭" : "准备关闭中"}
+            unit=""
             statusType={closure || history ? "healthy" : "warning"}
           />
         </Col>
@@ -197,6 +198,7 @@ export function ProjectClosePage() {
           <MetricStatCard
             title="应收结清"
             value={receiptSummary.outstanding === 0 ? "已结清" : `剩 ${receiptSummary.outstanding} 万元`}
+            unit=""
             statusType={receiptSummary.outstanding === 0 ? "healthy" : "warning"}
           />
         </Col>

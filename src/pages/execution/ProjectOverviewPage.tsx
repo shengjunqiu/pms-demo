@@ -218,13 +218,7 @@ export function ProjectOverviewPage() {
             return (
               <div
                 key={m.id}
-                className={`flex items-start gap-3 rounded-lg border px-3.5 py-2.5 transition-all cursor-pointer hover:shadow-xs ${
-                  isOverdue
-                    ? 'bg-rose-50/70 border-rose-200'
-                    : isDone
-                      ? 'bg-emerald-50/60 border-emerald-200'
-                      : 'bg-white border-slate-200'
-                }`}
+                className={`flex items-start gap-3 border-b border-slate-100 px-1 py-2.5 last:border-b-0 transition-colors cursor-pointer hover:bg-slate-50/80 ${isOverdue ? 'bg-rose-50/40' : ''}`}
                 onClick={() => open(m.name, [['编号', m.id], ['计划日期', m.plannedDate], ['实际日期', m.actualDate], ['状态', m.status], ['必交材料', m.requiredDeliverables], ['责任人', p.pmName]])}
               >
                 <div className={`flex-shrink-0 w-2 h-2 rounded-full mt-1.5 ${
@@ -233,11 +227,11 @@ export function ProjectOverviewPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-semibold text-slate-800 truncate">{m.name}</span>
-                    <Tag color={isOverdue ? 'error' : isDone ? 'success' : 'processing'} className="m-0 text-[10px] leading-none px-1.5 py-0.5 flex-shrink-0">
+                    <Tag color={isOverdue ? 'error' : isDone ? 'success' : 'processing'} className="m-0 text-xs leading-none px-1.5 py-0.5 flex-shrink-0">
                       {m.status}
                     </Tag>
                   </div>
-                  <div className="flex items-center gap-2 mt-0.5 text-[11px] text-slate-400">
+                  <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-500">
                     <span>计划: {m.plannedDate}</span>
                     {m.actualDate && <span>实际: {m.actualDate}</span>}
                   </div>
@@ -321,7 +315,7 @@ export function ProjectOverviewPage() {
       </div>
 
       <details className="pms-project-meta pt-2 mt-2 border-t border-slate-100">
-        <summary className="text-xs text-slate-400 cursor-pointer hover:text-slate-600">更多项目元数据（来源商机、总监、签约金额等）</summary>
+        <summary className="text-xs text-slate-500 cursor-pointer hover:text-slate-600">更多项目元数据（来源商机、总监、签约金额等）</summary>
         <Descriptions style={{ marginTop: 10 }} column={3} size="small" items={summaryItems.filter((item) => !['customer', 'pm', 'date', 'income', 'actual', 'margin', 'status', 'phase', 'contract'].includes(item.key))} />
       </details>
     </div>
@@ -348,19 +342,19 @@ export function ProjectOverviewPage() {
                 isActive ? 'bg-blue-600' : isPast ? 'bg-emerald-500' : 'bg-slate-300'
               }`} />
               <span className={`text-sm font-semibold ${
-                isActive ? 'text-blue-700' : isPast ? 'text-emerald-700' : 'text-slate-400'
+                isActive ? 'text-blue-700' : isPast ? 'text-emerald-700' : 'text-slate-500'
               }`}>
                 {title}
               </span>
               {isActive && (
-                <span className="ml-auto text-[10px] font-medium text-blue-600 bg-blue-100/60 px-1.5 py-0.5 rounded-full">当前</span>
+                <span className="ml-auto text-xs font-medium text-blue-700 bg-blue-100/60 px-1.5 py-0.5 rounded-full">当前</span>
               )}
               {isPast && (
-                <span className="ml-auto text-[10px] font-medium text-emerald-600 bg-emerald-100/60 px-1.5 py-0.5 rounded-full">已完成</span>
+                <span className="ml-auto text-xs font-medium text-emerald-700 bg-emerald-100/60 px-1.5 py-0.5 rounded-full">已完成</span>
               )}
             </div>
             <div className={`text-xs font-mono ${
-              isActive ? 'text-blue-600' : isPast ? 'text-emerald-600' : 'text-slate-300'
+              isActive ? 'text-blue-600' : isPast ? 'text-emerald-700' : 'text-slate-500'
             }`}>
               {stageAmounts[i] != null
                 ? `${stageAmounts[i]!.toFixed(1)} 万元`

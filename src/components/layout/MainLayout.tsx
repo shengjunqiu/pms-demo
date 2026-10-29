@@ -84,15 +84,17 @@ export const MainLayout: React.FC = () => {
   const allowed = (!currentPage || canAccessPage(data, currentUser, currentPage.id)) && (!routeProject || canAccessProject(data, currentUser, routeProject));
   const isWorkspace = !!currentPage && ['WK', 'GL', 'GS', 'YS', 'HS', 'JS', 'CF'].includes(currentPage.id.split('-')[0])
     || isApprovalsDetail
+    || location.pathname === '/settlement'
     || nav.context === 'project';
   const workspaceKind = nav.context === 'project' || nav.context === 'opportunity' ? nav.context : undefined;
 
   // 🔵2 切角色：当前页对新角色可见时原地停留，否则回角色首页，避免丢上下文或落 403
   const handleRoleChange = (val: UserRole) => {
     const nextUser = buildUserProfile(val);
-    const canStay = !!currentPage
-      && canAccessPage(data, nextUser, currentPage.id)
-      && (!routeProject || canAccessProject(data, nextUser, routeProject));
+    const canStay = (isApprovalsDetail && canAccessPage(data, nextUser, 'WK-02'))
+      || (!!currentPage
+        && canAccessPage(data, nextUser, currentPage.id)
+        && (!routeProject || canAccessProject(data, nextUser, routeProject)));
     setRole(val);
     navigate(canStay ? `${location.pathname}${location.search}` : ROLE_HOME[val]);
   };
@@ -168,15 +170,15 @@ export const MainLayout: React.FC = () => {
             type="button"
             aria-label="搜索项目、合同、单据"
             onClick={() => setSearchOpen(true)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-400 hover:border-blue-400 hover:text-slate-600 cursor-pointer transition-all w-64 text-xs select-none"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-500 hover:border-blue-400 hover:text-slate-600 cursor-pointer transition-all w-64 text-xs select-none"
           >
-            <SearchOutlined className="text-slate-400" />
+            <SearchOutlined className="text-slate-500" />
             <span className="flex-1 truncate text-left">搜索项目、合同、单据...</span>
             <kbd className="hidden sm:inline-block px-1.5 py-0.5 bg-white border border-slate-200 rounded font-mono text-[10px] text-slate-500">⌘K</kbd>
           </button>
 
           <Space size={16} align="center" className="flex-shrink-0">
-            <span className="hidden xl:inline-block text-xs text-slate-400 select-none">截至 {asOfDate}</span>
+            <span className="hidden xl:inline-block text-xs text-slate-500 select-none">截至 {asOfDate}</span>
             <Space size={6} align="center">
               <Text type="secondary" style={{ fontSize: 12, whiteSpace: 'nowrap' }}>角色:</Text>
               <Select

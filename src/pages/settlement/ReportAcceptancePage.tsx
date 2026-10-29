@@ -149,10 +149,10 @@ export function ReportAcceptancePage() {
         message="演示规则 RPT-1：同合同批次唯一；累计报验只汇总财务已确认原单，待确认金额占用可报额度。验收金额通过报验单计量，不重复叠加验收轮次金额。"
       />
       <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
-        <Col xs={12} xl={6}><MetricStatCard title="合同金额" value={contractTotal} /></Col>
-        <Col xs={12} xl={6}><MetricStatCard title="已确认报验" value={confirmedTotal} statusType="healthy" /></Col>
-        <Col xs={12} xl={6}><MetricStatCard title="待确认占用" value={pendingTotal} statusType={pendingTotal ? "warning" : "info"} /></Col>
-        <Col xs={12} xl={6}><MetricStatCard title="剩余可报" value={availableTotal} statusType={availableTotal < 0 ? "danger" : "info"} /></Col>
+        <Col xs={12} xl={6}><MetricStatCard title="合同金额" unit="万元" value={contractTotal} /></Col>
+        <Col xs={12} xl={6}><MetricStatCard title="已确认报验" unit="万元" value={confirmedTotal} statusType="healthy" /></Col>
+        <Col xs={12} xl={6}><MetricStatCard title="待确认占用" unit="万元" value={pendingTotal} statusType={pendingTotal ? "warning" : "info"} /></Col>
+        <Col xs={12} xl={6}><MetricStatCard title="剩余可报" unit="万元" value={availableTotal} statusType={availableTotal < 0 ? "danger" : "info"} /></Col>
       </Row>
       <PageSection title="客户合同与累计报验" description="按合同汇总已确认、待确认占用与剩余可提交额度。">
         <Table

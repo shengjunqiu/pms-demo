@@ -94,13 +94,13 @@ export function GL01DashboardPage() {
           <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
               <span style={{ fontSize: 13, fontWeight: 500, color: '#475569' }}>已签约总额 / 签约率</span>
-              <span style={{ fontSize: 11, color: '#94a3b8' }}>万元</span>
+              <span style={{ fontSize: 11, color: '#64748b' }}>万元</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 8 }}>
-              <span style={{ fontSize: 24, fontWeight: 700, color: '#1677ff' }}>{totalSignedContract.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: '#389e0d' }}>{acceptanceAchievedRate}%</span>
+              <span style={{ fontSize: 24, fontWeight: 700, color: '#1d4ed8' }}>{totalSignedContract.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: '#15803d' }}>{acceptanceAchievedRate}%</span>
             </div>
-            <div style={{ fontSize: 12, color: '#94a3b8' }}>
+            <div style={{ fontSize: 12, color: '#64748b' }}>
               年度规划总规模 <span style={{ fontWeight: 600, color: '#475569' }}>{annualTargetAcceptance.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</span>
             </div>
           </div>
@@ -109,13 +109,13 @@ export function GL01DashboardPage() {
           <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
               <span style={{ fontSize: 13, fontWeight: 500, color: '#475569' }}>已签在建项目 ({signedBuildingProjects.length}个)</span>
-              <span style={{ fontSize: 11, color: '#94a3b8' }}>万元</span>
+              <span style={{ fontSize: 11, color: '#64748b' }}>万元</span>
             </div>
             <div style={{ marginBottom: 8 }}>
-              <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>近期新增启动</div>
+              <div style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>近期新增启动</div>
               <div style={{ fontSize: 20, fontWeight: 700, color: '#fa8c16' }}>{weeklyNewSignedAmount.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</div>
             </div>
-            <div style={{ fontSize: 12, color: '#94a3b8' }}>
+            <div style={{ fontSize: 12, color: '#64748b' }}>
               累计在建存量 <span style={{ fontWeight: 600, color: '#475569' }}>{sumMoney(signedBuildingProjects.map((p) => p.contractAmount)).toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</span>
             </div>
           </div>
@@ -124,13 +124,13 @@ export function GL01DashboardPage() {
           <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
               <span style={{ fontSize: 13, fontWeight: 500, color: '#475569' }}>立项未签控制 ({unsignedProjects.length}个)</span>
-              <span style={{ fontSize: 11, color: '#94a3b8' }}>万元</span>
+              <span style={{ fontSize: 11, color: '#64748b' }}>万元</span>
             </div>
             <div style={{ marginBottom: 8 }}>
-              <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>本期批复额度</div>
+              <div style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>本期批复额度</div>
               <div style={{ fontSize: 20, fontWeight: 700, color: '#fa8c16' }}>{weeklyNewUnsignedAmount.toFixed(2)}</div>
             </div>
-            <div style={{ fontSize: 12, color: '#94a3b8' }}>
+            <div style={{ fontSize: 12, color: '#64748b' }}>
               授权累计限额 <span style={{ fontWeight: 600, color: '#475569' }}>{totalUnsignedQuota.toFixed(2)}</span>
             </div>
           </div>
@@ -139,19 +139,19 @@ export function GL01DashboardPage() {
           <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
               <span style={{ fontSize: 13, fontWeight: 500, color: '#475569' }}>在建成本超支预警 ({overrunProjects.length}项)</span>
-              <span style={{ fontSize: 11, color: '#94a3b8' }}>万元</span>
+              <span style={{ fontSize: 11, color: '#64748b' }}>万元</span>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
               <div>
-                <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 2 }}>累计超支</div>
+                <div style={{ fontSize: 11, color: '#64748b', marginBottom: 2 }}>累计超支</div>
                 <div style={{ fontSize: 15, fontWeight: 700, color: '#cf1322' }}>{totalOverrunCost.toFixed(2)}</div>
               </div>
               <div>
-                <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 2 }}>外包采购超支</div>
+                <div style={{ fontSize: 11, color: '#64748b', marginBottom: 2 }}>外包采购超支</div>
                 <div style={{ fontSize: 15, fontWeight: 600, color: '#d4380d' }}>{constructionOverrunCost.toFixed(2)}</div>
               </div>
               <div>
-                <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 2 }}>费用超支</div>
+                <div style={{ fontSize: 11, color: '#64748b', marginBottom: 2 }}>费用超支</div>
                 <div style={{ fontSize: 15, fontWeight: 600, color: '#d4380d' }}>{feeOverrunCost.toFixed(2)}</div>
               </div>
             </div>
@@ -161,11 +161,11 @@ export function GL01DashboardPage() {
         {/* 汇总条 */}
         <div style={{ marginTop: 12, background: 'linear-gradient(90deg, rgba(22,119,255,0.06) 0%, rgba(248,250,252,0.5) 100%)', border: '1px solid rgba(22,119,255,0.12)', borderRadius: 8, padding: '10px 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 24, fontSize: 12, color: '#475569' }}>
-            <span>立项在审项目 <strong style={{ color: '#1677ff' }}>{recentInitiatedProjects.length}</strong> 个，预计金额 <strong style={{ color: '#1677ff' }}>{recentInitiatedAmount.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</strong> 万</span>
+            <span>立项在审项目 <strong style={{ color: '#1d4ed8' }}>{recentInitiatedProjects.length}</strong> 个，预计金额 <strong style={{ color: '#1d4ed8' }}>{recentInitiatedAmount.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</strong> 万</span>
             <span style={{ color: '#cbd5e1' }}>|</span>
-            <span>收尾及验收中项目 <strong style={{ color: '#1677ff' }}>{recentAcceptedProjects.length}</strong> 个，涉及金额 <strong style={{ color: '#1677ff' }}>{recentAcceptedAmount.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</strong> 万</span>
+            <span>收尾及验收中项目 <strong style={{ color: '#1d4ed8' }}>{recentAcceptedProjects.length}</strong> 个，涉及金额 <strong style={{ color: '#1d4ed8' }}>{recentAcceptedAmount.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</strong> 万</span>
             <span style={{ color: '#cbd5e1' }}>|</span>
-            <span>已签在建执行项目 <strong style={{ color: '#1677ff' }}>{signedBuildingProjects.length}</strong> 个，在建合同额 <strong style={{ color: '#1677ff' }}>{sumMoney(signedBuildingProjects.map((p) => p.contractAmount)).toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</strong> 万</span>
+            <span>已签在建执行项目 <strong style={{ color: '#1d4ed8' }}>{signedBuildingProjects.length}</strong> 个，在建合同额 <strong style={{ color: '#1d4ed8' }}>{sumMoney(signedBuildingProjects.map((p) => p.contractAmount)).toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</strong> 万</span>
           </div>
         </div>
       </div>
@@ -455,7 +455,7 @@ export function GL01DashboardPage() {
                     <div style={{ fontSize: 18, fontWeight: 700, fontFamily: 'var(--pms-font-mono)', color: h.color }}>
                       {h.count}
                     </div>
-                    <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>
+                    <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
                       {percentage(h.count, scope.length)?.toFixed(1) ?? 0}%
                     </div>
                   </div>
@@ -485,7 +485,7 @@ export function GL01DashboardPage() {
                     {health.filter((h) => h.key !== 'green').reduce((n, h) => n + h.count, 0)}
                   </strong> 项
                 </span>
-                <span style={{ color: '#94a3b8', fontSize: 11 }}>最严重因素优先判定</span>
+                <span style={{ color: '#64748b', fontSize: 11 }}>最严重因素优先判定</span>
               </div>
             </Card>
           </Col>

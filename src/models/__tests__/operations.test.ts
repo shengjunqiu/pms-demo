@@ -328,6 +328,8 @@ describe("运维周期与正式关闭", () => {
         pmo,
       ),
     ).toThrow("关闭阻断");
+    const closed = s.projects.find((p) => p.id === "P-008")!;
+    closed.phase = "已关闭";
     expect(() =>
       transition(
         s,

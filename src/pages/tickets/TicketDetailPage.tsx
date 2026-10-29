@@ -33,10 +33,14 @@ function TicketDetailContent() {
   const meta = ticketMeta(data, kind, ticket.id); const pm = currentRole === 'project-manager' && currentUser.id === p.pmId;
   const writer = ['project-manager', 'solution-tech', 'pmo'].includes(currentRole);
   const owner = meta.ownerId === currentUser.id || ticket.owner === currentUser.name;
-  const creator = meta.creatorId ? meta.creatorId === currentUser.id : 'creator' in ticket && ticket.creator === currentUser.name;
+  const creator = meta.creatorId ? meta.creatorId === currentUser.id : 'creator' in ticket && !!ticket.creator && ticket.creator === currentUser.name;
+  // 导入/客户代提事项的发起人不是内部账号，无法登录确认；与领域规则一致，由项目主PM或PMO代理确认。
+  const externalCreator = !meta.creatorId && 'creator' in ticket && !!ticket.creator && !mockUsers.some((u) => u.name === ticket.creator);
+  const proxy = externalCreator && (currentUser.id === p.pmId || currentRole === 'pmo');
+  const confirmer = creator || proxy;
   const awaiting = ticket.status === (kind === 'requirement' ? '待验证' : kind === 'bug' ? '待复测' : '已解决');
   const closed = ticket.status === '已关闭'; const base = scopedProjectId ? `/projects/${scopedProjectId}/tickets` : '/tickets';
-  const canOperate = (op: Operation | undefined) => !!op && canDo(op === 'convert' ? 'risk-to-issue' : 'update-ticket', ticket.id) && writer && !closed && (op === 'confirm' || op === 'return' ? awaiting && (kind === 'issue' ? pm : creator) : op === 'convert' ? pm && ticket.status === '监控中' : op === 'escalate' ? pm || currentRole === 'pmo' : op === 'mitigate' ? (owner || pm) && ticket.status === '监控中' : owner || pm);
+  const canOperate = (op: Operation | undefined) => !!op && canDo(op === 'convert' ? 'risk-to-issue' : 'update-ticket', ticket.id) && writer && !closed && (op === 'confirm' || op === 'return' ? awaiting && (kind === 'issue' ? pm : confirmer) : op === 'convert' ? pm && ticket.status === '监控中' : op === 'escalate' ? pm || currentRole === 'pmo' : op === 'mitigate' ? (owner || pm) && ticket.status === '监控中' : owner || pm);
   const canOperateCurrent = canOperate(operation);
   const sourceRisk = 'fromRiskId' in ticket ? ticket.fromRiskId : undefined;
   const converted = data.issues.find((i) => i.fromRiskId === ticket.id);
@@ -44,7 +48,7 @@ function TicketDetailContent() {
   const ended = closed || ['已缓解', '已转问题'].includes(ticket.status);
   const overdue = !ended && meta.deadline < AS_OF_DATE;
   const creatorName = meta.creatorId ? mockUsers.find((u) => u.id === meta.creatorId)?.name : 'creator' in ticket ? ticket.creator : p.pmName;
-  const confirmationName = kind === 'issue' ? `主PM ${p.pmName}` : `发起人 ${creatorName ?? '原发起人'}`;
+  const confirmationName = kind === 'issue' ? `主PM ${p.pmName}` : proxy ? `主PM ${p.pmName}（代 ${creatorName} 确认）` : `发起人 ${creatorName ?? '原发起人'}`;
   const nextStep = closed ? `已最终关闭 · ${meta.closedAt ?? '历史未提供日期'}` : kind === 'risk' ? ticket.status === '已转问题' ? '风险已转为实际问题，请继续办理关联问题。' : ticket.status === '已缓解' ? '已登记缓解措施，原风险及历史保留。' : `由 ${ticket.owner} 持续监控；风险发生后由主PM转为问题。` : awaiting ? `等待${confirmationName}验证结果，确认关闭或退回。` : `由 ${ticket.owner} 处理并提交解决结果，再由${confirmationName}确认。`;
   const primary: Operation = kind === 'risk' ? 'mitigate' : awaiting ? 'confirm' : 'resolve';
   const orderedOperations: Operation[] = [primary, ...(kind === 'risk' ? ['convert' as const] : awaiting ? ['return' as const] : []), 'feedback', 'transfer', ...(kind !== 'risk' ? awaiting ? ['resolve' as const] : ['confirm' as const, 'return' as const] : ['escalate' as const])];
@@ -83,7 +87,7 @@ function TicketDetailContent() {
         <PageSection title="责任链与处理规则">
           <p style={{ marginTop: 0 }}>{ticket.owner} → 项目经理 {p.pmName} → {p.departmentName} → {meta.escalatedTo ?? 'PMO（按需升级）'}</p>
           <Descriptions size="small" column={1} items={[{ key: 'closed', label: '实际关闭日期', children: meta.closedAt ?? '尚未最终关闭' }, { key: 'escalated', label: '当前督办层级', children: meta.escalatedTo ?? (kind === 'risk' && ['重大', '特大'].includes(rank) || kind === 'issue' && rank === '重大' ? 'PMO' : '项目内跟踪') }]} />
-          <p style={{ margin: '12px 0 0', color: '#64748b' }}>{kind === 'issue' ? '责任人解决后，必须由主PM最终确认关闭；重大及超期问题持续督办。' : kind === 'risk' ? '重大风险升级后仍继续跟踪；发生后转问题，保留原风险、措施和关联。' : '责任人提交解决结果后，必须由发起人验证关闭或退回；转办不会改变发起人。'}</p>
+          <p style={{ margin: '12px 0 0', color: '#64748b' }}>{kind === 'issue' ? '责任人解决后，必须由主PM最终确认关闭；重大及超期问题持续督办。' : kind === 'risk' ? '重大风险升级后仍继续跟踪；发生后转问题，保留原风险、措施和关联。' : `责任人提交解决结果后，必须由发起人验证关闭或退回；转办不会改变发起人。${externalCreator ? '原发起人不是内部账号（导入/客户代提），由项目主PM或PMO代理确认，历史保留原发起人与代理原因。' : ''}`}</p>
         </PageSection>
       </Col>
       <Col xs={24} lg={9}><PageSection title="处理轨迹" description={`共 ${meta.history.length} 条 · 最新在前，完整历史保留`}><Timeline items={historyItems.slice(0, 4)} />{historyItems.length > 4 && <details><summary style={{ cursor: 'pointer', marginBottom: 16 }}>查看更早的 {historyItems.length - 4} 条记录</summary><Timeline items={historyItems.slice(4)} /></details>}</PageSection></Col>

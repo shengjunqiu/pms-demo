@@ -29,6 +29,7 @@ export const GLOBAL_NAV: GlobalNavSection[] = [
   ] },
   { key: 'projects', label: '项目', icon: 'project', items: [
     { key: '/projects', label: '项目台账', pageIds: ['HS-01'] },
+    { key: '/settlement', label: '结算台账', pageIds: ['JS-06'] },
     { key: '/project-changes', label: '变更台账', pageIds: ['HS-14'] },
     { key: '/tickets', label: '事项台账', pageIds: ['HS-05', 'HS-07'] },
   ] },

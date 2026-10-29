@@ -4,14 +4,15 @@ export const pmsTheme: ThemeConfig = {
   token: {
     colorPrimary: '#1d4ed8', // 国际深邃海蓝 (blue-700)
     colorPrimaryHover: '#2563eb',
-    colorSuccess: '#10b981', // 柔和翡翠绿 (emerald-500)
-    colorWarning: '#d97706', // 琥珀黄 (amber-600)
-    colorError: '#e11d48',   // 浆果玫红 (rose-600)
+    colorSuccess: '#047857', // 深翡翠绿 (emerald-700)：浅底上仍满足 WCAG AA
+    colorWarning: '#b45309', // 深琥珀 (amber-700)
+    colorError: '#be123c',   // 深浆果玫红 (rose-700)
     colorInfo: '#1d4ed8',
     colorTextBase: '#0f172a', // slate-900 (主文本色)
     colorTextSecondary: '#334155', // slate-700 (次级文本色)
     colorTextTertiary: '#64748b', // slate-500 (三级辅助/标签文本色)
-    colorTextQuaternary: '#94a3b8', // slate-400 (弱化/占位文本色)
+    colorTextQuaternary: '#94a3b8', // slate-400 (仅禁用/装饰)
+    colorTextPlaceholder: '#64748b', // 占位文字可读性不低于 4.5:1
     colorBgBase: '#ffffff',
     colorBorder: 'rgba(226, 232, 240, 0.9)', // 柔和微透半透明描边
     borderRadius: 8,          // rounded-lg
@@ -82,6 +83,10 @@ export const pmsTheme: ThemeConfig = {
       borderRadiusSM: 4,
     },
     Tabs: {
+      itemColor: '#64748b',
+      itemHoverColor: '#1e40af',
+      itemSelectedColor: '#1e40af',
+      itemActiveColor: '#1e40af',
       horizontalMargin: '0 0 16px 0',
     },
     Pagination: {

@@ -109,7 +109,11 @@ export function applyBudgetPlanningAction(state:BusinessState,action:BudgetPlann
   if(action.result==='整改'&&(!action.rectifications.length||action.rectifications.some(r=>!r.content.trim()||!draft.resources.some(m=>m.active&&m.userId===r.ownerId)||!validPlanDate(r.deadline)||r.deadline<AS_OF_DATE)))throw new Error('整改须有事项、有效责任人及截止日');
   review!.status=action.result;review!.opinion=action.opinion;review!.rectifications=action.result==='整改'?structuredClone(action.rectifications):[];review!.reviewer=actor.name;review!.reviewedAt=AS_OF_DATE;draft.status=action.result==='通过'?'已通过':action.result==='整改'?'整改中':'草稿';
  }else if(action.type==='reply-planning'){
-  const item=review!.rectifications.find(r=>r.id===action.rectificationId);if(review!.status!=='整改'||!item||draft.reviewId!==review!.id||draft.status!=='整改中')throw new Error('整改项不存在或已结束');if(actor.id!==item.ownerId&&!(actor.role==='project-manager'&&actor.id===p.pmId))throw new Error('仅责任人或主PM可回复');if(!action.reply.trim())throw new Error('整改回复必填');item.reply=action.reply;
+  const item=review!.rectifications.find(r=>r.id===action.rectificationId);if(review!.status!=='整改'||!item||draft.reviewId!==review!.id||draft.status!=='整改中')throw new Error('整改项不存在或已结束');
+  const owner=!!actor.id&&actor.id===item.ownerId,pmProxy=actor.role==='project-manager'&&actor.id===p.pmId;
+  if(!owner&&!pmProxy)throw new Error('仅整改责任人本人或项目主PM可回复');
+  if(!action.reply.trim())throw new Error('整改回复必填');
+  item.reply=action.reply;item.repliedBy=actor.id;item.repliedByName=actor.name;item.proxy=!owner;
  }
  return p.id;
 }

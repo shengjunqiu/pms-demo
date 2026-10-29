@@ -35,6 +35,6 @@ export interface SettlementRequest {
   lockedAt?: string;
   history: { actor: string; date: string; action: string; opinion: string }[];
 }
-export interface SettlementCostReview { id: string; projectId: string; sourceId: string; disposition: '已有凭证'|'取消不发生'; ledgerId?: string; amount: number; evidence: string; actor: string; date: string }
+export interface SettlementCostReview { id: string; projectId: string; sourceId: string; disposition: '已有凭证'|'取消不发生'; ledgerId?: string; amount: number; differenceReason?: string; evidence: string; actor: string; date: string }
 export interface SettlementCostDisposition { id: string; projectId: string; subjectId: string; bucket: '承诺'|'预测'; disposition: '实际发生'|'取消不发生'; amount: number; evidence: string; ledgerId?: string; date: string; actor: string }
 export interface SettlementAnalysis { subjectId: string; category: string; phase: string; changeId?: string; note: string }

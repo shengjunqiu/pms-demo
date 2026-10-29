@@ -16,7 +16,7 @@ export const BusinessStageBadge: React.FC<{ stage?: BusinessStage; className?: s
     <span
       className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50/70 text-blue-700 ring-1 ring-inset ring-blue-600/20 shadow-2xs ${className}`}
     >
-      <span className="h-1.5 w-1.5 rounded-full bg-blue-600 animate-pulse" />
+      <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
       <span>{stage}</span>
     </span>
   );

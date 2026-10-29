@@ -15,6 +15,22 @@ const finance: Actor = { id: 'U-004', name: '刘敏', role: 'finance' };
 const leader: Actor = { id: 'U-003', name: '王总', role: 'executive' };
 const pmo: Actor = { id: 'U-002', name: '李主任', role: 'pmo' };
 
+// 预算/变更审批按金额分档为多节点（财务复核→PMO→高管），测试统一沿节点链办结。
+function approveAll<T extends ReturnType<typeof createDemoBusinessState>>(state: T, id: string, opinion: string): T {
+  let s = state;
+  for (let guard = 0; guard < 12; guard += 1) {
+    const approval = s.approvals.find((a) => a.id === id);
+    if (!approval || approval.status !== '待审批') return s;
+    const index = approval.node ?? 0;
+    const node = approval.nodes?.[index];
+    const pendingRoles = node ? node.roles.filter((role) => !(approval.nodeReviews ?? []).some((r) => r.node === index && r.role === role)) : [];
+    const role = pendingRoles[0] ?? node?.roles[0];
+    const actor = role === 'finance' ? finance : role === 'pmo' ? pmo : leader;
+    s = transition(s, { type: 'review', approvalId: id, approve: true, opinion }, actor) as T;
+  }
+  throw new Error(`审批 ${id} 未能在节点链上办结`);
+}
+
 describe('经营聚合与样本一致性', () => {
   it('同一组织子树包含下属部门，权限先于用户筛选，重复项目只计一次', () => {
     const rows = selectProjects({ org: 'D-002' });
@@ -58,8 +74,8 @@ describe('审批、权限及成本锁定', () => {
     const quotedEstimate = state.approvals[0].estimate.totalCost;
     state.estimates[0].totalCost = 9999;
     expect(state.approvals[0].estimate.totalCost).toBe(quotedEstimate);
-    expect(() => transition(state, { type: 'review', approvalId: 'APR-1', approve: true, opinion: '同意' }, pmo)).toThrow('角色');
-    state = transition(state, { type: 'review', approvalId: 'APR-1', approve: true, opinion: '同意追加范围及预算' }, leader);
+    expect(() => transition(state, { type: 'review', approvalId: 'APR-1', approve: true, opinion: '同意' }, pmo)).toThrow('财务复核');
+    for (const node of state.approvals[0].nodes ?? []) for (const role of node.roles) state = transition(state, { type: 'review', approvalId: 'APR-1', approve: true, opinion: '同意追加范围及预算' }, role === 'finance' ? { id: 'U-004', name: '刘敏', role: 'finance' as const } : role === 'pmo' ? pmo : leader);
     expect(state.projects[0].budgetAmount).toBe(original.projects[0].budgetAmount);
     state = transition(state, {type:'confirm-budget-baseline',approvalId:'APR-1'}, pmo);
     expect(state.projects[0].budgetAmount).toBe(4000);
@@ -74,7 +90,7 @@ describe('审批、权限及成本锁定', () => {
     const original = createBusinessState();
     const pending = transition(original, { type: 'submit-budget', projectId: 'P-001', budget: original.budgets[0], reason: '计划调整' }, pm);
     expect(pending.approvals[0].budget.overEstimateReasons?.length).toBeGreaterThan(0);
-    const result = transition(pending, { type: 'review', approvalId: 'APR-1', approve: false, opinion: '补充交付范围' }, leader);
+    const result = transition(pending, { type: 'review', approvalId: 'APR-1', approve: false, opinion: '补充交付范围' }, { id: 'U-004', name: '刘敏', role: 'finance' as const });
     expect(result.baselines).toEqual(original.baselines);
     expect(result.projects[0].budgetAmount).toBe(original.projects[0].budgetAmount);
     expect(original.approvals).toHaveLength(0);
@@ -134,7 +150,7 @@ describe('领导待决策与到期回款', () => {
       expect(sumMoney(approval.budget.items.map((i) => i.amount))).toBe(approval.budget.totalAmount);
     }
     const pending = initial.approvals.find((a) => a.status === '待审批')!;
-    let next = transition(initial, { type: 'review', approvalId: pending.id, approve: true, opinion: '同意所引版本和交付范围' }, leader);
+    let next = approveAll(initial, pending.id, '同意所引版本和交付范围');
     expect(next.decisions.filter((d) => d.status === '待决策')).toHaveLength(18);
     expect(next.projects.find((p) => p.id === pending.projectId)?.budgetAmount).toBe(initial.projects.find(p=>p.id===pending.projectId)?.budgetAmount);
     next = transition(next,{type:'confirm-budget-baseline',approvalId:pending.id},pmo);
@@ -142,7 +158,7 @@ describe('领导待决策与到期回款', () => {
     expect(pending.status).toBe('待审批');
     const second = initial.approvals.find((a) => a.projectId === 'P-003')!;
     const imported = { ...initial, baselines: initial.baselines.filter((b) => b.projectId !== 'P-003' || b.status === '已生效') };
-    let upgraded = transition(imported, { type: 'review', approvalId: second.id, approve: true, opinion: '按引用版本批准' }, leader);
+    let upgraded = approveAll(imported, second.id, '按引用版本批准');
     upgraded=transition(upgraded,{type:'confirm-budget-baseline',approvalId:second.id},pmo);
     expect(upgraded.projects.find((p) => p.id === 'P-003')?.currentBaselineVersion).toBe('V3.0');
     expect(new Set(upgraded.baselines.filter((b) => b.projectId === 'P-003').map((b) => b.version)).size).toBe(2);
@@ -175,7 +191,7 @@ describe('领导待决策与到期回款', () => {
     expect(next.projects.find((p) => p.id === 'P-004')?.unsignedLimitQuota).toBe((initial.projects.find((p) => p.id === 'P-004')?.unsignedLimitQuota ?? 0) + 80);
     expect(next.projects.map((p) => p.actualCost)).toEqual(initial.projects.map((p) => p.actualCost));
     const change = initial.approvals.find((a) => a.kind === 'change')!;
-    const changed = transition(initial, { type: 'review', approvalId: change.id, approve: true, opinion: '同意成本变更' }, leader);
+    const changed = approveAll(initial, change.id, '同意成本变更');
     expect(changed.changes.find((c) => c.id === change.sourceChangeId)?.newBaselineId).toBe(`BASE-${change.id}`);
   });
 

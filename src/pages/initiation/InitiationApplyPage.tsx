@@ -8,13 +8,16 @@ import {
   Button,
   Card,
   Collapse,
+  DatePicker,
   Descriptions,
   Form,
+  Input,
   Select,
   Space,
   Table,
   Tabs,
   Tag,
+  Upload,
 } from "antd";
 import { useSearchParams } from "react-router-dom";
 import dayjs from "dayjs";
@@ -126,7 +129,7 @@ export function InitiationApplyPage() {
         ].find((group) => group.fields.some((name) => !values[name] || (Array.isArray(values[name]) && !values[name].length)));
         if (missing) { setTab('detail'); message.error('请补全「立项申请详情」页签的必填申请资料后提交'); return; }
       }
-      await form.validateFields();
+      if (submit) await form.validateFields();
       const v = form.getFieldsValue(true);
       const next: InitiationInput = {
         ...input!,
@@ -235,6 +238,47 @@ export function InitiationApplyPage() {
                     <div style={{ textAlign: 'center', marginBottom: 24, position: 'relative' }}>
                       <h2 style={{ fontSize: 20, fontWeight: 600, color: '#1e293b', margin: 0 }}>立项申请</h2>
                       <Tag color="processing" style={{ position: 'absolute', right: 16, top: 0, fontSize: 12, padding: '2px 12px' }}>{app?.status ?? '草稿'}</Tag>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', columnGap: 16 }}>
+                      <Form.Item name="name" label="项目名称" rules={[{ required: true, whitespace: true, message: '请填写项目名称' }]}>
+                        <Input placeholder="请输入项目名称" maxLength={80} />
+                      </Form.Item>
+                      <Form.Item name="region" label="所属区域" rules={[{ required: true, whitespace: true, message: '请填写所属区域' }]}>
+                        <Input placeholder="如：华东" maxLength={40} />
+                      </Form.Item>
+                      <Form.Item name="necessity" label="立项必要性" rules={[{ required: true, whitespace: true, message: '请填写立项必要性' }]}>
+                        <Input.TextArea rows={4} placeholder="说明客户痛点、业务价值与不立项的影响" />
+                      </Form.Item>
+                      <Form.Item name="recommendation" label="立项建议" rules={[{ required: true, whitespace: true, message: '请填写立项建议' }]}>
+                        <Input.TextArea rows={4} placeholder="说明建议的交付策略、资源与风险控制" />
+                      </Form.Item>
+                      <Form.Item name="scope" label="项目范围 / 建设内容" rules={[{ required: true, whitespace: true, message: '请填写项目范围' }]}>
+                        <Input.TextArea rows={4} placeholder="说明建设内容、边界与不在范围内的事项" />
+                      </Form.Item>
+                      <Form.Item name="customerNeeds" label="客户核心诉求" rules={[{ required: true, whitespace: true, message: '请填写客户核心诉求' }]}>
+                        <Input.TextArea rows={4} placeholder="说明客户关键验收诉求与约束" />
+                      </Form.Item>
+                      <Form.Item name="plannedStartDate" label="计划开始日期" rules={[{ required: true, message: '请选择计划开始日期' }]}>
+                        <DatePicker style={{ width: '100%' }} />
+                      </Form.Item>
+                      <Form.Item name="plannedEndDate" label="计划结束日期" rules={[{ required: true, message: '请选择计划结束日期' }]}>
+                        <DatePicker style={{ width: '100%' }} />
+                      </Form.Item>
+                      <Form.Item name="expectedSignDate" label="预计签约日期" rules={[{ required: true, message: '请选择预计签约日期' }]}>
+                        <DatePicker style={{ width: '100%' }} />
+                      </Form.Item>
+                      <Form.Item
+                        name="files"
+                        label="立项附件"
+                        rules={[{ required: true, message: '请上传至少一个立项附件' }]}
+                        valuePropName="fileList"
+                        getValueFromEvent={(e) => e?.fileList ?? []}
+                      >
+                        <Upload multiple beforeUpload={() => false}>
+                          <Button>选择文件</Button>
+                        </Upload>
+                      </Form.Item>
                     </div>
 
                     <Collapse

@@ -160,7 +160,7 @@ describe("真实收款与合同计划单一实收", () => {
       );
     },
   );
-  it.each(["2026-02-30", "2026-13-01", "2026-9-09", "2027-01-01", ""])(
+  it.each(["2026-02-30", "2026-13-01", "2026-9-09", ""])(
     "日期 %s 无效时拒绝",
     (receivedDate) => {
       const s = createBusinessState();
@@ -169,6 +169,20 @@ describe("真实收款与合同计划单一实收", () => {
       ).toThrow("收款日期无效");
     },
   );
+  it("晚于业务基准日的回款日期拒绝并引导登记回款计划，基准日当日可登记", () => {
+    const s = createBusinessState();
+    expect(() =>
+      transition(s, { ...receipt(s), receivedDate: "2027-01-01" }, finance),
+    ).toThrow(
+      `回款日期不能晚于业务基准日 ${AS_OF_DATE}；未来回款请登记为回款计划`,
+    );
+    const next = transition(
+      s,
+      { ...receipt(s), receivedDate: AS_OF_DATE },
+      finance,
+    );
+    expect(next.receiptRecords.at(-1)!.receivedDate).toBe(AS_OF_DATE);
+  });
   it("缺少流水、有效凭据或说明拒绝；支持精确到分和提前回款", () => {
     const s = createBusinessState();
     const action = receipt(s, 0.000001);

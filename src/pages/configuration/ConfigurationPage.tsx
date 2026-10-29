@@ -366,7 +366,7 @@ export function ConfigurationPage({ kind }: { kind: Kind }) {
                   render: (_, v) => (
                     <>
                       <strong>{v.name}</strong>
-                      <div style={{ fontSize: 12, color: "#8c8c8c" }}>
+                      <div style={{ fontSize: 12, color: "#64748b" }}>
                         {v.id}
                       </div>
                     </>

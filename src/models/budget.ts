@@ -18,7 +18,8 @@ export interface PlanningReview {
   id: string; projectId: string; round: number; revision: number; snapshot: PlanningSnapshot;
   status: '待评审' | '通过' | '整改' | '否决'; submittedBy: string; submittedAt: string;
   reviewer?: string; reviewedAt?: string; opinion?: string;
-  rectifications: { id: string; content: string; ownerId: string; deadline: string; reply?: string }[];
+  /** repliedBy/proxy 记录谁实际落实回复：责任人本人时 proxy 为 false，项目主PM 代答时为 true。 */
+  rectifications: { id: string; content: string; ownerId: string; deadline: string; reply?: string; repliedBy?: string; repliedByName?: string; proxy?: boolean }[];
 }
 export interface ProjectTeam {
  members:TeamResource[];

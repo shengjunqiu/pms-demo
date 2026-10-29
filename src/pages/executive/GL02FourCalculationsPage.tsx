@@ -35,6 +35,11 @@ export function GL02FourCalculationsPage() {
   const rolling = sum((r) => r.rolling); const income = sum((r) => r.income);
   const closed = rows.filter((r) => r.settlement); const settlement = closed.length ? sumMoney(closed.map((r) => r.settlement!.finalCost)) : undefined;
   const complete = rows.length > 0 && closed.length === rows.length;
+  // 在途预算审批：已生效预算之外还有待审金额，四算台账要能看到“批了会变多少”。
+  const rowIds = new Set(rows.map((r) => r.p.id));
+  const pendingApprovals = data.approvals.filter((a) => a.status === '待审批' && rowIds.has(a.projectId));
+  const pendingTotal = sumMoney(pendingApprovals.map((a) => a.budget.totalAmount));
+  const pendingDelta = sumMoney(pendingApprovals.map((a) => a.budget.totalAmount - a.baseline.budgetAmount));
   const subjectIds = [...new Set(rows.flatMap((r) => r.subjects.map((s) => s.subjectId)))];
   const subjects = subjectIds.map((id) => {
     const items = rows.flatMap((r) => r.subjects.filter((s) => s.subjectId === id));
@@ -44,6 +49,7 @@ export function GL02FourCalculationsPage() {
   const tab = params.get('tab') ?? 'projects';
   return <><PageHeader title="GL-02 四算经营专题" description={`冻结概算 → 生效预算 → 动态核算 → 锁定结算 · ${AS_OF_DATE} · 万元`} breadcrumbs={[{ title: '首页', href: '/' }, { title: '四算专题' }]} extra={<Button onClick={() => navigate(-1)}>返回上一级</Button>} />
     <ProjectFilters compact params={params} onChange={setParams} /><details style={{ margin: '12px 0' }}><summary style={{ cursor: 'pointer', color: '#475569' }}>常用分析视图</summary><div style={{ paddingTop: 12 }}><AnalysisTools storageKey="pms-four-views" params={params} onChange={setParams} /></div></details>
+    {pendingApprovals.length > 0 && <Alert showIcon type="warning" style={{ marginBottom: 16 }} message={`在途预算审批 ${pendingApprovals.length} 条，合计 ${pendingTotal} 万元（较生效预算 ${pendingDelta >= 0 ? '+' : ''}${pendingDelta} 万元）`} description={`下表的预算列为已生效版本；审批通过后新版本才进入台账。涉及项目：${pendingApprovals.map((a) => a.projectId).join('、')}`} />}
     <Tabs activeKey={settledOnly ? 'settled' : 'all'} onChange={(key) => { const next = new URLSearchParams(params); next.set('sample', key); next.delete('page'); setParams(next); }} items={[{ key: 'all', label: `概算 / 预算同样本（${scope.filter((r) => r.estimate && r.budget).length}）` }, { key: 'settled', label: `已结算同样本（${scope.filter((r) => r.estimate && r.budget && r.settlement).length}）` }]} />
     <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>{[
       { name: '冻结概算成本', value: estimate, icon: <AccountBookOutlined />, statusText: '基线V1.0', statusType: 'info' as const },
@@ -65,7 +71,7 @@ export function GL02FourCalculationsPage() {
     <PageSection title="四阶段成本对比" description={`同一组 ${rows.length} 个项目 · 柱长从零起点按金额比例展示 · 单位：万元`}>
       <div aria-label="四阶段成本比较" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 20 }}>
         {[
-          { label: '概算', value: estimate, delta: undefined, color: '#94a3b8' },
+          { label: '概算', value: estimate, delta: undefined, color: '#64748b' },
           { label: '预算', value: budget, delta: sumMoney([budget, -estimate]), color: '#3b82f6' },
           { label: '核算', value: rolling, delta: sumMoney([rolling, -budget]), color: rolling > budget ? '#dc2626' : '#2563eb' },
           { label: '结算', value: complete ? settlement : undefined, delta: complete && settlement !== undefined ? sumMoney([settlement, -rolling]) : undefined, color: '#0f766e' },

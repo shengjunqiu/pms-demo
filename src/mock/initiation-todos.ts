@@ -27,13 +27,13 @@ export function selectInitiationTodos(state: BusinessState, actor: Actor): Busin
         owner: actor.name,
         route,
       };
-      const pending = (key: string, node: string, due: string, target = route, opinion?: string) => rows.push({
+      const pending = (key: string, node: string, due: string, target = route, opinion?: string, source: BusinessTodo['source'] = 'approval') => rows.push({
         ...base, id: `${prefix}:${key}`, node, due, route: target,
-        status: '待办理', done: false, opinion,
+        status: '待办理', done: false, opinion, source,
       });
       const handled = (key: string, node: string, date: string, status: string, opinion: string) => rows.push({
         ...base, id: `${prefix}:${key}`, node: `${node}（日期为办理日）`,
-        due: date, status, done: true, opinion,
+        due: date, status, done: true, opinion, source: 'approval',
       });
 
       if (latest && round.status === '待风险评估' && actor.role === 'pmo') {
@@ -76,7 +76,7 @@ export function selectInitiationTodos(state: BusinessState, actor: Actor): Busin
       }
       if (latest && round.status === '整改' && opportunity && canManageOpportunity(state, opportunity, actor)) {
         const due = round.decision?.rectifications.map(r => r.deadline).sort()[0] ?? deadline(round.submittedAt);
-        pending('rectification', '主办角色补充整改并重新提交', due, `/initiation/apply?id=${app.id}`, round.decision?.opinion);
+        pending('rectification', '主办角色补充整改并重新提交', due, `/initiation/apply?id=${app.id}`, round.decision?.opinion, 'mine');
       }
       if (latest && round.status === '暂缓' && actor.role === 'pmo' && round.decision?.resumeDate) {
         pending('resume', 'PMO暂缓复评恢复', round.decision.resumeDate, route, round.decision.opinion);

@@ -9,14 +9,19 @@
 // 两者都只在 build 产物中出现，dev 模式无法暴露，因此在构建后自动把关。
 
 import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { gzipSync } from 'node:zlib';
+import process from 'node:process';
 import { join, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const assetsDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'assets');
 const indexHtmlPath = join(dirname(assetsDir), 'index.html');
 
-// 首屏 JS 预算（gzip 字节）。超出仅告警，不阻断构建。
+// 首屏 JS 预算（gzip 字节，与浏览器实际下载量对齐）。超出仅告警，不阻断构建。
 const EAGER_BUDGET_BYTES = 700 * 1024;
+
+/** 浏览器实际下载量：按 gzip 计，避免用未压缩体积误报超预算 */
+const gzipSize = (file) => gzipSync(readFileSync(join(assetsDir, file)), { level: 9 }).length;
 
 const files = readdirSync(assetsDir).filter((f) => f.endsWith('.js'));
 const chunks = new Map(); // chunk 名 -> { file, size, deps:Set }
@@ -86,19 +91,21 @@ while (queue.length) {
   if (chunk) for (const dep of chunk.deps) if (!eager.has(dep)) queue.push(dep);
 }
 
-const eagerBytes = [...eager].reduce((sum, f) => sum + statSync(join(assetsDir, f)).size, 0);
+const rawOf = (file) => statSync(join(assetsDir, file)).size;
+const eagerRawBytes = [...eager].reduce((sum, f) => sum + rawOf(f), 0);
+const eagerBytes = [...eager].reduce((sum, f) => sum + gzipSize(f), 0);
 const cssFiles = [...html.matchAll(/href="\.?\/?assets\/([A-Za-z0-9_.-]+\.css)"/g)].map((m) => m[1]);
-const cssBytes = cssFiles.reduce((sum, f) => sum + statSync(join(assetsDir, f)).size, 0);
+const cssBytes = cssFiles.reduce((sum, f) => sum + rawOf(f), 0);
 
 // ---- 报告 ----
 const fmt = (n) => (n / 1024).toFixed(1) + ' KB';
 console.log(`chunk 总数: ${chunks.size}`);
-console.log(`首屏 JS: ${eager.size} 个文件, ${fmt(eagerBytes)} (未压缩) + CSS ${fmt(cssBytes)}`);
+console.log(`首屏 JS: ${eager.size} 个文件, gzip ${fmt(eagerBytes)} / 未压缩 ${fmt(eagerRawBytes)} + CSS ${fmt(cssBytes)}`);
 console.log('\n首屏 JS 明细:');
 [...eager]
-  .map((f) => ({ f, size: statSync(join(assetsDir, f)).size }))
-  .sort((a, b) => b.size - a.size)
-  .forEach(({ f, size }) => console.log(`  ${fmt(size).padStart(10)}  ${f}`));
+  .map((f) => ({ f, gz: gzipSize(f), raw: rawOf(f) }))
+  .sort((a, b) => b.gz - a.gz)
+  .forEach(({ f, gz, raw }) => console.log(`  gzip ${fmt(gz).padStart(9)}  raw ${fmt(raw).padStart(9)}  ${f}`));
 
 const lazyOnly = [...chunks.values()].filter((c) => !eager.has(c.file));
 const lazyBytes = lazyOnly.reduce((s, c) => s + c.size, 0);
@@ -114,9 +121,9 @@ if (cycles.length) {
 }
 
 if (eagerBytes > EAGER_BUDGET_BYTES) {
-  console.warn(`\n⚠ 首屏 JS ${fmt(eagerBytes)} 超出预算 ${fmt(EAGER_BUDGET_BYTES)}，请检查是否有页面/mock 代码被打进首屏`);
+  console.warn(`\n⚠ 首屏 JS gzip ${fmt(eagerBytes)} 超出预算 ${fmt(EAGER_BUDGET_BYTES)}，请检查是否有页面/mock 代码被打进首屏`);
 } else {
-  console.log(`✓ 首屏 JS 在预算 ${fmt(EAGER_BUDGET_BYTES)} 内`);
+  console.log(`✓ 首屏 JS gzip ${fmt(eagerBytes)} 在预算 ${fmt(EAGER_BUDGET_BYTES)} 内`);
 }
 
 process.exit(failed ? 1 : 0);

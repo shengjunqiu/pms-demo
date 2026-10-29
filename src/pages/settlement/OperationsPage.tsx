@@ -18,7 +18,9 @@ import {
   Table,
   Tabs,
   Tag,
+  Tooltip,
 } from "antd";
+import type { ReactElement } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { PageHeader } from "@/components/common/PageHeader";
 import { MetricStatCard } from "@/components/common/MetricStatCard";
@@ -95,6 +97,27 @@ export function OperationsPage() {
   const canSubmitModal =
     canModal(modal) &&
     !(modal === "cost" && costKind === "labor" && !canEditField("labor-rate"));
+  // 按钮置灰时给就近原因，不让用户对着灰按钮猜（与归档页同一约定）。
+  const blockReason = (kind: typeof modal) => {
+    if (!active) return `周期当前为「${c.status}」，仅服务中/退出中可办理`;
+    if (kind === "event" || kind === "cost" || kind === "resolve")
+      return member
+        ? "当前权限策略未对本角色开放该动作"
+        : "运维记录与成本由本周期运维团队或 PMO 办理";
+    return owner
+      ? c.status === "待生效"
+        ? "待生效周期需先检查并激活"
+        : "当前权限策略未对本角色开放该动作"
+      : "周期配置、续期与退出由本项目项目经理或 PMO 办理";
+  };
+  const gate = (kind: typeof modal, button: ReactElement) =>
+    canModal(kind) ? (
+      button
+    ) : (
+      <Tooltip title={blockReason(kind)}>
+        <span style={{ display: "inline-block" }}>{button}</span>
+      </Tooltip>
+    );
   const open = (kind: typeof modal, targetId = eventId) => {
     if (!canModal(kind, targetId)) return;
     setEventId(targetId);
@@ -223,12 +246,13 @@ export function OperationsPage() {
           <MetricStatCard
             title="周期状态"
             value={c.status}
+            unit=""
             statusType={c.status === "服务中" ? "healthy" : c.status === "退出中" ? "warning" : "info"}
           />
         </Col>
         <Col xs={12} xl={6}>
           <MetricStatCard
-            title="本期运维费用"
+            title="本期运维费用" unit="万元"
             value={costs.reduce((s, c) => s + c.amount, 0)}
             statusType="info"
           />
@@ -318,13 +342,16 @@ export function OperationsPage() {
               label: "服务 / 问题 / SLA",
               children: (
                 <>
-                  <Button
-                    type="primary"
-                    disabled={!canModal("event")}
-                    onClick={() => open("event")}
-                  >
-                    登记运维记录
-                  </Button>
+                  {gate(
+                    "event",
+                    <Button
+                      type="primary"
+                      disabled={!canModal("event")}
+                      onClick={() => open("event")}
+                    >
+                      登记运维记录
+                    </Button>,
+                  )}
                   <Table
                     rowKey="id"
                     dataSource={events}
@@ -384,13 +411,16 @@ export function OperationsPage() {
                     type="info"
                     message="金额单位万元。团队提交真实发生的工时或费用记录，财务审核后单次入账，不改变建设期实际成本和最终结算。"
                   />
-                  <Button
-                    disabled={!canModal("cost")}
-                    onClick={() => open("cost")}
-                    style={{ margin: "12px 0" }}
-                  >
-                    填报运维工时 / 费用
-                  </Button>
+                  {gate(
+                    "cost",
+                    <Button
+                      disabled={!canModal("cost")}
+                      onClick={() => open("cost")}
+                      style={{ margin: "12px 0" }}
+                    >
+                      填报运维工时 / 费用
+                    </Button>,
+                  )}
                   <Table
                     rowKey="id"
                     dataSource={data.operationCostSources.filter(
@@ -472,12 +502,15 @@ export function OperationsPage() {
               children: (
                 <>
                   <Space>
-                    <Button
-                      disabled={!canModal("config")}
-                      onClick={() => open("config")}
-                    >
-                      配置到期提醒
-                    </Button>
+                    {gate(
+                      "config",
+                      <Button
+                        disabled={!canModal("config")}
+                        onClick={() => open("config")}
+                      >
+                        配置到期提醒
+                      </Button>,
+                    )}
                     {c.status === "待生效" && (
                       <Button
                         disabled={!owner || !canDo("activate-operation", c.id)}
@@ -492,18 +525,24 @@ export function OperationsPage() {
                         检查并激活新周期
                       </Button>
                     )}
-                    <Button
-                      disabled={!canModal("renew")}
-                      onClick={() => open("renew")}
-                    >
-                      办理续期 · 新建周期
-                    </Button>
-                    <Button
-                      disabled={!canModal("exit")}
-                      onClick={() => open("exit")}
-                    >
-                      办理退出 / 提前终止
-                    </Button>
+                    {gate(
+                      "renew",
+                      <Button
+                        disabled={!canModal("renew")}
+                        onClick={() => open("renew")}
+                      >
+                        办理续期 · 新建周期
+                      </Button>,
+                    )}
+                    {gate(
+                      "exit",
+                      <Button
+                        disabled={!canModal("exit")}
+                        onClick={() => open("exit")}
+                      >
+                        办理退出 / 提前终止
+                      </Button>,
+                    )}
                   </Space>
                   {c.exit && (
                     <Descriptions

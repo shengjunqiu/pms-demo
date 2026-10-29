@@ -117,7 +117,7 @@ export const mockOpportunities: Opportunity[] = Array.from({ length: 72 }).map((
   return {
     id,
     code: `OPP-2026-${String(i + 1).padStart(3, '0')}`,
-    name: i < oppNames.length ? oppNames[i] : `2026年数字化转型商机_${i + 1}`,
+    name: i < oppNames.length ? oppNames[i] : `${mockCustomers[i % mockCustomers.length].name}${mockCustomers[i % mockCustomers.length].industry}商机`,
     customerId: mockCustomers[i % mockCustomers.length].id,
     customerName: mockCustomers[i % mockCustomers.length].name,
     ownerId: mockUsers[i % 5].id,
@@ -405,7 +405,7 @@ const projectSeeds: Project[] = [
     departmentName: '交付中心一部',
     type: '软件开发',
     level: '重点',
-    phase: '已关闭',
+    phase: '收尾',
     subPhase: '项目结算',
     status: '已结算',
     health: 'green',
@@ -514,6 +514,14 @@ export const mockContracts: Contract[] = mockProjects.filter((p) => !p.isUnsigne
     status: p.isUnsigned ? '已终止' : '履约中',
     paidAmount: money(p.contractAmount * 0.45),
     unpaidAmount: money(p.contractAmount - money(p.contractAmount * 0.45)),
+    versions: [
+      { version: 'V1.0', date: '2026-01-12', operator: '陈亮', type: '草稿', fileName: `${p.code}-V1.0-合同草稿.docx`, status: '已作废' },
+      { version: 'V2.0', date: '2026-01-20', operator: '陈亮', type: '签署版', fileName: `${p.code}-V2.0-双方签署.pdf`, status: '已生效' },
+    ],
+    seals: [
+      { id: `SEAL-${p.id}-HT`, type: '合同章', status: '已用印', date: '2026-01-19', operator: '法务_周敏' },
+      { id: `SEAL-${p.id}-FR`, type: '法人章', status: '已用印', date: '2026-01-19', operator: '法务_周敏' },
+    ],
   };
 });
 
@@ -858,6 +866,9 @@ export const mockAcceptances: AcceptanceRecord[] = mockProjects.flatMap((p) => {
 });
 
 // 26. 结算记录 (≥30)
+// 历史结算只保留两种真实状态：已锁定已生效（P-008 唯一正式结算）与草稿。
+// 历史版本曾把 34 条写成「审核中」，但结算状态机没有该状态（见 mock/settlement.ts review-settlement），
+// 会让财务/PM/PMO 全部报「项目或结算申请不存在」，在途结算改由 settlementRequests 承载。
 export const mockSettlements: SettlementRecord[] = Array.from({ length: 35 }).map((_, i) => {
   const p = mockProjects[i % mockProjects.length];
   const finalIncome = p.contractAmount;
@@ -871,7 +882,7 @@ export const mockSettlements: SettlementRecord[] = Array.from({ length: 35 }).ma
     finalCost,
     finalGrossMargin,
     finalGrossMarginRate,
-    status: p.id === 'P-008' ? '已锁定已生效' : '审核中',
+    status: p.id === 'P-008' ? '已锁定已生效' : '草稿',
     isCostLocked: p.id === 'P-008',
     settledDate: p.id === 'P-008' ? '2026-04-10' : undefined,
     createdAt: '2026-04-01',

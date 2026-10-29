@@ -46,7 +46,7 @@ export const FourCalculationsPipeline: React.FC<FourCalculationsPipelineProps> =
       value: budget,
       highlight: currentStage === '立项',
       badge: estToBudDiff !== null ? (
-        <span className={estToBudDiff <= 0 ? 'text-emerald-600' : 'text-amber-600'}>
+        <span className={estToBudDiff <= 0 ? 'text-emerald-700' : 'text-amber-600'}>
           {estToBudDiff > 0 ? '+' : ''}{estToBudRate?.toFixed(1)}% 偏差
         </span>
       ) : null,
@@ -127,7 +127,7 @@ export const FourCalculationsPipeline: React.FC<FourCalculationsPipelineProps> =
             </div>
 
             {/* 底部副文案与流转能量条指示 */}
-            <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+            <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
               <span className="truncate">{stage.subtitle}</span>
               {idx < stages.length - 1 && (
                 <ArrowRightOutlined className="text-slate-300 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all hidden md:block text-xs" />
