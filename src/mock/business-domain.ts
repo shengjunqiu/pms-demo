@@ -799,7 +799,77 @@ export function buildDemoBusinessState(): BusinessState {
       firstRequest.history.push({ actor: initActors.finance.name, date: AS_OF_DATE, action: 'finance-confirm', opinion: '开票、税费与成本口径已核对一致' });
     }
   }
+  // 黄金演示线路：P-008 的立项历史。66 个在建项目都挂着真实商机，但立项流程的种子只造了
+  // OPP-067..070 四条独立申请（projectId 为空）——「同一个项目从商机讲到关闭」在立项段断档。
+  // 这里只补一条已通过的立项申请记录（不重跑状态机，也不新建项目），事实取自 P-008 / OPP-008 / CTR-007。
+  function seedGoldenInitiation(next: BusinessState) {
+    const p = next.projects.find((x) => x.id === 'P-008');
+    const o = next.opportunities.find((x) => x.id === 'OPP-008');
+    const estimate = next.estimates.find((e) => e.id === o?.currentEstimateVersionId);
+    if (!p || !o || !estimate) return;
+    if (next.initiations.some((i) => i.projectId === p.id)) return;
+    const input = {
+      opportunityId: o.id,
+      name: p.name,
+      type: p.type,
+      region: '福建省',
+      amount: o.estimatedAmount,
+      necessity: '县级数据中台需统一归集人口、法人、信用等主题库，支撑跨部门共享与业务协同。',
+      scope: '数据中台主题库建设、数据治理与四类业务系统接口联调。',
+      plannedStartDate: p.plannedStartDate,
+      plannedEndDate: p.plannedEndDate,
+      expectedSignDate: o.expectedSignDate,
+      customerNeeds: '希望打通各委办局数据，实现一次采集多方复用，并具备数据质量监控能力。',
+      recommendation: '建议按重点项目管理，分期建设、先行试点主题库。',
+      strategic: true,
+      contractStatus: '未签' as const,
+      contractReference: '',
+      attachments: ['立项申请.pdf', '数据中台总体方案.pdf'],
+      additionalDeliverables: [],
+      risks: [],
+      rectificationReply: '',
+    };
+    const signatures = INITIATION_SIGNATURES.map((node) => ({
+      node: node.node,
+      role: node.role,
+      by: node.role === 'finance' ? initActors.finance.name : node.role === 'pmo' ? initActors.pmo.name : node.role === 'project-manager' ? initActors.pm.name : initActors.tech.name,
+      conclusion: '同意' as const,
+      opinion: `${node.node}意见：商务、技术、交付与资金安排均可执行`,
+      date: '2025-02-20',
+    }));
+    next.initiations.push({
+      id: 'INIT-008',
+      input,
+      draftRevision: 1,
+      status: '通过',
+      createdBy: o.ownerId,
+      createdAt: '2025-02-10',
+      projectId: p.id,
+      rounds: [
+        {
+          revision: 1,
+          input,
+          source: { opportunity: o, estimate, solutionVersionId: '', solutionScope: '数据中台主题库与数据治理', solutionAttachments: ['数据中台总体方案.pdf'], expertReviewId: '', expertOpinions: [], risks: [], earlyCostTotal: 0, earlyCostSources: [] },
+          submittedAt: '2025-02-10',
+          submittedBy: o.ownerName,
+          status: '通过',
+          risks: [],
+          riskLevel: '中',
+          riskExplanation: '数据归集涉及多委办局协调，接口联调依赖客户侧配合，整体风险可控。',
+          assessedBy: initActors.pmo.name,
+          requiredDeliverables: [],
+          level: p.level,
+          classificationReason: '金额与战略价值达到重点项目标准',
+          ruleReasons: ['预计金额超过一般项目阈值', '战略客户且具备示范效应'],
+          path: '线上会签',
+          signatures,
+          decision: { result: '通过', opinion: '同意立项，按重点项目管理，未签先行立项并同步推进合同签署', by: initActors.pmo.name, date: '2025-02-20', meetingDate: '2025-02-20', participants: [initActors.pmo.name, initActors.market.name, initActors.finance.name, initActors.tech.name], minutes: '各节点会签同意；商务风险由合同条款规避，资金按里程碑支付。', rectifications: [] },
+        },
+      ],
+    });
+  }
   seedSettlementChain(state);
+  seedGoldenInitiation(state);
   // 项目成员以团队台账为准：工时填报、事项办理、资源视图都读 projects.memberIds，
   // 旧种子只建了 projectTeams.members，导致「已在团队成员列表里的人」事报工时被拒。
   for (const p of state.projects) {
