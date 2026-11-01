@@ -404,6 +404,8 @@ describe("运维周期与正式关闭", () => {
       pmo,
     );
     expect(s.projects.find((v) => v.id === p.id)?.phase).toBe("已关闭");
+    // 关闭成功后门禁不得翻回未达成（问题清单 F-31）
+    expect(closeChecks(s, p.id).filter((v) => !v.ok)).toEqual([]);
     expect(s.projectClosures[p.id].archiveId).toBe("TEST-ARCHIVE-006");
     expect(() =>
       transition(

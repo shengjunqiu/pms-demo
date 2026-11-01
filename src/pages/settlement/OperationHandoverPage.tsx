@@ -22,7 +22,7 @@ import { StateView } from "@/components/common/StateView";
 import { useBusinessStore } from "@/mock/store";
 import { mockUsers, AS_OF_DATE } from "@/mock";
 import { visibleProjects } from "@/mock/selectors";
-import { useAppStore } from "@/store/useAppStore";
+import { LOGINNABLE_USER_IDS, useAppStore } from "@/store/useAppStore";
 import type { OperationHandover } from "@/models/operations";
 export function OperationHandoverPage() {
   const { id } = useParams();
@@ -44,6 +44,7 @@ export function OperationHandoverPage() {
   )
     return <StateView type="403" />;
   const h = data.operationHandovers[p.id];
+  const receiverLoggable = !!h && LOGINNABLE_USER_IDS.includes(h.receiverId);
   const cycles = data.operationCycles.filter((c) => c.projectId === p.id);
   const canEdit =
     (currentRole === "pmo" ||
@@ -218,6 +219,18 @@ export function OperationHandoverPage() {
             )
           }
         >
+          {h.status === "待接收" && (
+            <Alert
+              type={receiverLoggable ? "info" : "warning"}
+              showIcon
+              style={{ marginBottom: 12 }}
+              message={
+                receiverLoggable
+                  ? "接收人需本人登录确认移交；如需改派，修改下方清单后重新提交即可（重新提交会替换原接收人）。"
+                  : "指定接收人不是可登录的模拟身份，无法确认接收；请修改下方清单的接收人后重新提交。"
+              }
+            />
+          )}
           <Descriptions
             column={2}
             bordered
@@ -226,9 +239,11 @@ export function OperationHandoverPage() {
               {
                 key: "receiver",
                 label: "指定接收人",
-                children:
-                  mockUsers.find((u) => u.id === h.receiverId)?.name ??
-                  "无需运维",
+                children: `${mockUsers.find((u) => u.id === h.receiverId)?.name ?? "无需运维"}${
+                  h.receiverId && !receiverLoggable
+                    ? "（不可登录，需改派）"
+                    : ""
+                }`,
               },
               { key: "scope", label: "服务范围", children: h.scope || "—" },
               { key: "sla", label: "SLA", children: h.sla || "—" },
@@ -334,6 +349,7 @@ export function OperationHandoverPage() {
                     options={mockUsers.map((u) => ({
                       value: u.id,
                       label: `${u.name} · ${u.role}`,
+                      disabled: !LOGINNABLE_USER_IDS.includes(u.id),
                     }))}
                   />
                 </Form.Item>

@@ -137,7 +137,9 @@ export function closeChecks(state: BusinessState, id: string) {
   return [
     {
       label: "项目处于收尾阶段",
-      ok: p.phase === "收尾",
+      // 已关闭项目应视为满足：关闭后 phase 变为「已关闭」，若仍按「收尾」判定，
+      // 同一页面会在关闭成功后把已满足的门禁翻成待办（见问题清单 F-31）。
+      ok: p.phase === "收尾" || p.phase === "已关闭",
     },
     {
       label: "管理决策事项已办理",

@@ -129,6 +129,15 @@ export function OperationsPage() {
       date: AS_OF_DATE,
       remindDays: c.remindDays,
       confirm: false,
+      // 已有退出清单时回填，否则重开弹窗要重敲一遍凭据（见问题清单 F-34）。
+      ...(kind === "exit" && c.exit
+        ? {
+            reason: c.exit.reason,
+            handoff: c.exit.handoff,
+            accountsRevoked: c.exit.accountsRevoked,
+            archive: c.exit.archive,
+          }
+        : {}),
     });
   };
   const run = (action: OperationsAction) =>

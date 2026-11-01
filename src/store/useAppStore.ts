@@ -39,6 +39,9 @@ const ROLE_USER_IDS: Record<UserRole, string> = {
   admin: 'U-ADMIN',
 };
 
+/** 可登录身份对应的用户 ID（模拟身份切换只开放这些账号） */
+export const LOGINNABLE_USER_IDS: string[] = Object.values(ROLE_USER_IDS);
+
 /** 由角色推导用户档案，保证 currentRole 与 currentUser 始终一致 */
 export function buildUserProfile(role: UserRole): UserProfile {
   const roleInfo = ROLES.find((r) => r.key === role) || ROLES[0];
