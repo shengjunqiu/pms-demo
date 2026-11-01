@@ -431,12 +431,11 @@ export function applyUnsignedAction(
       throw new Error('项目已确认启动，不得重复');
     if (
       !validPlanDate(action.date) ||
-      action.date > AS_OF_DATE ||
       action.date < project.plannedStartDate ||
       action.date > project.plannedEndDate ||
       !action.opinion.trim()
     )
-      throw new Error('启动日期须在批准项目周期内且不晚于演示日，确认意见必填');
+      throw new Error('启动日期须在批准项目周期内，确认意见必填');
     const result = startupChecks(state, project);
     const failed = result.checks.filter((check) => !check.passed);
     if (failed.length)
