@@ -99,15 +99,15 @@ export function OperationsPage() {
     !(modal === "cost" && costKind === "labor" && !canEditField("labor-rate"));
   // 按钮置灰时给就近原因，不让用户对着灰按钮猜（与归档页同一约定）。
   const blockReason = (kind: typeof modal) => {
+    if (c.status === "待生效")
+      return `本期自 ${c.startDate} 起生效，未生效前不能登记服务记录与费用`;
     if (!active) return `周期当前为「${c.status}」，仅服务中/退出中可办理`;
     if (kind === "event" || kind === "cost" || kind === "resolve")
       return member
         ? "当前权限策略未对本角色开放该动作"
         : "运维记录与成本由本周期运维团队或 PMO 办理";
     return owner
-      ? c.status === "待生效"
-        ? "待生效周期需先检查并激活"
-        : "当前权限策略未对本角色开放该动作"
+      ? "当前权限策略未对本角色开放该动作"
       : "周期配置、续期与退出由本项目项目经理或 PMO 办理";
   };
   const gate = (kind: typeof modal, button: ReactElement) =>
