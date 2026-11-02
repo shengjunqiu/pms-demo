@@ -29,10 +29,27 @@ type StoreType = {
 
 let _store: UseBoundStore<StoreApi<StoreType>> | undefined;
 
+// Keep a development demo in its own tab across Vite module updates. This is
+// a checkpoint of the single business store, never a second source of facts.
+const DEV_CHECKPOINT_KEY = 'pms-demo:dev-business:v1';
+function initialData(): BusinessState {
+  if (import.meta.env.DEV && typeof sessionStorage !== 'undefined') {
+    const raw = sessionStorage.getItem(DEV_CHECKPOINT_KEY);
+    if (raw) {
+      const data = JSON.parse(raw) as BusinessState;
+      if (!Array.isArray(data.projects) || !Array.isArray(data.audit)) {
+        throw new Error('开发演示检查点无效，请先备份再处理，不能自动覆盖现有记录');
+      }
+      return data;
+    }
+  }
+  return createDemoBusinessState();
+}
+
 function init(): UseBoundStore<StoreApi<StoreType>> {
   if (_store) return _store;
   _store = create<StoreType>((set, get) => ({
-    data: createDemoBusinessState(),
+    data: initialData(),
     dispatch: (action, actor) => {
       const previous = get().data;
       try {
@@ -79,6 +96,15 @@ function init(): UseBoundStore<StoreApi<StoreType>> {
         },
       })),
   }));
+  if (import.meta.env.DEV && typeof sessionStorage !== 'undefined') {
+    _store.subscribe(({ data }) => {
+      try {
+        sessionStorage.setItem(DEV_CHECKPOINT_KEY, JSON.stringify(data));
+      } catch (error) {
+        console.warn('无法保存开发演示检查点，当前内存业务记录仍保留', error);
+      }
+    });
+  }
   return _store;
 }
 

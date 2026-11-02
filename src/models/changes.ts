@@ -3,6 +3,8 @@ import type { FullBaselineSnapshot } from './budget';
 export interface ChangeInput {
  type:ProjectChange['type']; title:string; reason:string; scope:string; customerBasis:string; contractBasis:string;
  urgency:'一般'|'紧急'; shiftDays:number; proposedIncome:number; adjustments:Record<string,number>;
+ /** Explicit pre-start boundary change; omitted for legacy whole-plan shifts. */
+ plannedStartDate?:string;
  resourceHours:Record<string,number>; newWorkPackage:string; newTaskOwnerId:string; risk:string; majorRisk:boolean;
  procurementImpact:string; outsourceImpact:string; attachments:string[];
 }

@@ -15,3 +15,6 @@ role-sim/
 
 # impeccable design review artifacts
 .impeccable/
+
+# 工具产物（Codex/agent 工作目录）
+.workbuddy/

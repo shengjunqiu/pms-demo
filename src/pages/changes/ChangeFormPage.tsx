@@ -3,7 +3,8 @@ import { canViewSensitiveField } from "@/mock/configuration-access";
 import { constructionLockReason } from "@/mock/construction-lock";
 import { marginReason } from "@/utils/sensitive";
 import { useState } from "react";
-import { Alert, App, Button, Card, Checkbox, Col, Descriptions, Input, InputNumber, Modal, Row, Select, Space, Steps, Table, Tag, Timeline, } from "antd";
+import { Alert, App, Button, Card, Checkbox, Col, DatePicker, Descriptions, Input, InputNumber, Modal, Row, Select, Space, Steps, Table, Tag, Timeline, } from "antd";
+import dayjs from "dayjs";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useBusinessStore } from "@/mock/store";
 import { useAppStore } from "@/store/useAppStore";
@@ -269,7 +270,18 @@ function ChangeFormContent() {
             </Row>
           </Card>
           <Card title="02 · 范围与进度" size="small" style={{ marginBottom: 16 }}>
+            <Descriptions size="small" column={2} items={[
+                { key: 'start', label: '批准开工日', children: `${base?.plannedStartDate ?? p.plannedStartDate} → ${proposal?.proposed.plannedStartDate ?? '请核对输入'}` },
+                { key: 'end', label: '计划结束日', children: `${base?.plannedEndDate ?? p.plannedEndDate} → ${proposal?.proposed.plannedEndDate ?? '请核对输入'}` },
+            ]} />
             <Row gutter={[16, 16]}>
+              <Col span={24}>
+                <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <span>目标批准开工日</span>
+                  <DatePicker aria-label="目标批准开工日" style={{ width: 200 }} disabled={!canEdit || !!p.actualStartDate} value={dayjs(input.plannedStartDate ?? base?.plannedStartDate ?? p.plannedStartDate)} onChange={value => update({ plannedStartDate: value?.format('YYYY-MM-DD') })} />
+                </label>
+                <p>仅限尚未实际启动的项目。调整原开工边界上的任务、启动里程碑及有效团队起日，保留后续节点、计划工时和结束日；须完成专业评估与分级审批后生效。与整体顺延分单申请。</p>
+              </Col>
               <Col span={24}>
                 <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <span>目标范围</span>
@@ -485,6 +497,7 @@ function ChangeFormContent() {
                 <p>客户依据：{h.input.customerBasis}</p><p>合同依据：{h.input.contractBasis}</p>
                 <p>范围：{h.original.scopeDesc} → {h.proposed.scope}</p>
                 <p>计划验收：{h.original.plannedEndDate} → {h.proposed.plannedEndDate}</p>
+                <p>批准开工：{h.original.plannedStartDate} → {h.proposed.plannedStartDate}</p>
                 <p>类型：{h.input.type} · 紧急程度：{h.input.urgency}</p>
                 <p>预算万元：{h.original.budgetAmount.toFixed(2)} → {h.proposed.budget.totalAmount.toFixed(2)}</p>
                 <p>目标收入万元：{h.input.proposedIncome.toFixed(2)} · 计划顺延：{h.input.shiftDays}天</p>

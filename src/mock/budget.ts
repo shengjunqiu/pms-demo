@@ -69,7 +69,7 @@ export function confirmBudgetBaseline(state:BusinessState,approval:Approval,acto
  const version=`V${Math.max(0,...state.baselines.filter(b=>b.projectId===p.id).map(b=>Number(/^V(\d+)/.exec(b.version)?.[1]??0)))+1}.0`;
  state.budgets.filter(b=>b.projectId===p.id&&(b.status==='已生效'||b.id===`BUD-PENDING-${approval.id}`)).forEach(b=>{b.status='已废弃';});if(baseline)baseline.status='历史';
  const budget={...structuredClone(approval.budget),id:`BUD-${approval.id}`,version,status:'已生效' as const,createdAt:AS_OF_DATE,createdBy:actor.id};
- state.budgets.push(budget);const full={...structuredClone(snapshot),budget};
+ state.budgets.push(budget);const full={...structuredClone(snapshot),budget:structuredClone(budget)};
  state.baselines.push({...structuredClone(approval.baseline),id:`BASE-${approval.id}`,version,status:'已生效',budgetAmount:budget.totalAmount,createdAt:AS_OF_DATE,snapshot:full});
  if(!baseline){
   for(const name of [...new Set(snapshot.milestones.flatMap(m=>m.requiredDeliverables))]){if(!state.materials.some(m=>m.projectId===p.id&&m.name===name))state.materials.push({id:`MAT-${p.id}-${state.materials.length+1}`,projectId:p.id,name,required:true,status:'缺失'});}

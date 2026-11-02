@@ -3,7 +3,7 @@ import {AS_OF_DATE} from '@/mock';
 import type {Actor,Approval,BusinessState} from './business';
 import type {ChangeInput,ChangeRequest} from '@/models/changes';
 import type {BudgetVersion} from '@/models/types';
-import {planningSnapshot,confirmBudgetBaseline} from './budget';
+import {planningSnapshot,confirmBudgetBaseline,validPlanDate,validatePlanning} from './budget';
 import {projectEstimate} from './versions';
 import {assertConstructionWritable} from './construction-lock';
 import {money,percentage,sumMoney} from '@/utils/money';
@@ -18,18 +18,32 @@ export function proposeChange(state:BusinessState,id:string,input:ChangeInput){
  const items=currentBudget.items.map(i=>({...i,amount:money(i.amount+(input.adjustments[i.subjectId]??0))}));if(items.some(i=>i.amount<0))throw new Error('调整后科目预算不能为负');
  const budget:BudgetVersion={...structuredClone(currentBudget),id:`PROPOSED-${id}`,version:'变更提议',status:'审批中',items,totalAmount:sumMoney(items.map(i=>i.amount))};
  const snapshot=planningSnapshot(state,id);const shift=(date:string)=>new Date(Date.parse(date)+input.shiftDays*86400000).toISOString().slice(0,10);
- snapshot.scope=input.scope;snapshot.plannedEndDate=shift(original.plannedEndDate);if(snapshot.plannedEndDate<original.plannedStartDate)throw new Error('变更后结束日期不可早于项目开始');
+ const startDate=input.plannedStartDate??original.plannedStartDate;
+ if(!validPlanDate(startDate))throw new Error('批准开工日须为有效日期');
+ const startChanged=startDate!==original.plannedStartDate;
+ if(startChanged){
+  if(p.actualStartDate||state.startConfirmations[id]||state.tasks.some(t=>t.projectId===id&&(t.progress>0||t.actualStartDate)))throw new Error('项目已有实际执行记录，不可变更批准开工日');
+  if(input.shiftDays!==0)throw new Error('开工日调整与整体顺延请分单申请');
+  // Move only the original opening boundary. Later work and the final deadline
+  // stay in place; no progress, actual dates, cost or planned hours are created.
+  snapshot.tasks.forEach(t=>{if(t.startDate===original.plannedStartDate){t.startDate=startDate;if(t.endDate===original.plannedStartDate)t.endDate=startDate;t.plannedDays=Math.max(1,(Date.parse(t.endDate)-Date.parse(t.startDate))/86400000+1);}});
+  snapshot.milestones.forEach(m=>{if(m.type==='启动'&&m.status!=='已达成'&&m.plannedDate===original.plannedStartDate)m.plannedDate=startDate;});
+  snapshot.resources.forEach(r=>{if(r.active&&r.startDate===original.plannedStartDate)r.startDate=startDate;});
+ }
+ snapshot.scope=input.scope;snapshot.plannedStartDate=startDate;snapshot.plannedEndDate=shift(original.plannedEndDate);if(snapshot.plannedEndDate<startDate)throw new Error('变更后结束日期不可早于项目开始');
  snapshot.tasks.forEach(t=>{if(t.progress<100){t.startDate=shift(t.startDate);t.endDate=shift(t.endDate);}});
  snapshot.milestones.forEach(m=>{if(m.status!=='已达成')m.plannedDate=shift(m.plannedDate);});
  snapshot.resources.forEach(r=>{if(input.resourceHours[r.userId]!==undefined){const hours=input.resourceHours[r.userId];if(!Number.isFinite(hours)||hours<=0)throw new Error('资源投入工时须为正数');r.plannedHours=hours;}if(r.active)r.endDate=snapshot.plannedEndDate;});
  if(input.newWorkPackage.trim()){
   if(snapshot.plannedEndDate<AS_OF_DATE)throw new Error('新增工作包须有未来有效计划结束日期');
   const owner=state.projectTeams[id]?.members.find(m=>m.userId===input.newTaskOwnerId&&m.active);if(!owner)throw new Error('新增范围须指定有效团队责任人');
-  snapshot.tasks.push({id:`TASK-CHANGE-${id}-${state.changes.length+1}`,projectId:id,taskCode:`${snapshot.tasks.length+1}`,name:input.newWorkPackage,ownerId:owner.userId,ownerName:owner.name,startDate:AS_OF_DATE>p.plannedStartDate?AS_OF_DATE:p.plannedStartDate,endDate:snapshot.plannedEndDate,plannedDays:1,plannedHours:8,progress:0,isMilestone:false,status:'未开始',completionCondition:'完成变更批准范围并提交验证材料',predecessorIds:[]});
+  snapshot.tasks.push({id:`TASK-CHANGE-${id}-${state.changes.length+1}`,projectId:id,taskCode:`${snapshot.tasks.length+1}`,name:input.newWorkPackage,ownerId:owner.userId,ownerName:owner.name,startDate:AS_OF_DATE>startDate?AS_OF_DATE:startDate,endDate:snapshot.plannedEndDate,plannedDays:1,plannedHours:8,progress:0,isMilestone:false,status:'未开始',completionCondition:'完成变更批准范围并提交验证材料',predecessorIds:[]});
  }
  const proposed:FullBaselineSnapshot={...snapshot,budget,estimateVersionId:estimate.id,planningReviewId:state.planningDrafts[id]?.reviewId};
  const margin=percentage(input.proposedIncome-budget.totalAmount,input.proposedIncome);const reasons=[];
- if(Math.abs(budget.totalAmount-currentBudget.totalAmount)>=CHANGE_RULE.largeCost)reasons.push(`成本影响≥${CHANGE_RULE.largeCost}万元`);if(Math.abs(input.shiftDays)>=CHANGE_RULE.largeShiftDays)reasons.push(`工期影响≥${CHANGE_RULE.largeShiftDays}天`);if(margin===null||margin<CHANGE_RULE.minGrossMarginPercent)reasons.push(`变更后毛利率低于${CHANGE_RULE.minGrossMarginPercent}%或收入为零`);if(input.majorRisk)reasons.push('重大风险');
+ const startErrors=startChanged?validatePlanning(snapshot,id):[];if(startErrors.length)throw new Error(`开工日调整后计划不一致：${startErrors.join('；')}`);
+ const startImpact=(Date.parse(startDate)-Date.parse(original.plannedStartDate))/86400000;
+ if(Math.abs(budget.totalAmount-currentBudget.totalAmount)>=CHANGE_RULE.largeCost)reasons.push(`成本影响≥${CHANGE_RULE.largeCost}万元`);if(Math.max(Math.abs(input.shiftDays),Math.abs(startImpact))>=CHANGE_RULE.largeShiftDays)reasons.push(`工期影响≥${CHANGE_RULE.largeShiftDays}天`);if(margin===null||margin<CHANGE_RULE.minGrossMarginPercent)reasons.push(`变更后毛利率低于${CHANGE_RULE.minGrossMarginPercent}%或收入为零`);if(input.majorRisk)reasons.push('重大风险');
  return {original:structuredClone(original),proposed,budget,reasons};
 }
 export function initializePendingChanges(state:BusinessState){
@@ -47,7 +61,7 @@ export function applyProjectChangeAction(state:BusinessState,action:ProjectChang
  if(action.type==='save-project-change'){
   if(actor.role!=='project-manager'||actor.id!==p.pmId)throw new Error('仅项目主PM可申请变更');if(request&&!['草稿','已否决'].includes(request.status))throw new Error('提交版本不可修改');const input=structuredClone(action.input);if(!input.title.trim()||!input.reason.trim()||!input.scope.trim())throw new Error('变更标题、原因和目标范围必填');const proposal=proposeChange(state,p.id,input);const id=request?.id??`CHG-NEW-${state.changes.length+1}`;
   const value:ChangeRequest={id,projectId:p.id,input,original:proposal.original,originalIncome:p.revenueAmount??p.contractAmount,proposed:proposal.proposed,proposedBudget:proposal.budget,status:'草稿',requiredRole:proposal.reasons.length?'executive':'pmo',ruleReasons:proposal.reasons,assessments:[],submittedBy:actor.name,revision:(request?.revision??0)+1,history:[...(request?.history??[]),...(request?.status==='已否决'?[{revision:request.revision,status:request.status,input:structuredClone(request.input),original:structuredClone(request.original),originalIncome:request.originalIncome,proposed:structuredClone(request.proposed),opinion:request.opinion}]:[])]};
-  if(request)Object.assign(request,value);else state.changeRequests.push(value);const summary={id,projectId:p.id,code:`CR-${id}`,title:input.title,type:input.type,costImpact:money(proposal.budget.totalAmount-proposal.original.budgetAmount),scheduleImpactDays:input.shiftDays,status:'草稿' as const,createdAt:AS_OF_DATE};const existing=state.changes.find(c=>c.id===id);if(existing)Object.assign(existing,{...summary,code:existing.code,createdAt:existing.createdAt});else state.changes.push(summary);return id;
+  if(request)Object.assign(request,value);else state.changeRequests.push(value);const summary={id,projectId:p.id,code:`CR-${id}`,title:input.title,type:input.type,costImpact:money(proposal.budget.totalAmount-proposal.original.budgetAmount),scheduleImpactDays:input.plannedStartDate&&input.plannedStartDate!==proposal.original.plannedStartDate?(Date.parse(input.plannedStartDate)-Date.parse(proposal.original.plannedStartDate))/86400000:input.shiftDays,status:'草稿' as const,createdAt:AS_OF_DATE};const existing=state.changes.find(c=>c.id===id);if(existing)Object.assign(existing,{...summary,code:existing.code,createdAt:existing.createdAt});else state.changes.push(summary);return id;
  }
  const r=request!;const summary=state.changes.find(c=>c.id===r.id)!;
  if(action.type==='submit-project-change'){
@@ -62,11 +76,11 @@ export function applyProjectChangeAction(state:BusinessState,action:ProjectChang
   r.financeSignoff={signed:action.approve,actor:actor.name,date:AS_OF_DATE,opinion:action.opinion};
  }else if(action.type==='review-project-change'){
   if(!action.opinion.trim())throw new Error('审批意见必填');if(['草稿','已批准','已否决'].includes(r.status))throw new Error('变更尚未提交或已处理');if(action.approve&&(!['PMO审批中','PMC审议中'].includes(r.status)||actor.role!==r.requiredRole))throw new Error('须完成评估与分级，并由指定层级审批');if(!action.approve&&!['pmo','executive'].includes(actor.role))throw new Error('仅PMO或集团领导可退回变更');
-  if(action.approve){if(r.input.type==='成本/资源变更'&&!r.financeSignoff?.signed)throw new Error('成本/资源变更须先完成财务会签');if(!r.input.attachments.length||r.input.customerBasis.startsWith('待')||r.input.contractBasis.startsWith('待'))throw new Error('历史待审材料不完整，请先退回补充客户/合同依据与附件');if(r.proposed.tasks.some(t=>t.startDate<r.proposed.plannedStartDate||t.endDate>r.proposed.plannedEndDate||t.startDate>t.endDate))throw new Error('提议任务超出批准周期，请退回核对计划');if(state.baselines.find(b=>b.projectId===p.id&&b.status==='已生效')?.id!==r.original.id)throw new Error('源基线已变化，请重新申报变更');
+  if(action.approve){if(r.proposed.plannedStartDate!==r.original.plannedStartDate&&(p.actualStartDate||state.startConfirmations[p.id]||state.tasks.some(t=>t.projectId===p.id&&(t.progress>0||t.actualStartDate))))throw new Error('项目已有实际执行记录，不可变更批准开工日');if(r.input.type==='成本/资源变更'&&!r.financeSignoff?.signed)throw new Error('成本/资源变更须先完成财务会签');if(!r.input.attachments.length||r.input.customerBasis.startsWith('待')||r.input.contractBasis.startsWith('待'))throw new Error('历史待审材料不完整，请先退回补充客户/合同依据与附件');if(r.proposed.tasks.some(t=>t.startDate<r.proposed.plannedStartDate||t.endDate>r.proposed.plannedEndDate||t.startDate>t.endDate))throw new Error('提议任务超出批准周期，请退回核对计划');if(state.baselines.find(b=>b.projectId===p.id&&b.status==='已生效')?.id!==r.original.id)throw new Error('源基线已变化，请重新申报变更');
    const estimate=projectEstimate(p,state.estimates)!;const approval:Approval={id:`CHANGE-${r.id}`,projectId:p.id,kind:'change',status:'通过',budget:r.proposedBudget,baseline:{...r.original,scopeDesc:r.proposed.scope,plannedStartDate:r.proposed.plannedStartDate,plannedEndDate:r.proposed.plannedEndDate,snapshot:r.proposed},estimate,requiredRole:r.requiredRole,submittedBy:r.submittedBy,reason:r.input.reason,sourceChangeId:r.id,opinion:action.opinion};
    confirmBudgetBaseline(state,approval,actor);state.approvals.push(approval);r.sourceApprovalId=approval.id;
    const execution=new Map(state.tasks.filter(t=>t.projectId===p.id).map(t=>[t.id,t]));state.tasks=state.tasks.filter(t=>t.projectId!==p.id).concat(r.proposed.tasks.map(t=>{const old=execution.get(t.id);return {...structuredClone(t),...(old?{progress:old.progress,status:old.status,actualStartDate:old.actualStartDate,actualEndDate:old.actualEndDate,executionNote:old.executionNote}:{})};}));
-   const actualMilestones=new Map(state.milestones.filter(m=>m.projectId===p.id).map(m=>[m.id,m]));state.milestones=state.milestones.filter(m=>m.projectId!==p.id).concat(r.proposed.milestones.map(m=>{const old=actualMilestones.get(m.id);return {...structuredClone(m),...(old?{status:old.status,actualDate:old.actualDate,}:{})};}));const tasks=state.tasks.filter(t=>t.projectId===p.id);const duration=tasks.reduce((n,t)=>n+t.plannedDays,0);p.progressRate=duration?money(tasks.reduce((n,t)=>n+t.progress*t.plannedDays,0)/duration):0;p.plannedEndDate=r.proposed.plannedEndDate;p.revenueAmount=r.input.proposedIncome;if(state.projectTeams[p.id])state.projectTeams[p.id].members=structuredClone(r.proposed.resources);summary.newBaselineId=`BASE-${approval.id}`;
+   const actualMilestones=new Map(state.milestones.filter(m=>m.projectId===p.id).map(m=>[m.id,m]));state.milestones=state.milestones.filter(m=>m.projectId!==p.id).concat(r.proposed.milestones.map(m=>{const old=actualMilestones.get(m.id);return {...structuredClone(m),...(old?{status:old.status,actualDate:old.actualDate,}:{})};}));const tasks=state.tasks.filter(t=>t.projectId===p.id);const duration=tasks.reduce((n,t)=>n+t.plannedDays,0);p.progressRate=duration?money(tasks.reduce((n,t)=>n+t.progress*t.plannedDays,0)/duration):0;p.plannedStartDate=r.proposed.plannedStartDate;p.plannedEndDate=r.proposed.plannedEndDate;p.revenueAmount=r.input.proposedIncome;if(state.projectTeams[p.id])state.projectTeams[p.id].members=structuredClone(r.proposed.resources);summary.newBaselineId=`BASE-${approval.id}`;
    if(state.planningDrafts[p.id])state.planningDrafts[p.id]={...structuredClone(r.proposed),projectId:p.id,revision:state.planningDrafts[p.id].revision+1,status:'已冻结',updatedAt:AS_OF_DATE};
   }
   r.status=action.approve?'已批准':'已否决';r.reviewedBy=actor.name;r.opinion=action.opinion;r.reviewedAt=AS_OF_DATE;summary.status=action.approve?'已批准':'已否决';const decision=state.decisions.find(d=>d.id===`DEC-${r.id}`);if(decision)decision.status=action.approve?'已通过':'已否决';
