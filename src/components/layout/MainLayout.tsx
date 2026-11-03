@@ -4,13 +4,14 @@ import { canAccessPage, canAccessProject, selectAccessPolicy } from '@/mock/conf
 import { projectForTarget } from '@/mock/access';
 import { StateView } from '@/components/common/StateView';
 import { GlobalSearchModal } from '@/components/common/GlobalSearchModal';
-import { Layout, Menu, Select, Space, Typography, Dropdown, Avatar, type MenuProps } from 'antd';
+import { Layout, Menu, Select, Space, Typography, Dropdown, Avatar, Button, type MenuProps } from 'antd';
 import {
   AppstoreOutlined,
   AuditOutlined,
   BulbOutlined,
   DashboardOutlined,
   ProjectOutlined,
+  PlayCircleOutlined,
   SearchOutlined,
   SettingOutlined,
   UserOutlined,
@@ -21,6 +22,9 @@ import { ROLE_HOME } from '@/routes/navigation';
 import { GLOBAL_NAV, resolveNav, type NavIcon } from '@/routes/nav-config';
 import { PAGE_MANIFEST } from '@/routes/manifest';
 import { WorkspaceNav } from '@/components/layout/WorkspaceNav';
+import { usePresentationStore } from '@/features/presentation/store';
+import { DemoDataButton } from '@/features/demo/DemoDataButton';
+import { PRESENTATION_PATH } from '@/features/presentation/model';
 
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
@@ -42,6 +46,8 @@ export const MainLayout: React.FC = () => {
   const navigate = useNavigate();
   const { currentRole, setRole, currentUser, asOfDate } = useAppStore();
   const { data, recordAccess } = useBusinessStore();
+  const presentationSlide = usePresentationStore((s) => s.slide);
+  const presentationVisited = usePresentationStore((s) => s.hasVisited);
 
   const nav = resolveNav(location.pathname, location.search, {
     project: (id) => data.projects.find((p) => p.id === id)?.name,
@@ -177,7 +183,18 @@ export const MainLayout: React.FC = () => {
             <kbd className="hidden sm:inline-block px-1.5 py-0.5 bg-white border border-slate-200 rounded font-mono text-[10px] text-slate-500">⌘K</kbd>
           </button>
 
-          <Space size={16} align="center" className="flex-shrink-0">
+          <Space size={12} align="center" className="flex-shrink-0">
+            <DemoDataButton />
+            <Button
+              icon={<PlayCircleOutlined />}
+              aria-label={presentationVisited ? `返回讲解 · 第${presentationSlide}页` : '业务流程讲解'}
+              onClick={() => {
+                usePresentationStore.getState().enter(location.pathname + location.search);
+                navigate(PRESENTATION_PATH);
+              }}
+            >
+              {presentationVisited ? `返回讲解 · 第${presentationSlide}页` : '业务流程讲解'}
+            </Button>
             <span className="hidden xl:inline-block text-xs text-slate-500 select-none">截至 {asOfDate}</span>
             <Space size={6} align="center">
               <Text type="secondary" style={{ fontSize: 12, whiteSpace: 'nowrap' }}>角色:</Text>

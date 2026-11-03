@@ -39,6 +39,7 @@ const ProjectProgressPage = lazyPage(() => import('@/pages/execution/ProjectProg
 const PlanRequestPage = lazyPage(() => import('@/pages/approvals/PlanRequestPage'), 'PlanRequestPage');
 const ProjectOverviewPage = lazyPage(() => import('@/pages/execution/ProjectOverviewPage'), 'ProjectOverviewPage');
 const ProjectLedgerPage = lazyPage(() => import('@/pages/projects/ProjectLedgerPage'), 'ProjectLedgerPage');
+const PresentationPage = lazyPage(() => import('@/pages/presentation/PresentationPage'), 'PresentationPage');
 
 const PageLoading = () => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 300 }}><Spin /></div>;
 
@@ -48,6 +49,7 @@ export const AppRouter: React.FC = () => {
   return (
     <Suspense fallback={<PageLoading />}>
     <Routes>
+      <Route path="/presentation" element={<PresentationPage />} />
       <Route path="/" element={<MainLayout />}>
         {accessConfigurationRoutes.map(route=><Route key={route.path} path={route.path} element={route.element}/>)}
         {financeConfigurationRoutes.map(route=><Route key={route.path} path={route.path} element={route.element}/>)}

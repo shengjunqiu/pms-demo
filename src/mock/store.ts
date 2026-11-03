@@ -20,9 +20,12 @@ import { actionTarget, assertActionAccess } from './access';
 import { selectAccessPolicy } from './configuration-access';
 import type { AuditEvent } from '@/models/configuration-access';
 import { AS_OF_DATE } from '@/mock';
+import { LEGACY_CHECKPOINT, loadWorkspace, prepareWorkspace, saveDemo, useDemoPersistence } from '@/features/demo/persistence';
+import type { WorkspacePackage } from '@/features/demo/persistence';
 
 type StoreType = {
   data: BusinessState;
+  loadDemo: (source: 'saved' | 'built-in' | WorkspacePackage | { backup: string }) => Promise<void>;
   dispatch: (action: BusinessAction, actor: Actor) => void;
   recordAccess: (route: string, allowed: boolean, actor: Actor) => void;
 };
@@ -31,8 +34,13 @@ let _store: UseBoundStore<StoreApi<StoreType>> | undefined;
 
 // Keep a development demo in its own tab across Vite module updates. This is
 // a checkpoint of the single business store, never a second source of facts.
-const DEV_CHECKPOINT_KEY = 'pms-demo:dev-business:v1';
+const DEV_CHECKPOINT_KEY = LEGACY_CHECKPOINT;
+let preparedData: BusinessState | undefined;
+export async function prepareBusinessStore() {
+  preparedData = await prepareWorkspace();
+}
 function initialData(): BusinessState {
+  if (preparedData) return preparedData;
   if (import.meta.env.DEV && typeof sessionStorage !== 'undefined') {
     const raw = sessionStorage.getItem(DEV_CHECKPOINT_KEY);
     if (raw) {
@@ -50,11 +58,19 @@ function init(): UseBoundStore<StoreApi<StoreType>> {
   if (_store) return _store;
   _store = create<StoreType>((set, get) => ({
     data: initialData(),
+    loadDemo: async (source) => {
+      const current = get().data;
+      const restored = await loadWorkspace(current, source);
+      // A restore changes the workspace, never the logged-in actor or rules.
+      set({ data: restored });
+    },
     dispatch: (action, actor) => {
       const previous = get().data;
       try {
         assertActionAccess(previous, action, actor);
-        set({ data: transition(previous, action, actor) });
+        const next = transition(previous, action, actor);
+        set({ data: next });
+        void saveDemo(next);
       } catch (error) {
         const event: AuditEvent = {
           id: `AUD-${previous.audit.length + 1}`,
@@ -69,7 +85,9 @@ function init(): UseBoundStore<StoreApi<StoreType>> {
           changes: [],
           ruleVersion: selectAccessPolicy(previous, actor.role)?.id,
         };
-        set({ data: { ...previous, audit: [...previous.audit, event] } });
+        const next = { ...previous, audit: [...previous.audit, event] };
+        set({ data: next });
+        void saveDemo(next);
         throw error;
       }
     },
@@ -98,6 +116,7 @@ function init(): UseBoundStore<StoreApi<StoreType>> {
   }));
   if (import.meta.env.DEV && typeof sessionStorage !== 'undefined') {
     _store.subscribe(({ data }) => {
+      if (useDemoPersistence.getState().active) return;
       try {
         sessionStorage.setItem(DEV_CHECKPOINT_KEY, JSON.stringify(data));
       } catch (error) {

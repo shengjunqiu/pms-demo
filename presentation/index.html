@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>从商机到交付与维护｜项目四算管理平台</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="flow.css">
+</head>
+<body>
+  <header class="toolbar">
+    <a class="brand" href="#1" aria-label="返回封面"><span class="brand-mark">P</span><span>项目四算管理平台<small>全生命周期业务演示</small></span></a>
+    <span class="keyboard-hint">← → 翻页 <span>·</span> 点击系统截图查看原图</span>
+    <nav aria-label="演示工具">
+      <button id="open-live" type="button">进入联动演示</button>
+      <button id="demo-data" type="button" hidden>演示数据</button>
+      <button id="back-to-prototype" type="button" hidden>回到原型</button>
+      <button id="toc-button" type="button"><span aria-hidden="true">▦</span> 目录</button>
+      <button id="notes-button" type="button" aria-pressed="false">讲解提示</button>
+      <button id="fullscreen-button" type="button">全屏 <kbd>F</kbd></button>
+      <button id="print-button" type="button" aria-label="打印或另存为PDF">打印</button>
+    </nav>
+  </header>
+  <main id="stage" aria-label="幻灯片演示区域">
+    <div id="deck-shell"><div id="deck"></div></div>
+  </main>
+  <footer class="player">
+    <span class="player-topic" id="player-topic">产品介绍</span>
+    <div class="player-navigation">
+      <button id="previous" type="button" aria-label="上一页">←</button>
+      <span id="counter" aria-live="polite">01 / 36</span>
+      <button id="next" type="button" aria-label="下一页">→</button>
+    </div>
+    <span class="player-caption">一个项目 · 一套流程 · 一条数据链</span>
+    <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
+  </footer>
+  <aside id="speaker-notes" hidden aria-label="当前页讲解提示"><div><strong>这一页怎么讲</strong><button id="close-notes" type="button" aria-label="关闭讲解提示">×</button></div><p id="notes-text"></p></aside>
+  <dialog id="toc-dialog" aria-labelledby="toc-title"><div class="dialog-heading"><div><small>CONTENTS</small><h2 id="toc-title">选择一个讲解阶段</h2></div><button class="close-button" type="button" data-close="toc-dialog" aria-label="关闭目录">×</button></div><div id="toc-grid"></div></dialog>
+  <dialog id="image-dialog" aria-labelledby="image-title"><div class="image-toolbar"><div><strong id="image-title"></strong><small id="image-description"></small></div><nav aria-label="截图查看工具"><button id="zoom-out" type="button" aria-label="缩小截图">−</button><span id="zoom-label">适应屏幕</span><button id="zoom-in" type="button" aria-label="放大截图">＋</button><button id="zoom-fit" type="button">适应屏幕</button><button id="zoom-original" type="button">原始尺寸</button><button class="close-button" type="button" data-close="image-dialog" aria-label="关闭截图">×</button></nav></div><div id="image-scroll"><img id="full-image" alt=""></div></dialog>
+  <div id="toast" role="status" hidden></div>
+  <noscript>此演示稿需要启用JavaScript才能翻页。所有原始系统截图均保存在 assets 目录。</noscript>
+  <script src="content.js"></script>
+  <script src="slides.js"></script>
+</body>
+</html>

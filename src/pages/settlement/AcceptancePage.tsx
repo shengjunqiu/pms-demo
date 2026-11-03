@@ -355,7 +355,8 @@ export function AcceptancePage({ kind }: { kind: AcceptanceType }) {
         </PageSection>
       )}
       <Tabs
-        defaultActiveKey="rounds"
+        activeKey={['conditions', ...(kind === '供应商验收' ? ['sources'] : [])].includes(params.get('view') ?? '') ? params.get('view')! : 'rounds'}
+        onChange={(key) => setParam('view', key === 'rounds' ? undefined : key)}
         items={[
           {
             key: "rounds",
